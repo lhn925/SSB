@@ -8,14 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class TestController {
 
     @GetMapping("commit-test2")
-    public String TestCommit1 () {
+    public String TestCommit () {
         System.out.println("0 = " + 0);
         return "iuiu";
-    }
-
-    @GetMapping("commit")
-    public String TestCommit2 () {
-        System.out.println("0 = " + 0);
-        return "hihi";
     }
 }
