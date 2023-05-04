@@ -10,7 +10,7 @@ public class BoardApplication {
 
     public static void main (String[] args) {
         SpringApplication.run(BoardApplication.class, args);
-        log.info("이건 main 입니다");
+        log.info("이건 main일까요?");
     }
 
 }
