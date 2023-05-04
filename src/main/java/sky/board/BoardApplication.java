@@ -13,9 +13,6 @@ public class BoardApplication {
         log.info("이건 main 입니다");
         // 여기는 feature2 테스트
         // 여기는 feature1 테스트
-
-
-
     }
 
 }
