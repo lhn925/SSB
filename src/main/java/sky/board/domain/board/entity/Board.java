@@ -1,32 +1,59 @@
 package sky.board.domain.board.entity;
 
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.format.annotation.DateTimeFormat;
+import sky.board.domain.board.dto.BoardForm;
+import sky.board.domain.user.entity.User;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
-@Data
+import static jakarta.persistence.FetchType.LAZY;
+
+@Getter
+@Setter(value = AccessLevel.PRIVATE)
+@Entity
 public class Board {
 
-    @NotBlank
+
+    @Id
+    @GeneratedValue
     private Long id;
 
-    @NotBlank
     private String title;
 
-    @NotBlank
-    private String text;
+    private String content;
 
-    @NotBlank
-    private String nickname;
+    private Long views; // 조회수
 
-    private Date date;
+    private int total_rec; // 추천 수
 
-    private Long views;
+    private String createByUsername; // 글쓴 사람 닉네임
 
-    private Long referrals;
+    @CreatedBy
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
+    private User createByUser; // 글쓴 유저의 pk값
 
+    @CreatedDate
+    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
+    private LocalDateTime createDateTime;
 
+    @LastModifiedDate
+    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
+    private LocalDateTime modifiedDateTime;
+
+    public static Board createBoard (BoardForm boardForm) {
+        Board board = new Board();
+        board.setTitle(boardForm.getTitle());
+        board.setContent(boardForm.getText());
+        return board;
+    }
 
 }

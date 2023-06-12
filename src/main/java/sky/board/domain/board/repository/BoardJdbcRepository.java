@@ -1,7 +1,9 @@
+/*
 package sky.board.domain.board.repository;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
 import sky.board.domain.board.entity.Board;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Repository
+//@Repository
 public class BoardJdbcRepository implements BoardRepository {
 
     private final DataSource dataSource;
@@ -27,7 +29,7 @@ public class BoardJdbcRepository implements BoardRepository {
     }
 
     @Override
-    public Integer save (Board board) {
+    public void save (Board board) {
         try {
             getConn();
             pstm = conn.prepareStatement("INSERT INTO board(title,text,nickname) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -120,3 +122,4 @@ public class BoardJdbcRepository implements BoardRepository {
         this.conn = DataSourceUtils.getConnection(dataSource);// connection 갖고오기
     }
 }
+*/

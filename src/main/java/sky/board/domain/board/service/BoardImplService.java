@@ -1,32 +1,28 @@
 package sky.board.domain.board.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.board.entity.Board;
-import sky.board.domain.board.form.BoardForm;
+import sky.board.domain.board.dto.BoardForm;
 import sky.board.domain.board.repository.BoardRepository;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BoardImplService implements boardService {
 
     private final BoardRepository boardRepository;
 
+    @Transactional
     @Override
-    public Integer save (BoardForm boardForm) {
-        Board board = new Board();
-        board.setTitle(boardForm.getTitle());
-        board.setText(boardForm.getText());
-        board.setNickname(boardForm.getNickname());
-        Integer save = boardRepository.save(board);
-        return save;
+    public Long save (BoardForm boardForm) {
+        Board board = Board.createBoard(boardForm);
+        boardRepository.save(board);
+        return board.getId();
     }
 
     @Override
@@ -37,6 +33,7 @@ public class BoardImplService implements boardService {
 
     @Override
     public List<Board> findByList (int page, int end) {
-        return boardRepository.findByList(page, end);
+        int start = 10 * (page - 1);
+        return boardRepository.findByList(start, end);
     }
 }

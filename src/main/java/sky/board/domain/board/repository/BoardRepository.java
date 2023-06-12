@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface BoardRepository {
 
-    Integer save (Board board);
+    void save (Board board);
     Optional<Board> findById(Long findId);
-    List<Board> findByList(int page,int end);
+    List<Board> findByList(int start,int end);
 }

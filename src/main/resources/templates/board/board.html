@@ -7,26 +7,24 @@
     <title>Title</title>
 </head>
 <body>
-
-
 <nav class="py-2 bg-light border-bottom">
     <div class="container d-flex flex-wrap">
         <ul class="nav me-auto">
             <li class="nav-item"><a href="#" class="nav-link link-dark px-2 active" aria-current="page">Home</a></li>
-            <li class="nav-item"><a th:href="@{/board}" class="nav-link link-dark px-2">게시판</a></li>
+            <li class="nav-item"><a th:href="@{/templates/board}" class="nav-link link-dark px-2">게시판</a></li>
             <li class="nav-item"><a href="#" class="nav-link link-dark px-2">Pricing</a></li>
             <li class="nav-item"><a href="#" class="nav-link link-dark px-2">FAQs</a></li>
             <li class="nav-item"><a href="#" class="nav-link link-dark px-2">About</a></li>
         </ul>
         <ul class="nav">
-            <li class="nav-item"><a href="#" class="nav-link link-dark px-2">Login</a></li>
-            <li class="nav-item"><a href="#" class="nav-link link-dark px-2">Sign up</a></li>
+            <li class="nav-item"><a href="#" class="nav-link link-dark px-2" th:text="#{sky.login}"></a></li>
+            <li class="nav-item"><a href="#" class="nav-link link-dark px-2"th:text="#{sky.signup}"></a></li>
         </ul>
     </div>
 </nav>
-<header class="py-3 mb-4 border-bottom ">
+<header class="py-3 mb-4 border-bottom">
     <div class="container d-flex flex-wrap justify-content-center">
-        <a href="/" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
+        <a href="/static" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
             <svg class="bi me-2" width="40" height="32">
                 <use xlink:href="#bootstrap"/>
             </svg>
@@ -38,19 +36,30 @@
     </div>
 </header>
 
-<div class="mt-3 container">
-    <div class="border-bottom row">
-        <div class="col-md-8"><p class="p-1 fs-4" th:text="${board.title}">Show Collapsible Content ByDefault</p></div>
-
-    </div>
-    <div class="border-bottom row">
-        <div class="col-lg-3" th:text="${board.nickname}"></div>
-        <div class="col-lg-2 "th:text="${board.date}"></div>
-    </div>
-    <div id="demo" class="collapse show" th:text="${board.text}">
-
-    </div>
-</div>
+<section class="container mt-3">
+    <h2>자유 게시판</h2>
+    <p>자유로운 분위기에서 소통하세요</p>
+    <table class="table table-hover">
+        <thead>
+            <th>탭</th>
+            <th>제목</th>
+            <th>닉네임</th>
+            <th>날짜</th>
+            <th>조회수</th>
+            <th>추천</th>
+        </thead>
+        <tbody>
+            <tr th:each="list:${List}">
+                <td>탭</td>
+                <td ><a th:text="${list.title}" th:href="@{|/board/${list.id}|}"></a></td>
+                <td th:text="${list.nickname}"></td>
+                <td th:text="${list.date}"></td>
+                <td>조회수</td>
+                <td>추천</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
 
 
 </body>

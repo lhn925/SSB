@@ -1,4 +1,4 @@
-package sky.board.domain.board.form;
+package sky.board.domain.board.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
@@ -17,11 +17,6 @@ public class BoardForm {
 
     @NotBlank
     private String text;
-
-    private String nickname;
-
-    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private Date date;
 
     private Long views;
 
