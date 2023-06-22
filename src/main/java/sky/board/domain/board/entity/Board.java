@@ -9,6 +9,8 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.format.annotation.DateTimeFormat;
+import sky.board.domain.base.BaseEntity;
+import sky.board.domain.base.BaseTimeEntity;
 import sky.board.domain.board.dto.BoardForm;
 import sky.board.domain.user.entity.User;
 
@@ -19,7 +21,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
 @Entity
-public class Board {
+public class Board extends BaseTimeEntity {
 
 
     @Id
@@ -40,14 +42,6 @@ public class Board {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User createByUser; // 글쓴 유저의 pk값
-
-    @CreatedDate
-    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private LocalDateTime createDateTime;
-
-    @LastModifiedDate
-    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private LocalDateTime modifiedDateTime;
 
     public static Board createBoard (BoardForm boardForm) {
         Board board = new Board();

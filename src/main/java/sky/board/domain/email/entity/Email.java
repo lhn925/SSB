@@ -1,4 +1,4 @@
-package sky.board.globalutill.email.entity;
+package sky.board.domain.email.entity;
 
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
@@ -6,7 +6,7 @@ import static lombok.AccessLevel.PROTECTED;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.board.globalutill.email.dto.EmailPostDto;
+import sky.board.domain.email.dto.EmailPostDto;
 
 @Getter
 @Setter(value = PRIVATE)

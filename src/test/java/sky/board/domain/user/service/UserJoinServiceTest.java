@@ -69,8 +69,9 @@ class UserJoinServiceTest {
 
         userJoinDto.setEmail("222132512@daum.net");
         userJoinDto.setUserName("아이유입니다2");
+        userJoinDto.setPassword("dkdldb@2");
         userJoinDto.setNotification_enabled(false);
-        userJoinDto.setUserId("dlagksmf071");
+//        userJoinDto.setUserId("dlagksmf071");
         Long join1 = userJoinService.join(userJoinDto);
 
         UserJoinDto userJoinDto1 = new UserJoinDto();
@@ -78,6 +79,7 @@ class UserJoinServiceTest {
         userJoinDto1.setEmail("asd112@daum.net");
         userJoinDto1.setUserName("asd아이입니다2");
         userJoinDto1.setNotification_enabled(false);
+        userJoinDto1.setPassword("dkdldb@2");
         userJoinDto1.setUserId("agkasdsmf071");
         Long join2 = userJoinService.join(userJoinDto1);
 
@@ -86,6 +88,7 @@ class UserJoinServiceTest {
         userJoinDto2.setEmail("221asd2512@daum.net");
         userJoinDto2.setUserName("asd1아이유입니다2");
         userJoinDto2.setNotification_enabled(false);
+        userJoinDto2.setPassword("dkdldb@2");
         userJoinDto2.setUserId("dksasfsamf071");
         Long join3 = userJoinService.join(userJoinDto2);
 

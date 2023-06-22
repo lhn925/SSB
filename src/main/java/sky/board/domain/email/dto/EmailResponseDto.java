@@ -1,4 +1,4 @@
-package sky.board.globalutill.email.dto;
+package sky.board.domain.email.dto;
 
 import lombok.Getter;
 import lombok.Setter;

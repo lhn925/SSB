@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.format.annotation.DateTimeFormat;
+import sky.board.domain.base.BaseTimeEntity;
 import sky.board.domain.user.dto.UserJoinDto;
 
 import java.time.LocalDateTime;
@@ -22,11 +23,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@SequenceGenerator(name="userTable_id_sequence",sequenceName = "userTable_id_sequence",initialValue = 1,allocationSize = 50)
 @Table(uniqueConstraints = {
-    @UniqueConstraint(name = "UniqueTokenAndNotification", columnNames = {"token",
-        "notification_enabled"}),
+    @UniqueConstraint(name = "UniqueTokenAndNotification", columnNames = {"token", "notification_enabled"}),
     @UniqueConstraint(name = "UniqueEmailAndSalt", columnNames = {"email", "salt"}),
     @UniqueConstraint(name = "UniqueUserIdAndUserName", columnNames = {"userid", "username"})})
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
 //    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userTable_id_sequence")
@@ -42,12 +42,6 @@ public class User {
     private String email;
     private String salt;
     private Boolean notification_enabled;
-
-    @CreationTimestamp
-    private LocalDateTime createDateTime;
-
-    @UpdateTimestamp
-    private LocalDateTime lastVisitDateTime;
 
     public static User createUser(UserJoinDto userJoinDto,String salt) {
         User user = new User();

@@ -1,5 +1,5 @@
 
-package sky.board.globalutill.email.service;
+package sky.board.domain.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -12,7 +12,7 @@ import org.thymeleaf.context.Context;
 import java.util.Random;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import sky.board.domain.user.service.UserJoinService;
-import sky.board.globalutill.email.entity.Email;
+import sky.board.domain.email.entity.Email;
 
 @Slf4j
 @RequiredArgsConstructor

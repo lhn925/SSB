@@ -1,13 +1,11 @@
 package sky.board.globalutill.email;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.board.globalutill.email.dto.EmailPostDto;
-import sky.board.globalutill.email.entity.Email;
-import sky.board.globalutill.email.service.EmailService;
+import sky.board.domain.email.dto.EmailPostDto;
+import sky.board.domain.email.entity.Email;
+import sky.board.domain.email.service.EmailService;
 
 @SpringBootTest
 class MailSenderTest {

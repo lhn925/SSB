@@ -1,11 +1,18 @@
 package sky.board.domain.user.dto;
 
 
+import jakarta.validation.GroupSequence;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
+import sky.board.domain.user.utill.ValidationGroups;
+import sky.board.domain.user.utill.ValidationGroups.NotBlankGroup;
+import sky.board.domain.user.utill.ValidationGroups.PatternCheckGroup;
+import sky.board.domain.user.utill.ValidationSequence;
 
 @Data
 public class UserJoinDto {
@@ -19,21 +26,22 @@ public class UserJoinDto {
      * 1달에 1번 닉네임 변경 가능합니다.
      */
 
+
     @NotBlank
-    @Pattern(regexp = "^[a-z0-9_-]{5,20} *$", message = "userJoinForm.userId")
+    @Pattern(regexp = "^[a-z0-9_-]{5,20} *$", message = "{userJoinForm.userId}")
     private String userId;
 
 
     @NotBlank
-    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}",message="userJoinForm.password")
+    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}",message="{userJoinForm.password}")
     private String password;
 
     @NotBlank
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "userJoinForm.username")
+    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
     private String userName;
 
     @NotBlank
-    @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$",message = "userJoinForm.email")
+    @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$",message = "{userJoinForm.email}")
     private String email;
 
 //    @NotNull
