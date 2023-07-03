@@ -1,0 +1,21 @@
+.container {
+  margin-top: 100px;
+}
+
+.btn-primary {
+  background-color: #1aafec;
+  border-color: #1aafec;
+}
+
+.btn-primary:hover {
+  background-color: #439cb9;
+  border-color: #439cb9;
+}
+
+.mainLogo {
+  color: #1aafec;
+}
+
+.error-msg {
+  color: #dc3545;
+}

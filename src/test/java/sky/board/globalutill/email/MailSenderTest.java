@@ -22,8 +22,8 @@ class MailSenderTest {
         emailPostDto.setEmail("2221325@naver.com");
 
         Email email = Email.createJoinEmail("[SAVIEW] 이메일 인증을 위한 인증 코드 발송", emailPostDto);
-        String code = emailService.sendMail(email,"/email/joinSendEmail");
-        System.out.println("code = " + code);
+//        String code = emailService.sendMail(email,"/email/joinSendEmail");
+//        System.out.println("code = " + code);
     }
 
 }

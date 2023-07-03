@@ -1,13 +1,12 @@
 package sky.board.domain.user.service;
 
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import sky.board.domain.user.controller.JoinController;
-import sky.board.domain.user.dto.UserJoinDto;
+import sky.board.domain.user.dto.UserJoinAgreeDto;
+import sky.board.domain.user.dto.UserJoinPostDto;
 
 
 @SpringBootTest
@@ -21,7 +20,7 @@ class UserJoinServiceTest {
 
     @Test
     void join() throws Exception {
-        UserJoinDto userJoinDto = new UserJoinDto();
+        UserJoinPostDto userJoinDto = new UserJoinPostDto();
 /*
 
         userJoinDto.setEmail("2221312512@daum.net");
@@ -49,48 +48,40 @@ class UserJoinServiceTest {
         Long join3 = userJoinService.join(userJoinDto2);
 */
 
-
-
-        for (int i = 0; i <10 ; i++) {
-            UserJoinDto userJoinDto4 = new UserJoinDto();
-            userJoinDto4.setEmail(i+"2512@daum.net");
-            userJoinDto4.setUserName(i+"유입니다2");
-            userJoinDto4.setNotification_enabled(false);
-            userJoinDto4.setUserId(i+"dksmf071");
-            userJoinDto4.setPassword(i+"dlagksmf2");
-            userJoinService.join(userJoinDto4);
+        for (int i = 0; i < 10; i++) {
+            UserJoinPostDto userJoinDto4 = new UserJoinPostDto();
+            userJoinDto4.setEmail(i + "2512@daum.net");
+            userJoinDto4.setUserName(i + "유입니다2");
+            userJoinDto4.setUserId(i + "dksmf071");
+            userJoinDto4.setPassword(i + "dlagksmf2");
+            userJoinService.join(userJoinDto4, UserJoinAgreeDto.createUserJoinAgree());
         }
-        userJoinService.checkEmail("02512@daum.net");
     }
 
     @Test
-    void join2() throws Exception{
-        UserJoinDto userJoinDto = new UserJoinDto();
+    void join2() throws Exception {
+        UserJoinPostDto userJoinDto = new UserJoinPostDto();
 
         userJoinDto.setEmail("222132512@daum.net");
         userJoinDto.setUserName("아이유입니다2");
         userJoinDto.setPassword("dkdldb@2");
-        userJoinDto.setNotification_enabled(false);
-//        userJoinDto.setUserId("dlagksmf071");
-        Long join1 = userJoinService.join(userJoinDto);
+        Long join1 = userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
 
-        UserJoinDto userJoinDto1 = new UserJoinDto();
+        UserJoinPostDto userJoinDto1 = new UserJoinPostDto();
 
         userJoinDto1.setEmail("asd112@daum.net");
         userJoinDto1.setUserName("asd아이입니다2");
-        userJoinDto1.setNotification_enabled(false);
         userJoinDto1.setPassword("dkdldb@2");
         userJoinDto1.setUserId("agkasdsmf071");
-        Long join2 = userJoinService.join(userJoinDto1);
+        Long join2 = userJoinService.join(userJoinDto1, UserJoinAgreeDto.createUserJoinAgree());
 
-        UserJoinDto userJoinDto2 = new UserJoinDto();
+        UserJoinPostDto userJoinDto2 = new UserJoinPostDto();
 
         userJoinDto2.setEmail("221asd2512@daum.net");
         userJoinDto2.setUserName("asd1아이유입니다2");
-        userJoinDto2.setNotification_enabled(false);
         userJoinDto2.setPassword("dkdldb@2");
         userJoinDto2.setUserId("dksasfsamf071");
-        Long join3 = userJoinService.join(userJoinDto2);
+        Long join3 = userJoinService.join(userJoinDto2, UserJoinAgreeDto.createUserJoinAgree());
 
         System.out.println("join id = " + join1);
         System.out.println("join id = " + join2);
@@ -101,8 +92,6 @@ class UserJoinServiceTest {
     void checkId() {
         userJoinService.checkEmail("02512@daum.net");
     }
-
-
 
 
 }

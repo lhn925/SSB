@@ -6,13 +6,14 @@ import java.security.SecureRandom;
 
 public class PwEncryptor {
 
-    private final int SALT_SIZE = 20;
+    private final int SALT_SIZE = 15;
 
     // 비밀번호 해싱
-    public String Hashing(byte[] password, String Salt) {
-        MessageDigest md = null;  // SHA-256 해시함수를 사용
+    public String hashing(byte[] password, String Salt) {
+        MessageDigest md = null;  // SHA3-256 해시함수를 사용
+
         try {
-            md = MessageDigest.getInstance("SHA-256");
+            md = MessageDigest.getInstance("SHA3-256");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

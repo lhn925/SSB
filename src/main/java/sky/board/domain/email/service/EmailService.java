@@ -3,6 +3,7 @@ package sky.board.domain.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,7 +25,7 @@ public class EmailService {
 
     private final UserJoinService userService;
 
-    public String sendMail(Email email,String type) {
+    public Optional<String> sendMail(Email email,String type) {
         String authNum = createCode();
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -38,7 +39,7 @@ public class EmailService {
             javaMailSender.send(mimeMessage);
 
             log.info("Success");
-            return authNum;
+            return Optional.ofNullable(authNum);
         } catch (MessagingException e) {
             log.info("fail");
             throw new RuntimeException(e);
