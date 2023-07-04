@@ -40,7 +40,7 @@ public class JoinController {
      * @return
      */
     @GetMapping
-    public String joinForm(@Validated @ModelAttribute("userJoinAgreeDto") UserJoinAgreeDto userJoinAgreeDto,
+    public String joinForm(@Validated @ModelAttribute UserJoinAgreeDto userJoinAgreeDto,
         BindingResult bindingResult, Model model, HttpServletResponse response, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return "redirect:/join/agree";

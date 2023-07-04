@@ -23,7 +23,6 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
 
-    private final UserJoinService userService;
 
     public Optional<String> sendMail(Email email,String type) {
         String authNum = createCode();

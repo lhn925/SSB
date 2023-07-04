@@ -26,6 +26,7 @@ import sky.board.domain.email.dto.EmailPostDto;
 import sky.board.domain.email.dto.CodeCheckRequestDto;
 import sky.board.domain.email.entity.Email;
 import sky.board.domain.email.service.EmailService;
+import sky.board.domain.user.service.UserJoinService;
 import sky.board.global.dto.ErrorGlobalResultDto;
 import sky.board.global.dto.ErrorResult;
 import sky.board.global.dto.ErrorResultDto;
@@ -40,6 +41,7 @@ public class EmailApiController {
 
 
     private final EmailService emailService;
+    private final UserJoinService userJoinService;
     private final MessageSource ms;
 
     //
@@ -62,6 +64,9 @@ public class EmailApiController {
         if (bindingResult.hasErrors()) {
             return getErrorResultDto(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
+
+        // 이메일 중복 체크
+        userJoinService.checkEmail(emailPostDto.getEmail());
 
         Email email = Email.createJoinEmail("[SKYBOARD] 회원가입시 이메일 인증을 위한 인증 코드 발송", emailPostDto);
 
