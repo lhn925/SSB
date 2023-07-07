@@ -1,7 +1,7 @@
 function Email() {
-  let _emailDto;
-  let _errorResult; // error
-  let _countdownInterval; // 유효시간 변수
+  this._emailDto = null;
+  this._errorResult = null; // error
+  this._countdownInterval = null; // 유효시간 변수
   this._init();
 }
 
@@ -15,12 +15,15 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
   const emailVal = $email.value.split(" ").join("");
 
   const $errorMsg = document.getElementById("email-NotThyme-msg");
-
+  if (emailVal == "") { // 이메일 형식 확인 및 경고메세지 띄움
+    $errorMsg.innerText = errors["NotBlank"];
+    return;
+  }
   // 이메일 정규 표현식
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   if (!emailRegex.test(emailVal)) { // 이메일 형식 확인 및 경고메세지 띄움
-    $errorMsg.innerText = error["userJoinForm.email"];
+    $errorMsg.innerText = errors["userJoinForm.email"];
     return;
   }
   $errorMsg.innerText = "";
@@ -54,11 +57,13 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
 
 Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
   const $authCode = document.getElementById("authCode");
+  const $verificationMsg = document.getElementById("verification-msg");
 
   // 공백 없앰
   const authCodeVal = $authCode.value.split(" ").join("");
 
   if (authCodeVal == "") {
+    $verificationMsg.innerText = errors["authCode.NotBlank"];
     return;
   }
 
@@ -66,6 +71,7 @@ Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
 
   post("/email/codeCheck", {authCode: authCodeVal}).then(
       (data) => {
+
       }
   ).catch((error) => {
     console.log("message", JSON.parse(error.message));
@@ -84,7 +90,7 @@ Email.prototype._startCountdown = function (verifyTime, // 유효시간 5분 알
     minutes = minutes < 10 ? "0" + minutes : minutes;
     seconds = seconds < 10 ? "0" + seconds : seconds;
 
-    $countdown.innerText = "인증 유효시간: " + minutes + ":" + seconds;
+    $countdown.innerText = ": 인증 유효시간: " + minutes + ":" + seconds;
 
     if (timer == 60) { // 유효시간 1분남을시에 text-color 빨강으로 변경
       $countdown.className += " text-danger";
@@ -101,7 +107,7 @@ Email.prototype._startCountdown = function (verifyTime, // 유효시간 5분 알
 }
 
 Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton 에 이벤트 구현
-  // 중복 클릭 방지
+                                                            // 중복 클릭 방지
   let isClicking = false;
 
   document.getElementById("sendCodeButton").onclick = function () {
@@ -120,7 +126,7 @@ Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton �
 }
 
 Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 이벤트 구현
-                                                       // 중복 클릭 방지
+  // 중복 클릭 방지
   let isClicking = false;
 
   document.getElementById("verifyCodeButton").onclick = function () {

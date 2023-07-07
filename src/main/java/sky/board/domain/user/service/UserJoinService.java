@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.entity.User;
@@ -23,7 +24,6 @@ import sky.board.domain.user.utill.PwEncryptor;
 public class UserJoinService {
 
     private final MessageSource ms;
-    private final UserJoinRepository userJoinRepository;
     private final UserAgreeRepository UserAgreeRepository;
     private final UserQueryRepository userQueryRepository;
 
@@ -70,18 +70,17 @@ public class UserJoinService {
         }
     }
 
-    public void checkId(String userId) {
+    public void checkId(String userId) throws DuplicateCheckException {
         if (userQueryRepository.existsByUserId(userId)) {
-            throw new DuplicateCheckException(
-                ms.getMessage("join.duplication", new Object[]{"아이디"}, null));
+            throw new DuplicateCheckException("아이디");
         }
     }
 
     public void checkUserName(String userName) {
         if (userQueryRepository.existsByUserName(userName)) {
-            throw new DuplicateCheckException(
-                ms.getMessage("join.duplication", new Object[]{"닉네임"}, null));
+            throw new DuplicateCheckException("닉네임");
         }
+
     }
 
     public void checkEmail(String email) {
@@ -89,8 +88,7 @@ public class UserJoinService {
 
         System.out.println("aBoolean = " + aBoolean);
         if (userQueryRepository.existsByEmail(email)) {
-            throw new DuplicateCheckException(
-                ms.getMessage("join.duplication", new Object[]{"email"}, null));
+            throw new DuplicateCheckException("email");
         }
     }
 

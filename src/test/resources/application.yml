@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: test
+
+
+
+
+
+##email.getProps().put("mail.smtp.host", "smtp.gmail.com"); // use Gmail
+##email.getProps().put("mail.smtp.port", "587"); // set port
+##email.getProps().put("mail.smtp.auth", "true");
+##email.getProps().put("mail.smtp.starttls.enable", "true"); // use TLS
+#spring.mail.host=smtp.gmail.com
+#spring.mail.port=587
+#spring.mail.username=lim642666@gmail.com
+#spring.mail.password=mtcnsojqjuoguobs

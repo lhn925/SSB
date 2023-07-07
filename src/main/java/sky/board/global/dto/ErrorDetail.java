@@ -1,6 +1,8 @@
 package sky.board.global.dto;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @Getter
 public abstract class ErrorDetail {
@@ -13,5 +15,6 @@ public abstract class ErrorDetail {
         this.code = code;
         this.message = message;
     }
+
 }
 

@@ -94,31 +94,31 @@
         <div class="form-group">
           <label for="authCode">인증번호 확인</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="authCode"
+            <input type="text" class="form-control authCode" name="authCode" id="authCode"
                    placeholder="인증번호를 입력하세요">
             <div class="input-group-append">
               <button type="button" class="btn btn-primary" id="verifyCodeButton">인증번호 확인</button>
             </div>
           </div>
+          <small id="verification-msg" class=""></small>
           <small id="verification-time" class=""></small> <br>
-          <small id="verification-msg" class=""></small><br>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block btn-dark">가입하기</button>
+        <div class="d-grid gap-2 col-6 mx-auto">
+          <button type="submit" class="btn btn-primary btn-block btn-dark mt-5">가입하기</button>
+        </div>
       </form>
     </div>
   </div>
 </div>
 
-<script th:src="@{/js/error/{locale}/error.js(locale = ${#locale})}"></script>
+<script th:src="@{/js/errors/{locale}/errors.js(locale = ${#locale})}"></script>
 <script th:src="@{/js/join/Email.js}"></script>
 <script th:src="@{/js/join/join_ready.js}"></script>
 <script th:inline="javascript">
   const $password = document.getElementById("password");
   const rePw = [[${rePw}]];
-  const locale = [[${#locale}]];
 
-  console.log("locale", locale);
   $password.value = rePw;
   let _email;
   join_ready_init();

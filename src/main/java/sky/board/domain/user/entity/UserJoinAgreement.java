@@ -47,7 +47,7 @@ public class UserJoinAgreement extends BaseTimeEntity {
     public static UserJoinAgreement createUserJoinAgreement(User user, UserJoinAgreeDto userJoinAgreeDto) {
         UserJoinAgreement userJoinAgreement = new UserJoinAgreement();
         userJoinAgreement.setUser(user);
-        userJoinAgreement.setSddAgreement(userJoinAgreeDto.isSddAgreement());
+        userJoinAgreement.setSddAgreement(userJoinAgreeDto.isSbbAgreement());
         userJoinAgreement.setInfoAgreement(userJoinAgreeDto.isInfoAgreement());
         return userJoinAgreement;
     }

@@ -12,10 +12,10 @@ import org.springframework.validation.Errors;
 @NoArgsConstructor
 public class ErrorGlobalResultDto implements ErrorResult {
 
-    private List<ErrorGlobalDetailDto> globalDetails;
+    private List<ErrorGlobalDetailDto> errorDetails;
 
     public ErrorGlobalResultDto(Errors errors, MessageSource messageSource, Locale locale) {
-        globalDetails = errors.getGlobalErrors()
+        errorDetails = errors.getGlobalErrors()
             .stream()
             .map(error -> new ErrorGlobalDetailDto(error, messageSource, locale))
             .toList();

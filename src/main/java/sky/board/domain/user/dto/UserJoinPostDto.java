@@ -22,20 +22,20 @@ public class UserJoinPostDto {
 
 
     @NotBlank
-    @Pattern(regexp = "^[a-z0-9_-]{5,20} *$", message = "userJoinForm.userId")
+    @Pattern(regexp = "^[a-z0-9_-]{5,20} *$", message = "{userJoinForm.userId}")
     private String userId;
 
 
     @NotBlank
-    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}",message="userJoinForm.password")
+    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "{userJoinForm.password}")
     private String password;
 
     @NotBlank
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "userJoinForm.userName")
+    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
     private String userName;
 
     @NotBlank
-    @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$",message = "userJoinForm.email")
+    @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
     private String email;
 
     public String changePassword(String password) {

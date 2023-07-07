@@ -7,6 +7,8 @@ server:
     include-binding-errors: never
   address: localhost
 spring:
+  profiles:
+    active: local
   mail:
     host: smtp.gmail.com
     port: 587

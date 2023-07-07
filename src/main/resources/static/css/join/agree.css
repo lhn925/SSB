@@ -1,0 +1,28 @@
+
+.agreeText {
+  width: 100%;
+  height: 10em;
+}
+
+.article-Text {
+  margin-top: 5px;
+}
+
+.agreePoint {
+  color: #1aafec;
+}
+
+.agreeOption {
+  font-style: normal;
+  display: inline-block;
+  margin-right: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -.6px;
+  vertical-align: middle;
+}
+.check_all {
+  font-size: 17px;
+  font-weight: 700;
+}

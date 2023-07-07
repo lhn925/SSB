@@ -17,7 +17,7 @@ public class UserJoinAgreeDto {
     private String agreeToken;
 
     @AssertTrue(message = "userJoinAgree.AssertTrue")
-    private boolean sddAgreement;
+    private boolean sbbAgreement;
 
     @AssertTrue(message = "userJoinAgree.AssertTrue")
     private boolean infoAgreement;
