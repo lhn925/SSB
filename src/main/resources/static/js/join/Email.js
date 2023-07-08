@@ -58,12 +58,14 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
 Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
   const $authCode = document.getElementById("authCode");
   const $verificationMsg = document.getElementById("verification-msg");
+  const $countdown = document.getElementById("verification-time");
 
   // 공백 없앰
   const authCodeVal = $authCode.value.split(" ").join("");
 
   if (authCodeVal == "") {
     $verificationMsg.innerText = errors["authCode.NotBlank"];
+
     return;
   }
 
@@ -71,10 +73,15 @@ Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
 
   post("/email/codeCheck", {authCode: authCodeVal}).then(
       (data) => {
-
+        $verificationMsg.innerText = messages["auth.success"];
+        $verificationMsg.className = "success-msg";
+        clearInterval(_email._countdownInterval);// 유효시간 중단
+        $countdown.innerText = "";
       }
   ).catch((error) => {
-    console.log("message", JSON.parse(error.message));
+    if (error.name == "Error") {
+      console.log("message", JSON.parse(error.message));
+    }
   })
 }
 

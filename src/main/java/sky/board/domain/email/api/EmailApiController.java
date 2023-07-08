@@ -124,7 +124,7 @@ public class EmailApiController {
                 new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 
-        if (!authCode.getAuthCode().equals(emailAuthCodeDto.getCode())) { // 인증 코드 체크
+        if (!(authCode.getAuthCode().equals(emailAuthCodeDto.getCode()))) { // 인증 코드 체크
             bindingResult.reject("join.code.mismatch");
             return Result.getErrorResult(
                 new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
