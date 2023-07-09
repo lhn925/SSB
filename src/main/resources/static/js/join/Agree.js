@@ -36,6 +36,7 @@ Agree.prototype._isChecked = function () {
   if (sbbChecked && infoChecked) {
     $agreeSubBtn.disabled = false;
   } else {
+    document.getElementById("chk_all").checked = false;
     $agreeSubBtn.disabled = true;
   }
 }

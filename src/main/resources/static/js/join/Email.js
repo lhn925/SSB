@@ -2,19 +2,20 @@ function Email() {
   this._emailDto = null;
   this._errorResult = null; // error
   this._countdownInterval = null; // 유효시간 변수
+  this.$email = null;
   this._init();
 }
 
 Email.prototype._init = function () { //sendCodeButton 이벤트 등록
   this._sendCodeButtonOnclickEvent();
   this._verifyCodeButtonEvent();
+  this.$email = document.getElementById("email");
 }
 Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요청
-  const $email = document.getElementById("email");
   // 공백 없앰
-  const emailVal = $email.value.split(" ").join("");
+  let emailVal = this.$email.value.split(" ").join("");
 
-  const $errorMsg = document.getElementById("email-NotThyme-msg");
+  let $errorMsg = document.getElementById("email-NotThyme-msg");
   if (emailVal == "") { // 이메일 형식 확인 및 경고메세지 띄움
     $errorMsg.innerText = errors["NotBlank"];
     return;
@@ -28,23 +29,22 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
   }
   $errorMsg.innerText = "";
 
-  post("/email/join", {email: emailVal})
+  _post("/email/join", {email: emailVal})
   .then((data) => {
         if (_email._countdownInterval != null) { // 유효 시간 중단 및 재 시작
           clearInterval(_email._countdownInterval);
         }
-
         // 오류시 border-danger 제거
-        $email.classList.remove("border-danger");
+        _email.$email.classList.remove("border-danger");
 
         // 형제 error-msg 제거
-        removeNodesByClass("email-thyme-msg");
+        _removeNodesByClass("email-thyme-msg");
 
         _email._emailDto = data;
         // 사용자가 이메일을 보낸 후, 인증 코드 유효시간 - 인증 코드 발급시간 / 1000
-        const verifyTime = (new Date(_email._emailDto.data.authTimeLimit)
+        let verifyTime = (new Date(_email._emailDto.data.authTimeLimit)
             - new Date(_email._emailDto.data.authIssueTime)) / 1000
-        const $countdown = document.getElementById("verification-time");
+        let $countdown = document.getElementById("verification-time");
         _email._startCountdown(verifyTime, $countdown);
       }
   ).catch((error) => {
@@ -56,27 +56,29 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
 }
 
 Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
-  const $authCode = document.getElementById("authCode");
-  const $verificationMsg = document.getElementById("verification-msg");
-  const $countdown = document.getElementById("verification-time");
+  let $authCode = document.getElementById("authCode");
+  let $verificationMsg = document.getElementById("verification-msg");
+  let $countdown = document.getElementById("verification-time");
 
   // 공백 없앰
-  const authCodeVal = $authCode.value.split(" ").join("");
+  let authCodeVal = $authCode.value.split(" ").join("");
 
   if (authCodeVal == "") {
     $verificationMsg.innerText = errors["authCode.NotBlank"];
-
     return;
   }
 
-  const $errorMsg = document.getElementById("email-NotThyme-msg");
 
-  post("/email/codeCheck", {authCode: authCodeVal}).then(
+  let $errorMsg = document.getElementById("email-NotThyme-msg");
+
+  _post("/email/codeCheck", {authCode: authCodeVal}).then(
       (data) => {
         $verificationMsg.innerText = messages["auth.success"];
         $verificationMsg.className = "success-msg";
         clearInterval(_email._countdownInterval);// 유효시간 중단
         $countdown.innerText = "";
+        // 인증 성공시 disabled 속성추가
+        _addAttributeByClass("disabled",true,"authCode");
       }
   ).catch((error) => {
     if (error.name == "Error") {

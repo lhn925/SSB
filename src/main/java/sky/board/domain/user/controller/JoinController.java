@@ -48,6 +48,10 @@ public class JoinController {
         }
         HttpSession session = request.getSession();
 
+        if (session.getAttribute("emailAuthCodeDto") != null) {// 인증번호 삭제 (뒤로가기 버그 방지)
+            session.removeAttribute("emailAuthCodeDto");
+        }
+
         Optional<String> agreeToken = readCookie(request.getCookies(), "agreeToken");
 
         // agreeToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
@@ -103,6 +107,7 @@ public class JoinController {
         }
         return "redirect:/";
     }
+
     /**
      * 이용약관 동의 페이지 이동
      * 유효토큰 생성 api

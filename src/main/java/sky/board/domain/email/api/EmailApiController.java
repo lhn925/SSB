@@ -109,9 +109,6 @@ public class EmailApiController {
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute(
             "emailAuthCodeDto");
 
-        log.info("email 인증 코드{}", authCode.getAuthCode());
-        log.info("과연? {}", hasText(emailAuthCodeDto.getCode()));
-        log.info("과연? 코드는? {}", emailAuthCodeDto.getCode());
         if (emailAuthCodeDto == null || !hasText(emailAuthCodeDto.getCode())) { // 인증코드가 발급되지 않았을 경우
             bindingResult.reject("join.code.error");
             return Result.getErrorResult(

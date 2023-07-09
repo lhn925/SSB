@@ -71,10 +71,10 @@
         <div class="form-group">
           <label th:for="notification_enabled">이메일</label>
           <div class="input-group">
-            <input class="form-control" th:field="*{email}" th:errorclass="border-danger"
+            <input class="form-control authCode" th:field="*{email}" th:errorclass="border-danger"
                    placeholder="이메일을 입력하세요">
             <div class="input-group-append">
-              <button type="button" class="btn btn-primary" id="sendCodeButton">인증번호 전송</button>
+              <button type="button" class="btn btn-primary authCode" id="sendCodeButton">인증번호 전송</button>
             </div>
           </div>
 
@@ -97,7 +97,7 @@
             <input type="text" class="form-control authCode" name="authCode" id="authCode"
                    placeholder="인증번호를 입력하세요">
             <div class="input-group-append">
-              <button type="button" class="btn btn-primary" id="verifyCodeButton">인증번호 확인</button>
+              <button type="button" class="btn btn-primary authCode" id="verifyCodeButton">인증번호 확인</button>
             </div>
           </div>
           <small id="verification-msg" class=""></small>
@@ -116,13 +116,17 @@
 <script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
 <script th:src="@{/js/join/Email.js}"></script>
 <script th:src="@{/js/join/join_ready.js}"></script>
+<script th:src="@{/js/common/function.js}"></script>
 <script th:inline="javascript">
   const $password = document.getElementById("password");
   const rePw = [[${rePw}]];
 
   $password.value = rePw;
   let _email;
-  join_ready_init();
+
+  // 뒤로가기로 진입시 agree 페이지로 이동
+  _onpageshow("/join/agree");
+  _join_ready_init();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
