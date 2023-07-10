@@ -5,7 +5,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.beans.PropertyEditor;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +16,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import sky.board.domain.email.dto.EmailAuthCodeDto;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.ex.DuplicateCheckException;
@@ -71,16 +75,30 @@ public class JoinController {
     /**
      * 회원가입 api
      *
-     * @param userJoinDto
+     * @param userJoinPostDto
      * @param bindingResult
      * @return
      */
     @PostMapping
-    public String join(@Validated @ModelAttribute UserJoinPostDto userJoinDto,
+    public String join(@Validated @ModelAttribute UserJoinPostDto userJoinPostDto,
         BindingResult bindingResult, Model model, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            if (StringUtils.hasText(userJoinDto.getPassword())) { // 비밀번호 재전송
-                model.addAttribute("rePw", userJoinDto.getPassword());
+            if (StringUtils.hasText(userJoinPostDto.getPassword())){ // 비밀번호 재전송
+                model.addAttribute("rePw", userJoinPostDto.getPassword());
+                bindingResult.addError(
+                    new FieldError("userJoinPostDto", "password", userJoinPostDto.getPassword(), false,
+                        new String[]{"userJoinForm.rePw"}, null,
+                        null));
+                PropertyEditor password = bindingResult.findEditor("password", String.class);
+                password.setValue(userJoinPostDto.getPassword());
+            }
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            for (FieldError fieldError : fieldErrors) {
+                System.out.println("==============================");
+                System.out.println("fieldError.getField() = " + fieldError.getField());
+                System.out.println("fieldError.getRejectedValue() = " + fieldError.getRejectedValue());
+                System.out.println("fieldError.getCode() = " + fieldError.getCode());
+                System.out.println("==============================");
             }
             return "user/join/joinForm";
         }
@@ -99,9 +117,18 @@ public class JoinController {
             return "redirect:/join/agree";
         }
 
+        EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
+
+        if (emailAuthCodeDto == null || !emailAuthCodeDto.getIsSuccess()) {
+//            bindingResult.addError(new FieldError());
+            return "user/join/joinForm";
+        }
+
         try {
-            userJoinService.join(userJoinDto, userJoinAgreeDto);
+            userJoinService.join(userJoinPostDto, userJoinAgreeDto);
         } catch (DuplicateCheckException e) {
+
+//            bindingResult.addError(new FieldError());
             bindingResult.reject("join.duplication", new Object[]{e.getMessage()}, null);
             return "user/join/joinForm";
         }

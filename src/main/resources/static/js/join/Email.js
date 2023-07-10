@@ -68,9 +68,6 @@ Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
     return;
   }
 
-
-  let $errorMsg = document.getElementById("email-NotThyme-msg");
-
   _post("/email/codeCheck", {authCode: authCodeVal}).then(
       (data) => {
         $verificationMsg.innerText = messages["auth.success"];
@@ -79,10 +76,13 @@ Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
         $countdown.innerText = "";
         // 인증 성공시 disabled 속성추가
         _addAttributeByClass("disabled",true,"authCode");
+        _email.$email.setAttribute("readOnly", "readOnly");
       }
   ).catch((error) => {
     if (error.name == "Error") {
-      console.log("message", JSON.parse(error.message));
+      error = JSON.parse(error.message);
+      $verificationMsg.className = "text-danger";
+      $verificationMsg.innerText = error.message;
     }
   })
 }
