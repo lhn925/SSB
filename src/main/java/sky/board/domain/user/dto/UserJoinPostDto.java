@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import sky.board.domain.user.annotation.JoinValid;
 
 @Getter
 @Setter
@@ -20,23 +21,19 @@ public class UserJoinPostDto {
      * 1달에 1번 닉네임 변경 가능합니다.
      */
 
-
-    @NotBlank
-    @Pattern(regexp = "^[a-z0-9_-]{5,20} *$", message = "{userJoinForm.userId}")
+    @JoinValid(regexp = "^[a-z0-9_-]{5,20} *$", message = "{userJoinForm.userId}")
     private String userId;
 
-
-    @NotBlank
-    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "{userJoinForm.password}")
+    @JoinValid(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "{userJoinForm.password}")
     private String password;
 
-    @NotBlank
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
+    @JoinValid(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
     private String userName;
 
-    @NotBlank
-    @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
+    @JoinValid(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
     private String email;
+
+    private String authCode;
 
     public String changePassword(String password) {
         return this.password = password;

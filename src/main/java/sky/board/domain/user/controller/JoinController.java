@@ -27,6 +27,7 @@ import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.ex.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
+import sky.board.global.dto.FieldErrorCustom;
 
 
 @Slf4j
@@ -82,35 +83,21 @@ public class JoinController {
     @PostMapping
     public String join(@Validated @ModelAttribute UserJoinPostDto userJoinPostDto,
         BindingResult bindingResult, Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        if (StringUtils.hasText(userJoinPostDto.getPassword())) { // 비밀번호 재전송
+            model.addAttribute("rePw", userJoinPostDto.getPassword());
+        }
+        // 이메일 인증 여부 확인
+
         if (bindingResult.hasErrors()) {
-            if (StringUtils.hasText(userJoinPostDto.getPassword())){ // 비밀번호 재전송
-                model.addAttribute("rePw", userJoinPostDto.getPassword());
-                bindingResult.addError(
-                    new FieldError("userJoinPostDto", "password", userJoinPostDto.getPassword(), false,
-                        new String[]{"userJoinForm.rePw"}, null,
-                        null));
-                PropertyEditor password = bindingResult.findEditor("password", String.class);
-                password.setValue(userJoinPostDto.getPassword());
-            }
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            for (FieldError fieldError : fieldErrors) {
-                System.out.println("==============================");
-                System.out.println("fieldError.getField() = " + fieldError.getField());
-                System.out.println("fieldError.getRejectedValue() = " + fieldError.getRejectedValue());
-                System.out.println("fieldError.getCode() = " + fieldError.getCode());
-                System.out.println("==============================");
-            }
             return "user/join/joinForm";
         }
-
         //cookie 기간 확인
         Cookie[] cookies = request.getCookies();
 
-        HttpSession session = request.getSession();
-
         Optional<String> agreeToken = readCookie(cookies, "agreeToken");
 
-        // 동의 여부 token이 없을 경우 다시 동의 폼으로
+        // 동의 여부 token 이 없을 경우 다시 동의 폼으로
         // 세션에 저장해둔 동의 여부 갖고오기
         UserJoinAgreeDto userJoinAgreeDto = (UserJoinAgreeDto) session.getAttribute(agreeToken.orElse(null));
         if (userJoinAgreeDto == null) {
@@ -118,20 +105,30 @@ public class JoinController {
         }
 
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
-
         if (emailAuthCodeDto == null || !emailAuthCodeDto.getIsSuccess()) {
-//            bindingResult.addError(new FieldError());
+            session.removeAttribute("emailAuthCodeDto");
+            bindingResult.addError(
+                new FieldErrorCustom("userJoinPostDto",
+                    "email", userJoinPostDto.getEmail(),
+                    "userJoinForm.email2",
+                    null));
             return "user/join/joinForm";
         }
-
+        // 중복 확인
         try {
             userJoinService.join(userJoinPostDto, userJoinAgreeDto);
-        } catch (DuplicateCheckException e) {
-
-//            bindingResult.addError(new FieldError());
-            bindingResult.reject("join.duplication", new Object[]{e.getMessage()}, null);
+        } catch (DuplicateCheckException e) { // 중복 시
+            bindingResult.addError(
+                new FieldErrorCustom(
+                    "userJoinPostDto",
+                    e.getFieldName(),
+                    e.getRejectValue(),
+                    "join.duplication",
+                    new String[]{e.getMessage()}));
             return "user/join/joinForm";
         }
+
+        // 회원가입 성공
         return "redirect:/";
     }
 

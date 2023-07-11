@@ -31,40 +31,40 @@
           <div class="form-text text-danger">
             <th:block th:if="${#fields.hasErrors('userId')}"
                       th:each="err : ${#fields.detailedErrors('userId')}">
-              <small th:if="${errStat.size > 1 && err.getCode() == 'NotBlank'}"
-                     th:text="${err.getMessage()}"></small>
-              <small th:if="${errStat.size == 1 && err.getCode() == 'Pattern'}"
-                     th:text="${err.getMessage()}"></small>
+              <small th:text="${err.getMessage()}"></small>
             </th:block>
           </div>
         </div>
         <div class="form-group">
           <label th:for="password">비밀번호</label>
-          <input type="password"  th:field="*{password}" class="form-control"
+          <input type="password" th:field="*{password}" class="form-control"
                  th:errorclass="border-danger"
                  placeholder="비밀번호를 입력하세요">
           <div class="form-text text-danger">
+<!--            <th:block th:if="${#fields.hasErrors('password')}"-->
+<!--                      th:each="err : ${#fields.detailedErrors('password')}">-->
+<!--              <small th:if="${errStat.size > 1 && err.getCode() == 'NotBlank'}"-->
+<!--                     th:text="${err.getMessage()}"></small>-->
+<!--              <small th:if="${errStat.size == 1 && err.getCode() == 'Pattern'}"-->
+<!--                     th:text="${err.getMessage()}"></small>-->
+<!--            </th:block>-->
             <th:block th:if="${#fields.hasErrors('password')}"
                       th:each="err : ${#fields.detailedErrors('password')}">
-              <small th:if="${errStat.size > 1 && err.getCode() == 'NotBlank'}"
-                     th:text="${err.getMessage()}"></small>
-              <small th:if="${errStat.size == 1 && err.getCode() == 'Pattern'}"
-                     th:text="${err.getMessage()}"></small>
+              <small th:text="${err.getMessage()}"></small>
             </th:block>
           </div>
         </div>
+
 
         <div class="form-group">
           <label th:for="userName">닉네임</label>
           <input class="form-control" th:field="*{userName}"
                  placeholder="닉네임을 입력하세요" th:errorclass="border-danger">
           <div class="form-text text-danger">
+
             <th:block th:if="${#fields.hasErrors('userName')}"
                       th:each="err : ${#fields.detailedErrors('userName')}">
-              <small th:if="${errStat.size > 1 && err.getCode() == 'NotBlank'}"
-                     th:text="${err.getMessage()}"></small>
-              <small th:if="${errStat.size == 1 && err.getCode() == 'Pattern'}"
-                     th:text="${err.getMessage()}"></small>
+              <small th:text="${err.getMessage()}"></small>
             </th:block>
           </div>
         </div>
@@ -79,23 +79,17 @@
           </div>
 
           <div class="form-text text-danger">
-
             <th:block th:if="${#fields.hasErrors('email')}"
                       th:each="err : ${#fields.detailedErrors('email')}">
-              <small class="email-thyme-msg"
-                     th:if="${errStat.size > 1 && err.getCode() == 'NotBlank'}"
-                     th:text="${err.getMessage()}"></small>
-              <small class="email-thyme-msg"
-                     th:if="${errStat.size == 1 && err.getCode() == 'Pattern'}"
-                     th:text="${err.getMessage()}"></small>
+              <small th:text="${err.getMessage()}"></small>
             </th:block>
             <small id="email-NotThyme-msg"></small>
           </div>
         </div>
         <div class="form-group">
-          <label for="authCode">인증번호 확인</label>
+          <label th:for="authCode">인증번호 확인</label>
           <div class="input-group">
-            <input type="text" class="form-control authCode" name="authCode" id="authCode"
+            <input type="text" class="form-control authCode" th:field="*{authCode}"
                    placeholder="인증번호를 입력하세요">
             <div class="input-group-append">
               <button type="button" class="btn btn-primary authCode" id="verifyCodeButton">인증번호 확인</button>
@@ -120,12 +114,9 @@
 <script th:src="@{/js/join/join_ready.js}"></script>
 <script th:src="@{/js/common/function.js}"></script>
 <script th:inline="javascript">
-  // const $password = document.getElementById("password");
-  // const rePw = [[${rePw}]];
-  // $password.value = rePw;
-  const list = [[${#fields.detailedErrors("password")}]];
-
-
+  const $password = document.getElementById("password");
+  const rePw = [[${rePw}]];
+  $password.value = rePw;
   let _email;
 
   // 뒤로가기로 진입시 agree 페이지로 이동

@@ -65,30 +65,26 @@ public class UserJoinService {
 
     public void checkSalt(String salt) {
         if (userQueryRepository.existsBySalt(salt)) {
-            throw new DuplicateCheckException(
-                ms.getMessage("join.duplication", new Object[]{"salt"}, null));
+            throw new UserJoinServerErrorException(ms.getMessage("join.error", null, null));
         }
     }
 
     public void checkId(String userId) throws DuplicateCheckException {
         if (userQueryRepository.existsByUserId(userId)) {
-            throw new DuplicateCheckException("아이디");
+            throw new DuplicateCheckException("아이디", "userId", userId);
         }
     }
 
     public void checkUserName(String userName) {
         if (userQueryRepository.existsByUserName(userName)) {
-            throw new DuplicateCheckException("닉네임");
+            throw new DuplicateCheckException("닉네임", "userName", userName);
         }
 
     }
 
     public void checkEmail(String email) {
-        Boolean aBoolean = userQueryRepository.existsByEmail(email);
-
-        System.out.println("aBoolean = " + aBoolean);
         if (userQueryRepository.existsByEmail(email)) {
-            throw new DuplicateCheckException("email");
+            throw new DuplicateCheckException("email", "email", email);
         }
     }
 
