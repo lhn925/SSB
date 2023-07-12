@@ -21,7 +21,7 @@ public class JoinValidator implements ConstraintValidator<JoinValid, String> {
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        // 빈값 message NotBlank 로 변경
+        // 빈값 message NotBlank 로 변경 함
         if (value == null || !StringUtils.hasText(value.trim())) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{NotBlank}")
