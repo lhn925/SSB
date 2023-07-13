@@ -32,7 +32,7 @@ public class InitUser {
         private EntityManager em;
 
         public void init() {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 3; i++) {
                 UserJoinPostDto userJoinDto = new UserJoinPostDto();
                 userJoinDto.setEmail(i + "2512@daum.net");
                 userJoinDto.setUserName(i + "유입니다2");

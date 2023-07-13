@@ -1,0 +1,107 @@
+.form-join:before {
+  content: "";
+  background-size: 20px 20px;
+  background-position: 0px 6px;
+  background-repeat: no-repeat;
+  /*font-family: "Font Awesome"; !* 폰트 아이콘 라이브러리를 사용하는 경우 해당 폰트 패밀리로 변경하세요 *!*/
+  position: absolute;
+  left: 12px; /* 아이콘의 왼쪽 여백을 조정하세요 */
+  top: 38%; /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  transform: translateY(-50%); /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+}
+
+.form-pw:not(.error):before {
+  background-image: url("../image/free-icon-padlock-4503885.png");
+}
+
+.form-pw:before {
+  background-image: url("../image/free-icon-padlock-4503969.png");
+}
+
+.form-name:not(.error):before, .form-id:not(.error):before {
+  background-image: url("../image/profile2.png");
+}
+
+.form-name:before, .form-id:before {
+  background-image: url("../image/profile.png");
+}
+
+.form-email:not(.error):before {
+  background-image: url("../image/mail.png");
+}
+
+.form-email:before {
+  background-image: url("../image/error-mail.png");
+}
+
+
+.form-group {
+  padding-bottom: 5px;
+}
+
+.display-none {
+  display: none;
+}
+
+/*
+
+.form_item {
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 50px;
+  padding: 0 10px 0 45px;
+}
+.form_item::before {
+  position: absolute;
+  top: 10px;
+  left: 9px;
+  content: '';
+}
+
+.form_item.lock.error::before {
+  background-position: -96px -264px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+}
+form_item:not(.error).lock::before {
+  background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_dark_d5da14a9.png);
+  background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_4c092b41.png);
+  background-size: 159px 146px;
+  background-position: -32px -84px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+}
+.form_item.lock::before {
+  background-position: -96px -264px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+}*/
+
+.form-join {
+  position: relative;
+}
+
+.form-text {
+  margin-top: -10px;
+  font-size: .875em;
+}
+
+.form-join > .form-control {
+  margin-bottom: 10px;
+  padding-top: 10px;
+  padding-left: 40px; /* 아이콘과 인풋 사이의 여백을 조정하세요 */
+}
+
+.form-join.error > .form-control::placeholder {
+  color: #dc3545;
+  text-decoration: underline;
+}

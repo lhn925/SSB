@@ -49,6 +49,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
       }
   ).catch((error) => {
     _email._errorResult = JSON.parse(error.message);
+    _removeNodesByClass("email-Thyme-msg");
     let message = _email._errorResult.message;
     // 에러메시지
     $errorMsg.innerText = message;
