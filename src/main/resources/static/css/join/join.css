@@ -33,8 +33,17 @@
   background-image: url("../image/mail.png");
 }
 
-.form-email:before {
+.form-email.error:before {
   background-image: url("../image/error-mail.png");
+}
+
+
+.form-auth:not(.error):before {
+  background-image: url("../image/check-mark (2).png");
+}
+
+.form-auth:before {
+  background-image: url("../image/check-mark.png");
 }
 
 

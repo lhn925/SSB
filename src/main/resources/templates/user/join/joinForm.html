@@ -101,10 +101,11 @@
           </div>
         </div>
         <div class="form-group">
-          <label th:for="authCode">인증번호 확인</label>
-          <div class="input-group">
+          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
+          <div class="input-group form-join form-auth"
+               th:classappend="${#fields.hasErrors('authCode')} ? 'error' : 'on'">
             <input type="text" class="form-control authCode" th:field="*{authCode}"
-                   placeholder="인증번호">
+                   placeholder="인증번호확인">
             <div class="input-group-append">
               <button type="button" class="btn btn-primary authCode" id="verifyCodeButton">인증번호 확인</button>
             </div>
