@@ -80,11 +80,10 @@
           </div>
         </div>
         <div class="form-group">
+          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
           <div class="input-group form-join form-email"
                th:classappend="${#fields.hasErrors('email')} ? 'error' : 'on'"
-
           >
-            <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
             <input class="form-control" th:field="*{email}" th:errorclass="border-danger"
                    placeholder="이메일">
             <div class="input-group-append">

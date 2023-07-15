@@ -19,9 +19,11 @@ function _removeNodesByClass(className) { // 자식 노드들중 특정값을 �
   }
 }
 
-function _addAttributeByClass(attribute, value, className) { // 자식 노드들중 특정값을 가진 클래스 삭제 함수
+function _addAttributeByClass(attribute, value, className) {
   let elements = document.getElementsByClassName(className);
   for (const element of elements) {
     element.setAttribute(attribute, value);
   }
 }
+
+

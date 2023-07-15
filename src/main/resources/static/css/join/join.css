@@ -41,6 +41,9 @@
 .form-auth:not(.error):before {
   background-image: url("../image/check-mark (2).png");
 }
+.form-auth.error:before {
+  background-image: url("../image/check-mark (1).png");
+}
 
 .form-auth:before {
   background-image: url("../image/check-mark.png");
