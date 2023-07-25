@@ -78,10 +78,13 @@ Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
         // 인증 성공시 disabled 속성추가
         _addAttributeByClass("disabled",true,"authCode");
         _email.$email.setAttribute("readOnly", "readOnly");
+        _removeByClass("form-auth","on") // 성공시 이모티콘 변경
+        _removeByClass("form-auth","error") // 실패 error 제거
       }
   ).catch((error) => {
     if (error.name == "Error") {
       error = JSON.parse(error.message);
+      _addClassByClass("form-auth", "error");
       $verificationMsg.className = "text-danger";
       $verificationMsg.innerText = error.message;
     }

@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.user.ex.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
+import sky.board.global.dto.ErrorDetailDto;
 import sky.board.global.dto.ErrorGlobalResultDto;
 import sky.board.global.dto.ErrorResult;
+import sky.board.global.dto.Result;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +34,15 @@ public class JoinApiController {
      */
     @GetMapping("/duplicate/id")
     public ResponseEntity checkUserId(@RequestParam("userId") String userId) {
-        userJoinService.checkId(userId);
+        try {
+            userJoinService.checkId(userId);
+        } catch (DuplicateCheckException e) {
+
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        new Result<>();
+
         return new ResponseEntity(HttpStatus.OK);
     }
 

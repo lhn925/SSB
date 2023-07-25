@@ -45,7 +45,7 @@
   background-image: url("../image/check-mark (1).png");
 }
 
-.form-auth:before {
+.form-auth:not(.error,.on):before { /* 둘다 없을 경우 인증이 성공 했을경우*/
   background-image: url("../image/check-mark.png");
 }
 

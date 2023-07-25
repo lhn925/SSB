@@ -10,7 +10,6 @@ function _onpageshow(path) { // 뒤로가기시 page 초기화 문제
   }
 }
 
-
 function _removeNodesByClass(className) { // 자식 노드들중 특정값을 가진 클래스 삭제 함수
   let elements = document.getElementsByClassName(className);
   for (let i = elements.length - 1; i >= 0; i--) {
@@ -23,6 +22,20 @@ function _addAttributeByClass(attribute, value, className) {
   let elements = document.getElementsByClassName(className);
   for (const element of elements) {
     element.setAttribute(attribute, value);
+  }
+}
+
+function _removeByClass(className, removeClassName) {
+  let elements = document.getElementsByClassName(className);
+  for (const element of elements) {
+    element.classList.remove(removeClassName);
+  }
+}
+
+function _addClassByClass(className, addClassName) {
+  let elements = document.getElementsByClassName(className);
+  for (const element of elements) {
+    element.classList.add(addClassName);
   }
 }
 

@@ -18,8 +18,6 @@ public class ErrorResultDto implements ErrorResult {
             .stream()
             .map(error -> new ErrorDetailDto(error, messageSource, locale))
             .toList();
-
-
     }
 
 //    public static ResponseEntity<ErrorResultDto> getErrorResultDtoResponseEntity(

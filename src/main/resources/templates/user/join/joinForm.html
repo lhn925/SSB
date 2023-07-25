@@ -37,6 +37,7 @@
                       th:each="err : ${#fields.detailedErrors('userId')}">
               <small th:text="${err.getMessage()}"></small>
             </th:block>
+            <small id="id-NotThyme-msg"> </small>
           </div>
         </div>
 
@@ -136,8 +137,9 @@
 
 
 
-  
+
   let _email;
+  let _join;
 
   // 뒤로가기로 진입시 agree 페이지로 이동
   _onpageshow("/join/agree");
