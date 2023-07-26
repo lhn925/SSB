@@ -15,6 +15,5 @@ public abstract class ErrorDetail {
         this.code = code;
         this.message = message;
     }
-
 }
 

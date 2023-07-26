@@ -27,16 +27,9 @@ async function _post(path, body, headers = {}) { //post fetch
     throw Error(JSON.stringify(data.errorDetails[0]));
   }
 }
-async function _get(path, body, headers = {}) { //post fetch
+async function _get(path) { //post fetch
   let url = path;
-  const options = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: JSON.stringify(body)
-  };
+  const options = {method: "GET"};
 
   const res = await fetch(url, options);
   const data = await res.json();

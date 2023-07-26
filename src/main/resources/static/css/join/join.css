@@ -12,6 +12,54 @@
   height: 30px;
   z-index: 10;
 }
+.password-info {
+  display: flex;
+  content: "";
+  padding: 0 3%;
+  background-size: 20px 20px;
+  background-position: 0px 6px;
+  background-repeat: no-repeat;
+  /*font-family: "Font Awesome"; !* 폰트 아이콘 라이브러리를 사용하는 경우 해당 폰트 패밀리로 변경하세요 *!*/
+  position: absolute;
+  left: 80%; /* 아이콘의 왼쪽 여백을 조정하세요 */
+  top: 38%; /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  transform: translateY(-50%); /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  z-index: 10;
+}
+.btn-show {
+  display: contents;
+}
+.btn-show:before {
+  content: "";
+  background-size: 20px 20px;
+  background-position: 0 6px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+  margin-left: 10px;
+}
+.btn-show:not(.on):before {
+  background-image: url("../image/free-icon-eye-8024992.png");
+}
+
+.btn-show.on:before {
+  background-image: url("../image/free-icon-eye-8024991.png");
+}
+
+.how-secure {
+  font-size: 5px;
+  border-radius: 10px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: -.4px;
+  vertical-align: middle;
+  font-style: normal;
+  margin-right: -8px;
+  width: 38px;
+  text-align: center;
+}
+
 
 .form-pw:not(.error):before {
   background-image: url("../image/free-icon-padlock-4503885.png");
@@ -56,6 +104,18 @@
 
 .display-none {
   display: none;
+}
+.how-secure.dangerous {
+  background: rgba(236,62,59,.12);
+  color: #dc3545;
+}
+.how-secure.safe {
+  background: rgba(3,199,90,.12);
+  color: #1aafec;
+}
+.how-secure.normal {
+  background: rgba(255,168,0,.12);
+  color: #ffa41c;
 }
 
 /*

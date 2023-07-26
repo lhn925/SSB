@@ -15,6 +15,14 @@ public class FieldErrorCustom extends FieldError {
     }
 
 
+    /**
+     *
+     * @param objectName dto
+     * @param field input에 아이디또는 name
+     * @param rejectedValue 반환값
+     * @param code 문자코드
+     * @param arguments 문자코드에 삽입할 값
+     */
     // custom
     public FieldErrorCustom(String objectName, String field, Object rejectedValue, String code, String[] arguments) {
         super(objectName, field, rejectedValue, false, new String[]{code}, arguments, null);

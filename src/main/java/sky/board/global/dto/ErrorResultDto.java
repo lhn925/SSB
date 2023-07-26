@@ -18,13 +18,7 @@ public class ErrorResultDto implements ErrorResult {
             .stream()
             .map(error -> new ErrorDetailDto(error, messageSource, locale))
             .toList();
+
     }
 
-//    public static ResponseEntity<ErrorResultDto> getErrorResultDtoResponseEntity(
-//        BindingResult bindingResult, MessageSource ms, HttpServletRequest request) {
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResultDto.builder()
-//            .errors(bindingResult)
-//            .messageSource(ms)
-//            .locale(request.getLocale()).build());
-//    }
 }

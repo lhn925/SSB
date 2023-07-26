@@ -20,11 +20,8 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
     $errorMsg.innerText = errors["NotBlank"];
     return;
   }
-  // 이메일 정규 표현식
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  if (!emailRegex.test(emailVal)) { // 이메일 형식 확인 및 경고메세지 띄움
-    $errorMsg.innerText = errors["userJoinForm.email"];
+  if (!_regex("email",emailVal)) { // 이메일 형식 확인 및 경고메세지 띄움
+    $errorMsg.innerText = messages["userJoinForm.email"];
     return;
   }
   $errorMsg.innerText = "";
@@ -65,7 +62,7 @@ Email.prototype._reqEmailAuthFetch = function () { // 인증번호 체크 함수
   let authCodeVal = $authCode.value.split(" ").join("");
 
   if (authCodeVal == "") {
-    $verificationMsg.innerText = errors["authCode.NotBlank"];
+    $verificationMsg.innerText = messages["authCode.NotBlank"];
     return;
   }
 

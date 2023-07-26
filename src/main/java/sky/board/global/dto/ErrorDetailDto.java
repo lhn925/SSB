@@ -15,5 +15,4 @@ public class ErrorDetailDto extends ErrorDetail {
         this.field = fieldError.getField();
     }
 
-
 }

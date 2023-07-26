@@ -43,24 +43,29 @@
 
         <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean Prabowo -
           Flaticon</a>
+        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘  제작자: Bharat Icons - Flaticon</a>
         <div class="form-group">
           <div class="input-group form-join form-pw"
                th:classappend="${#fields.hasErrors('password')} ? 'error' : 'on'">
             <input type="password" th:field="*{password}" class="form-control"
                    th:errorclass="border-danger"
                    placeholder="비밀번호">
+
+            <div class="password-info">
+              <em class="how-secure" id="secureLevel"></em>
+              <button type="button" id="btn-show" class="btn-show hide">
+                <span class="blind"></span>
+              </button>
+            </div>
           </div>
-          <!-- <div class="password_info">
-             <em class="how_secure" id="secureLevel"></em>
-             <button type="button" class="btn_show hide">
-               <span class="blind">비밀번호 보기</span>
-             </button>
-           </div>-->
+
+
           <div class="form-text text-danger">
             <th:block th:if="${#fields.hasErrors('password')}"
                       th:each="err : ${#fields.detailedErrors('password')}">
               <small th:text="${err.getMessage()}"></small>
             </th:block>
+            <small id="password-NotThyme-msg"> </small>
           </div>
         </div>
 
@@ -73,11 +78,11 @@
                    placeholder="닉네임" th:errorclass="border-danger">
           </div>
           <div class="form-text text-danger">
-
             <th:block th:if="${#fields.hasErrors('userName')}"
                       th:each="err : ${#fields.detailedErrors('userName')}">
               <small th:text="${err.getMessage()}"></small>
             </th:block>
+            <small id="userName-NotThyme-msg"> </small>
           </div>
         </div>
         <div class="form-group">
