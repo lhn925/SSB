@@ -26,7 +26,8 @@
       </h1>
       <form method="post" th:object="${userJoinPostDto}">
         <div class="form-group">
-          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘  제작자: inkubators - Flaticon</a>
+          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
+            Flaticon</a>
           <div th:for="userId" class="input-group form-join form-id"
                th:classappend="${#fields.hasErrors('userId')} ? 'error' : 'on'">
             <input type="text" class="form-control" th:field="*{userId}"
@@ -43,7 +44,8 @@
 
         <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean Prabowo -
           Flaticon</a>
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘  제작자: Bharat Icons - Flaticon</a>
+        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat Icons -
+          Flaticon</a>
         <div class="form-group">
           <div class="input-group form-join form-pw"
                th:classappend="${#fields.hasErrors('password')} ? 'error' : 'on'">
@@ -86,7 +88,8 @@
           </div>
         </div>
         <div class="form-group">
-          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
+          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from
+            <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
           <div class="input-group form-join form-email"
                th:classappend="${#fields.hasErrors('email')} ? 'error' : 'on'"
           >
@@ -106,7 +109,8 @@
           </div>
         </div>
         <div class="form-group">
-          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
+          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from
+            <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
           <div class="input-group form-join form-auth"
                th:classappend="${#fields.hasErrors('authCode')} ? 'error' : 'on'">
             <input type="text" class="form-control authCode" th:field="*{authCode}"
@@ -120,7 +124,7 @@
         </div>
 
         <div class="d-grid gap-2 col-6 mx-auto">
-          <button type="submit" class="btn btn-primary btn-block btn-dark mt-5">가입하기</button>
+          <button type="button" id="subBtn" class="btn btn-primary btn-block btn-dark mt-5">가입하기</button>
         </div>
       </form>
     </div>
@@ -135,16 +139,17 @@
 <script th:src="@{/js/join/join_ready.js}"></script>
 <script th:src="@{/js/common/function.js}"></script>
 <script th:inline="javascript">
+  let _isChkUId = false;
+  let _isChkPw = false;
+  let _isChkUname = false;
+  let _isChkEmail = false;
+  let _isChkAuth = false;
   const $password = document.getElementById("password");
   const rePw = [[${rePw}]];
   $password.value = rePw;
-
-
-
-
-
   let _email;
   let _join;
+
 
   // 뒤로가기로 진입시 agree 페이지로 이동
   _onpageshow("/join/agree");
