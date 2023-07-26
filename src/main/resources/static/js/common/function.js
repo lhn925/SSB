@@ -34,28 +34,6 @@ function _regex(type, value) { // 정규표현식 모음
 }
 
 function _PwSecureLevel(password) {// 패스워드 안전 강도
-  let secLevel = 0;
-  let secLevelStr;
-  let regex1 = /^(.)\1{1,7}$/ // 같은 문자 반복 및 한글 8글자 이하 차단
-
-
-  /*let regex2 = /^[a-z]{8,9}$/; // 서로 다른 소문자만 8~9글자
-  let regex3 = /^[a-z]{10}$/; // 서로 다른 소문자만 10글자
-  let regex4 = /^[a-zA-Z!@#$%^&*()-_=+\\|[\]{};:'",.<>/?]{8,9}$/;
-  */
-  let regex2 = /.*[A-Z].{7,}/i;
-  // 대문자 찾기
-  let regex3 = /^(?=.*[!@#$%^&*()\-_=+\\|[\]{};:'",.<>/?]).{7,}$/;
-
-  let regex4 = /^(?=.*\d).{8,}$/;
-  // 숫자 찾기
-
-  let regex5 = /(.)\1{7,}/;
-  //연속된 문자열 찾기
-
-  let regex6 = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\\|[\]{};:'",.<>/?]).{8,16}$/;
-  //  비밀번호: 8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.
-
   // 소문자로 이루어졌는데 같은문자만 도배일경우 - 사용불가
   // 그리고 8문자이하면 사용불가 한글 사용불가
 
@@ -63,6 +41,30 @@ function _PwSecureLevel(password) {// 패스워드 안전 강도
   // 소문자인데 2개이상 다른걸로 이루어져 있는데 10글자이면 - 보통
   // 대문자+소문자,소문자+숫자,대문자로만 이어진 경우,소문자+특수기호,대문자+특수기호 9글자 이하면 보통
   // 소문자인데 2개이상 다른걸로 이루어져 있고 숫자 및 특수기호 포함,대문자 하나라도 포함하고 10글자 이상이면 - 안전
+
+  let secLevel = 0;
+  let regex1 = /^(.)\1{1,7}$/ // 같은 문자 반복 및 한글 8글자 이하 차단
+
+  let regex2 = /.*[A-Z].{7,}/i;
+  // 대문자 찾기
+
+  let regex3 = /^(?=.*[!@#$%^&*()\-_=+\\|[\]{};:'",.<>/?]).{7,}$/;
+  //특수표현식 찾기
+
+  let regex4 = /^(?=.*\d).{8,}$/;
+  // 숫자 찾기
+
+  let regex5 = /(.)\1{7,}/;
+  //연속된 문자열 찾기
+
+  // let regex6 = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\\|[\]{};:'",.<>/?]).{8,16}$/;
+  // //  비밀번호: 8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.
+
+  let regex7 = /[ㄱ-ㅎ가-힣]/;
+  // 한글확인
+
+  let regex8 = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
+  // 이모지 확인
 
   /**
    * 0점 사용불가
@@ -77,24 +79,26 @@ function _PwSecureLevel(password) {// 패스워드 안전 강도
    * 그리고 8문자이하면 사용불가 한글 사용불가
    */
 
-  if (regex1.test(password) || regex5.test(password)) { // 0점 반환
+  if (regex8.test(password) ||
+      regex7.test(password) ||
+      regex1.test(password)
+      || regex5.test(password)) { // 0점 반환
     secLevel = 0;
     return secLevel;
   }
 
   if (regex2.test(password)) { // 대문자 검색
-    console.log("2:"+regex2.test(password))
+    console.log("2:" + regex2.test(password))
     ++secLevel;
   }
   if (regex4.test(password)) { // 숫자 검색
-    console.log("4:"+regex4.test(password))
+    console.log("4:" + regex4.test(password))
     ++secLevel;
   }
   if (regex3.test(password)) { // 특수표현 검색
-    console.log("3:"+regex3.test(password))
+    console.log("3:" + regex3.test(password))
     ++secLevel;
   }
-
 
   return secLevel;
 }
