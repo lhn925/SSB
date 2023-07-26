@@ -45,13 +45,13 @@ function _PwSecureLevel(password) {// 패스워드 안전 강도
   let secLevel = 0;
   let regex1 = /^(.)\1{1,7}$/ // 같은 문자 반복 및 한글 8글자 이하 차단
 
-  let regex2 = /.*[A-Z].{7,}/i;
+  let regex2 = /[A-Z]/g;
   // 대문자 찾기
 
-  let regex3 = /^(?=.*[!@#$%^&*()\-_=+\\|[\]{};:'",.<>/?]).{7,}$/;
+  let regex3 = /[!@#$%^&*()\-_=+\\|[\]{};:'",.<>/?]/;
   //특수표현식 찾기
 
-  let regex4 = /^(?=.*\d).{8,}$/;
+  let regex4 = /\d+/g;
   // 숫자 찾기
 
   let regex5 = /(.)\1{7,}/;
@@ -79,10 +79,15 @@ function _PwSecureLevel(password) {// 패스워드 안전 강도
    * 그리고 8문자이하면 사용불가 한글 사용불가
    */
 
+  /**
+   * 이모지 확인
+   * 한글 확인
+   * 연속된 글자 확인
+   * 연속된 문자열 확인
+   */
   if (regex8.test(password) ||
       regex7.test(password) ||
-      regex1.test(password)
-      || regex5.test(password)) { // 0점 반환
+      regex1.test(password)) { // 0점 반환
     secLevel = 0;
     return secLevel;
   }
@@ -92,12 +97,17 @@ function _PwSecureLevel(password) {// 패스워드 안전 강도
     ++secLevel;
   }
   if (regex4.test(password)) { // 숫자 검색
-    console.log("4:" + regex4.test(password))
     ++secLevel;
   }
   if (regex3.test(password)) { // 특수표현 검색
-    console.log("3:" + regex3.test(password))
     ++secLevel;
+  }
+
+  if (secLevel < 1) {
+    if (regex5.test(password)) {
+      secLevel = 0;
+      return secLevel;
+    }
   }
 
   return secLevel;
