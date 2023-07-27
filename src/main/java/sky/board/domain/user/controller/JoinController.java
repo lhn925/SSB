@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
+import sky.board.domain.user.entity.PwSecLevel;
 import sky.board.domain.user.ex.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.utill.PwChecker;
 import sky.board.global.dto.FieldErrorCustom;
 
 
@@ -84,12 +86,29 @@ public class JoinController {
         if (StringUtils.hasText(userJoinPostDto.getPassword())) { // 비밀번호 재전송
             model.addAttribute("rePw", userJoinPostDto.getPassword());
         }
-        // 이메일 인증 여부 확인
+        // 비밀번호 보안 레벨 확인
+        PwSecLevel pwSecLevel = PwChecker.checkPw(userJoinPostDto.getPassword());
 
+        // 비밀번호 값이 유효하지 않은 경우
+        if (pwSecLevel.name().equals(PwSecLevel.NOT)) {
+            log.info("pwSecLever {}", pwSecLevel.name());
+            session.removeAttribute("emailAuthCodeDto");
+            bindingResult.addError(
+                new FieldErrorCustom("userJoinPostDto",
+                    "password", userJoinPostDto.getPassword(),
+                    "userJoinForm.password",
+                    null));
+            return "user/join/joinForm";
+        }
+        // 보안레벨 저장 나중에 -> 보안 위험 표시할 떄 유용
+        userJoinPostDto.setPwSecLevel(pwSecLevel);
+
+        // 이메일 인증 여부 확인
         if (bindingResult.hasErrors()) {
             return "user/join/joinForm";
         }
         //cookie 기간 확인
+
         Cookie[] cookies = request.getCookies();
 
         Optional<String> agreeToken = readCookie(cookies, "agreeToken");

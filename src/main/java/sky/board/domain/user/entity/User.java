@@ -59,6 +59,10 @@ public class User extends BaseTimeEntity {
     @Enumerated(STRING)
     private UserGrade grade;
 
+    // 비밀번호 보안 등급
+    @Enumerated(STRING)
+    private PwSecLevel pwSecLevel;
+
     private String salt;
 
     // 비활성화(회원 탈퇴) 여부 true:탈퇴,false:탈퇴 x
@@ -74,6 +78,7 @@ public class User extends BaseTimeEntity {
         user.setUserName(userJoinDto.getUserName());
         user.setSalt(salt);
         user.setGrade(UserGrade.USER);
+        user.setPwSecLevel(userJoinDto.getPwSecLevel());
         user.setIsStatus(false);
 
         return user;

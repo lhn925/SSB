@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import sky.board.domain.user.annotation.JoinValid;
+import sky.board.domain.user.entity.PwSecLevel;
 
 @Getter
 @Setter
@@ -35,6 +36,9 @@ public class UserJoinPostDto {
     private String email;
 
     private String authCode;
+
+    // 보안 레벨
+    private PwSecLevel pwSecLevel;
 
     public String changePassword(String password) {
         return this.password = password;
