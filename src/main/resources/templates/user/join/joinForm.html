@@ -24,7 +24,15 @@
           <span class="mainLogo blind" th:text="#{sky.logo}"></span>
         </a>
       </h1>
-      <form method="post" th:object="${userJoinPostDto}">
+      <form id="form" method="post" th:object="${userJoinPostDto}">
+
+
+        <input type="checkbox" hidden="true" id="_isChkUId"/>
+        <input type="checkbox" hidden="true" id="_isChkPw"/>
+        <input type="checkbox" hidden="true" id="_isChkUname"/>
+        <input type="checkbox" hidden="true" id="_isChkEmail"/>
+        <input type="checkbox" hidden="true" id="_isChkAuth"/>
+
         <div class="form-group">
           <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
             Flaticon</a>
@@ -139,17 +147,11 @@
 <script th:src="@{/js/join/join_ready.js}"></script>
 <script th:src="@{/js/common/function.js}"></script>
 <script th:inline="javascript">
-  let _isChkUId = false;
-  let _isChkPw = false;
-  let _isChkUname = false;
-  let _isChkEmail = false;
-  let _isChkAuth = false;
-  const $password = document.getElementById("password");
+  const $password = _getElementById("password");
   const rePw = [[${rePw}]];
   $password.value = rePw;
   let _email;
   let _join;
-
 
   // 뒤로가기로 진입시 agree 페이지로 이동
   _onpageshow("/join/agree");

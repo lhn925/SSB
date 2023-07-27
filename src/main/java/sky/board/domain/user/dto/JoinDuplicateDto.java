@@ -12,4 +12,5 @@ import lombok.Setter;
 public class JoinDuplicateDto {
     private String userId;
     private String userName;
+    private String email;
 }

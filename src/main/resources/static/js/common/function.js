@@ -121,6 +121,8 @@ function _removeNodesByClass(className) { // 자식 노드들중 특정값을 �
   }
 }
 
+
+// 해당 클래스가 있는 태그에 속성 추가
 function _addAttributeByClass(attribute, value, className) {
   let elements = document.getElementsByClassName(className);
   for (const element of elements) {
@@ -128,6 +130,7 @@ function _addAttributeByClass(attribute, value, className) {
   }
 }
 
+// 해당 클래스가 있는 태그에 클래스 삭제
 function _removeByClass(className, removeClassName) {
   let elements = document.getElementsByClassName(className);
   for (const element of elements) {
@@ -135,6 +138,7 @@ function _removeByClass(className, removeClassName) {
   }
 }
 
+// 해당 클래스가 있는 태그에 클래스 추가
 function _addClassByClass(className, addClassName) {
   let elements = document.getElementsByClassName(className);
   for (const element of elements) {
@@ -143,3 +147,27 @@ function _addClassByClass(className, addClassName) {
 }
 
 
+//해당 element 에 클래스 추가
+function _addClassById($elementById, className) {
+  $elementById.classList.add(className);
+}
+
+//해당 element 에 클래스 삭제
+function _removeClassById($elementById, className) {
+  $elementById.classList.remove(className);
+}
+
+//해당 element 에 부모 태그 클래스 추가
+function _addClassByParent($elementById, className) {
+  $elementById.parentElement.classList.add(className);
+}
+
+//해당 element 에 부모 태크 클래스 삭제
+function _removeClassByParent($elementById, className) {
+  $elementById.parentElement.classList.remove(className);
+}
+
+// 아이디로 element 가져오기
+function _getElementById(id) {
+  return document.getElementById(id);
+}

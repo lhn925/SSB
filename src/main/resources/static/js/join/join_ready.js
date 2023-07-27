@@ -1,6 +1,6 @@
 function _join_ready_init() {
-  _email = new Email();
   _join = new Join();
+  _email = new Email();
 }
 
 function _agree_ready_init() {

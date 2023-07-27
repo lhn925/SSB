@@ -85,4 +85,27 @@ public class JoinApiController {
         }
         return new ResponseEntity(new Result<>(userName), HttpStatus.OK);
     }
+
+    /**
+     *
+     * @param email
+     * @param bindingResult
+     * @param request
+     * @return
+     */
+    @GetMapping("/duplicate/email")
+    public ResponseEntity checkEmail(@ModelAttribute("email") JoinDuplicateDto email,BindingResult bindingResult,HttpServletRequest request) {
+        try {
+            userJoinService.checkEmail(email.getUserName());
+        } catch (DuplicateCheckException e) {
+            bindingResult.addError(
+                new FieldErrorCustom(
+                    "JoinDuplicateDto",
+                    e.getFieldName(), e.getRejectValue(),
+                    "join.duplication",
+                    new String[]{e.getMessage()}));
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
+        return new ResponseEntity(new Result<>(email), HttpStatus.OK);
+    }
 }
