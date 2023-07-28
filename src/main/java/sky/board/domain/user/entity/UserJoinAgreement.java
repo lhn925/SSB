@@ -25,7 +25,7 @@ public class UserJoinAgreement extends BaseTimeEntity {
     private Long id;
 
 
-    @OneToOne(fetch = LAZY, cascade = ALL)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "userId")
     private User user;
 
@@ -37,9 +37,8 @@ public class UserJoinAgreement extends BaseTimeEntity {
     @Nullable
     private boolean infoAgreement;
 
-    public void setUser(User user) {
+    private void setUser(User user) {
         this.user = user;
-        user.changeUserJoinAgreement(this);
     }
 
     public static UserJoinAgreement createUserJoinAgreement(User user, UserJoinAgreeDto userJoinAgreeDto) {

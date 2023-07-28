@@ -6,9 +6,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import sky.board.domain.user.utill.CustomPasswordEncoder;
 
 @Configuration
 public class SpringSecurityConfig {
@@ -33,6 +35,7 @@ public class SpringSecurityConfig {
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                     requestMatchers(
+                        "/",
                         "/js/common/**",
                         "/js/error/**",
                         "/js/join/**",
@@ -57,6 +60,11 @@ public class SpringSecurityConfig {
          *
          */
         return http.build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 

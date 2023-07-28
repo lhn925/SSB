@@ -6,7 +6,7 @@ import java.security.SecureRandom;
 
 public class PwEncryptor {
 
-    private final int SALT_SIZE = 15;
+    private final int SALT_SIZE = 10;
 
     // 비밀번호 해싱
     public String hashing(byte[] password, String Salt) {
@@ -49,4 +49,10 @@ public class PwEncryptor {
         }
         return sb.toString();
     }
+
+
+
+
+
+
 }

@@ -14,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
@@ -45,8 +46,6 @@ public class User extends BaseTimeEntity {
     private String userName;
     private String email;
 
-    @OneToOne(mappedBy = "user", fetch = LAZY)
-    private UserJoinAgreement userJoinAgreement;
 
     // 프로필 사진
     private String pictureUrl;
@@ -70,12 +69,12 @@ public class User extends BaseTimeEntity {
     private Boolean isStatus;
 
     // 가입할 유저 entity 생성
-    public static User createJoinUser(UserJoinPostDto userJoinDto, String salt) {
+    public static User createJoinUser(UserJoinPostDto userJoinDto, String salt, PasswordEncoder passwordEncoder) {
         User user = new User();
         user.setUserId(userJoinDto.getUserId());
         user.setEmail(userJoinDto.getEmail());
         user.setToken(UserTokenUtil.hashing(userJoinDto.getEmail().getBytes(), salt));
-        user.setPassword(userJoinDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userJoinDto.getPassword()));
         user.setUserName(userJoinDto.getUserName());
         user.setSalt(salt);
         user.setGrade(UserGrade.USER);
@@ -89,16 +88,13 @@ public class User extends BaseTimeEntity {
     //  User 클래스 (org.springframework.security.core.UserDetails.User)의 빌더를
     //  사용해서 username 에 아이디, password 에 비밀번호,
     //  roles 에 권한(역할)을 넣어주고 리턴
-    public static UserDetails UserBuilder (User user) {
+    public static UserDetails UserBuilder(User user) {
+
         return org.springframework.security.core.userdetails.User.builder().
             username(user.getUserId()).
             password(user.getPassword()).
             roles(user.getGrade().name()).build();
 
-    }
-
-    public void changeUserJoinAgreement(UserJoinAgreement userJoinAgreement){
-        this.userJoinAgreement = userJoinAgreement;
     }
 
 }

@@ -2,6 +2,7 @@ package sky.board.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
@@ -12,6 +13,7 @@ import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.exception.UserJoinServerErrorException;
 import sky.board.domain.user.repository.UserAgreeRepository;
 
+import sky.board.domain.user.repository.UserJoinRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.utill.PwEncryptor;
 
@@ -24,6 +26,8 @@ public class UserJoinService {
     private final MessageSource ms;
     private final UserAgreeRepository UserAgreeRepository;
     private final UserQueryRepository userQueryRepository;
+    private final UserJoinRepository userJoinRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Long join(UserJoinPostDto userJoinDto, UserJoinAgreeDto userJoinAgreeDto) {
@@ -35,22 +39,22 @@ public class UserJoinService {
         // hashingPw = salt + 사용자가 입력한 pw 암호화
         String salt = pwEncryptor.getSALT();
 
-        userJoinDto.changePassword(pwEncryptor.hashing(userJoinDto.getPassword().getBytes(), salt));
+//        userJoinDto.changePassword(pwEncryptor.hashing(userJoinDto.getPassword().getBytes(), salt));
 
         // 중복검사
         joinDuplicate(userJoinDto, salt);
 
         // db 저장
-        User user = User.createJoinUser(userJoinDto, salt);
-
+        User user = User.createJoinUser(userJoinDto, salt, passwordEncoder);
+        userJoinRepository.save(user);
+        if (user.getId() == null) {
+            throw new UserJoinServerErrorException(ms.getMessage("join.error", null, null));
+        }
         // 이용약관 저장
         UserJoinAgreement userJoinAgreement = UserJoinAgreement.createUserJoinAgreement(user, userJoinAgreeDto);
 
         UserAgreeRepository.save(userJoinAgreement);
 
-        if (user.getId() == null) {
-            throw new UserJoinServerErrorException(ms.getMessage("join.error", null, null));
-        }
         return user.getId();
     }
 
