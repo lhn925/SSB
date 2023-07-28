@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
-import sky.board.domain.user.entity.PwSecLevel;
-import sky.board.domain.user.ex.DuplicateCheckException;
+import sky.board.domain.user.model.PwSecLevel;
+import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
 import sky.board.domain.user.utill.PwChecker;
-import sky.board.global.dto.FieldErrorCustom;
+import sky.board.global.error.dto.FieldErrorCustom;
 
 
 @Slf4j
@@ -39,9 +39,19 @@ public class JoinController {
     private final MessageSource ms;
 
     /**
+     * id:join_1
      * 회원가입 페이지 이동 api
      *
      * @param model
+     *
+     * @return
+     */
+    /**
+     *
+     * @param userJoinAgreeDto
+     * @param bindingResult
+     * @param model
+     * @param request
      * @return
      */
     @GetMapping
@@ -73,6 +83,7 @@ public class JoinController {
 
 
     /**
+     * id:join_2
      * 회원가입 api
      *
      * @param userJoinPostDto
@@ -91,7 +102,6 @@ public class JoinController {
 
         // 비밀번호 값이 유효하지 않은 경우
         if (pwSecLevel.name().equals(PwSecLevel.NOT)) {
-            log.info("pwSecLever {}", pwSecLevel.name());
             session.removeAttribute("emailAuthCodeDto");
             bindingResult.addError(
                 new FieldErrorCustom("userJoinPostDto",
@@ -149,6 +159,7 @@ public class JoinController {
     }
 
     /**
+     * id:join_3
      * 이용약관 동의 페이지 이동
      * 유효토큰 생성 api
      *

@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.UserJoinAgreement;
-import sky.board.domain.user.ex.DuplicateCheckException;
-import sky.board.domain.user.ex.UserJoinServerErrorException;
+import sky.board.domain.user.exception.DuplicateCheckException;
+import sky.board.domain.user.exception.UserJoinServerErrorException;
 import sky.board.domain.user.repository.UserAgreeRepository;
-import sky.board.domain.user.repository.UserJoinRepository;
 
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.utill.PwEncryptor;

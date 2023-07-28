@@ -1,0 +1,23 @@
+package sky.board.global.error.dto;
+
+import java.util.List;
+import java.util.Locale;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.validation.Errors;
+
+@Getter
+@NoArgsConstructor
+public class ErrorGlobalResultDto implements ErrorResult {
+
+    private List<ErrorGlobalDetailDto> errorDetails;
+
+    public ErrorGlobalResultDto(Errors errors, MessageSource messageSource, Locale locale) {
+        errorDetails = errors.getGlobalErrors()
+            .stream()
+            .map(error -> new ErrorGlobalDetailDto(error, messageSource, locale))
+            .toList();
+    }
+
+}

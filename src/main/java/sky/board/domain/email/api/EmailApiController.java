@@ -5,7 +5,6 @@ import static org.springframework.util.StringUtils.hasText;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,11 +24,11 @@ import sky.board.domain.email.dto.EmailPostDto;
 import sky.board.domain.email.dto.CodeCheckRequestDto;
 import sky.board.domain.email.entity.Email;
 import sky.board.domain.email.service.EmailService;
-import sky.board.domain.user.ex.DuplicateCheckException;
+import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
-import sky.board.global.dto.ErrorGlobalResultDto;
-import sky.board.global.dto.ErrorResultDto;
-import sky.board.global.dto.Result;
+import sky.board.global.error.dto.ErrorGlobalResultDto;
+import sky.board.global.error.dto.ErrorResultDto;
+import sky.board.global.error.dto.Result;
 
 
 @Slf4j
@@ -47,6 +45,8 @@ public class EmailApiController {
     //
 
     /**
+     * id:emailApi_1
+     *
      * 회원가입 이메일 인증 번호 생성 후
      * session에 유효시간과 인증번호 저장
      * body에는 인증발급시간,인증유효시간 전달
@@ -91,7 +91,17 @@ public class EmailApiController {
     }
 
 
-    // 회원가입 이메일 인증 번호 유효 체크
+
+    /**
+     *
+     * id:emailApi_2
+     *
+     * 회원가입 이메일 인증 번호 유효 체크
+     * @param authCode
+     * @param bindingResult
+     * @param request
+     * @return
+     */
     @ResponseBody
     @PostMapping("/codeCheck")
     public ResponseEntity sendJoinMail(

@@ -2,7 +2,7 @@ package sky.board.domain.user.utill;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import sky.board.domain.user.entity.PwSecLevel;
+import sky.board.domain.user.model.PwSecLevel;
 
 // 비밀번호 보안 레벨 확인 서버 버전
 public class PwChecker {

@@ -1,7 +1,6 @@
 package sky.board.domain.user.entity;
 
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -14,9 +13,10 @@ import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
-import sky.board.domain.base.BaseTimeEntity;
-import sky.board.domain.user.dto.UserJoinAgreeDto;
+import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.UserJoinPostDto;
+import sky.board.domain.user.model.PwSecLevel;
+import sky.board.domain.user.model.UserGrade;
 import sky.board.domain.user.utill.UserTokenUtil;
 
 

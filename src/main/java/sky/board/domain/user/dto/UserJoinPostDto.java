@@ -2,12 +2,10 @@ package sky.board.domain.user.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import sky.board.domain.user.annotation.JoinValid;
-import sky.board.domain.user.entity.PwSecLevel;
+import sky.board.domain.user.model.PwSecLevel;
 
 @Getter
 @Setter

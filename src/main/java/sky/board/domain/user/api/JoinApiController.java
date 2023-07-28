@@ -11,19 +11,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sky.board.domain.user.dto.JoinDuplicateDto;
-import sky.board.domain.user.ex.DuplicateCheckException;
+import sky.board.domain.user.dto.JoinEmailDuplicateDto;
+import sky.board.domain.user.dto.JoinIdDuplicateDto;
+import sky.board.domain.user.dto.JoinUserNameDuplicateDto;
+import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
-import sky.board.global.dto.ErrorDetailDto;
-import sky.board.global.dto.ErrorGlobalResultDto;
-import sky.board.global.dto.ErrorResult;
-import sky.board.global.dto.ErrorResultDto;
-import sky.board.global.dto.FieldErrorCustom;
-import sky.board.global.dto.Result;
+import sky.board.global.error.dto.ErrorResultDto;
+import sky.board.global.error.dto.FieldErrorCustom;
+import sky.board.global.error.dto.Result;
 
 @RestController
 @Slf4j
@@ -36,17 +33,21 @@ public class JoinApiController {
 
 
     /**
-     *  유저아이디 중복체크
+     * id:joinApi_1
+     * 유저아이디 중복체크
+     *
      * @param userId
      * @param bindingResult
      * @param request
      * @return
      */
     @GetMapping("/duplicate/id")
-    public ResponseEntity checkUserId(@ModelAttribute("userId") JoinDuplicateDto userId,
+    public ResponseEntity checkUserId(@Validated @ModelAttribute("userId") JoinIdDuplicateDto userId,
         BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
 
-        log.info("id {}",userId.getUserId());
         try {
             userJoinService.checkId(userId.getUserId());
         } catch (DuplicateCheckException e) {
@@ -64,14 +65,20 @@ public class JoinApiController {
 
 
     /**
+     * id:joinApi_2
      * 유저네임 중복체크
+     *
      * @param userName
      * @param bindingResult
      * @param request
      * @return
      */
     @GetMapping("/duplicate/userName")
-    public ResponseEntity checkUserName(@ModelAttribute("userName") JoinDuplicateDto userName,BindingResult bindingResult,HttpServletRequest request) {
+    public ResponseEntity checkUserName(@Validated @ModelAttribute("userName") JoinUserNameDuplicateDto userName,
+        BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
         try {
             userJoinService.checkUserName(userName.getUserName());
         } catch (DuplicateCheckException e) {
@@ -87,16 +94,21 @@ public class JoinApiController {
     }
 
     /**
-     *
+     * 이메일 중복체크
+     * id:joinApi_3
      * @param email
      * @param bindingResult
      * @param request
      * @return
      */
     @GetMapping("/duplicate/email")
-    public ResponseEntity checkEmail(@ModelAttribute("email") JoinDuplicateDto email,BindingResult bindingResult,HttpServletRequest request) {
+    public ResponseEntity checkEmail(@Validated @ModelAttribute("email") JoinEmailDuplicateDto email, BindingResult bindingResult,
+        HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
         try {
-            userJoinService.checkEmail(email.getUserName());
+            userJoinService.checkEmail(email.getEmail());
         } catch (DuplicateCheckException e) {
             bindingResult.addError(
                 new FieldErrorCustom(

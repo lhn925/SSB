@@ -6,15 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.format.annotation.DateTimeFormat;
-import sky.board.domain.base.BaseEntity;
-import sky.board.domain.base.BaseTimeEntity;
+import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.board.dto.BoardForm;
 import sky.board.domain.user.entity.User;
-
-import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 

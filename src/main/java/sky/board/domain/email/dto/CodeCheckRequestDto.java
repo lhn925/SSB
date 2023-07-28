@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CodeCheckRequestDto {
-    @NotBlank(message = "{NotBlank.authCode}")
+    @NotBlank(message = "NotBlank.authCode")
     private String authCode;
 
 }
