@@ -32,14 +32,30 @@ public class SpringSecurityConfig {
             .authorizeHttpRequests(request ->
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
-                    anyRequest().
-                    authenticated() // 어떠한 요청이라도 인증필요
+                    requestMatchers(
+                        "/js/common/**",
+                        "/js/error/**",
+                        "/js/join/**",
+                        "/css/**",
+                        "/join/**",
+                        "/email/**"). // 허용 파일 및 허용 url
+                    permitAll().
+                    anyRequest().authenticated() // 어떠한 요청이라도 인증필요
             ).
             formLogin(login -> login. //form 방식 로그인 사용
+                loginPage("/login"). // 커스텀 로그인 페이지 지정
+                loginProcessingUrl("/login"). // submit 받을 Url post
+                usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
+                passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
                 defaultSuccessUrl("/", true).
                 permitAll() // 대시보드 이동이 막히면 안되므로 얘는 허용
-            ).
-            logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
+            ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
+
+        /**
+         *     loginProcessingUrl("/login")
+         * 지정하지 않을 시 기본은 'POST /login'
+         *
+         */
         return http.build();
     }
 

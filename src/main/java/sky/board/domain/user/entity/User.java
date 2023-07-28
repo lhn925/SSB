@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.userdetails.UserDetails;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
@@ -82,6 +83,18 @@ public class User extends BaseTimeEntity {
         user.setIsStatus(false);
 
         return user;
+    }
+
+
+    //  User 클래스 (org.springframework.security.core.UserDetails.User)의 빌더를
+    //  사용해서 username 에 아이디, password 에 비밀번호,
+    //  roles 에 권한(역할)을 넣어주고 리턴
+    public static UserDetails UserBuilder (User user) {
+        return org.springframework.security.core.userdetails.User.builder().
+            username(user.getUserId()).
+            password(user.getPassword()).
+            roles(user.getGrade().name()).build();
+
     }
 
     public void changeUserJoinAgreement(UserJoinAgreement userJoinAgreement){
