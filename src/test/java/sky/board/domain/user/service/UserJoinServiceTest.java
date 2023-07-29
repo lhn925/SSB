@@ -1,22 +1,53 @@
 package sky.board.domain.user.service;
 
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import sky.board.domain.user.controller.JoinController;
 import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
 
 
 @SpringBootTest
+@WebMvcTest(JoinController.class)
 class UserJoinServiceTest {
 
-    @Autowired
+
+
+    // 가짜 객체생성
+    @MockBean
     UserJoinService userJoinService;
 
     @Autowired
-    JoinController joinController;
+    private MockMvc mockMvc;
+
+
+    
+    @Test
+    public void userJoinAgreeDto() throws Exception {
+
+        ResultActions resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.get("/join/agree"));
+        MvcResult mvcResult = resultActions.andReturn();
+
+    }
+    
+    
+
 
     @Test
     void join() throws Exception {
