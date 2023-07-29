@@ -80,7 +80,6 @@ public class User extends BaseTimeEntity {
         user.setGrade(UserGrade.USER);
         user.setPwSecLevel(userJoinDto.getPwSecLevel());
         user.setIsStatus(false);
-
         return user;
     }
 

@@ -24,7 +24,6 @@ public class UserLoginService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         Optional<User> findUser = userQueryRepository.findByUserId(userId);
         User user = findUser.orElseThrow(() -> new UsernameNotFoundException("login.NotFound"));
-
         return User.UserBuilder(user);
     }
 }

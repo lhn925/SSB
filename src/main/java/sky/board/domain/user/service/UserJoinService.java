@@ -32,14 +32,10 @@ public class UserJoinService {
     @Transactional
     public Long join(UserJoinPostDto userJoinDto, UserJoinAgreeDto userJoinAgreeDto) {
 
-        // 암호화 객체 생성
+        // 유저토큰 생성 할 객체 생성
         PwEncryptor pwEncryptor = new PwEncryptor();
-
-        //암호화에 사용될 salt 생성
-        // hashingPw = salt + 사용자가 입력한 pw 암호화
         String salt = pwEncryptor.getSALT();
 
-//        userJoinDto.changePassword(pwEncryptor.hashing(userJoinDto.getPassword().getBytes(), salt));
 
         // 중복검사
         joinDuplicate(userJoinDto, salt);

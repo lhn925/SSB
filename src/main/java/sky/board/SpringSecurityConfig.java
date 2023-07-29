@@ -41,6 +41,7 @@ public class SpringSecurityConfig {
                         "/js/join/**",
                         "/css/**",
                         "/join/**",
+                        "view/dashboard",
                         "/email/**"). // 허용 파일 및 허용 url
                     permitAll().
                     anyRequest().authenticated() // 어떠한 요청이라도 인증필요
@@ -50,7 +51,7 @@ public class SpringSecurityConfig {
                 loginProcessingUrl("/login"). // submit 받을 Url post
                 usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                 passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-                defaultSuccessUrl("/", true).
+                defaultSuccessUrl("/view/dashboard", true).
                 permitAll() // 대시보드 이동이 막히면 안되므로 얘는 허용
             ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
 
