@@ -18,19 +18,17 @@ public class HomeController {
     }
 
 
+
     /**
      * 로그인 성공 후 호출되는 API
-     *
-     *
+     * 0dksmf071
+     * 0dlagksmf2
      * @param user
      * @param model
      * @return
      */
     @GetMapping("/view/dashboard")
-    public String dashBoardPage(@AuthenticationPrincipal UserDetails user, Model model, HttpServletRequest request) {
-        String pathInfo = request.getPathInfo();
-        log.info("pageInfo {}");
-
-        return "home";
+    public String dashBoardPage(@AuthenticationPrincipal UserDetails user, Model model, HttpServletRequest request){
+        return "redirect:/";
     }
 }

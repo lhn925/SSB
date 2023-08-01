@@ -11,8 +11,8 @@ import sky.board.domain.user.dto.UserJoinAgreeDto;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.service.UserJoinService;
 
-@Profile("local")
 @Component
+@Profile("local")
 @RequiredArgsConstructor
 public class InitUser {
 
@@ -31,6 +31,10 @@ public class InitUser {
         @PersistenceContext
         private EntityManager em;
 
+        /**
+         * 0dksmf071
+         * 0dlagksmf2
+         */
         public void init() {
             for (int i = 0; i < 3; i++) {
                 UserJoinPostDto userJoinDto = new UserJoinPostDto();

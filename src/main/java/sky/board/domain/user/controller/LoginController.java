@@ -16,9 +16,10 @@ import sky.board.domain.user.dto.UserLoginReqDto;
 public class LoginController {
 
     @GetMapping
-    public String loginForm (Model model) {
+    public String loginForm(Model model) {
         model.addAttribute("userLoginReqDto", new UserLoginReqDto());
         return "/user/login";
     }
+
 
 }
