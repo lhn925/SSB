@@ -31,14 +31,18 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
         if (this.postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
-        String username = obtainUsername(request);
+        String username = request.getParameter("userId");
         username = (username != null) ? username.trim() : "";
 
-        String password = obtainPassword(request);
+        String password = request.getParameter("password");
         password = (password != null) ? password : "";
 
         String url = request.getParameter("url");
         url = (url != null) ? url : "";
+
+        log.info("username {}",username);
+        log.info("password {}",password);
+        log.info("url {}",url);
 
         CustomUsernamePasswordAuthenticationToken authRequest =
             CustomUsernamePasswordAuthenticationToken.unauthenticated(
@@ -46,10 +50,17 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
                 password
             );
         // Allow subclasses to set the "details" property
-        setDetails(request, authRequest);
+        this.setDetails(request, authRequest);
 
-        return super.getAuthenticationManager().authenticate(authRequest);
+        return this.getAuthenticationManager().authenticate(authRequest);
     }
 
+    @Override
+    protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
+        this.setDetails(request, authRequest);
+    }
+    protected void setDetails(HttpServletRequest request, CustomUsernamePasswordAuthenticationToken authRequest) {
+        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
+    }
 
 }
