@@ -4,21 +4,42 @@ package sky.board;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import sky.board.domain.user.utill.CustomPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sky.board.domain.user.utill.Filter.CustomUsernamePasswordAuthenticationFilter;
+import sky.board.global.handler.CustomAuthenticationFailHandler;
+import sky.board.global.handler.CustomAuthenticationSuccessHandler;
 
+@EnableWebSecurity
+@EnableMethodSecurity
 @Configuration
 public class SpringSecurityConfig {
 
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    /*   */
 
+    /**
+     * 에외 처리하고 싶은 url
+     *
+     * @return
+     */
+/*    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/login/dashboard", "/email/**", "/join/**", "/");
+    }*/
+    @Bean
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
         /**
          * cors
          * Cross-Origin Resource Sharing
@@ -28,31 +49,44 @@ public class SpringSecurityConfig {
          * csrf
          * cross-site Request forgey
          *
+         *
+         * dispatcherTypeMatchers 부분의 설정은 스프링 부트 3.0부터 적용된 스프링 시큐리티 6.0 부터
+         * forward 방식 페이지 이동에도 default로 인증이 걸리도록 변경되어서 JSP나 타임리프 등
+         * 컨트롤러에서 화면 파일명을 리턴해 ViewResolver가 작동해 페이지 이동을 하는 경우 위처럼 설정을 추가하셔야 합니다.
          * 요청을 위조하여 사용자의 권한을 이용해 서버에 대한 악성공격을 하는 것
          */
-        http.csrf().disable().cors().disable()
+
+        // Filter 추가
+        http.addFilterBefore(new CustomUsernamePasswordAuthenticationFilter(
+                    authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))),
+                UsernamePasswordAuthenticationFilter.class).
+            csrf().disable().cors().disable()
             .authorizeHttpRequests(request ->
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                     requestMatchers(
-                        "/",
                         "/js/common/**",
                         "/js/error/**",
                         "/js/join/**",
-                        "/css/**",
+                        "/login/**",
+                        "/email/**",
                         "/join/**",
-                        "view/dashboard",
-                        "/email/**"). // 허용 파일 및 허용 url
+                        "/",
+                        "/login",
+                        "/css/**"). // 허용 파일 및 허용 url
                     permitAll().
                     anyRequest().authenticated() // 어떠한 요청이라도 인증필요
             ).
             formLogin(login -> login. //form 방식 로그인 사용
-                loginPage("/login"). // 커스텀 로그인 페이지 지정
-                loginProcessingUrl("/login/proc"). // submit 받을 Url post
-                usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
-                passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-                defaultSuccessUrl("/view/dashboard", true).
-                permitAll() // 대시보드 이동이 막히면 안되므로 얘는 허용
+
+                    loginPage("/login"). // 커스텀 로그인 페이지 지정
+                    loginProcessingUrl("/login"). // submit 받을 Url post
+                    usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
+                    passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
+//                    defaultSuccessUrl("/login/dashboard").
+    successHandler(new CustomAuthenticationSuccessHandler()). // 로그인 성공 시 실행할 커스터마이즈드 핸들러
+                        failureHandler(new CustomAuthenticationFailHandler()).// 로그인 실패 시 실행할 커스터마이즈드 핸들러
+                        permitAll()// 대시보드 이동이 막히면 안되므로 얘는 허용
             ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
 
         /**
@@ -63,10 +97,26 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
+
+/*    @Bean
+    public FilterRegistrationBean filterRegistrationBean() {
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new CustomUsernamePasswordAuthenticationFilter()); // 직접 만들 logFilter 객체 생성
+        filterRegistrationBean.setOrder(1);// filter chain 순서 정해줌
+        filterRegistrationBean.addUrlPatterns("/**");
+        return filterRegistrationBean;
+    }*/
+
+
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+        throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 }

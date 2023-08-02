@@ -88,12 +88,10 @@ public class User extends BaseTimeEntity {
     //  사용해서 username 에 아이디, password 에 비밀번호,
     //  roles 에 권한(역할)을 넣어주고 리턴
     public static UserDetails UserBuilder(User user) {
-
         return org.springframework.security.core.userdetails.User.builder().
             username(user.getUserId()).
             password(user.getPassword()).
             roles(user.getGrade().name()).build();
-
     }
 
 }
