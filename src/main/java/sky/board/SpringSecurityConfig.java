@@ -21,8 +21,8 @@ import sky.board.domain.user.utill.Filter.CustomUsernamePasswordAuthenticationFi
 import sky.board.global.handler.CustomAuthenticationFailHandler;
 import sky.board.global.handler.CustomAuthenticationSuccessHandler;
 
-@EnableWebSecurity
-@EnableMethodSecurity
+//@EnableWebSecurity
+//@EnableMethodSecurity
 @Configuration
 public class SpringSecurityConfig {
 
@@ -57,10 +57,10 @@ public class SpringSecurityConfig {
          */
 //        http.addFilter(usernamePasswordAuthenticationFilter(http));
         // Filter 추가
-//        http.addFilterBefore(usernamePasswordAuthenticationFilter(http),
-//                UsernamePasswordAuthenticationFilter.class).
-            http.csrf().disable().cors().disable()
-            .authorizeHttpRequests(request ->
+
+        http.csrf().disable().cors().disable().
+            addFilterBefore(customAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class).
+            authorizeHttpRequests(request ->
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                     requestMatchers(
@@ -81,9 +81,9 @@ public class SpringSecurityConfig {
                     loginProcessingUrl("/login"). // submit 받을 Url post
                     usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                     passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-                    defaultSuccessUrl("/login/dashboard").
-                    failureHandler(new CustomAuthenticationFailHandler()).// 로그인 실패 시 실행할 커스터마이즈드 핸들러
-                    permitAll()// 대시보드 이동이 막히면 안되므로 얘는 허용
+                    permitAll()
+                // 대시보드 이동이 막히면 안되므로 얘는 허용
+//                defaultSuccessUrl("/login/dashboard").
             ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
 
         /**
@@ -95,7 +95,6 @@ public class SpringSecurityConfig {
     }
 
 
-/*
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
         throws Exception {
@@ -103,12 +102,12 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter(HttpSecurity httpSecurity)
+    public CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter(HttpSecurity httpSecurity)
         throws Exception {
         return new CustomUsernamePasswordAuthenticationFilter(
             authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)));
     }
-*/
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

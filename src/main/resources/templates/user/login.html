@@ -41,6 +41,7 @@
               <input type="checkbox" class="form-check-input" id="rememberMe">
               <label class="form-check-label" for="rememberMe">Remember me</label>
             </div>
+            <input type="hidden" class="form-control" id="url" name="url" th:value="${param.url}" placeholder="Enter your url">
             <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
             <button type="submit" class="btn btn-primary btn-login mx-auto d-block">Login</button>
           </form>
