@@ -15,7 +15,6 @@ import sky.board.domain.user.repository.UserQueryRepository;
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Service
 public class UserLoginService implements UserDetailsService {
 
     private final UserQueryRepository userQueryRepository;

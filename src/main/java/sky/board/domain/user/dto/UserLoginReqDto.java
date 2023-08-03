@@ -6,8 +6,5 @@ import lombok.Getter;
 @Getter
 public class UserLoginReqDto {
     private String url;
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+    private String mode;
 }

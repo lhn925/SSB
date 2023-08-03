@@ -6,40 +6,49 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sky.board.domain.user.repository.UserQueryRepository;
+import sky.board.domain.user.service.UserLoginService;
 import sky.board.domain.user.utill.Filter.CustomUsernamePasswordAuthenticationFilter;
 import sky.board.global.handler.CustomAuthenticationFailHandler;
 import sky.board.global.handler.CustomAuthenticationSuccessHandler;
 
-//@EnableWebSecurity
-//@EnableMethodSecurity
 @Configuration
 public class SpringSecurityConfig {
 
 
     /*   */
 
+    /*    */
+
     /**
      * 에외 처리하고 싶은 url
      *
      * @return
-     */
-/*    @Bean
+     *//*
+    @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/login/dashboard", "/email/**", "/join/**", "/");
     }*/
     @Bean
-    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http, MessageSource ms) throws Exception {
         /**
          * cors
          * Cross-Origin Resource Sharing
@@ -74,18 +83,19 @@ public class SpringSecurityConfig {
                         "/login",
                         "/css/**"). // 허용 파일 및 허용 url
                     permitAll().
-                    anyRequest().authenticated() // 어떠한 요청이라도 인증필요
+                    anyRequest().
+                    authenticated() // 어떠한 요청이라도 인증필요
             ).
             formLogin(login -> login. //form 방식 로그인 사용
                     loginPage("/login"). // 커스텀 로그인 페이지 지정
-                    loginProcessingUrl("/login"). // submit 받을 Url post
                     usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                     passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-                    permitAll()
+                    successHandler(authenticationSuccessHandler()).
+//                    failureHandler(new CustomAuthenticationFailHandler()).
+    permitAll()
                 // 대시보드 이동이 막히면 안되므로 얘는 허용
 //                defaultSuccessUrl("/login/dashboard").
             ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
-
         /**
          *     loginProcessingUrl("/login")
          * 지정하지 않을 시 기본은 'POST /login'
@@ -101,11 +111,34 @@ public class SpringSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * Handler 등록
+     * @return
+     */
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailHandler();
+    }
+
     @Bean
     public CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter(HttpSecurity httpSecurity)
         throws Exception {
-        return new CustomUsernamePasswordAuthenticationFilter(
+        CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter = new CustomUsernamePasswordAuthenticationFilter(
             authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)));
+        customAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
+        customAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+
+        return customAuthenticationFilter;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(UserQueryRepository userQueryRepository) {
+        return new UserLoginService(userQueryRepository);
     }
 
 

@@ -2,10 +2,10 @@ package sky.board.domain.user.entity;
 
 
 import static jakarta.persistence.EnumType.STRING;
-import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import sky.board.domain.user.dto.CustomUserDetails;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
@@ -88,10 +89,13 @@ public class User extends BaseTimeEntity {
     //  사용해서 username 에 아이디, password 에 비밀번호,
     //  roles 에 권한(역할)을 넣어주고 리턴
     public static UserDetails UserBuilder(User user) {
-        return org.springframework.security.core.userdetails.User.builder().
-            username(user.getUserId()).
+        CustomUserDetails build = CustomUserDetails.builder().
+            username(user.getUserName()).
             password(user.getPassword()).
-            roles(user.getGrade().name()).build();
+            enabled(user.getIsStatus()).
+            build();
+        build.setAuthorities(user.getGrade().name());
+        return build;
     }
 
 }
