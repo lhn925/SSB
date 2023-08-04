@@ -28,10 +28,10 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title text-center">Login</h5>
-          <form class="mt-4" method="post" th:action="@{/login}">
+          <form class="mt-4" method="post" th:action="@{/login}" th:object="${userLoginFormDto}">
             <div class="form-group">
               <label th:for="userId">Username</label>
-              <input type="text" class="form-control" name="userId" id="userId" placeholder="Enter your username">
+              <input type="text" class="form-control" th:field="*{userId}" placeholder="Enter your username">
             </div>
             <div class="form-group">
               <label th:for="password">Password</label>
@@ -43,12 +43,12 @@
               <label class="form-check-label" for="rememberMe">Remember me</label>
             </div>
             <div class="form-text text-danger">
-              <th:block th:if="${errorMsg}">
-                <small th:text="${errorMsg}"></small>
+              <th:block th:if="${errMsg}">
+                <small th:text="${errMsg}"></small>
               </th:block>
             </div>
 
-            <input type="hidden" class="form-control" id="url" name="url" th:value="${param.url}"
+            <input type="hidden" class="form-control" th:field="*{url}"
                    placeholder="Enter your url">
             <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
             <button type="submit" class="btn btn-primary btn-login mx-auto d-block">Login</button>

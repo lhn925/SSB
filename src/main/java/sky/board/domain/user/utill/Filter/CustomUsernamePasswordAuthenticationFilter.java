@@ -12,7 +12,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import sky.board.domain.user.dto.CustomUserDetails;
-import sky.board.global.handler.CustomAuthenticationFailHandler;
 
 @Slf4j
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -56,7 +55,6 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
         return authentication;
     }
-
 
 
     @Override
