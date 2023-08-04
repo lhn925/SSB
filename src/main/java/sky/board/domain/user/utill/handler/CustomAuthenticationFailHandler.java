@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.entity.UserLoginLog;
+import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.service.UserLogService;
 import sky.board.domain.user.utill.HttpReqRespUtils;
@@ -30,11 +31,16 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException exception) throws IOException {
 
-        //로그 저장
-        userLogService.saveLoginLog(request, LoginSuccess.FAIL);
+        StringBuffer sbPath = new StringBuffer(request.getContextPath() + "/login/fail?");
 
-        // 로그인 실패 시 redirect
-        sendRedirect(request, response);
+        boolean retryTwoFactor = false;
+
+        if (exception.getClass().equals(LoginFailCountException.class)) {
+            log.info("request.getParameter(username) = {}", request.getParameter("userId"));
+            retryTwoFactor = true;
+        }
+        userLogService.saveLoginLog(request, LoginSuccess.FAIL);
+        sendRedirect(request, response, sbPath,retryTwoFactor);
     }
 
 
@@ -45,16 +51,20 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
      * @param response
      * @throws IOException
      */
-    private void sendRedirect(HttpServletRequest request, HttpServletResponse response)
+    private void sendRedirect(HttpServletRequest request, HttpServletResponse response, StringBuffer sbPath,
+        boolean retryTwoFactor)
         throws IOException {
 
         String userId = request.getParameter("userId");
         String url = request.getParameter("url");
         String errMsg = "login.error";
         errMsg = URLEncoder.encode(errMsg, "UTF-8");
-        request.setAttribute("userId", userId);
-        response.sendRedirect(request.getContextPath() + "/login/fail?url=" +
-            url + "&errMsg=" + errMsg + "&userId=" + userId);
+        sbPath.append("url=" + url);
+        sbPath.append("&userId=" + userId);
+        sbPath.append("&errMsg=" + errMsg);
+        sbPath.append("&retryTwoFactor=" + retryTwoFactor);
+
+        response.sendRedirect(sbPath.toString());
     }
 
 }

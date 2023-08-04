@@ -5,6 +5,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,20 +17,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sky.board.domain.user.repository.LoginLogRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.service.UserDetailsCustomService;
 import sky.board.domain.user.utill.Filter.CustomUsernamePasswordAuthenticationFilter;
 
 @Configuration
-@RequiredArgsConstructor
 public class SpringSecurityConfig {
 
-    private final AuthenticationFailureHandler authenticationFailureHandler;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+
+
 
     /*   */
 
@@ -44,7 +43,8 @@ public class SpringSecurityConfig {
         return (web) -> web.ignoring().requestMatchers("/login/dashboard", "/email/**", "/join/**", "/");
     }*/
     @Bean
-    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http, MessageSource ms) throws Exception {
+    public SecurityFilterChain webSecurityFilterChain(CustomUsernamePasswordAuthenticationFilter authenticationFilter,
+        HttpSecurity http) throws Exception {
         /**
          * cors
          * Cross-Origin Resource Sharing
@@ -60,11 +60,9 @@ public class SpringSecurityConfig {
          * 컨트롤러에서 화면 파일명을 리턴해 ViewResolver가 작동해 페이지 이동을 하는 경우 위처럼 설정을 추가하셔야 합니다.
          * 요청을 위조하여 사용자의 권한을 이용해 서버에 대한 악성공격을 하는 것
          */
-//        http.addFilter(usernamePasswordAuthenticationFilter(http));
-        // Filter 추가
 
         http.csrf().disable().cors().disable().
-            addFilterBefore(customAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class).
+            addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class).
             authorizeHttpRequests(request ->
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
@@ -87,10 +85,8 @@ public class SpringSecurityConfig {
                     loginPage("/login"). // 커스텀 로그인 페이지 지정
                     loginProcessingUrl("/login-proc").
                     usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
-                    passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-//                    successHandler(authenticationSuccessHandler).
-//                    failureHandler(authenticationFailureHandler).
-    permitAll()
+                        passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
+                        permitAll()
                 // 대시보드 이동이 막히면 안되므로 얘는 허용
 //                defaultSuccessUrl("/login/dashboard").
             ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
@@ -109,32 +105,6 @@ public class SpringSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-
-    /**
-     * Handler 등록
-     *
-     * @return
-     *//*
-
-    @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    public AuthenticationFailureHandler authenticationFailureHandler() {
-        return new CustomAuthenticationFailHandler();
-    }
-*/
-    @Bean
-    public CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter(HttpSecurity httpSecurity)
-        throws Exception {
-        CustomUsernamePasswordAuthenticationFilter customAuthenticationFilter = new CustomUsernamePasswordAuthenticationFilter(
-            authenticationManager(httpSecurity.getSharedObject(AuthenticationConfiguration.class)));
-        customAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        customAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        return customAuthenticationFilter;
-    }
 
     @Bean
     public UserDetailsService userDetailsService(UserQueryRepository userQueryRepository) {

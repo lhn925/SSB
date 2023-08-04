@@ -3,9 +3,14 @@ package sky.board.domain.user.service;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.entity.UserLoginLog;
@@ -28,7 +33,6 @@ public class UserLogService {
 
     /**
      * 로그인 기록 저장
-     *
      */
     @Transactional
     public void saveLoginLog(HttpServletRequest request, LoginSuccess isSuccess) {
@@ -37,8 +41,20 @@ public class UserLogService {
         saveLog.orElseThrow(() -> new RuntimeException());
     }
 
+
+    public Long getLoginLogCount(String userId, LoginSuccess loginSuccess) {
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<UserLoginLog> loginLogPage = loginLogRepository.findByUserIdAndIsSuccess(userId, loginSuccess,
+            pageRequest);
+        log.info("loginLogPage.getTotalElements() = {}", loginLogPage.getTotalElements());
+        log.info("loginLogPage.getSize() = {}", loginLogPage.getSize());
+        return loginLogPage.getTotalElements();
+    }
+
     /**
      * 유저 로그 DTO 생성
+     *
      * @param request
      * @param isSuccess
      * @return

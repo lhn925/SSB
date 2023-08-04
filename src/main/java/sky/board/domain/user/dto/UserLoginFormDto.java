@@ -10,4 +10,5 @@ public class UserLoginFormDto {
     private String url;
     private String mode;
     private String userId;
+    private String captcha;
 }
