@@ -20,11 +20,8 @@ import sky.board.domain.user.model.UserAgent;
 
 /**
  * 같은 아이디 당 시도
- *
+ * <p>
  * 5번이상 틀렸을 경우
- *
- *
- *
  */
 
 @Entity
@@ -44,30 +41,43 @@ public class UserLoginLog {
     private LoginSuccess isSuccess;
 
     // 로그인시도 국가
-    private Locale locale;
+    private String countryName;
 
     // 접속한 기기
     @Enumerated(STRING)
     private UserAgent userAgent;
+
+    //위도
+    private String latitude;
+
+    // 경도
+    private String longitude;
+
 
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime loginDateTime;
 
     @Builder
-    public UserLoginLog(String ip, Locale locale, String userId, LoginSuccess isSuccess,UserAgent userAgent) {
+    public UserLoginLog(String ip, String userId, LoginSuccess isSuccess, String countryName,
+        UserAgent userAgent,
+        String latitude, String longitude) {
         this.ip = ip;
-        this.locale = locale;
         this.userId = userId;
         this.isSuccess = isSuccess;
+        this.countryName = countryName;
         this.userAgent = userAgent;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
+
     protected UserLoginLog() {
 
     }
+
     public static UserAgent isDevice(HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent").toUpperCase();
-        if(userAgent.indexOf(UserAgent.MOBI.name()) > -1) {
+        if (userAgent.indexOf(UserAgent.MOBI.name()) > -1) {
             return UserAgent.MOBI;
         } else {
             return UserAgent.PC;

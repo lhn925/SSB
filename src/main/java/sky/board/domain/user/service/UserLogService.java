@@ -1,6 +1,8 @@
 package sky.board.domain.user.service;
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,8 @@ import sky.board.domain.user.entity.UserLoginLog;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.repository.LoginLogRepository;
 import sky.board.domain.user.utill.HttpReqRespUtils;
+import sky.board.global.locationfinder.dto.UserLocationDto;
+import sky.board.global.locationfinder.service.LocationFinderService;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ import sky.board.domain.user.utill.HttpReqRespUtils;
 public class UserLogService {
 
     private final LoginLogRepository loginLogRepository;
+    private final LocationFinderService locationFinderService;
 
     // 로그인 기록은 최근 90일까지의 기록을 최대 1,000 건 까지 제공합니다.
 
@@ -32,12 +37,28 @@ public class UserLogService {
         saveLog.orElseThrow(() -> new RuntimeException());
     }
 
-    public static UserLoginLog getUserLoginLog(HttpServletRequest request, LoginSuccess isSuccess) {
+    /**
+     * 유저 로그 DTO 생성
+     * @param request
+     * @param isSuccess
+     * @return
+     */
+    public UserLoginLog getUserLoginLog(HttpServletRequest request, LoginSuccess isSuccess) {
         String userId = request.getParameter("userId");
-        String clientIp = HttpReqRespUtils.getClientIpAddressIfServletRequestExist();
+
+        UserLocationDto userLocationDto = null;
+        try {
+            userLocationDto = locationFinderService.findLocation();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (GeoIp2Exception e) {
+            throw new RuntimeException(e);
+        }
         UserLoginLog userLoginLog = UserLoginLog.builder()
-            .ip(clientIp)
-            .locale(request.getLocale()) // 지역 코드 저장?
+            .ip(userLocationDto.getIpAddress()) //ip 저장
+            .countryName(userLocationDto.getCountryName()) // iso Code 저장
+            .latitude(userLocationDto.getLatitude()) // 위도
+            .longitude(userLocationDto.getLongitude()) // 경도
             .isSuccess(isSuccess) // 실패 여부 확인
             .userAgent(UserLoginLog.isDevice(request)) // 기기 저장
             .userId(userId) //유저아이디 저장

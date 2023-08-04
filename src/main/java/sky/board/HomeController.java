@@ -28,7 +28,7 @@ import sky.board.global.model.DataPath;
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
+    public String home(HttpServletRequest request) {
         return "home";
     }
 
@@ -46,37 +46,5 @@ public class HomeController {
     public String dashBoardPage(@AuthenticationPrincipal UserDetails user, Model model, HttpServletRequest request){
         return "redirect:/";
     }
-
-    /**
-     * 데이터베이스를 통해 요청 ip에 대한 국가 정보 확인
-     */
-
-    @GetMapping("/example/city")
-    @ResponseBody
-    public ResponseEntity infoFromCityDB(HttpServletRequest request) throws IOException, GeoIp2Exception {
-//        String ip = HttpReqRespUtils.getClientIpAddressIfServletRequestExist();
-        String ip = "218.239.21.150";
-
-        ClassPathResource resource = new ClassPathResource(DataPath.CITY_DB.getValue());
-
-        DatabaseReader databaseReader = new Builder(resource.getFile()).build();
-
-        InetAddress ipAddress = InetAddress.getByName(ip);
-        CityResponse response = databaseReader.city(ipAddress);
-
-        String isoCode = response.getCountry().getIsoCode();
-
-        Locale locale = new Locale("en", isoCode);
-
-        log.info("locale.getCountry() = {}", locale.getCountry());
-        log.info("locale.getDisplayName() = {}", locale.getDisplayName());
-        log.info("locale.getDisplayCountry() = {}", locale.getDisplayCountry());
-        log.info("locale.getDisplayCountry(new Locale(en)) = {}", locale.getDisplayCountry(new Locale("ja")));
-
-
-
-        return ResponseEntity.ok(response);
-    }
-
 
 }

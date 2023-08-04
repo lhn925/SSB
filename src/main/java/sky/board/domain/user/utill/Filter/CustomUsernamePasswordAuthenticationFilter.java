@@ -50,9 +50,6 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
         Authentication authentication = this.getAuthenticationManager().authenticate(authRequest);
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        customUserDetails.setUrl(url);
-
         return authentication;
     }
 

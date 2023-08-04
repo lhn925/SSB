@@ -23,7 +23,7 @@ import sky.board.global.model.DataPath;
 public class LocationFinderService {
 
 
-    public UserLocationDto findLocation(HttpServletRequest request) throws IOException, GeoIp2Exception {
+    public UserLocationDto findLocation() throws IOException, GeoIp2Exception {
         DatabaseReader databaseReader = getClassPathResource(DataPath.CITY_DB.getValue());
         InetAddress ipAddress = getInetAddress();
         CityResponse response = databaseReader.city(ipAddress);
@@ -34,7 +34,7 @@ public class LocationFinderService {
     // 사용자 ip추출
     private String getIp() {
         String ip = HttpReqRespUtils.getClientIpAddressIfServletRequestExist();
-        return getIp();
+        return ip;
     }
 
     private InetAddress getInetAddress() throws UnknownHostException {

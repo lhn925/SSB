@@ -28,7 +28,7 @@ public class UserLocationDto {
         this.longitude = longitude;
     }
     public static UserLocationDto createUserLocationDto(CityResponse response) {
-        String countryName = response.getCountry().getName();
+        String countryName = response.getCountry().getIsoCode();
         String cityName = response.getCity().getName();
         String ipAddress = response.getTraits().getIpAddress();
         String latitude = String.valueOf(response.getLocation().getLatitude());

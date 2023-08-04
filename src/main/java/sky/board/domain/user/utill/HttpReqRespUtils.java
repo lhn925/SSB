@@ -32,16 +32,21 @@ public class HttpReqRespUtils {
         if (Objects.isNull(RequestContextHolder.getRequestAttributes())) {
             return "0.0.0.0";
         }
-
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
         for (String header: IP_HEADER_CANDIDATES) {
             String ipFromHeader = request.getHeader(header);
-            log.info("ipFromHeader = {}", ipFromHeader);
             if (Objects.nonNull(ipFromHeader) && ipFromHeader.length() != 0 && !"unknown".equalsIgnoreCase(ipFromHeader)) {
                 String ip = ipFromHeader.split(",")[0];
+                log.info("getClientIpAddressIfServletRequestExist = {}", ip);
                 return ip;
             }
         }
-        return request.getRemoteAddr();
+
+        return "218.239.21.150";
+//        return request.getRemoteAddr();
     }
+
+
+
 }
