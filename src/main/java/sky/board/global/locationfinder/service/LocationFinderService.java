@@ -5,8 +5,6 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.DatabaseReader.Builder;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
-import com.maxmind.geoip2.model.CountryResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -14,9 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import sky.board.domain.user.utill.HttpReqRespUtils;
-import sky.board.global.locationfinder.dto.UserCityDto;
 import sky.board.global.locationfinder.dto.UserLocationDto;
-import sky.board.global.model.DataPath;
+import sky.board.global.locationfinder.model.DataPath;
 
 @Slf4j
 @Service

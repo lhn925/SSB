@@ -1,4 +1,4 @@
-package sky.board.global.model;
+package sky.board.global.locationfinder.model;
 
 public enum DataPath {
     CITY_DB("data/GeoLite2-city.mmdb"),

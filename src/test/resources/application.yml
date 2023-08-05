@@ -1,9 +1,43 @@
 spring:
   profiles:
     active: test
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+          timeout: 5000
+  messages:
+    basename: messages,errors
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/SpringTest?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 1000
+    open-in-view: false
+
+openapi:
+  relaxed-binding:
+    clientId: ${openapi.clientId}
+    clientSecret: ${openapi.clientSecret}
 
 
-
+logging.level: #띄어쓰기 없음
+  org.hibernate.SQL: debug #띄어쓰기 2칸
 
 
 ##email.getProps().put("mail.smtp.host", "smtp.gmail.com"); // use Gmail

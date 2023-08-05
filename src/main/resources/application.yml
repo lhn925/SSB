@@ -38,6 +38,10 @@ spring:
         default_batch_fetch_size: 1000
     open-in-view: false
 
+openapi:
+  relaxed-binding:
+    clientId: ${openapi.clientId}
+    clientSecret: ${openapi.clientSecret}
 
 
 logging.level: #띄어쓰기 없음
