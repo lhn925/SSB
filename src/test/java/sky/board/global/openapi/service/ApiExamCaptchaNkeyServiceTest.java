@@ -29,6 +29,10 @@ class ApiExamCaptchaNkeyServiceTest {
         Map keyMap = objectMapper.readValue(key, Map.class);
 
         String keyResult = (String) keyMap.get("key");
+
+
+
+        
         String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(keyResult);
 
         System.out.println("apiExamCaptchaImage = " + apiExamCaptchaImage);
