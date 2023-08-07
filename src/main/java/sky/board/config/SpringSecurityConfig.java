@@ -1,13 +1,9 @@
-package sky.board;
+package sky.board.config;
 
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.service.UserDetailsCustomService;
@@ -83,8 +78,8 @@ public class SpringSecurityConfig {
             ).
             formLogin(login -> login. //form 방식 로그인 사용
                     loginPage("/login"). // 커스텀 로그인 페이지 지정
-                    loginProcessingUrl("/login-proc").
-                    usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
+//                    loginProcessingUrl("/login-proc").
+    usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                         passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
                         permitAll()
                 // 대시보드 이동이 막히면 안되므로 얘는 허용

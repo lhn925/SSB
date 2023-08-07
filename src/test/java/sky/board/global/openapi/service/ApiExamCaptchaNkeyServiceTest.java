@@ -20,20 +20,14 @@ class ApiExamCaptchaNkeyServiceTest {
     @Test
     public void 키발급_이미지발급() throws JsonProcessingException {
 
-        String key = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
+        Map apiExamCaptchaNkey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
 
-        System.out.println("apiExamCaptchaNkey = " + key);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Map keyMap = objectMapper.readValue(key, Map.class);
-
-        String keyResult = (String) keyMap.get("key");
+        System.out.println("apiExamCaptchaNkey = " + apiExamCaptchaNkey.toString());
 
 
 
-        
-        String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(keyResult);
+        String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(
+            (String) apiExamCaptchaNkey.get("key"));
 
         System.out.println("apiExamCaptchaImage = " + apiExamCaptchaImage);
     }

@@ -1,5 +1,8 @@
 package sky.board;
 
+import static org.springframework.data.repository.config.BootstrapMode.DEFAULT;
+import static org.springframework.data.repository.config.BootstrapMode.DEFERRED;
+
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -8,17 +11,28 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.repository.config.BootstrapMode;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @Slf4j
 @EnableJpaAuditing
+@EnableJpaRepositories(
+    //이 기능을 사용해서 JPA Repository가 들어있는 패키지만 스캔
+    bootstrapMode = DEFERRED
+)
+/**
+ * DEFAULT : 가장 기본으로 모든 Repository를 즉시 인스턴스화 시킵니다. Repository가 많은 경우 스프링 시작 시간이 지연되는 단점이 있습니다.
+ * LAZY : 모든 Repository를 프록시로 만들어두고, 처음 사용할 때 실제 인스턴스로 만들어 줍니다.
+ * DEFERRED : 기본적으로 LAZY와 동일하지만 비동기적으로 작업하고, ContextRefreshedEvent에 의해 Repository가 초기화 되어 검증되도록 진행합니다.
+ */
 @SpringBootApplication
+@EnableRedisHttpSession
 public class BoardApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(BoardApplication.class, args);
         log.info("이건 main 입니다");
-        // 여기는 feature2 테스트
-        // 여기는 feature1 테스트
         /*1.
             우선 엔티티를 DTO로 변환하는 방법을 선택한다.
             2. 필요하면 페치 조인으로 성능을 최적화 한다. 대부분의 성능 이슈가 해결된다.
@@ -28,13 +42,12 @@ public class BoardApplication {
     }
 
     /**
-     *
      * 생성자 및 수정자의 아이디나 구별값을 db 컬럼에 저장
      *
      * @return
      */
     @Bean
-    public AuditorAware<String> auditorProvider () {
+    public AuditorAware<String> auditorProvider() {
         return () -> Optional.of(UUID.randomUUID().toString());
     }
 

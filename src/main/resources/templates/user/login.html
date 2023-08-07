@@ -48,8 +48,9 @@
               </th:block>
             </div>
 
-            <input type="hidden" class="form-control" th:field="*{url}"
-                   placeholder="Enter your url">
+            <input type="hidden" class="form-control" th:field="*{url}">
+            <input type="hidden" class="form-control" th:field="*{captchaKey}">
+            <input type="hidden" class="form-control" th:field="*{imagePath}">
             <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
             <button type="submit" class="btn btn-primary btn-login mx-auto d-block">Login</button>
           </form>

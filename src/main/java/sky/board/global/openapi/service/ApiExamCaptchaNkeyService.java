@@ -22,6 +22,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sky.board.domain.user.model.PathDetails;
 import sky.board.global.openapi.entity.OpenApi;
 import sky.board.global.openapi.model.code;
 
@@ -38,14 +39,16 @@ public class ApiExamCaptchaNkeyService {
 
     // 키 발급시 0,  캡차 이미지 비교시 1로 세팅
     // 네이버 캡차 API 예제 - 키발급
-    public String getApiExamCaptchaNkey() {
-        return setOpenApiConfiguration("https://openapi.naver.com/v1/captcha/nkey?code=" + 0);
+    public Map<String, Object> getApiExamCaptchaNkey() throws JsonProcessingException {
+        String responseBody = setOpenApiConfiguration("https://openapi.naver.com/v1/captcha/nkey?code=" + 0);
+        return objectMapper.readValue(responseBody, HashMap.class);
     }
 
     // 네이버 2차 보안키 이미지 발급
     public String getApiExamCaptchaImage(String key) {
         String apiURL = "https://openapi.naver.com/v1/captcha/ncaptcha.bin?key=" + key;
         String responseBody = getImage(apiURL, getRequestHeaders());
+        log.info("responseBody = {}", responseBody);
         return responseBody;
     }
 
@@ -53,11 +56,12 @@ public class ApiExamCaptchaNkeyService {
     // 캡차 키 발급시 받은 키값
     // 사용자가 입력한 캡차 이미지 글자값
     // 네이버 캡차 API 예제 - 키발급, 키 비교
-    public Map getApiExamCaptchaNkeyResult(String filename,String key, String value) throws IOException {
+    public Map<String, Object> getApiExamCaptchaNkeyResult(String filename, String key, String value)
+        throws IOException {
         String result = setOpenApiConfiguration(
             "https://openapi.naver.com/v1/captcha/nkey?code=" + 1 + "&key=" + key + "&value=" + value);
 
-        Map map = objectMapper.readValue(result, Map.class);
+        Map map = objectMapper.readValue(result, HashMap.class);
 
         // 인증코드 성공시 이미지 삭제
         if (((boolean) map.get("result"))) {
@@ -114,21 +118,22 @@ public class ApiExamCaptchaNkeyService {
     }
 
     public void deleteImage(String filename) throws IOException {
-        Path filePath = Paths.get("src/main/resources/image/" + filename + ".jpg");
+        Path filePath = Paths.get(PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, filename, "jpg"));
         Files.delete(filePath);
     }
+
     private String getReadImage(InputStream is) {
         int read;
         byte[] bytes = new byte[1024];
         // 랜덤한 이름으로  파일 생성
         String filename = Long.valueOf(new Date().getTime()).toString();
-        File f = new File("src/main/resources/image/"+filename + ".jpg");
+        File f = new File(PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, filename, "jpg"));
         try (OutputStream outputStream = new FileOutputStream(f)) {
             f.createNewFile();
             while ((read = is.read(bytes)) != -1) {
                 outputStream.write(bytes, 0, read);
             }
-            return filename+" 이미지 캡차가 생성되었습니다.";
+            return filename;
         } catch (IOException e) {
             throw new RuntimeException("이미지 캡차 파일 생성에 실패 했습니다.", e);
         }

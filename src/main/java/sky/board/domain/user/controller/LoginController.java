@@ -35,9 +35,8 @@ public class LoginController {
     public String loginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
         @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
         HttpServletRequest request, Model model) {
-        String mode = userLoginFormDto.getMode();
-        //Mode가 비어졌거나 form 이 아니면 로그인 실패 로직
-        if (userLoginFailErrorDto.isError()) {
+        // error 또는 retryTwoFactor가 true 일 경우
+        if (userLoginFailErrorDto.isError() || userLoginFailErrorDto.isRetryTwoFactor()) {
             model.addAttribute("errMsg", ms.getMessage(userLoginFailErrorDto.getErrMsg(),
                 null, request.getLocale()));
         }
@@ -47,15 +46,12 @@ public class LoginController {
     }
 
     /**
-     *
      * 주소값에 파라미터가 노출되지 않게끔
-     *
      */
     @GetMapping("/fail")
     public String failLoginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
         @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
         RedirectAttributes redirectAttributes) {
-        userLoginFailErrorDto.setError(true);
         redirectAttributes.addFlashAttribute("userLoginFormDto", userLoginFormDto);
         redirectAttributes.addFlashAttribute("userLoginFailErrorDto", userLoginFailErrorDto);
         return "redirect:/login";
