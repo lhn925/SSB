@@ -36,12 +36,12 @@ public class InitUser {
          * 0dlagksmf2
          */
         public void init() {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 UserJoinPostDto userJoinDto = new UserJoinPostDto();
                 userJoinDto.setEmail(i + "2512@daum.net");
                 userJoinDto.setUserName(i + "유입니다2");
-                userJoinDto.setUserId(i + "dksmf071");
-                userJoinDto.setPassword(i + "dlagksmf2");
+                userJoinDto.setUserId(i + "221325");
+                userJoinDto.setPassword(i + "221325");
                 userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
             }
         }

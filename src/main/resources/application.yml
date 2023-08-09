@@ -7,10 +7,13 @@ server:
     include-binding-errors: never
   address: localhost
 spring:
+  session:
+    redis:
+      flush-mode: on_save
+      namespace: spring:session:Erjuer
+    store-type: redis
   profiles:
     active: local
-  session:
-    store-type: redis
   data:
     redis:
       repositories:
