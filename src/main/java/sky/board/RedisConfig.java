@@ -1,4 +1,4 @@
-package sky.board.config;
+package sky.board;
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +37,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConfiguration);
     }
 
+
     @Bean(name = "redisTemplate")
     public RedisTemplate<?, ?> redisTemplate() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
@@ -52,4 +53,6 @@ public class RedisConfig {
         redisTemplate.setDefaultSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
+
+
 }
