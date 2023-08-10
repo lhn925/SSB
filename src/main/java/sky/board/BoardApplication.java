@@ -12,22 +12,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.repository.config.BootstrapMode;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @Slf4j
 @EnableJpaAuditing
-@EnableJpaRepositories(
-    //이 기능을 사용해서 JPA Repository가 들어있는 패키지만 스캔
-    bootstrapMode = DEFERRED
-)
+@EnableJpaRepositories
 /**
  * DEFAULT : 가장 기본으로 모든 Repository를 즉시 인스턴스화 시킵니다. Repository가 많은 경우 스프링 시작 시간이 지연되는 단점이 있습니다.
  * LAZY : 모든 Repository를 프록시로 만들어두고, 처음 사용할 때 실제 인스턴스로 만들어 줍니다.
  * DEFERRED : 기본적으로 LAZY와 동일하지만 비동기적으로 작업하고, ContextRefreshedEvent에 의해 Repository가 초기화 되어 검증되도록 진행합니다.
  */
 @SpringBootApplication
-@EnableRedisHttpSession
 public class BoardApplication {
 
     public static void main(String[] args) {

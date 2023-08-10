@@ -4,6 +4,8 @@ package sky.board.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.catalina.authenticator.SavedRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,14 +22,6 @@ import sky.board.domain.user.utill.Filter.CustomUsernamePasswordAuthenticationFi
 
 @Configuration
 public class SpringSecurityConfig {
-
-
-
-
-    /*   */
-
-    /*    */
-
     /**
      * 에외 처리하고 싶은 url
      *
@@ -71,6 +65,8 @@ public class SpringSecurityConfig {
                         "/example/city",
                         "/",
                         "/login",
+                        "/test/**",
+                        "/test",
                         "/css/**"). // 허용 파일 및 허용 url
                     permitAll().
                     anyRequest().
@@ -101,10 +97,6 @@ public class SpringSecurityConfig {
     }
 
 
-    @Bean
-    public UserDetailsService userDetailsService(UserQueryRepository userQueryRepository) {
-        return new UserDetailsCustomService(userQueryRepository);
-    }
 
 
     @Bean

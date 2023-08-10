@@ -16,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sky.board.domain.user.dto.CustomUserDetails;
+import sky.board.domain.user.model.Status;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
@@ -80,7 +81,7 @@ public class User extends BaseTimeEntity {
         user.setSalt(salt);
         user.setGrade(UserGrade.USER);
         user.setPwSecLevel(userJoinDto.getPwSecLevel());
-        user.setIsStatus(false);
+        user.setIsStatus(Status.OFF.getValue());
         return user;
     }
 
@@ -90,12 +91,15 @@ public class User extends BaseTimeEntity {
     //  roles 에 권한(역할)을 넣어주고 리턴
     public static UserDetails UserBuilder(User user) {
         CustomUserDetails build = CustomUserDetails.builder().
+            userId(user.getUserId()).
+            token(user.getToken()).
             username(user.getUserName()).
             password(user.getPassword()).
             enabled(user.getIsStatus()).
             build();
         build.setAuthorities(user.getGrade().name());
         return build;
+
     }
 
 }

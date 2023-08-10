@@ -3,6 +3,7 @@ package sky.board.domain.board.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,14 +27,16 @@ public class BoardController {
 
 
     @GetMapping
-    public String boardList (@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int end, Model model) {
+    public String boardList(@RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int end, Model model) {
+
         List<Board> boardList = boardImplService.findByList(page, end);
         model.addAttribute("List", boardList);
         return "board/board";
     }
 
     @GetMapping("/{id}")
-    public String getBoard (@PathVariable Long id, Model model) throws FileNotFoundException {
+    public String getBoard(@PathVariable Long id, Model model) throws FileNotFoundException {
 
         Board board = boardImplService.findById(id);
         if (board == null) {
@@ -44,12 +47,13 @@ public class BoardController {
     }
 
     @GetMapping("/add")
-    public String boardForm (@ModelAttribute BoardForm boardForm, Model model) {
+    public String boardForm(@ModelAttribute BoardForm boardForm, Model model) {
         return "board/boardForm";
     }
 
     @PostMapping("/add")
-    public String addBoard (@Validated @ModelAttribute BoardForm boardForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String addBoard(@Validated @ModelAttribute BoardForm boardForm, BindingResult bindingResult,
+        RedirectAttributes redirectAttributes) {
         return "redirect:/board/boardDetail";
     }
 

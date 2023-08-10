@@ -9,14 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.entity.UserLoginLog;
 import sky.board.domain.user.model.LoginSuccess;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.LoginLogRepository;
-import sky.board.domain.user.utill.HttpReqRespUtils;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
 
@@ -35,17 +33,18 @@ public class UserLogService {
      * 로그인 기록 저장
      */
     @Transactional
-    public void saveLoginLog(HttpServletRequest request, LoginSuccess isSuccess) {
-        UserLoginLog userLoginLog = getUserLoginLog(request, isSuccess);
+    public void saveLoginLog(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
+        UserLoginLog userLoginLog = getUserLoginLog(request, isSuccess, isStatus);
         Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));
         saveLog.orElseThrow(() -> new RuntimeException());
     }
 
 
-    public Long getLoginLogCount(String userId, LoginSuccess loginSuccess) {
+    public Long getLoginLogCount(String userId, LoginSuccess loginSuccess, Status isStatus) {
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<UserLoginLog> loginLogPage = loginLogRepository.findByUserIdAndIsSuccess(userId, loginSuccess,
+        Page<UserLoginLog> loginLogPage = loginLogRepository.findByUserIdAndIsSuccessAndIsStatus(userId, loginSuccess,
+            isStatus.getValue(),
             pageRequest);
         log.info("loginLogPage.getTotalElements() = {}", loginLogPage.getTotalElements());
         log.info("loginLogPage.getSize() = {}", loginLogPage.getSize());
@@ -59,7 +58,7 @@ public class UserLogService {
      * @param isSuccess
      * @return
      */
-    public UserLoginLog getUserLoginLog(HttpServletRequest request, LoginSuccess isSuccess) {
+    public UserLoginLog getUserLoginLog(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
         String userId = request.getParameter("userId");
 
         UserLocationDto userLocationDto = null;
@@ -78,8 +77,15 @@ public class UserLogService {
             .isSuccess(isSuccess) // 실패 여부 확인
             .userAgent(UserLoginLog.isDevice(request)) // 기기 저장
             .userId(userId) //유저아이디 저장
+            .isStatus(isStatus)
             .build();
         return userLoginLog;
+    }
+
+    @Transactional
+    public void deleteLoginLog(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
+        String userId = request.getParameter("userId");
+        loginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
     }
 
 }

@@ -24,7 +24,7 @@ public class PwChecker {
         // 한글 확인
         Pattern regex7 = Pattern.compile("[ㄱ-ㅎ가-힣]");
         // 이모지 확인
-        Pattern regex8 = Pattern.compile("[^\\p{L}\\p{N}!]+", Pattern.UNICODE_CHARACTER_CLASS);
+        Pattern regex8 = Pattern.compile("[\\p{So}]", Pattern.UNICODE_CHARACTER_CLASS);
 
         int pwLen = pw.length();
 

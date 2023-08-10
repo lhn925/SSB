@@ -1,12 +1,13 @@
 package sky.board.domain.user.dto;
 
 
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserLoginFailErrorDto {
+public class UserLoginFailErrorDto implements Serializable  {
 
     // 에러 메시지
     private String errMsg;

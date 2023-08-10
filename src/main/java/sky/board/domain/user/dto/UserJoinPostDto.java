@@ -2,6 +2,7 @@ package sky.board.domain.user.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import sky.board.domain.user.annotation.JoinValid;
@@ -9,7 +10,7 @@ import sky.board.domain.user.model.PwSecLevel;
 
 @Getter
 @Setter
-public class UserJoinPostDto {
+public class UserJoinPostDto implements Serializable {
 
     /**
      * 아이디: 5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.

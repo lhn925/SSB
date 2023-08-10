@@ -15,6 +15,7 @@ import sky.board.domain.user.entity.UserLoginLog;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.UserLogService;
 import sky.board.domain.user.utill.HttpReqRespUtils;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
@@ -50,6 +51,7 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
         boolean retryTwoFactor = false;
         // 로그인 실패 횟수가 5번을 넘어가는 경우
 
+        log.info("exception = {}", exception.getClass());
         if (exception instanceof LoginFailCountException) {
             retryTwoFactor = true;
             errMsg = "login.error.captcha";
@@ -62,7 +64,7 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
 
         }
 
-        userLogService.saveLoginLog(request, LoginSuccess.FAIL);
+        userLogService.saveLoginLog(request, LoginSuccess.FAIL, Status.ON);
         sendRedirect(request, response, errMsg, sbPath, retryTwoFactor);
     }
 

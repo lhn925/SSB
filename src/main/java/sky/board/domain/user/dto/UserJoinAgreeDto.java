@@ -2,6 +2,7 @@ package sky.board.domain.user.dto;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +12,7 @@ import sky.board.domain.user.utill.UserTokenUtil;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserJoinAgreeDto {
-
+public class UserJoinAgreeDto implements Serializable  {
     @NotBlank
     private String agreeToken;
 

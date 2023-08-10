@@ -1,18 +1,27 @@
 package sky.board.domain.user.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.Assert;
-
+import sky.board.domain.user.entity.User;
 
 /**
  * getAuthorities() : 계정이 가지고 있는 권한 목록 리턴
@@ -24,13 +33,16 @@ import org.springframework.util.Assert;
  * isEnabled() : 계정이 활성화돼 있는지 리턴 -> true는 활성화 상태 의미
  */
 
-@Slf4j
-public class CustomUserDetails implements UserDetails, CredentialsContainer {
+
+public class CustomUserDetails implements Serializable, UserDetails {
 
     private String url;
-
+    private String token;
+    private String userId;
     private String password;
     private String username;
+    private User user;
+
 
     private List<GrantedAuthority> authorities;
 
@@ -48,44 +60,51 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     // isEnabled() : 계정이 활성화돼 있는지 리턴 -> true는 활성화 상태 의미
     private boolean enabled;
 
-    private Function<String, String> passwordEncoder = (password) -> password;
+    private transient Function<String, String> passwordEncoder = (password) -> password;
 
+    public CustomUserDetails() {
+    }
+
+    public CustomUserDetails(String url, String token, String userId, String password, String username, User user,
+        List<GrantedAuthority> authorities, boolean accountNonExpired, boolean accountNonLocked,
+        boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder) {
+        this.url = url;
+        this.token = token;
+        this.userId = userId;
+        this.password = password;
+        this.username = username;
+        this.user = user;
+        this.authorities = authorities;
+        this.accountNonExpired = accountNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.enabled = enabled;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Builder
-    public CustomUserDetails(String url, String password, String username,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled) {
+    public CustomUserDetails(String url, String userId, String token, String password, String username,
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
+        User user) {
         this.url = url;
+        this.token = token;
+        this.userId = userId;
         this.password = this.passwordEncoder.apply(password);
-        log.info("password {}", password);
         this.username = username;
         this.accountNonExpired = !accountNonExpired;
         this.accountNonLocked = !accountNonLocked;
         this.credentialsNonExpired = !credentialsNonExpired;
         this.enabled = !enabled;
-
-        log.info(" accountNonExpired{}", this.accountNonExpired);
-        log.info(" accountNonLocked{}", this.accountNonLocked);
-        log.info("credentialsNonExpired {}", this.credentialsNonExpired);
-        log.info(" enabled {}", this.enabled);
-
-
+        this.user = user;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getName()).append(" [");
-        sb.append("Username=").append(this.username).append(", ");
-        sb.append("Password=[PROTECTED], ");
-        sb.append("Enabled=").append(this.enabled).append(", ");
-        sb.append("url=").append(this.url).append(", ");
-        sb.append("AccountNonExpired=").append(this.accountNonExpired).append(", ");
-        sb.append("credentialsNonExpired=").append(this.credentialsNonExpired).append(", ");
-        sb.append("AccountNonLocked=").append(this.accountNonLocked).append(", ");
-        sb.append("Granted Authorities=").append(this.authorities).append("]");
-        return sb.toString();
+    public String getToken() {
+        return token;
     }
 
+    public String getUserId() {
+        return userId;
+    }
 
     public List<GrantedAuthority> roles(String... roles) {
         List<GrantedAuthority> authorities = new ArrayList<>(roles.length);
@@ -98,11 +117,7 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     }
 
     @Override
-    public void eraseCredentials() {
-
-    }
-
-    @Override
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -148,4 +163,22 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+            "url='" + url + '\'' +
+            ", token='" + token + '\'' +
+            ", userId='" + userId + '\'' +
+            ", username='" + username + '\'' +
+            ", user=" + user +
+            ", authorities=" + Arrays.toString(new List[]{authorities}) +
+            ", accountNonExpired=" + accountNonExpired +
+            ", accountNonLocked=" + accountNonLocked +
+            ", credentialsNonExpired=" + credentialsNonExpired +
+            ", enabled=" + enabled +
+            '}';
+    }
+
+
 }

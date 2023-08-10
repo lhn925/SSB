@@ -99,6 +99,7 @@ public class JoinController {
         }
         // 비밀번호 보안 레벨 확인
         PwSecLevel pwSecLevel = PwChecker.checkPw(userJoinPostDto.getPassword());
+        log.info("pwSecLevel.name() = {}", pwSecLevel.name());
 
         // 비밀번호 값이 유효하지 않은 경우
         if (pwSecLevel.name().equals(PwSecLevel.NOT)) {
@@ -131,6 +132,10 @@ public class JoinController {
         }
 
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
+
+        log.info("emailAuthCodeDto = {}", emailAuthCodeDto);
+        log.info("emailAuthCodeDto.getIsSuccess() = {}", emailAuthCodeDto.getIsSuccess());
+
         if (emailAuthCodeDto == null || !emailAuthCodeDto.getIsSuccess()) {
             session.removeAttribute("emailAuthCodeDto");
             bindingResult.addError(

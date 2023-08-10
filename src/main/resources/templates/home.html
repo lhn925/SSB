@@ -26,6 +26,7 @@ md는 사이즈
 Div속성은 원래 로우를 다 차지 하는 특성
 
 -->
+  <h1 th:if="${session.USER_ID != null}" th:text="${session.USER_ID.getUsername()}+'님 반갑습니다'"></h1>
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="#">Home</a></li>

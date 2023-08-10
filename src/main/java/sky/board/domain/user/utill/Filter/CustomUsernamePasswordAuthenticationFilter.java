@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.exception.LoginFailCountException;
-import sky.board.domain.user.exception.MissingCapthcahFactorException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.PathDetails;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.UserLogService;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 
@@ -53,7 +52,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
-        final int LIMIT = 4;
+        final int LIMIT = 5;
 
         /**
          * 유저가 로그인 버튼을 입력한 URL 저장
@@ -102,7 +101,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
             throw new UsernameNotFoundException("password Not found");
         }
 
-        Long failCount = userLogService.getLoginLogCount(userId, LoginSuccess.FAIL);
+        Long failCount = userLogService.getLoginLogCount(userId, LoginSuccess.FAIL, Status.ON);
 
         // 로그인 실패가 5번 이상 일 경우 & 2차인증을 성공하지 못했을 경우
         if (LIMIT <= failCount && !isCaptcha) {

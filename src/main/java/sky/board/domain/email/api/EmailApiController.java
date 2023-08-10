@@ -139,6 +139,7 @@ public class EmailApiController {
 
         // 이메일 인증 성공시 성공 여부 값에 true
         emailAuthCodeDto.changeSuccess(true);
+        session.setAttribute("emailAuthCodeDto",emailAuthCodeDto);
 
         return new ResponseEntity(new Result<>(emailAuthCodeDto), HttpStatus.OK);
     }

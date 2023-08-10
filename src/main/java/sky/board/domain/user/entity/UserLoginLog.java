@@ -1,6 +1,7 @@
 package sky.board.domain.user.entity;
 
 
+import static jakarta.persistence.EnumType.ORDINAL;
 import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.Entity;
@@ -12,10 +13,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import lombok.Builder;
+import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import sky.board.domain.user.model.LoginSuccess;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.model.UserAgent;
 
 /**
@@ -25,6 +28,7 @@ import sky.board.domain.user.model.UserAgent;
  */
 
 @Entity
+@Getter
 @EntityListeners(AuditingEntityListener.class)
 public class UserLoginLog {
 
@@ -53,6 +57,9 @@ public class UserLoginLog {
     // 경도
     private String longitude;
 
+    // 상태 값
+    private Boolean isStatus;
+
 
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
@@ -61,7 +68,7 @@ public class UserLoginLog {
     @Builder
     public UserLoginLog(String ip, String userId, LoginSuccess isSuccess, String countryName,
         UserAgent userAgent,
-        String latitude, String longitude) {
+        String latitude, String longitude,Status isStatus) {
         this.ip = ip;
         this.userId = userId;
         this.isSuccess = isSuccess;
@@ -69,6 +76,7 @@ public class UserLoginLog {
         this.userAgent = userAgent;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.isStatus = isStatus.getValue();
     }
 
     protected UserLoginLog() {

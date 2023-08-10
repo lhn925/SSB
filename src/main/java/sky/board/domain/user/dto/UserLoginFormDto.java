@@ -1,12 +1,13 @@
 package sky.board.domain.user.dto;
 
 
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserLoginFormDto {
+public class UserLoginFormDto implements Serializable {
     private String url;
     private String mode;
     private String userId;

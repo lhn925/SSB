@@ -1,5 +1,6 @@
 package sky.board.domain.user.dto;
 
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import sky.board.domain.user.annotation.JoinValid;
@@ -10,7 +11,7 @@ import sky.board.domain.user.annotation.JoinValid;
  */
 @Getter
 @Setter
-public class JoinEmailDuplicateDto {
+public class JoinEmailDuplicateDto implements Serializable  {
 
     @JoinValid(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
     private String email;

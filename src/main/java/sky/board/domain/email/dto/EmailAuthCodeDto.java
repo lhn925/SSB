@@ -1,11 +1,12 @@
 package sky.board.domain.email.dto;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class EmailAuthCodeDto {
+public class EmailAuthCodeDto implements Serializable  {
     private String code;
     private LocalDateTime authTimeLimit;
     private Boolean isSuccess; // 이메일 인증 성공 여부
