@@ -5,7 +5,6 @@ import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -79,7 +78,7 @@ public class User extends BaseTimeEntity {
         user.setPassword(passwordEncoder.encode(userJoinDto.getPassword()));
         user.setUserName(userJoinDto.getUserName());
         user.setSalt(salt);
-        user.setGrade(UserGrade.USER);
+        user.setGrade(UserGrade.MEMBER);
         user.setPwSecLevel(userJoinDto.getPwSecLevel());
         user.setIsStatus(Status.OFF.getValue());
         return user;
@@ -97,8 +96,9 @@ public class User extends BaseTimeEntity {
             password(user.getPassword()).
             enabled(user.getIsStatus()).
             build();
-        build.setAuthorities(user.getGrade().name());
-        return build;
+         build.setAuthorities(user.getGrade().getDescription());
+
+         return build;
 
     }
 

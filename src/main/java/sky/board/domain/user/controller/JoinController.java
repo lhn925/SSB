@@ -26,6 +26,7 @@ import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
 import sky.board.domain.user.utill.PwChecker;
+import sky.board.domain.user.utill.ReadCookie;
 import sky.board.global.error.dto.FieldErrorCustom;
 
 
@@ -66,7 +67,7 @@ public class JoinController {
             session.removeAttribute("emailAuthCodeDto");
         }
 
-        Optional<String> agreeToken = readCookie(request.getCookies(), "agreeToken");
+        Optional<String> agreeToken = ReadCookie.readCookie(request.getCookies(), "agreeToken");
 
         // agreeToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
         if (agreeToken.isEmpty() || (!agreeToken.orElse(null).equals(userJoinAgreeDto.getAgreeToken()))) {
@@ -122,7 +123,7 @@ public class JoinController {
 
         Cookie[] cookies = request.getCookies();
 
-        Optional<String> agreeToken = readCookie(cookies, "agreeToken");
+        Optional<String> agreeToken = ReadCookie.readCookie(cookies, "agreeToken");
 
         // 동의 여부 token 이 없을 경우 다시 동의 폼으로
         // 세션에 저장해둔 동의 여부 갖고오기
@@ -188,12 +189,4 @@ public class JoinController {
         return "user/join/joinAgreeForm";
     }
 
-
-    private static Optional<String> readCookie(Cookie[] cookies, String key) {
-        Optional<String> agreeToken = Arrays.stream(cookies)
-            .filter(c -> c.getName().equals(key))
-            .map(Cookie::getValue)
-            .findAny();
-        return agreeToken;
-    }
 }

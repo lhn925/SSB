@@ -28,7 +28,6 @@ public class TestController {
         log.info("httpSession.getLastAccessedTime() = {}",new Date(httpSession.getLastAccessedTime()));
         log.info("httpSession = {}", httpSession.getMaxInactiveInterval() / 60);
 
-        httpSession.setMaxInactiveInterval(120);
         Iterator<String> stringIterator = httpSession.getAttributeNames().asIterator();
         for (Iterator<String> it = stringIterator; it.hasNext(); ) {
             String attributeName = it.next();
@@ -41,8 +40,11 @@ public class TestController {
 
     @GetMapping("/test/logout")
     public String logout(HttpSession httpSession) {
-        httpSession.removeAttribute("USER_ID");
+        Object user_id = httpSession.getAttribute("USER_ID");
+        if (user_id != null) {
+            httpSession.removeAttribute("USER_ID");
+        }
+        redisTemplate.delete("spring:session:Erjuer:sessions:"+httpSession.getId());
         return httpSession.getId();
-
     }
 }

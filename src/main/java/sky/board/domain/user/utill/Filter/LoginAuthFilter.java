@@ -11,14 +11,14 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
 //@Component
-public class LoginAuthFilter extends GenericFilterBean {
+public class LoginAuthFilter {
 
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+   /* public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
@@ -35,5 +35,8 @@ public class LoginAuthFilter extends GenericFilterBean {
 
         doFilter(request,response,chain);
 
-    }
+    }*/
+
+
+
 }

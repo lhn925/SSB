@@ -12,6 +12,8 @@ public class UserLoginFormDto implements Serializable {
     private String mode;
     private String userId;
 
+    private Boolean rememberMe;
+
     // 인증번호
     private String captcha;
 

@@ -4,24 +4,33 @@ package sky.board.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.catalina.authenticator.SavedRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sky.board.domain.user.repository.UserQueryRepository;
-import sky.board.domain.user.service.UserDetailsCustomService;
-import sky.board.domain.user.utill.Filter.CustomUsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.utill.Filter.CustomUsernameFilter;
+import sky.board.domain.user.utill.handler.CustomAuthenticationFailHandler;
+import sky.board.domain.user.utill.handler.CustomAuthenticationSuccessHandler;
+import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SpringSecurityConfig {
+
+
     /**
      * 에외 처리하고 싶은 url
      *
@@ -32,7 +41,11 @@ public class SpringSecurityConfig {
         return (web) -> web.ignoring().requestMatchers("/login/dashboard", "/email/**", "/join/**", "/");
     }*/
     @Bean
-    public SecurityFilterChain webSecurityFilterChain(CustomUsernamePasswordAuthenticationFilter authenticationFilter,
+    public SecurityFilterChain webSecurityFilterChain(AuthenticationManager authenticationManager,
+        UserLogService userLogService,
+        CustomAuthenticationSuccessHandler successHandler,
+        CustomAuthenticationFailHandler failHandler,
+        ApiExamCaptchaNkeyService apiExamCaptchaNkeyService,
         HttpSecurity http) throws Exception {
         /**
          * cors
@@ -49,9 +62,20 @@ public class SpringSecurityConfig {
          * 컨트롤러에서 화면 파일명을 리턴해 ViewResolver가 작동해 페이지 이동을 하는 경우 위처럼 설정을 추가하셔야 합니다.
          * 요청을 위조하여 사용자의 권한을 이용해 서버에 대한 악성공격을 하는 것
          */
-
-        http.csrf().disable().cors().disable().
-            addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class).
+        /**
+         * .rememberMeParameter() 사용자가 로그인 페이지를 만들때 여기를 주의해야 한다.
+         * 보통 checkbox로 만들텐데, 이때 name을 여기서 설정한 값과 동일하게 해줘야 한다.
+         * tokenValiditySeconds 초 단위로 remember-me 토큰의 유효시간을 설정할 수 있다.
+         * .alwaysRemember 사용자가 이 기능을 사용한다고 체크하지 않아도 자동으로 사용하게 하는 기능이다.
+         * userDetailsService 이 기능을 사용하려면 사용자 정보가 필요하다. 따라서 객체를 주입받은 후 넣어주자.
+         */
+  /*      http.rememberMe()// rememberMe 기능 작동함
+            .rememberMeParameter("rememberMe") // default: remember-me, checkbox 등의 이름과 맞춰야함
+            .alwaysRemember(false)  // 사용자가 체크박스를 활성화하지 않아도 항상 실행, default: false
+            .userDetailsService(userDetailsService);*/
+        // 기능을 사용할 때 사용자 정보가 필요함. 반드시 이 설정 필요함.
+        //tokenValiditySeconds(3600) // 쿠키의 만료시간 설정(초), default: 14일
+        http.csrf().disable().
             authorizeHttpRequests(request ->
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
@@ -63,9 +87,10 @@ public class SpringSecurityConfig {
                         "/email/**",
                         "/join/**",
                         "/example/city",
-                        "/",
                         "/login",
+                        "/login/logout",
                         "/test/**",
+                        "/",
                         "/test",
                         "/css/**"). // 허용 파일 및 허용 url
                     permitAll().
@@ -74,13 +99,17 @@ public class SpringSecurityConfig {
             ).
             formLogin(login -> login. //form 방식 로그인 사용
                     loginPage("/login"). // 커스텀 로그인 페이지 지정
-//                    loginProcessingUrl("/login-proc").
-    usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
-                        passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-                        permitAll()
+                    usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
+                    passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
+//                    successHandler(successHandler).
+//                    failureHandler(failHandler).
+    permitAll()
                 // 대시보드 이동이 막히면 안되므로 얘는 허용
 //                defaultSuccessUrl("/login/dashboard").
-            ).logout(withDefaults()); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
+            ).logout(withDefaults()).
+            addFilterBefore(new CustomUsernameFilter(authenticationManager, userLogService, successHandler, failHandler,
+                    apiExamCaptchaNkeyService),
+                UsernamePasswordAuthenticationFilter.class); // 로그아웃은 기본설정으로 (/logout으로 인증해제)
         /**
          *     loginProcessingUrl("/login")
          * 지정하지 않을 시 기본은 'POST /login'
@@ -89,15 +118,23 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public HttpSessionSecurityContextRepository httpSessionSecurityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+
+    @Bean
+    public SecurityContextImpl securityContext() {
+        return new SecurityContextImpl();
+    }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
         throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

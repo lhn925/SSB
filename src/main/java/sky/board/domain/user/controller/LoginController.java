@@ -2,18 +2,22 @@ package sky.board.domain.user.controller;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sky.board.domain.user.dto.UserLoginFailErrorDto;
 import sky.board.domain.user.dto.UserLoginFormDto;
+import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Controller
@@ -22,12 +26,14 @@ import sky.board.domain.user.dto.UserLoginFormDto;
 public class LoginController {
 
     private final MessageSource ms;
+    private final RedisTemplate redisTemplate;
 
     /**
      * @param request
      * @return
      */
-    @GetMapping
+
+    @GetMapping()
     public String loginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
         @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
         HttpServletRequest request, Model model) {
@@ -60,8 +66,20 @@ public class LoginController {
      * 로그인 성공 후 호출되는 API
      * 0dksmf071
      * 0dlagksmf2
-     *
      */
 
 
+    @GetMapping("/logout")
+    public String logout(HttpSession httpSession) {
+        Object user_id = httpSession.getAttribute(RedisKeyDto.USER_KEY);
+        if (user_id != null) {
+            httpSession.removeAttribute(RedisKeyDto.USER_KEY);
+        }
+        log.info("RedisKeyDto.SESSION_KEY = {}", RedisKeyDto.SESSION_KEY);
+        String id = httpSession.getId();
+        if (StringUtils.hasText(id)) {
+            redisTemplate.delete(RedisKeyDto.SESSION_KEY + httpSession.getId());
+        }
+        return "redirect:/";
+    }
 }

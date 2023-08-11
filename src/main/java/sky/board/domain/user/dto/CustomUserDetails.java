@@ -12,8 +12,8 @@ import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,7 +34,7 @@ import sky.board.domain.user.entity.User;
  */
 
 
-public class CustomUserDetails implements Serializable, UserDetails {
+public class CustomUserDetails implements Serializable, UserDetails,CredentialsContainer {
 
     private String url;
     private String token;
@@ -42,7 +42,6 @@ public class CustomUserDetails implements Serializable, UserDetails {
     private String password;
     private String username;
     private User user;
-
 
     private List<GrantedAuthority> authorities;
 
@@ -137,7 +136,7 @@ public class CustomUserDetails implements Serializable, UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
+    public  boolean isAccountNonExpired() {
         return accountNonExpired;
     }
 
@@ -181,4 +180,8 @@ public class CustomUserDetails implements Serializable, UserDetails {
     }
 
 
+    @Override
+    public void eraseCredentials() {
+        this.password = null;
+    }
 }

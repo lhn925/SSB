@@ -1,17 +1,13 @@
 package sky.board.domain.user.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.util.Assert;
 
 @Getter
 public class UserInfoSessionDto implements Serializable {
+
 
     private String userId;
     private String username;
