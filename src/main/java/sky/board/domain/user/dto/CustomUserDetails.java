@@ -116,7 +116,6 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     }
 
     @Override
-    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -167,10 +166,9 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     public String toString() {
         return "{" +
             "url='" + url + '\'' +
-            ", token='" + token + '\'' +
+//            ", token='" + token + '\'' +
             ", userId='" + userId + '\'' +
             ", username='" + username + '\'' +
-            ", user=" + user +
             ", authorities=" + Arrays.toString(new List[]{authorities}) +
             ", accountNonExpired=" + accountNonExpired +
             ", accountNonLocked=" + accountNonLocked +

@@ -13,11 +13,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
@@ -32,7 +31,6 @@ import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
     private final UserLogService userLogService;
-
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
     public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "userId";
@@ -45,19 +43,16 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
     private boolean postOnly = true;
 
-    private final AuthenticationSuccessHandler successHandler;
-    private final AuthenticationFailureHandler failHandler;
 
-    public CustomUsernameFilter(AuthenticationManager authenticationManager, UserLogService userLogService,
+    public CustomUsernameFilter(RememberMeServices rememberMeServices, AuthenticationManager authenticationManager,
+        UserLogService userLogService,
         AuthenticationSuccessHandler successHandler,
         AuthenticationFailureHandler failureHandler,
-
         ApiExamCaptchaNkeyService apiExamCaptchaNkeyService) {
         super(authenticationManager);
+        super.setRememberMeServices(rememberMeServices);
         super.setAuthenticationSuccessHandler(successHandler);
         super.setAuthenticationFailureHandler(failureHandler);
-        this.successHandler = successHandler;
-        this.failHandler = failureHandler;
         this.userLogService = userLogService;
         this.apiExamCaptchaNkeyService = apiExamCaptchaNkeyService;
     }
@@ -76,6 +71,9 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
          */
 
         log.info(" 여기는 필터 메서드");
+        String rememberMe = request.getParameter("rememberMe");
+        log.info("rememberMe = {}", rememberMe);
+
         String chptchaKey = getRequestValue("captchaKey", request);
 
         // 2차인증 키가 있을 경우 인증번호를 확인하고 널일 경우 반환
@@ -167,4 +165,5 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         value = (value != null) ? value.trim() : "";
         return value;
     }
+
 }

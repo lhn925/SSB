@@ -1,6 +1,8 @@
 package sky.board;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import sky.board.domain.user.utill.ReadCookie;
 
 @Controller
 @Slf4j
@@ -17,7 +20,7 @@ public class HomeController {
 
 
     @GetMapping("/")
-    public String home() {
+    public String home(HttpServletRequest request) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -26,6 +29,7 @@ public class HomeController {
         log.info("authentication.getDetails() = {}", authentication.getDetails());
         log.info("authentication.getAuthorities().toString() = {}", authentication.getAuthorities());
         log.info("authentication.isAuthenticated() = {}", authentication.isAuthenticated());
+
         if (authentication != null && authentication.isAuthenticated()) {
             log.info(" 로그인이 된것인가?? 됐음!= {}" );
             

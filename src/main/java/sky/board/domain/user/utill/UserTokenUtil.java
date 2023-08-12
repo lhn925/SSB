@@ -7,7 +7,7 @@ import java.security.SecureRandom;
 public class UserTokenUtil {
 
     // token 발급
-    public static String hashing(byte[] email, String Salt) {
+    public static String hashing(byte[] value, String Salt) {
         MessageDigest md = null;  // SHA3-256 해시함수를 사용
         try {
             md = MessageDigest.getInstance("SHA3-256");
@@ -16,12 +16,12 @@ public class UserTokenUtil {
         }
         // key-stretching
         for (int i = 0; i < 10000; i++) {
-            String temp = Byte_to_String(email) + Salt;
+            String temp = Byte_to_String(value) + Salt;
             md.update(temp.getBytes());
-            email = md.digest();
+            value = md.digest();
         }
-        return Byte_to_String(email);
-    }
+        return Byte_to_String(value);
+    }   // token 발급
 
     // 바이트 값을 16진수로 변경해준다
     private static String Byte_to_String(byte[] temp) {

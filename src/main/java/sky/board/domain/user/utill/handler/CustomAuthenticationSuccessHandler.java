@@ -79,13 +79,13 @@ public class CustomAuthenticationSuccessHandler implements
          * 단, 2주 동안 해당 PC에서 사이트를 사용하지 않는다면 로그인 상태 유지는 해제될 수 있습니다.
          * - 개인 정보 보호를 위해 공용 PC에서는 사용에 유의해 주시기 바랍니다.
          */
-        if (rememberMe) {
-       /*     Cookie sk_id = new Cookie("remember-me", session.getId());
+     /*   if (rememberMe) {
+            Cookie sk_id = new Cookie("remember-me", session.getId());
             sk_id.setPath("/");
             sk_id.setMaxAge(MAX);
             response.addCookie(sk_id);
-            session.setMaxInactiveInterval(MAX);*/
-        }
+            session.setMaxInactiveInterval(MAX);
+        }*/
         securityContext.setAuthentication(authentication);
 
         securityContextRepository.saveContext(securityContext,request,response);

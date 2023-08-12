@@ -92,7 +92,7 @@ public class User extends BaseTimeEntity {
         CustomUserDetails build = CustomUserDetails.builder().
             userId(user.getUserId()).
             token(user.getToken()).
-            username(user.getUserName()).
+            username(user.getUserId()).
             password(user.getPassword()).
             enabled(user.getIsStatus()).
             build();
@@ -102,4 +102,18 @@ public class User extends BaseTimeEntity {
 
     }
 
+
+    public static UserDetails UserBuilder(User user,String password) {
+        CustomUserDetails build = CustomUserDetails.builder().
+            userId(user.getUserId()).
+            token(user.getToken()).
+            username(user.getUserId()).
+            password(password).
+            enabled(user.getIsStatus()).
+            build();
+        build.setAuthorities(user.getGrade().getDescription());
+
+        return build;
+
+    }
 }
