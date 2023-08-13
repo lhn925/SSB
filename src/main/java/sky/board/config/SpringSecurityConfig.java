@@ -4,6 +4,7 @@ package sky.board.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +26,14 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.CustomUserDetails;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.RedisRememberService;
 import sky.board.domain.user.service.UserLogService;
 import sky.board.domain.user.utill.Filter.CustomRememberMeAuthenticationFilter;
 import sky.board.domain.user.utill.Filter.CustomUsernameFilter;
+import sky.board.domain.user.utill.ReadCookie;
 import sky.board.domain.user.utill.handler.CustomAuthenticationFailHandler;
 import sky.board.domain.user.utill.handler.CustomAuthenticationSuccessHandler;
 import sky.board.domain.user.utill.handler.CustomCookieLoginSuccessHandler;
@@ -130,9 +133,24 @@ public class SpringSecurityConfig {
         http.logout()
             .logoutUrl("/logout")
             .logoutSuccessHandler((request, response, authentication) -> {
-                response.sendRedirect("/login");
+
+                Cookie[] cookies = request.getCookies();
+
+                String hashKey = ReadCookie.readCookie(cookies, RememberCookie.NAME.getValue());
+
+                if (hashKey != null && StringUtils.hasText(hashKey)) {
+                    RedisRememberService redisRememberService = (RedisRememberService) rememberMeServices;
+                    String redisKey = redisRememberService.hashing(hashKey);
+                    redisService.deleteData(redisKey);
+                }
+                String url = request.getParameter("url");
+
+                if (url == null || !StringUtils.hasText(url)) {
+                    url = "/";
+                }
+                response.sendRedirect(url);
             }) // 로그아웃 성공 핸들러
-            .deleteCookies("remember-me"); // 로그아웃 후 삭제할 쿠키 지정
+            .deleteCookies(RememberCookie.NAME.getValue()); // 로그아웃 후 삭제할 쿠키 지정
         return http.build();
     }
 
