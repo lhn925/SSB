@@ -1,25 +1,17 @@
 package sky.board.domain.user.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.Assert;
 import sky.board.domain.user.entity.User;
 
@@ -39,9 +31,11 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     private String url;
     private String token;
     private String userId;
+
+    // username 이랑 겹치는 문제로 바꿈 nickname으로 일시적으로 바꿈
+    private String nickname;
     private String password;
     private String username;
-    private User user;
 
     private List<GrantedAuthority> authorities;
 
@@ -64,7 +58,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     public CustomUserDetails() {
     }
 
-    public CustomUserDetails(String url, String token, String userId, String password, String username, User user,
+    public CustomUserDetails(String url, String token, String userId, String password, String username, String nickname,
         List<GrantedAuthority> authorities, boolean accountNonExpired, boolean accountNonLocked,
         boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder) {
         this.url = url;
@@ -72,19 +66,18 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.userId = userId;
         this.password = password;
         this.username = username;
-        this.user = user;
         this.authorities = authorities;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
         this.passwordEncoder = passwordEncoder;
+        this.nickname = nickname;
     }
 
     @Builder
-    public CustomUserDetails(String url, String userId, String token, String password, String username,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
-        User user) {
+    public CustomUserDetails(String url, String userId, String token, String password, String username,String nickname,
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled) {
         this.url = url;
         this.token = token;
         this.userId = userId;
@@ -94,7 +87,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.accountNonLocked = !accountNonLocked;
         this.credentialsNonExpired = !credentialsNonExpired;
         this.enabled = !enabled;
-        this.user = user;
+        this.nickname = nickname;
     }
 
     public String getToken() {

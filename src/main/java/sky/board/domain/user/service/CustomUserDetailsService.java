@@ -16,7 +16,7 @@ import sky.board.domain.user.repository.UserQueryRepository;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class UserDetailsCustomService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
     private final UserQueryRepository userQueryRepository;
 
     @Override

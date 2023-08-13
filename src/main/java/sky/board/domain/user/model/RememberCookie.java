@@ -2,7 +2,7 @@ package sky.board.domain.user.model;
 
 public enum RememberCookie {
 
-    NAME("rememberMe");
+    KEY("rememberMe");
 
     private String value;
 

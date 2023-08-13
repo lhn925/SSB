@@ -78,7 +78,7 @@ public class User extends BaseTimeEntity {
         user.setPassword(passwordEncoder.encode(userJoinDto.getPassword()));
         user.setUserName(userJoinDto.getUserName());
         user.setSalt(salt);
-        user.setGrade(UserGrade.MEMBER);
+        user.setGrade(UserGrade.USER);
         user.setPwSecLevel(userJoinDto.getPwSecLevel());
         user.setIsStatus(Status.OFF.getValue());
         return user;
@@ -91,24 +91,10 @@ public class User extends BaseTimeEntity {
     public static UserDetails UserBuilder(User user) {
         CustomUserDetails build = CustomUserDetails.builder().
             userId(user.getUserId()).
-            token(user.getToken()).
             username(user.getUserId()).
+            token(user.getToken()).
+            nickname(user.getUserName()).
             password(user.getPassword()).
-            enabled(user.getIsStatus()).
-            build();
-         build.setAuthorities(user.getGrade().getDescription());
-
-         return build;
-
-    }
-
-
-    public static UserDetails UserBuilder(User user,String password) {
-        CustomUserDetails build = CustomUserDetails.builder().
-            userId(user.getUserId()).
-            token(user.getToken()).
-            username(user.getUserId()).
-            password(password).
             enabled(user.getIsStatus()).
             build();
         build.setAuthorities(user.getGrade().getDescription());
@@ -116,4 +102,6 @@ public class User extends BaseTimeEntity {
         return build;
 
     }
+
+
 }

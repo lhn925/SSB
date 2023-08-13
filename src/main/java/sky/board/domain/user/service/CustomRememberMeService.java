@@ -15,13 +15,13 @@ public class CustomRememberMeService extends TokenBasedRememberMeServices {
     @Autowired
     public CustomRememberMeService(
         UserDetailsService userDetailsService) {
-        super(RememberCookie.NAME.getValue(), userDetailsService);
-        super.setParameter(RememberCookie.NAME.getValue());
-        super.setCookieName(RememberCookie.NAME.getValue());
+        super(RememberCookie.KEY.getValue(), userDetailsService);
+        super.setParameter(RememberCookie.KEY.getValue());
+        super.setCookieName(RememberCookie.KEY.getValue());
     }
     public CustomRememberMeService(UserDetailsService userDetailsService,
         RememberMeTokenAlgorithm encodingAlgorithm) {
-        super(RememberCookie.NAME.getValue(), userDetailsService, encodingAlgorithm);
+        super(RememberCookie.KEY.getValue(), userDetailsService, encodingAlgorithm);
     }
 
 }

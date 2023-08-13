@@ -1,10 +1,8 @@
 package sky.board.domain.user.utill.Filter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
@@ -12,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import sky.board.domain.user.dto.CustomUserDetails;
 import sky.board.domain.user.model.RememberCookie;
@@ -43,7 +40,7 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         RedisRememberService rememberMeServices = (RedisRememberService) super.getRememberMeServices();
 
         // 쿠키에 있는 값을 가져온 뒤
-        String key = ReadCookie.readCookie(request.getCookies(), RememberCookie.NAME.getValue());
+        String key = ReadCookie.readCookie(request.getCookies(), RememberCookie.KEY.getValue());
 
         log.info("rememberMe value = {}", key);
         String redisToken = rememberMeServices.hashing(key);
