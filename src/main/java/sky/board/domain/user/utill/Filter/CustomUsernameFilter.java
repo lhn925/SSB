@@ -12,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -43,7 +45,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
     private boolean postOnly = true;
 
-
     public CustomUsernameFilter(RememberMeServices rememberMeServices, AuthenticationManager authenticationManager,
         UserLogService userLogService,
         AuthenticationSuccessHandler successHandler,
@@ -53,6 +54,8 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         super.setRememberMeServices(rememberMeServices);
         super.setAuthenticationSuccessHandler(successHandler);
         super.setAuthenticationFailureHandler(failureHandler);
+        super.setUsernameParameter(this.SPRING_SECURITY_FORM_USERNAME_KEY);
+        super.setPasswordParameter(this.SPRING_SECURITY_FORM_PASSWORD_KEY);
         this.userLogService = userLogService;
         this.apiExamCaptchaNkeyService = apiExamCaptchaNkeyService;
     }
@@ -125,34 +128,27 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(userId,
             password);
         // Allow subclasses to set the "details" property
-        setDetails(request, authRequest);
-        return this.getAuthenticationManager().authenticate(authRequest);
+        super.setDetails(request, authRequest);
+
+        Authentication authenticate = super.getAuthenticationManager().authenticate(authRequest);
+
+        return authenticate;
     }
 
 
-    @Nullable
-    protected String obtainPassword(HttpServletRequest request) {
-        return request.getParameter(this.passwordParameter);
-    }
-
-    @Nullable
-    protected String obtainUsername(HttpServletRequest request) {
-        return request.getParameter(this.usernameParameter);
-    }
-
-    protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
-        authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
-    }
-
+    @Override
     public void setUsernameParameter(String usernameParameter) {
         Assert.hasText(usernameParameter, "Username parameter must not be empty or null");
         this.usernameParameter = usernameParameter;
+        super.setUsernameParameter(this.usernameParameter);
     }
 
 
+    @Override
     public void setPasswordParameter(String passwordParameter) {
         Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
         this.passwordParameter = passwordParameter;
+        super.setPasswordParameter(this.passwordParameter);
     }
 
 

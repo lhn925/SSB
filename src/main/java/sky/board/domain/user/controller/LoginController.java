@@ -67,8 +67,6 @@ public class LoginController {
      * 0dksmf071
      * 0dlagksmf2
      */
-
-
     @GetMapping("/logout")
     public String logout(HttpSession httpSession) {
         Object user_id = httpSession.getAttribute(RedisKeyDto.USER_KEY);

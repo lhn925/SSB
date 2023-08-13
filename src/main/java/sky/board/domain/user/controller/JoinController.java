@@ -48,7 +48,6 @@ public class JoinController {
      * @return
      */
     /**
-     *
      * @param userJoinAgreeDto
      * @param bindingResult
      * @param model
@@ -67,10 +66,10 @@ public class JoinController {
             session.removeAttribute("emailAuthCodeDto");
         }
 
-        Optional<String> agreeToken = ReadCookie.readCookie(request.getCookies(), "agreeToken");
+        String agreeToken = ReadCookie.readCookie(request.getCookies(), "agreeToken");
 
         // agreeToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
-        if (agreeToken.isEmpty() || (!agreeToken.orElse(null).equals(userJoinAgreeDto.getAgreeToken()))) {
+        if (!StringUtils.hasText(agreeToken) || (!agreeToken.equals(userJoinAgreeDto.getAgreeToken()))) {
             bindingResult.reject("code.error");
             return "redirect:/join/agree";
         }
@@ -123,11 +122,11 @@ public class JoinController {
 
         Cookie[] cookies = request.getCookies();
 
-        Optional<String> agreeToken = ReadCookie.readCookie(cookies, "agreeToken");
+        String agreeToken = ReadCookie.readCookie(cookies, "agreeToken");
 
         // 동의 여부 token 이 없을 경우 다시 동의 폼으로
         // 세션에 저장해둔 동의 여부 갖고오기
-        UserJoinAgreeDto userJoinAgreeDto = (UserJoinAgreeDto) session.getAttribute(agreeToken.orElse(null));
+        UserJoinAgreeDto userJoinAgreeDto = (UserJoinAgreeDto) session.getAttribute(agreeToken);
         if (userJoinAgreeDto == null) {
             return "redirect:/join/agree";
         }

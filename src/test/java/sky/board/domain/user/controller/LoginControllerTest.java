@@ -52,7 +52,7 @@ class LoginControllerTest {
     @Test
     public void autoLogin() throws Exception {
         Cookie cookie = new Cookie("rememberMe",
-            "eb3c49fe-efa6-4898-8799-6c5d45457c26:5adbb752f89427fe3dba");
+            "a467984f-5e69-460f-92cd-663d3c0cf1b9:b0bb0a9e086714902492");
         MockHttpServletResponse response = new MockHttpServletResponse();
         mockMvc.perform(
             get("/login").contentType(MediaType.TEXT_HTML)

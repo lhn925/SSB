@@ -4,15 +4,18 @@ package sky.board.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,12 +23,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import sky.board.domain.user.dto.CustomUserDetails;
+import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.RedisRememberService;
 import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.utill.Filter.CustomRememberMeAuthenticationFilter;
 import sky.board.domain.user.utill.Filter.CustomUsernameFilter;
 import sky.board.domain.user.utill.handler.CustomAuthenticationFailHandler;
 import sky.board.domain.user.utill.handler.CustomAuthenticationSuccessHandler;
+import sky.board.domain.user.utill.handler.CustomCookieLoginSuccessHandler;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.service.RedisService;
 
@@ -37,6 +45,7 @@ public class SpringSecurityConfig {
 
 
     private final UserDetailsService userDetailsService;
+    private final RedisService redisService;
 
     /**
      * 에외 처리하고 싶은 url
@@ -52,6 +61,7 @@ public class SpringSecurityConfig {
         AuthenticationManager authenticationManager,
         UserLogService userLogService,
         CustomAuthenticationSuccessHandler successHandler,
+        CustomCookieLoginSuccessHandler cookieLoginSuccessHandler,
         CustomAuthenticationFailHandler failHandler,
         ApiExamCaptchaNkeyService apiExamCaptchaNkeyService,
         RememberMeServices rememberMeServices,
@@ -73,9 +83,9 @@ public class SpringSecurityConfig {
          * 요청을 위조하여 사용자의 권한을 이용해 서버에 대한 악성공격을 하는 것
          */
         http.rememberMe()// rememberMe 기능 작동함
-            .rememberMeParameter("rememberMe") // default: remember-me, checkbox 등의 이름과 맞춰야함
+            .rememberMeParameter(RememberCookie.NAME.getValue()) // default: remember-me, checkbox 등의 이름과 맞춰야함
             .alwaysRemember(false)  // 사용자가 체크박스를 활성화하지 않아도 항상 실행, default: false
-            .rememberMeCookieName("rememberMe")
+            .rememberMeCookieName(RememberCookie.NAME.getValue())
             .userDetailsService(userDetailsService);
         // 기능을 사용할 때 사용자 정보가 필요함. 반드시 이 설정 필요함.
         //tokenValiditySeconds(3600) // 쿠키의 만료시간 설정(초), default: 14일
@@ -85,8 +95,10 @@ public class SpringSecurityConfig {
                 successHandler, failHandler,
                 apiExamCaptchaNkeyService),
             UsernamePasswordAuthenticationFilter.class);
-/*        http.addFilterBefore(new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices),
-            RememberMeAuthenticationFilter.class);*/
+        http.addFilterBefore(
+            new CustomRememberMeAuthenticationFilter(authenticationManager, rememberMeServices,
+                cookieLoginSuccessHandler),
+            RememberMeAuthenticationFilter.class);
         http.csrf().disable().
             authorizeHttpRequests(request ->
                 request.
@@ -114,8 +126,13 @@ public class SpringSecurityConfig {
                 usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                 passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
                 permitAll()
-            ).logout(withDefaults());// 로그아웃은 기본설정으로 (/logout으로 인증해제)
-
+            );
+        http.logout()
+            .logoutUrl("/logout")
+            .logoutSuccessHandler((request, response, authentication) -> {
+                response.sendRedirect("/login");
+            }) // 로그아웃 성공 핸들러
+            .deleteCookies("remember-me"); // 로그아웃 후 삭제할 쿠키 지정
         return http.build();
     }
 
@@ -124,16 +141,14 @@ public class SpringSecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
 
-
     @Bean
     public SecurityContextImpl securityContext() {
         return new SecurityContextImpl();
     }
 
-
     @Bean
-    public RememberMeServices rememberMeServices(RedisService redisService) {
-        return new RedisRememberService("rememberMe", userDetailsService, redisService);
+    public RememberMeServices rememberMeServices() {
+        return new RedisRememberService(RememberCookie.NAME.getValue(), userDetailsService, redisService);
     }
 
     @Bean

@@ -6,6 +6,9 @@ server:
     include-stacktrace: never
     include-binding-errors: never
   address: localhost
+  servlet:
+    session:
+      timeout: 1m
 spring:
   session:
     redis:

@@ -30,13 +30,6 @@ public class HomeController {
         log.info("authentication.getAuthorities().toString() = {}", authentication.getAuthorities());
         log.info("authentication.isAuthenticated() = {}", authentication.isAuthenticated());
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            log.info(" 로그인이 된것인가?? 됐음!= {}" );
-            
-        } else {
-            log.info(" 로그인이 된것인가?? 안됨= {}" );
-        }
-
 //        Optional<String> ss_id = ReadCookie.readCookie(cookies, "SS_ID");
 
 //        log.info("ss_id = {}", ss_id);
