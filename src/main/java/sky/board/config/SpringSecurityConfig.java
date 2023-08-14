@@ -106,6 +106,7 @@ public class SpringSecurityConfig {
                         "/login/**",
                         "/email/**",
                         "/join/**",
+                        "/image/**",
                         "/example/city",
                         "/login",
                         "/logout",

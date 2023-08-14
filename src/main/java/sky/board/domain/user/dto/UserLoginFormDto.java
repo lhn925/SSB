@@ -11,7 +11,7 @@ public class UserLoginFormDto implements Serializable {
     private String url;
     private String mode;
     private String userId;
-
+    private String password;
     private Boolean rememberMe;
 
     // 인증번호

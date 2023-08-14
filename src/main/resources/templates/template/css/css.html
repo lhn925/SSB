@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="css (page)">
+
+
+<th:block th:if="${page == 'joinAgreeForm'}">
+  <link th:href="@{/css/base/base.css}" rel="stylesheet">
+  <link th:href="@{/css/join/agree.css}" rel="stylesheet">
+  <title th:text="#{sky.logo} +':'+ #{sky.signup}"></title>
+</th:block>
+
+<th:block th:if="${page == 'joinForm'}">
+  <link th:href="@{/css/base/base.css}" rel="stylesheet">
+  <link th:href="@{/css/join/join.css}" rel="stylesheet">
+  <title th:text="#{sky.logo} +':' + #{sky.signup}"></title>
+</th:block>
+
+</html>

@@ -1,7 +1,11 @@
+body {
+  /*min-width: 768px; !* <-- 이렇게 *!*/
+  margin: 0;
+  height: 100%;
+}
 .container {
   margin-top: 100px;
 }
-
 .btn-primary {
   background-color: #1aafec;
   border-color: #1aafec;
@@ -28,4 +32,8 @@
   font-weight: bold;
   text-align: center;
   margin-top: 20px;
+}
+
+.display-none {
+  display: none;
 }

@@ -102,9 +102,6 @@
   padding-bottom: 5px;
 }
 
-.display-none {
-  display: none;
-}
 .how-secure.dangerous {
   background: rgba(236,62,59,.12);
   color: #dc3545;

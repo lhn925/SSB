@@ -1,168 +1,157 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-        crossorigin="anonymous">
-  <link th:href="@{/css/base/base.css}" rel="stylesheet">
-  <link th:href="@{/css/join/join.css}" rel="stylesheet">
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-          crossorigin="anonymous"></script>
-  <title th:text="#{sky.logo} +' : 회원가입'"></title>
+  <th:block th:replace="~{template/header/header :: commonHead}">
+  </th:block>
+  <th:block th:replace="~{template/css/css :: css ('joinForm')}">
+  </th:block>
+
+
 </head>
 <body>
 <div class="container">
   <div class="row justify-content-center">
-    <div class="col-md-4 col-lg-4">
+    <div class="col-lg-5">
       <h1 class="logo_sky">
         <a class="link text-decoration-none">
           <span class="mainLogo blind" th:text="#{sky.logo}"></span>
         </a>
       </h1>
-      <form id="form" method="post" th:object="${userJoinPostDto}">
+      <div class="card">
+        <div class="card-body">
+          <form id="form" method="post" th:object="${userJoinPostDto}">
 
 
-        <input type="checkbox" hidden="true" id="_isChkUId"/>
-        <input type="checkbox" hidden="true" id="_isChkPw"/>
-        <input type="checkbox" hidden="true" id="_isChkUname"/>
-        <input type="checkbox" hidden="true" id="_isChkEmail"/>
-        <input type="checkbox" hidden="true" id="_isChkAuth"/>
+            <input type="checkbox" hidden="true" id="_isChkUId"/>
+            <input type="checkbox" hidden="true" id="_isChkPw"/>
+            <input type="checkbox" hidden="true" id="_isChkUname"/>
+            <input type="checkbox" hidden="true" id="_isChkEmail"/>
+            <input type="checkbox" hidden="true" id="_isChkAuth"/>
 
-        <div class="form-group">
-          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
-            Flaticon</a>
-          <div th:for="userId" class="input-group form-join form-id"
-               th:classappend="${#fields.hasErrors('userId')} ? 'error' : 'on'">
-            <input type="text" class="form-control" th:field="*{userId}"
-                   placeholder="아이디" th:errorclass="border-danger">
-          </div>
-          <div class="form-text text-danger">
-            <th:block th:if="${#fields.hasErrors('userId')}"
-                      th:each="err : ${#fields.detailedErrors('userId')}">
-              <small th:text="${err.getMessage()}"></small>
-            </th:block>
-            <small id="id-NotThyme-msg"> </small>
-          </div>
-        </div>
+            <div class="form-group">
+              <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
+                Flaticon</a>
+              <div th:for="userId" class="input-group form-join form-id"
+                   th:classappend="${#fields.hasErrors('userId')} ? 'error' : 'on'">
+                <input type="text" class="form-control" th:field="*{userId}"
+                       th:placeholder="#{sky.id}" th:errorclass="border-danger">
+              </div>
+              <div class="form-text text-danger">
+                <th:block th:if="${#fields.hasErrors('userId')}"
+                          th:each="err : ${#fields.detailedErrors('userId')}">
+                  <small th:text="${err.getMessage()}"></small>
+                </th:block>
+                <small id="id-NotThyme-msg"> </small>
+              </div>
+            </div>
 
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean Prabowo -
-          Flaticon</a>
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat Icons -
-          Flaticon</a>
-        <div class="form-group">
-          <div class="input-group form-join form-pw"
-               th:classappend="${#fields.hasErrors('password')} ? 'error' : 'on'">
-            <input type="password" th:field="*{password}" class="form-control"
-                   th:errorclass="border-danger"
-                   placeholder="비밀번호">
+            <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
+              Prabowo
+              -
+              Flaticon</a>
+            <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
+              Icons
+              -
+              Flaticon</a>
+            <div class="form-group">
+              <div class="input-group form-join form-pw"
+                   th:classappend="${#fields.hasErrors('password')} ? 'error' : 'on'">
+                <input type="password" th:field="*{password}" class="form-control"
+                       th:errorclass="border-danger"
+                       th:placeholder="#{sky.pw}">
 
-            <div class="password-info">
-              <em class="how-secure" id="secureLevel"></em>
-              <button type="button" id="btn-show" class="btn-show hide">
-                <span class="blind"></span>
+                <div class="password-info">
+                  <em class="how-secure" id="secureLevel"></em>
+                  <button type="button" id="btn-show" class="btn-show hide">
+                    <span class="blind"></span>
+                  </button>
+                </div>
+              </div>
+
+
+              <div class="form-text text-danger">
+                <th:block th:if="${#fields.hasErrors('password')}"
+                          th:each="err : ${#fields.detailedErrors('password')}">
+                  <small th:text="${err.getMessage()}"></small>
+                </th:block>
+                <small id="password-NotThyme-msg"> </small>
+              </div>
+            </div>
+
+
+            <div class="form-group">
+              <div class="input-group form-join form-name"
+                   th:classappend="${#fields.hasErrors('userName')} ? 'error' : 'on'"
+              >
+                <input class="form-control" th:field="*{userName}"
+                       th:placeholder="#{sky.userName}" th:errorclass="border-danger">
+              </div>
+              <div class="form-text text-danger">
+                <th:block th:if="${#fields.hasErrors('userName')}"
+                          th:each="err : ${#fields.detailedErrors('userName')}">
+                  <small th:text="${err.getMessage()}"></small>
+                </th:block>
+                <small id="userName-NotThyme-msg"> </small>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a>
+                from
+                <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
+              <div class="input-group form-join form-email"
+                   th:classappend="${#fields.hasErrors('email')} ? 'error' : 'on'"
+              >
+                <input class="form-control" th:field="*{email}" th:errorclass="border-danger"
+                       th:placeholder="#{sky.email}">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-primary authCode" id="sendCodeButton" th:text="#{sky.authBtn}">
+                    인증번호
+                    전송
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-text text-danger">
+                <th:block th:if="${#fields.hasErrors('email')}"
+                          th:each="err : ${#fields.detailedErrors('email')}">
+                  <small class="email-Thyme-msg" th:text="${err.getMessage()}"></small>
+                </th:block>
+                <small id="email-NotThyme-msg"></small>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a>
+                from
+                <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
+              <div class="input-group form-join form-auth"
+                   th:classappend="${#fields.hasErrors('authCode')} ? 'error' : 'on'">
+                <input type="text" class="form-control authCode" th:field="*{authCode}"
+                       th:placeholder="#{sky.checkBtn}">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-primary authCode" id="verifyCodeButton"
+                          th:text="#{sky.checkBtn}">인증번호 확인
+                  </button>
+                </div>
+              </div>
+              <small id="verification-msg" class=""></small>
+              <small id="verification-time" class=""></small> <br>
+            </div>
+
+            <div class="d-grid gap-2 col-6 mx-auto">
+              <button type="button" id="subBtn" class="btn btn-primary btn-block btn-dark mt-5"
+                      th:text="#{sky.signupBtn}">가입하기
               </button>
             </div>
-          </div>
-
-
-          <div class="form-text text-danger">
-            <th:block th:if="${#fields.hasErrors('password')}"
-                      th:each="err : ${#fields.detailedErrors('password')}">
-              <small th:text="${err.getMessage()}"></small>
-            </th:block>
-            <small id="password-NotThyme-msg"> </small>
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <div class="input-group form-join form-name"
-               th:classappend="${#fields.hasErrors('userName')} ? 'error' : 'on'"
-          >
-            <input class="form-control" th:field="*{userName}"
-                   placeholder="닉네임" th:errorclass="border-danger">
-          </div>
-          <div class="form-text text-danger">
-            <th:block th:if="${#fields.hasErrors('userName')}"
-                      th:each="err : ${#fields.detailedErrors('userName')}">
-              <small th:text="${err.getMessage()}"></small>
-            </th:block>
-            <small id="userName-NotThyme-msg"> </small>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from
-            <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
-          <div class="input-group form-join form-email"
-               th:classappend="${#fields.hasErrors('email')} ? 'error' : 'on'"
-          >
-            <input class="form-control" th:field="*{email}" th:errorclass="border-danger"
-                   placeholder="이메일">
-            <div class="input-group-append">
-              <button type="button" class="btn btn-primary authCode" id="sendCodeButton">인증번호 전송</button>
-            </div>
-          </div>
-
-          <div class="form-text text-danger">
-            <th:block th:if="${#fields.hasErrors('email')}"
-                      th:each="err : ${#fields.detailedErrors('email')}">
-              <small class="email-Thyme-msg" th:text="${err.getMessage()}"></small>
-            </th:block>
-            <small id="email-NotThyme-msg"></small>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from
-            <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
-          <div class="input-group form-join form-auth"
-               th:classappend="${#fields.hasErrors('authCode')} ? 'error' : 'on'">
-            <input type="text" class="form-control authCode" th:field="*{authCode}"
-                   placeholder="인증번호확인">
-            <div class="input-group-append">
-              <button type="button" class="btn btn-primary authCode" id="verifyCodeButton">인증번호 확인</button>
-            </div>
-          </div>
-          <small id="verification-msg" class=""></small>
-          <small id="verification-time" class=""></small> <br>
-        </div>
-
-        <div class="d-grid gap-2 col-6 mx-auto">
-          <button type="button" id="subBtn" class="btn btn-primary btn-block btn-dark mt-5">가입하기</button>
-        </div>
-      </form>
+          </form>
+        </div><!--카드바디-->
+      </div><!--카드-->
     </div>
   </div>
 </div>
-
-
-<script th:src="@{/js/errors/{locale}/errors.js(locale = ${#locale})}"></script>
-<script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
-<script th:src="@{/js/join/Email.js}"></script>
-<script th:src="@{/js/join/join.js}"></script>
-<script th:src="@{/js/join/join_ready.js}"></script>
-<script th:src="@{/js/common/function.js}"></script>
-<script th:inline="javascript">
-  const $password = _getElementById("password");
-  const rePw = [[${rePw}]];
-  $password.value = rePw;
-  let _email;
-  let _join;
-
-  // 뒤로가기로 진입시 agree 페이지로 이동
-  _onpageshow("/join/agree");
-  _join_ready_init();
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
-        integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
-        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
-        crossorigin="anonymous"></script>
+<th:block th:replace="~{template/js/js :: js ('joinForm')}">
+</th:block>
+<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+</th:block>
 </body>
 </html>
