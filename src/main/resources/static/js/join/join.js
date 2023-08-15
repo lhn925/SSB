@@ -32,8 +32,13 @@ Join.prototype._init = function () {
 Join.prototype._SubmitBtnClickAddEvent = function () {
 
   let $subBtn = _getElementById("subBtn");
-
+  let isClicking = false;
   $subBtn.onclick = function () {
+    if (isClicking) {
+      return;
+    }
+    isClicking = true;
+
     let _isChkUId = _join.$isChkUId.checked;
     let _isChkPw = _join.$isChkPw.checked;
     let _isChkUname = _join.$isChkUname.checked;
@@ -71,8 +76,9 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
     if (_isChkUId && _isChkUname && _isChkPw && _isChkEmail && _isChkAuth) {
       this.type = "submit";
       this.click();
-
+      this.setAttribute("disabled", "disabled");
     } else {
+      isClicking = false;
       return;
     }
   }
@@ -119,7 +125,7 @@ Join.prototype._PwSecureCheckFn = function () {
   if (input_value == "") {
     _addClassByParent($password, "error");
     _addClassById($password, "border-danger")
-    $NotThymeMsg.innerText = errors["NotBlank"];
+    $NotThymeMsg.innerText = errorsMsg["NotBlank"];
     $secureLevel.innerText = "";
     _join.$isChkPw.checked = false;
     return;
@@ -191,7 +197,7 @@ Join.prototype._duplicateCheckFn = function (type, msgId, path, $elementById,
   if (input_value == "") {
     _addClassByParent($elementById, "error");
     _addClassById($elementById, "border-danger");
-    $NotThymeMsg.innerText = errors["NotBlank"];
+    $NotThymeMsg.innerText = errorsMsg["NotBlank"];
     $isChkElement.checked = false;
     return false;
   }

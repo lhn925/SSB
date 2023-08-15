@@ -44,7 +44,7 @@ public class LoginController {
         }
 
         model.addAttribute("userLoginFormDto", userLoginFormDto);
-        return "/user/login";
+        return "/user/login/login";
     }
 
     /**

@@ -51,6 +51,16 @@ spring:
         format_sql: true
         default_batch_fetch_size: 1000
     open-in-view: false
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    devtools:
+      livereload:
+        enabled: true
+      remote:
+        restart:
+          enabled: true
 
 openapi:
   relaxed-binding:

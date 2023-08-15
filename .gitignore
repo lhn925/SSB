@@ -5,7 +5,6 @@ src/main/generated/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-!**/resource/image/
 
 ### STS ###
 .apt_generated

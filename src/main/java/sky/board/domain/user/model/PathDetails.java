@@ -6,7 +6,8 @@ package sky.board.domain.user.model;
  */
 public class PathDetails {
 
-    public static final String CAPTCHA_IMAGE_URL = "/src/main/resources/static/image/";
+    public static final String CAPTCHA_IMAGE_URL = "src/main/resources/static/image/";
+    public static final String PATH_IMAGE_URL = "/image/";
 
 
     public static String getFilePath(String path, String filename, String ext) {
@@ -26,5 +27,9 @@ public class PathDetails {
             end = file.lastIndexOf(".");
         }
         return file.substring(first, end);
+    }
+
+    public static String getFileName(String file, String ext) {
+        return file + "." + ext;
     }
 }

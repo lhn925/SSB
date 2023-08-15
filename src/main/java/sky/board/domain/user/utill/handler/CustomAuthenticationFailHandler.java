@@ -54,14 +54,12 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
         // 로그인 실패 횟수가 5번을 넘어가는 경우
 
         log.info("exception = {}", exception.getClass());
-        if (exception instanceof LoginFailCountException) {
+        if (exception instanceof LoginFailCountException || exception instanceof CaptchaMisMatchFactorException) {
             retryTwoFactor = true;
             errMsg = "login.error.captcha";
-            sbPath.append("imagePath=" + request.getAttribute("imagePath"));
+            sbPath.append("imageName=" + request.getAttribute("imageName"));
             sbPath.append("&captchaKey=" + request.getAttribute("captchaKey") + "&");
 
-        } else if (exception instanceof CaptchaMisMatchFactorException) { // 2차 인증번호가 맞지 않은 경우
-            errMsg = "login.error.captcha";
         } else if (exception instanceof UsernameNotFoundException) { //
 
         }

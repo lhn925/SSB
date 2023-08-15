@@ -10,25 +10,15 @@
 
 </head>
 <body>
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-lg-5">
-      <h1 class="logo_sky">
-        <a class="link text-decoration-none">
-          <span class="mainLogo blind" th:text="#{sky.logo}"></span>
-        </a>
-      </h1>
+<div class="container" th:replace="~{template/container/container ::container (~{:: .card})}">
       <div class="card">
         <div class="card-body">
           <form id="form" method="post" th:object="${userJoinPostDto}">
-
-
             <input type="checkbox" hidden="true" id="_isChkUId"/>
             <input type="checkbox" hidden="true" id="_isChkPw"/>
             <input type="checkbox" hidden="true" id="_isChkUname"/>
             <input type="checkbox" hidden="true" id="_isChkEmail"/>
             <input type="checkbox" hidden="true" id="_isChkAuth"/>
-
             <div class="form-group">
               <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
                 Flaticon</a>
@@ -146,12 +136,11 @@
           </form>
         </div><!--카드바디-->
       </div><!--카드-->
-    </div>
-  </div>
 </div>
-<th:block th:replace="~{template/js/js :: js ('joinForm')}">
-</th:block>
+</body>
 <th:block th:replace="~{template/js/js :: js ('commonJs')}">
 </th:block>
-</body>
+
+<th:block th:replace="~{template/js/js :: js ('joinForm')}">
+</th:block>
 </html>

@@ -21,8 +21,12 @@ public class ReadCookie {
         if (cookies == null || cookies.length == 0) {
             return null;
         }
-        Cookie cookie = (Cookie) Arrays.stream(cookies)
-            .filter(c -> c.getName().equals(key));
-        return cookie;
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(key)) {
+                return cookie;
+            }
+        }
+        return null;
     }
 }

@@ -20,6 +20,6 @@ public class UserLoginFormDto implements Serializable {
     // 인증키
     private String captchaKey;
 
-    // 이미지경로
-    private String imagePath;
+    // 이미지 이름
+    private String imageName;
 }

@@ -7,6 +7,12 @@ function Agree() {
 Agree.prototype._init = function () {
   this.$sbbAgreement = _getElementById("sbbAgreement1");// 사이트 이용약관 동의
   this.$infoAgreement = _getElementById("infoAgreement1");// 개인정보 이용약관 동의
+  let $chk_all = _getElementById("chk_all");
+
+  this.$sbbAgreement.checked = false;
+  this.$infoAgreement.checked = false;
+  $chk_all.checked = false;
+
   this._allCheckBtnEvent();
   this._sbbCheckBtnEvent();
   this._infoCheckBtnEvent();

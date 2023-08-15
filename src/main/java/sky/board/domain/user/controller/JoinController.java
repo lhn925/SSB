@@ -172,7 +172,16 @@ public class JoinController {
      * @return
      */
     @GetMapping("/agree")
-    public String joinAgreeForm(Model model, HttpServletResponse response) {
+    public String joinAgreeForm(Model model, HttpServletResponse response,HttpServletRequest request) {
+
+        Cookie result = ReadCookie.getCookie(request.getCookies(), "agreeToken");
+
+        // 뒤로가기 방지
+        if (result != null) {
+            result.setMaxAge(0);
+            response.addCookie(result);
+            return "redirect:/join/agree";
+        }
 
         // 쿠키 생성
         UserJoinAgreeDto userJoinAgreeDto = UserJoinAgreeDto.createUserJoinAgree();

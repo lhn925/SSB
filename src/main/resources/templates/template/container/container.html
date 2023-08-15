@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <div class="container"  th:fragment="container (page)" >
+    <div class="row justify-content-center">
+      <div class="col-lg-5">
+        <h1 class="logo_sky logo-text">
+          <a class="link text-decoration-none">
+            <span class="mainLogo" th:text="#{sky.logo}"></span>
+          </a>
+        </h1>
+        <th:block th:replace="${page}">
+
+        </th:block>
+      </div>
+    </div>
+  </div>

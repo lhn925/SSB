@@ -100,17 +100,21 @@ public class SpringSecurityConfig {
                 request.
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                     requestMatchers(
+
                         "/js/common/**",
-                        "/js/error/**",
+                        "/js/errors/**",
                         "/js/join/**",
+                        "/js/login/**",
                         "/login/**",
                         "/email/**",
                         "/join/**",
+                        "/image/**",
                         "/image/**",
                         "/example/city",
                         "/login",
                         "/logout",
                         "/test/**",
+                        "/open/**",
                         "/",
                         "/css/**"). // 허용 파일 및 허용 url
                     permitAll().

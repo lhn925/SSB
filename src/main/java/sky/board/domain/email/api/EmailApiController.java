@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.email.dto.AuthTimeResponseDto;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
 import sky.board.domain.email.dto.EmailPostDto;
@@ -33,7 +34,7 @@ import sky.board.global.error.dto.Result;
 
 @Slf4j
 @RequiredArgsConstructor
-@Controller
+@RestController
 @RequestMapping("/email")
 public class EmailApiController {
 
@@ -56,7 +57,6 @@ public class EmailApiController {
      * @param request
      * @return
      */
-    @ResponseBody
     @PostMapping("/join")
     public ResponseEntity sendJoinMail(
         @Validated @RequestBody EmailPostDto emailPostDto,
@@ -102,7 +102,6 @@ public class EmailApiController {
      * @param request
      * @return
      */
-    @ResponseBody
     @PostMapping("/codeCheck")
     public ResponseEntity sendJoinMail(
         @Validated @RequestBody CodeCheckRequestDto authCode,

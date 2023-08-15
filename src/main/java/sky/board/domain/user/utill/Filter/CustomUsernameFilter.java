@@ -66,9 +66,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         if (this.postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
-        final int LIMIT = 5;
-
-        log.info("request.getMethod() = {}", request.getMethod());
         /**
          * 유저가 로그인 버튼을 입력한 URL 저장
          */
@@ -85,10 +82,9 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         // 2차 인증 성공시 true,아니며 false 발급을 안 받았을경우도 false
         boolean isCaptcha = false;
         if (StringUtils.hasText(chptchaKey)) {
-            String captcha = request.getParameter("captcha");
-            captcha = (captcha != null) ? captcha.trim() : "";
+            String captcha = getRequestValue("captcha", request);
+            String filename = getRequestValue("imageName", request);
 
-            String filename = getRequestValue("filename", request);
             if (!StringUtils.hasText(captcha)) {
                 throw new UsernameNotFoundException("captcha Not found");
             }
@@ -103,7 +99,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             if (!isCaptcha) {
                 throw new CaptchaMisMatchFactorException("CaptchaMisMatchFactorException");
             }
-
         }
         String userId = obtainUsername(request);
         userId = (userId != null) ? userId.trim() : "";
@@ -115,13 +110,13 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
         request.setAttribute("failCount", failCount);
         // 로그인 실패가 5번 이상 일 경우 그리고 2차인증을 성공하지 못했을 경우
-        if (LIMIT <= failCount && !isCaptcha) {
+        if (5 <= failCount && !isCaptcha) {
             Map mapKey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
             String key = (String) mapKey.get("key");
+            log.info("key = {}", key);
             String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
             request.setAttribute("captchaKey", key);
-            request.setAttribute("imagePath", PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, image, "jpg"));
-
+            request.setAttribute("imageName", image);
             throw new LoginFailCountException("LoginVerificationFilter count < 5");
         }
 

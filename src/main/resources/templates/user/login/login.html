@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{template/header/header :: commonHead}">
+  </th:block>
+
+  <th:block th:replace="~{template/css/css :: css ('login')}">
+  </th:block>
+</head>
+<body>
+<div class="container" th:replace="~{template/container/container ::container (~{:: .mainCard})}">
+
+  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
+    Prabowo -
+    Flaticon</a>
+  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
+    Icons -
+    Flaticon</a>
+
+  <div class="card mainCard">
+    <div class="card-body">
+      <h5 class="card-title text-center" th:text="#{sky.login}">Login</h5>
+      <form class="mt-4" method="post" th:action="@{/login}" th:object="${userLoginFormDto}">
+        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
+          Flaticon</a>
+        <div class="form-group">
+          <div th:for="userId" class="input-group form-login form-id">
+            <input type="text" class="form-control" th:field="*{userId}"
+                   th:placeholder="#{sky.id}">
+          </div>
+        </div>
+        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
+          Prabowo -
+          Flaticon</a>
+        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
+          Icons -
+          Flaticon</a>
+
+        <div class="form-group">
+          <div class="input-group form-login form-pw">
+            <input type="password" th:field="*{password}" class="form-control form-control"
+                   th:errorclass="border-danger" th:placeholder="#{sky.pw}">
+          </div>
+        </div>
+        <!--            <th:block th:if="*{captchaKey}">-->
+        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title="반복 아이콘">반복 아이콘 제작자: Stockes Design
+          - Flaticon</a>
+
+
+        <div class="card captchaCard" th:classappend="*{imageName} ? '' : 'display-none' ">
+          <div class="form-group card-body">
+            <img class="captcha-img mb-3" id="imageName" th:src="*{imageName} ? '/open/image/'+ *{imageName} : '' "/>
+            <div class="input-group form-login form-cap">
+              <input type="text" th:field="*{captcha}" class="form-control captcha" th:placeholder="#{sky.captcha}">
+              <div class="input-group-append">
+                <button type="button" class="btn captchaBtn" id="captchaBtn">
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--            </th:block>-->
+
+        <div class="form-group form-check mt-3">
+          <input type="checkbox" class="form-check-input" th:field="*{rememberMe}">
+          <label class="form-check-label" th:text="#{sky.remember}" th:for="rememberMe">Remember me</label>
+        </div>
+        <div class="form-text text-danger">
+          <th:block th:if="${errMsg}">
+            <small th:text="${errMsg}"></small>
+          </th:block>
+          <small class="login-err display-none"></small>
+        </div>
+        <input type="hidden" class="form-control" th:field="*{url}">
+        <input type="hidden" class="form-control" th:field="*{captchaKey}">
+        <input type="hidden" class="form-control" th:field="*{imageName}">
+        <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
+        <button type="button" id="loginSubBtn" class="btn btn-primary btn-login mx-auto d-block mt-3"
+                th:text="#{sky.loginBtn}">
+          Login
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+
+
+<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+</th:block>
+
+<th:block th:replace="~{template/js/js :: js ('login')}">
+</th:block>
+
+
+<!--<script th:inline="javascript">
+  let image = [[${userLoginFormDto.getImageName()}]];
+  let $captchaImg = _getElementById("captchaImg");
+
+  if (image.length != null) {
+    _removeByClass("captchaCard", "display-none");
+    $captchaImg.src = "/image/" + image;
+  }
+</script>-->
+
+
+</html>

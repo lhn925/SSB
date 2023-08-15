@@ -4,7 +4,7 @@ body {
   height: 100%;
 }
 .container {
-  margin-top: 100px;
+  margin-top: 70px;
 }
 .btn-primary {
   background-color: #1aafec;
@@ -36,4 +36,16 @@ body {
 
 .display-none {
   display: none;
+}
+#progress-container {
+  width: 100%;
+  background-color: #DDDDDD;
+}
+
+#progress-bar {
+  width: 0;
+  height: 30px;
+  line-height: 30px;
+  background-color: #8C9CEC;
+  text-align: center;
 }

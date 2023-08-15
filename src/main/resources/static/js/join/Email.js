@@ -20,7 +20,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
   let $authCode = _getElementById("authCode");
 
   if (emailVal == "") { // 이메일 형식 확인 및 경고메세지 띄움
-    $errorMsg.innerText = errors["NotBlank"];
+    $errorMsg.innerText = errorsMsg["NotBlank"];
     _addClassById(_email.$email, "border-danger")
     _addClassByParent(_email.$email, "error");
     return;

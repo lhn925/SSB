@@ -6,7 +6,6 @@ function _onpageshow(path) { // 뒤로가기시 page 초기화 문제
     } else {
       console.log("발생!");
     }
-
   }
 }
 
@@ -121,7 +120,6 @@ function _removeNodesByClass(className) { // 자식 노드들중 특정값을 �
   }
 }
 
-
 // 해당 클래스가 있는 태그에 속성 추가
 function _addAttributeByClass(attribute, value, className) {
   let elements = document.getElementsByClassName(className);
@@ -138,6 +136,14 @@ function _removeByClass(className, removeClassName) {
   }
 }
 
+// 해당 클래스가 있는 태그에 클래스 삭제
+function _innerTextByClass(className, innerText) {
+  let elements = document.getElementsByClassName(className);
+  for (const element of elements) {
+    element.innerText = innerText;
+  }
+}
+
 // 해당 클래스가 있는 태그에 클래스 추가
 function _addClassByClass(className, addClassName) {
   let elements = document.getElementsByClassName(className);
@@ -145,7 +151,6 @@ function _addClassByClass(className, addClassName) {
     element.classList.add(addClassName);
   }
 }
-
 
 //해당 element 에 클래스 추가
 function _addClassById($elementById, className) {
@@ -171,3 +176,19 @@ function _removeClassByParent($elementById, className) {
 function _getElementById(id) {
   return document.getElementById(id);
 }
+
+
+async function  _getFetch(url) {
+
+  const options = {method: "GET"};
+
+  const res = await fetch(url, options);
+  const data = await res.json();
+
+  if (res.ok) {
+    return data;
+  } else {
+    throw await Error(JSON.stringify(data.data));
+  }
+}
+

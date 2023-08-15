@@ -35,13 +35,14 @@ import sky.board.global.openapi.model.code;
 public class ApiExamCaptchaNkeyService {
 
     private final OpenApi openApi;
-    private final ObjectMapper objectMapper;
 
     // 키 발급시 0,  캡차 이미지 비교시 1로 세팅
     // 네이버 캡차 API 예제 - 키발급
     public Map<String, Object> getApiExamCaptchaNkey() {
         String responseBody = setOpenApiConfiguration("https://openapi.naver.com/v1/captcha/nkey?code=" + 0);
         try {
+
+            ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(responseBody, HashMap.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -67,6 +68,7 @@ public class ApiExamCaptchaNkeyService {
 
         Map map = null;
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
             map = objectMapper.readValue(result, HashMap.class);
             // 인증코드 성공시 이미지 삭제
             if (((boolean) map.get("result"))) {
@@ -138,7 +140,8 @@ public class ApiExamCaptchaNkeyService {
         byte[] bytes = new byte[1024];
         // 랜덤한 이름으로  파일 생성
         String filename = Long.valueOf(new Date().getTime()).toString();
-        File f = new File(PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, filename, "jpg"));
+        String fullName = PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, filename, "jpg");
+        File f = new File(fullName);
         try (OutputStream outputStream = new FileOutputStream(f)) {
             f.createNewFile();
             while ((read = is.read(bytes)) != -1) {
