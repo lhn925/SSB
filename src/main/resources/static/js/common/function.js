@@ -186,7 +186,7 @@ async function  _getFetch(url) {
   const data = await res.json();
 
   if (res.ok) {
-    return data;
+    return data.data;
   } else {
     throw await Error(JSON.stringify(data.data));
   }

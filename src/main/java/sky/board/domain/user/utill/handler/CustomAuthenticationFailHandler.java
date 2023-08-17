@@ -4,23 +4,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import javax.swing.Spring;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import sky.board.domain.user.entity.UserLoginLog;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.UserLogService;
-import sky.board.domain.user.utill.HttpReqRespUtils;
-import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 
 /**
  * 로그인 실패시 로직을 실행하는 핸들러
@@ -53,15 +48,20 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
         boolean retryTwoFactor = false;
         // 로그인 실패 횟수가 5번을 넘어가는 경우
 
+        Boolean isCaptcha = (Boolean) Optional.ofNullable(request.getAttribute("isCaptcha")).orElse(false);
+
         log.info("exception = {}", exception.getClass());
-        if (exception instanceof LoginFailCountException || exception instanceof CaptchaMisMatchFactorException) {
+        // 인증번호는 맞는데 비밀번호가 틀렸을 경우
+        if (exception instanceof LoginFailCountException) {
             retryTwoFactor = true;
-            errMsg = "login.error.captcha";
+            errMsg = "login.error";
             sbPath.append("imageName=" + request.getAttribute("imageName"));
             sbPath.append("&captchaKey=" + request.getAttribute("captchaKey") + "&");
-
-        } else if (exception instanceof UsernameNotFoundException) { //
-
+        } else if (exception instanceof CaptchaMisMatchFactorException || isCaptcha) {
+            retryTwoFactor = true;
+            errMsg = "login.error.captcha";
+            sbPath.append("imageName=" + request.getParameter("imageName"));
+            sbPath.append("&captchaKey=" + request.getParameter("captchaKey") + "&");
         }
 
         userLogService.saveLoginLog(request, LoginSuccess.FAIL, Status.ON);

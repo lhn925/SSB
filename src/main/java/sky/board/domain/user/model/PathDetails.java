@@ -18,8 +18,6 @@ public class PathDetails {
         int first = 0;
         int end = file.length();
 
-        System.out.println("file.substring(first,) = " + file.substring(first + 1, end));
-
         if (file.contains("/")) {
             first = file.lastIndexOf("/") + 1;
         }

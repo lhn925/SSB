@@ -86,7 +86,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             String filename = getRequestValue("imageName", request);
 
             if (!StringUtils.hasText(captcha)) {
-                throw new UsernameNotFoundException("captcha Not found");
+                throw new CaptchaMisMatchFactorException("captcha Not found");
             }
             // 2차 인증 키 검증
             Map result = null;
@@ -108,7 +108,10 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         // failCount 전달  success 핸들러에 전달
         Long failCount = userLogService.getLoginLogCount(userId, LoginSuccess.FAIL, Status.ON);
 
+        log.info("failCount = {}", failCount);
+
         request.setAttribute("failCount", failCount);
+        request.setAttribute("isCaptcha", isCaptcha);
         // 로그인 실패가 5번 이상 일 경우 그리고 2차인증을 성공하지 못했을 경우
         if (5 <= failCount && !isCaptcha) {
             Map mapKey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
@@ -119,6 +122,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             request.setAttribute("imageName", image);
             throw new LoginFailCountException("LoginVerificationFilter count < 5");
         }
+
 
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(userId,
             password);

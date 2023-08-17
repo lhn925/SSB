@@ -25,6 +25,7 @@ import sky.board.domain.user.dto.UserInfoSessionDto;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.UserLogService;
+import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 /**
@@ -38,6 +39,7 @@ public class CustomAuthenticationSuccessHandler implements
     private final UserLogService userLogService;
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final SecurityContextImpl securityContext;
+    private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
@@ -59,6 +61,10 @@ public class CustomAuthenticationSuccessHandler implements
          */
         saveContext(request, response, authentication);
 
+        String imageName = request.getParameter("imageName");
+        if (StringUtils.hasText(imageName)){
+            apiExamCaptchaNkeyService.deleteImage(imageName);
+        }
         // 로그인 실패 기록 다 삭제
         Optional.ofNullable(request.getAttribute("failCount")).ifPresent(
             c -> userLogService.deleteLoginLog(request, LoginSuccess.FAIL, Status.OFF)

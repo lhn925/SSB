@@ -22,6 +22,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.model.PathDetails;
 import sky.board.global.openapi.entity.OpenApi;
 import sky.board.global.openapi.model.code;
@@ -70,16 +71,9 @@ public class ApiExamCaptchaNkeyService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             map = objectMapper.readValue(result, HashMap.class);
-            // 인증코드 성공시 이미지 삭제
-            if (((boolean) map.get("result"))) {
-                deleteImage(filename);
-            }
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new CaptchaMisMatchFactorException("잘못된 요청");
         }
-
         return map;
     }
 

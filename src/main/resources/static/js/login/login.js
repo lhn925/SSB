@@ -16,7 +16,9 @@ Login.prototype._init = function () {
   this.$password = _getElementById("password");
   this.$url = _getElementById("url");
   this.$captchaKey = _getElementById("captchaKey");
-  this.$imagePath = _getElementById("imagePath");
+
+  // 인증하고 삭제할때 필요한 이미지 name
+  this.$imageName = _getElementById("imageName");
   this.$captcha = _getElementById("captcha");
 
   this._LoginSubBtnClickAddEvent();
@@ -37,16 +39,16 @@ Login.prototype._LoginSubBtnClickAddEvent = function () {
     let userIdVal = _login.$userId.value.split(" ").join("");
     let pwVal = _login.$password.value.split(" ").join("");
     let capKeyVal = _login.$captchaKey.value.split(" ").join("");
-
+    _innerTextByClass("error-Thyme-msg", "");
     if (userIdVal == "") {
-      _removeByClass("login-err", "display-none");
-      _innerTextByClass("login-err", messages["userId.NotBlank"])
+      _removeByClass("err-NotThyme-msg", "display-none");
+      _innerTextByClass("err-NotThyme-msg", messages["userId.NotBlank"])
       isClicking = false;
       return;
     }
     if (pwVal == "") {
-      _removeByClass("login-err", "display-none");
-      _innerTextByClass("login-err", messages["password.NotBlank"]);
+      _removeByClass("err-NotThyme-msg", "display-none");
+      _innerTextByClass("err-NotThyme-msg", messages["password.NotBlank"]);
       isClicking = false;
       return;
     }
@@ -54,8 +56,9 @@ Login.prototype._LoginSubBtnClickAddEvent = function () {
     if (capKeyVal != "") {
       let captchaVal = _login.$captcha.value.split(" ").join("");
       if (captchaVal == "") {
-        _removeByClass("login-err", "display-none");
-        _innerTextByClass("login-err", messages["captcha.NotBlank"]);
+        _removeByClass("err-NotThyme-msg", "display-none");
+        _innerTextByClass("err-NotThyme-msg", messages["captcha.NotBlank"]);
+
         isClicking = false;
         return;
       }
@@ -94,15 +97,39 @@ Login.prototype._captchaBtnClickAddEvent = function () {
   let $captchaBtn = _getElementById("captchaBtn");
   let isClicking = false;
   $captchaBtn.onclick = function () {
-    let capKeyVal = _login.$captchaKey.value.split(" ").join("");
+
     if (isClicking) {
+      isClicking = false;
       return;
     }
     isClicking = true;
-
+    let capKeyVal = _login.$captchaKey.value.split(" ").join("");
     if (capKeyVal == "") {
       isClicking = false;
       return;
+    }
+
+    let $imagePath = _getElementById("imagePath");
+    let imageName = $imagePath.src;
+    if (capKeyVal != "") {
+      _getFetch(
+          "/open/again?captchaKey=" + capKeyVal + "&imageName="
+          + imageName).then()
+      .then((data) => {
+        _login.$captchaKey.value = data.captchaKey;
+        $imagePath.src = "/open/image/" + data.imageName;
+        _login.$imageName.value = data.imageName;
+
+        console.log(data.imageName)
+        console.log(data.captchaKey)
+        isClicking = false;
+        return;
+      }).catch((error) => {
+        _innerTextByClass("error-Thyme-msg", "");
+        _removeByClass("login-err", "display-none");
+        _innerTextByClass("login-err", errorsMsg["server"])
+        return;
+      });
     }
 
   }
