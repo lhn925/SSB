@@ -66,13 +66,17 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         if (this.postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
+
+        final int Limit =5;
         /**
          * 유저가 로그인 버튼을 입력한 URL 저장
          */
+        String userId = obtainUsername(request);
+        String password = obtainPassword(request);
 
-        log.info(" 여기는 필터 메서드");
-        String rememberMe = request.getParameter("rememberMe");
-        log.info("rememberMe = {}", rememberMe);
+        // failCount 전달  success 핸들러에 전달
+        Long failCount = userLogService.getLoginLogCount(userId, LoginSuccess.FAIL, Status.ON);
+        request.setAttribute("failCount", failCount);
 
         String chptchaKey = getRequestValue("captchaKey", request);
 
@@ -81,7 +85,9 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
         // 2차 인증 성공시 true,아니며 false 발급을 안 받았을경우도 false
         boolean isCaptcha = false;
-        if (StringUtils.hasText(chptchaKey)) {
+
+        // 2차인증키가 있고 failCount가 5를 넘어야 보안코드 발급
+        if (StringUtils.hasText(chptchaKey) && failCount >= Limit) {
             String captcha = getRequestValue("captcha", request);
             String filename = getRequestValue("imageName", request);
 
@@ -100,20 +106,10 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
                 throw new CaptchaMisMatchFactorException("CaptchaMisMatchFactorException");
             }
         }
-        String userId = obtainUsername(request);
-        userId = (userId != null) ? userId.trim() : "";
-        String password = obtainPassword(request);
-        password = (password != null) ? password : "";
 
-        // failCount 전달  success 핸들러에 전달
-        Long failCount = userLogService.getLoginLogCount(userId, LoginSuccess.FAIL, Status.ON);
-
-        log.info("failCount = {}", failCount);
-
-        request.setAttribute("failCount", failCount);
         request.setAttribute("isCaptcha", isCaptcha);
         // 로그인 실패가 5번 이상 일 경우 그리고 2차인증을 성공하지 못했을 경우
-        if (5 <= failCount && !isCaptcha) {
+        if (Limit <= failCount && !isCaptcha) {
             Map mapKey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
             String key = (String) mapKey.get("key");
             log.info("key = {}", key);

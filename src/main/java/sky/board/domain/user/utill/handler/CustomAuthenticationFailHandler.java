@@ -50,7 +50,8 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
 
         Boolean isCaptcha = (Boolean) Optional.ofNullable(request.getAttribute("isCaptcha")).orElse(false);
 
-        log.info("exception = {}", exception.getClass());
+
+
         // 인증번호는 맞는데 비밀번호가 틀렸을 경우
         if (exception instanceof LoginFailCountException) {
             retryTwoFactor = true;

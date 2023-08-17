@@ -62,7 +62,7 @@ public class CustomAuthenticationSuccessHandler implements
         saveContext(request, response, authentication);
 
         String imageName = request.getParameter("imageName");
-        if (StringUtils.hasText(imageName)){
+        if (StringUtils.hasText(imageName)){ // 성공시 삭제
             apiExamCaptchaNkeyService.deleteImage(imageName);
         }
         // 로그인 실패 기록 다 삭제
