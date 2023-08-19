@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import sky.board.domain.email.dto.EmailAuthCodeDto;
 import sky.board.domain.email.dto.EmailPostDto;
 import sky.board.domain.email.dto.CodeCheckRequestDto;
 import sky.board.domain.email.entity.Email;
+import sky.board.domain.email.model.EmailSendType;
 import sky.board.domain.email.service.EmailService;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
@@ -47,7 +49,7 @@ public class EmailApiController {
 
     /**
      * id:emailApi_1
-     *
+     * <p>
      * 회원가입 이메일 인증 번호 생성 후
      * session에 유효시간과 인증번호 저장
      * body에는 인증발급시간,인증유효시간 전달
@@ -73,30 +75,15 @@ public class EmailApiController {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 
-        Email email = Email.createJoinEmail("[SKYBOARD] 회원가입시 이메일 인증을 위한 인증 코드 발송", emailPostDto);
-
-        Optional<String> optCode = emailService.sendMail(email, "/email/joinSendEmail");
-        LocalDateTime issueTime = LocalDateTime.now(); // 인증발급시간
-        LocalDateTime authTime = issueTime.plusSeconds(300); // 5분 인증 시간
-
-        String code = optCode.orElse(null);
-
-        EmailAuthCodeDto emailResponseDto = new EmailAuthCodeDto(code, authTime, false);
-
-        HttpSession session = request.getSession();
-
-        session.setAttribute("emailAuthCodeDto", emailResponseDto);
-        return new ResponseEntity(new Result(new AuthTimeResponseDto(authTime, issueTime)),
-            HttpStatus.OK);
+        return sendEmail(EmailSendType.JOIN, emailPostDto, request);
     }
 
 
-
     /**
-     *
      * id:emailApi_2
-     *
+     * <p>
      * 회원가입 이메일 인증 번호 유효 체크
+     *
      * @param authCode
      * @param bindingResult
      * @param request
@@ -138,10 +125,86 @@ public class EmailApiController {
 
         // 이메일 인증 성공시 성공 여부 값에 true
         emailAuthCodeDto.changeSuccess(true);
-        session.setAttribute("emailAuthCodeDto",emailAuthCodeDto);
+        session.setAttribute("emailAuthCodeDto", emailAuthCodeDto);
 
         return new ResponseEntity(new Result<>(emailAuthCodeDto), HttpStatus.OK);
     }
+    /**
+     * id:emailApi_3
+     *
+     * @param emailPostDto
+     * @param bindingResult
+     * @param request
+     * @return
+     */
+    @PostMapping("/find/id")
+    public ResponseEntity sendFindMail(
+        @Validated @RequestBody EmailPostDto emailPostDto,
+        BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
+        try {
+            // 등록 이메일 체크
+            userJoinService.checkEmail(emailPostDto.getEmail());
+        } catch (DuplicateCheckException e) {
+            return sendEmail(EmailSendType.ID, emailPostDto, request);
+        }
+        String subArgs = setArgs(EmailSendType.EMAIL, request);
+        bindingResult.reject("sky.email.find", new Object[]{subArgs}, null);
+        return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
+    }
 
+
+    private ResponseEntity sendEmail(EmailSendType sendType, EmailPostDto emailPostDto,
+        HttpServletRequest request) {
+
+        String subject = "sky.email.subject";
+        String subArgs = setArgs(sendType, request);
+        Email email = Email.createJoinEmail(
+            ms.getMessage(subject, new Object[]{subArgs}, request.getLocale()),
+            emailPostDto);
+
+        JSONObject msObject = new JSONObject();
+
+        msObject.put("content", ms.getMessage("sky.email.content", null, request.getLocale()));
+        msObject.put("subContent1", ms.getMessage("sky.email.subContent1", new Object[]{subArgs}, request.getLocale()));
+        msObject.put("subContent2", ms.getMessage("sky.email.subContent2", new Object[]{subArgs}, request.getLocale()));
+
+        Optional<String> optCode = emailService.sendMail(msObject, email, "/email/sendEmail");
+        LocalDateTime issueTime = LocalDateTime.now(); // 인증발급시간
+        LocalDateTime authTime = issueTime.plusSeconds(300); // 5분 인증 시간
+
+        String code = optCode.orElse(null);
+
+        EmailAuthCodeDto emailResponseDto = new EmailAuthCodeDto(code, authTime, false);
+
+        HttpSession session = request.getSession();
+
+        session.setAttribute("emailAuthCodeDto", emailResponseDto);
+        return new ResponseEntity(new Result(new AuthTimeResponseDto(authTime, issueTime)),
+            HttpStatus.OK);
+    }
+
+    private String setArgs(EmailSendType sendType, HttpServletRequest request) {
+        String subArgs = "";
+        switch (sendType) {
+            case JOIN:
+                subArgs = ms.getMessage("sky.signup", null, request.getLocale());
+                break;
+            case ID:
+                subArgs = ms.getMessage("sky.findId", null, request.getLocale());
+                break;
+            case PW:
+                subArgs = ms.getMessage("sky.findPw", null, request.getLocale());
+                break;
+            case EMAIL:
+                subArgs = ms.getMessage("sky.email", null, request.getLocale());
+                break;
+            default:
+        }
+
+        return subArgs;
+    }
 
 }

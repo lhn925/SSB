@@ -67,7 +67,7 @@ public class UserJoinService {
         }
     }
 
-    public void checkId(String userId) throws DuplicateCheckException {
+    public void checkId(String userId) {
         if (userQueryRepository.existsByUserId(userId)) {
             throw new DuplicateCheckException("아이디", "userId", userId);
         }

@@ -6,6 +6,8 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.Random;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import sky.board.domain.user.service.UserJoinService;
 import sky.board.domain.email.entity.Email;
+import sky.board.global.openapi.model.code;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,9 +25,11 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
+    private final MessageSource ms;
 
 
-    public Optional<String> sendMail(Email email,String type) {
+
+    public Optional<String> sendMail(JSONObject msObject,Email email,String type) {
         String authNum = createCode();
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -34,7 +39,7 @@ public class EmailService {
                 "UTF-8");
             mimeMessageHelper.setTo(email.getToMail()); // 메일 수신자
             mimeMessageHelper.setSubject(email.getSubject()); // 메일 제목
-            mimeMessageHelper.setText(setContext(authNum, type), true); // 메일 본문 내용, HTML 여부
+            mimeMessageHelper.setText(setContext(msObject,authNum, type), true); // 메일 본문 내용, HTML 여부
             javaMailSender.send(mimeMessage);
 
             log.info("Success");
@@ -70,9 +75,12 @@ public class EmailService {
     }
 
     // thymeleaf를 통한 html 적용
-    public String setContext(String code, String type) {
+    public String setContext(JSONObject msObject,String code, String type) {
         Context context = new Context();
         context.setVariable("code", code);
+        context.setVariable("content",msObject.get("content"));
+        context.setVariable("subContent1",msObject.get("subContent1"));
+        context.setVariable("subContent2",msObject.get("subContent2"));
         return templateEngine.process(type, context);
     }
 }
