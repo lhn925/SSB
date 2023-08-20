@@ -137,7 +137,7 @@ public class EmailApiController {
      * @param request
      * @return
      */
-    @PostMapping("/find/id")
+    @PostMapping("/find")
     public ResponseEntity sendFindMail(
         @Validated @RequestBody EmailPostDto emailPostDto,
         BindingResult bindingResult, HttpServletRequest request) {
