@@ -192,3 +192,62 @@ async function  _getFetch(url) {
   }
 }
 
+
+async function _post(path, body, headers = {}) { //post fetch
+  let url = path;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+    body: JSON.stringify(body)
+  };
+
+  const res = await fetch(url, options);
+  const data = await res.json();
+  if (res.ok) {
+    return data;
+  } else {
+    throw Error(JSON.stringify(data.errorDetails[0]));
+  }
+}
+async function _get(path) { //post fetch
+  let url = path;
+  const options = {method: "GET"};
+
+  const res = await fetch(url, options);
+  const data = await res.json();
+  if (res.ok) {
+    return data;
+  } else {
+    throw Error(JSON.stringify(data.errorDetails[0]));
+  }
+}
+
+function _valueCheck(type, msgId, $elementById,
+    $isChkElement) {
+  let $NotThymeMsg = _getElementById(msgId);
+  let input_value = $elementById.value; // 아이디값 갖고오기
+// 유효검사
+  input_value = input_value.split(" ").join("");
+
+// 공백값 체크
+  if (input_value == "") {
+    _addClassByParent($elementById, "error");
+    _addClassById($elementById, "border-danger");
+    $NotThymeMsg.innerText = errorsMsg["NotBlank"];
+    $isChkElement.checked = false;
+    return false;
+  }
+
+//정규표현식 체크
+  if (!_regex(type, input_value)) {
+    _addClassByParent($elementById, "error")
+    _addClassById($elementById, "border-danger");
+    $NotThymeMsg.innerText = messages["userJoinForm." + type];
+    $isChkElement.checked = false;
+    return false;
+  }
+}
+

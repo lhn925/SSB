@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.board.domain.user.dto.JoinEmailDuplicateDto;
-import sky.board.domain.user.dto.JoinIdDuplicateDto;
-import sky.board.domain.user.dto.JoinUserNameDuplicateDto;
+import sky.board.domain.user.dto.join.JoinEmailDuplicateDto;
+import sky.board.domain.user.dto.join.JoinIdDuplicateDto;
+import sky.board.domain.user.dto.join.JoinUserNameDuplicateDto;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
 import sky.board.global.error.dto.ErrorResultDto;
@@ -25,7 +25,7 @@ import sky.board.global.error.dto.Result;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/join/api")
+@RequestMapping("/user/join/api")
 public class JoinApiController {
 
     private final UserJoinService userJoinService;

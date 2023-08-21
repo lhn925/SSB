@@ -3,7 +3,6 @@ package sky.board.domain.user.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import java.io.Serializable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -15,8 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import sky.board.domain.user.dto.UserLoginFailErrorDto;
-import sky.board.domain.user.dto.UserLoginFormDto;
+import sky.board.domain.user.dto.login.UserLoginFailErrorDto;
+import sky.board.domain.user.dto.login.UserLoginFormDto;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j

@@ -72,6 +72,8 @@
           </th:block>
           <small class="err-NotThyme-msg display-none"></small>
         </div>
+
+
         <input type="hidden" class="form-control" th:field="*{url}">
         <input type="hidden" class="form-control" th:field="*{captchaKey}">
         <input type="hidden" class="form-control" th:field="*{imageName}">
@@ -80,6 +82,14 @@
                 th:text="#{sky.loginBtn}">
           Login
         </button>
+
+        <div aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/user/help/id}">아이디 찾기</a></li>
+            <li class="breadcrumb-item"><a href="#">비밀번호 찾기</a></li>
+            <li class="breadcrumb-item active" aria-current="page">회원가입</li>
+          </ol>
+        </div>
       </form>
     </div>
   </div>

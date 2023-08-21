@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 
 @Getter
 public class UserInfoSessionDto implements Serializable {

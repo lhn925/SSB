@@ -1,8 +1,6 @@
 package sky.board;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import sky.board.domain.user.utill.ReadCookie;
 
 @Controller
 @Slf4j
@@ -30,7 +27,7 @@ public class HomeController {
         log.info("authentication.getAuthorities().toString() = {}", authentication.getAuthorities());
         log.info("authentication.isAuthenticated() = {}", authentication.isAuthenticated());
 
-//        Optional<String> ss_id = ReadCookie.readCookie(cookies, "SS_ID");
+//        Optional<String> ss_id = CustomCookie.readCookie(cookies, "SS_ID");
 
 //        log.info("ss_id = {}", ss_id);
 

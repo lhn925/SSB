@@ -43,6 +43,15 @@
   </script>
 </th:block>
 
+<th:block th:if="${page == 'idHelpForm'}" class="idHelpForm">
+  <script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{/js/join/Email.js}"></script>
+  <script th:src="@{/js/help/help_ready.js}"></script>
+  <script th:inline="javascript">
+    let _email;
+    _id_help_ready_init();
+  </script>
+</th:block>
 
 <th:block th:if="${page == 'login'}" class="login" >
   <script th:src="@{/js/login/messages/{locale}/messages.js(locale = ${#locale})}"></script>

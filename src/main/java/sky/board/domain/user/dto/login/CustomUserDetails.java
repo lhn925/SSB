@@ -1,7 +1,8 @@
-package sky.board.domain.user.dto;
+package sky.board.domain.user.dto.login;
 
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +38,9 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     private String password;
     private String username;
 
+    //가입한 날짜
+    private LocalDateTime createdDateTime;
+
     private List<GrantedAuthority> authorities;
 
     // isAccountNonExpired() : 계정이 만료됐는지 리턴 -> true는 완료되지 않음 의미
@@ -60,7 +64,9 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
 
     public CustomUserDetails(String url, String token, String userId, String password, String username, String nickname,
         List<GrantedAuthority> authorities, boolean accountNonExpired, boolean accountNonLocked,
-        boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder) {
+        boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder,
+        LocalDateTime createdDateTime
+    ) {
         this.url = url;
         this.token = token;
         this.userId = userId;
@@ -70,14 +76,15 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
-        this.enabled = enabled;
+        this.enabled = !enabled;
         this.passwordEncoder = passwordEncoder;
         this.nickname = nickname;
+        this.createdDateTime = createdDateTime;
     }
 
     @Builder
     public CustomUserDetails(String url, String userId, String token, String password, String username,String nickname,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled) {
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime) {
         this.url = url;
         this.token = token;
         this.userId = userId;
@@ -88,6 +95,11 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.credentialsNonExpired = !credentialsNonExpired;
         this.enabled = !enabled;
         this.nickname = nickname;
+        this.createdDateTime = createdDateTime;
+    }
+
+    public LocalDateTime getCreatedDateTime() {
+        return createdDateTime;
     }
 
     public String getToken() {
@@ -107,6 +119,9 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         }
         return authorities;
     }
+
+
+
 
     @Override
     public String getPassword() {

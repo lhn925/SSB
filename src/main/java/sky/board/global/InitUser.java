@@ -7,8 +7,8 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import sky.board.domain.user.dto.UserJoinAgreeDto;
-import sky.board.domain.user.dto.UserJoinPostDto;
+import sky.board.domain.user.dto.join.UserJoinAgreeDto;
+import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.service.UserJoinService;
 
 @Component
@@ -44,6 +44,15 @@ public class InitUser {
                 userJoinDto.setPassword(i + "221325");
                 userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
             }
+
+            UserJoinPostDto userJoinDto = new UserJoinPostDto();
+            userJoinDto.setEmail("2221325@naver.com");
+            userJoinDto.setUserName("임하늘");
+            userJoinDto.setUserId("lim222");
+            userJoinDto.setPassword("didELd@2");
+            userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
+
+
         }
     }
 }

@@ -1,11 +1,11 @@
 package sky.board.domain.user.utill;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Optional;
-import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
-public class ReadCookie {
+public class CustomCookie {
 
     public static String readCookie(Cookie[] cookies, String key) {
         if (cookies == null || cookies.length == 0) {
@@ -16,6 +16,23 @@ public class ReadCookie {
             .map(Cookie::getValue).findFirst().orElse(null);
         return value;
     }
+
+
+    public static void addCookie(String url, String name, int maxAge, HttpServletResponse response, String value) {
+        Cookie cookie = null;
+        if (StringUtils.hasText(name) && StringUtils.hasText(value)) {
+            cookie = new Cookie(name, value);
+        }
+        if (maxAge != 0) {
+            cookie.setMaxAge(maxAge); // 15분 유효
+        }
+        if (StringUtils.hasText(url)) {
+            cookie.setPath(url);
+        }
+        // 쿠키에 agreeToken 저장
+        response.addCookie(cookie);
+    }
+
 
     public static Cookie getCookie(Cookie[] cookies, String key) {
         if (cookies == null || cookies.length == 0) {

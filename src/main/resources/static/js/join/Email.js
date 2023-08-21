@@ -1,18 +1,22 @@
-function Email() {
+function Email(url) {
   this._emailDto = null;
   this._errorResult = null; // error
   this._countdownInterval = null; // 유효시간 변수
   this.$email = null;
+  this._url = url;
   this._init();
 }
 
 Email.prototype._init = function () { //sendCodeButton 이벤트 등록
   this._sendCodeButtonOnclickEvent();
   this._verifyCodeButtonEvent();
+  this.$isChkEmail = _getElementById("_isChkEmail");
+  this.$isChkAuth = _getElementById("_isChkAuth");
   this.$email = _getElementById("email");
 }
+
 Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요청
-                                                   // 공백 없앰
+  // 공백 없앰
   let emailVal = this.$email.value.split(" ").join("");
 
   let $errorMsg = _getElementById("email-NotThyme-msg");
@@ -33,7 +37,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
   }
   $errorMsg.innerText = "";
 
-  _post("/email/join", {email: emailVal})
+  _post(_email._url, {email: emailVal})
   .then((data) => {
         if (_email._countdownInterval != null) { // 유효 시간 중단 및 재 시작
           clearInterval(_email._countdownInterval);
@@ -52,12 +56,12 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
         $verificationMsg.innerText = "";
 
         _email._emailDto = data;
-        _join.$isChkEmail.checked = true;
+        _email._isChkEmail(true);
         // 사용자가 이메일을 보낸 후, 인증 코드 유효시간 - 인증 코드 발급시간 / 1000
-        let verifyTime = (new Date(_email._emailDto.data.authTimeLimit)
-            - new Date(_email._emailDto.data.authIssueTime)) / 1000
+        // let verifyTime = (new Date(_email._emailDto.data.authTimeLimit)
+        //     - new Date(_email._emailDto.data.authIssueTime)) / 1000
         let $countdown = _getElementById("verification-time");
-        _email._startCountdown(verifyTime, $countdown);
+        _email._startCountdown($countdown);
       }
   ).catch((error) => {
     _email._errorResult = JSON.parse(error.message);
@@ -66,7 +70,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
     let message = _email._errorResult.message;
     // 에러메시지
     $errorMsg.innerText = message;
-    _join.$isChkEmail.checked = false;
+    _email._isChkEmail(false);
   })
 }
 
@@ -104,30 +108,45 @@ Email.prototype._reqEmailAuthFetch = function (clickCheck) { // 인증번호 체
         $countdown.innerText = "";
         // 인증 성공시 disabled 속성추가
         //인증 성공시 success 저장
-        _join.$isChkAuth.checked = data.data.isSuccess;
+        _email._isAuthEmail(data.data.isSuccess);
 
         _addAttributeByClass("disabled", true, "authCode");
         _email.$email.setAttribute("readOnly", "readOnly");
         _removeByClass("form-auth", "on") // 성공시 이모티콘 변경
         _removeByClass("form-auth", "error") // 실패 error 제거
+
+        return data.data.isSuccess;
       }
   ).catch((error) => {
     if (error.name == "Error") {
-      _join.$isChkAuth.checked = false;
+      _email._isAuthEmail(false);
       error = JSON.parse(error.message);
       _addClassByClass("form-auth", "error");
       $verificationMsg.className = "text-danger";
       $verificationMsg.innerText = error.message;
+      return false;
     }
   })
 }
 
-Email.prototype._startCountdown = function (verifyTime, // 유효시간 5분 알림
+Email.prototype._startCountdown = function ( // 유효시간 5분 알림
     $countdown) {
-  let timer = verifyTime;
   let minutes, seconds;
-
+  let timer
+      = (new Date(_email._emailDto.data.authTimeLimit)
+      - new Date(_email._emailDto.data.authIssueTime)) / 1000;
   this._countdownInterval = setInterval(function () {
+    if (parseInt(timer) == 60) { // 유효시간 1분남을시에 text-color 빨강으로 변경
+      $countdown.className += " text-danger";
+    }
+
+    if (timer < 0) {
+      clearInterval(_email._countdownInterval);
+      $countdown.innerText = "인증 시간이 만료되었습니다.";
+      _removeClassById($countdown, "text-danger");
+      // 인증 시간 만료시 수행할 작업 추가
+    }
+    timer = (new Date(_email._emailDto.data.authTimeLimit) - new Date()) / 1000;
     minutes = parseInt(timer / 60, 10); // 10진수로 출력
     seconds = parseInt(timer % 60, 10);
 
@@ -136,22 +155,12 @@ Email.prototype._startCountdown = function (verifyTime, // 유효시간 5분 알
 
     $countdown.innerText = ": 인증 유효시간: " + minutes + ":" + seconds;
 
-    if (timer == 60) { // 유효시간 1분남을시에 text-color 빨강으로 변경
-      $countdown.className += " text-danger";
-    }
-
-    if (--timer < 0) {
-      clearInterval(_email._countdownInterval);
-      $countdown.innerText = "인증 시간이 만료되었습니다.";
-      _removeClassById($countdown, "text-danger");
-      // 인증 시간 만료시 수행할 작업 추가
-    }
   }, 1000);
 
 }
 
 Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton 에 이벤트 구현
-  // 중복 클릭 방지
+                                                            // 중복 클릭 방지
   let isClicking = false;
 
   _getElementById("sendCodeButton").onclick = function () {
@@ -170,7 +179,7 @@ Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton �
 }
 
 Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 이벤트 구현
-                                                       // 중복 클릭 방지
+  // 중복 클릭 방지
   let isClicking = false;
 
   _getElementById("verifyCodeButton").onclick = function () {
@@ -185,4 +194,43 @@ Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 �
     }, 1000);
     _email._reqEmailAuthFetch(true);
   };
+}
+
+Email.prototype._isChkEmail = function (checked) {
+  this.$isChkEmail.checked = checked;
+}
+Email.prototype._isAuthEmail = function (checked) {
+  this.$isChkAuth.checked = checked;
+}
+
+Email.prototype._SubmitBtnClickAddEvent = function () {
+  let $subBtn = _getElementById("subBtn");
+  let isClicking = false;
+  $subBtn.onclick = function () {
+    if (isClicking) {
+      return;
+    }
+    isClicking = true;
+
+    let _isChkEmail = _email.$isChkEmail.checked;
+    let _isChkAuth = _email.$isChkAuth.checked;
+
+    if (!_isChkEmail) {
+      _email.$isChkEmail.checked = _valueCheck("email",
+          "email-NotThyme-msg", _getElementById("email"),
+          _email.$isChkEmail);
+    }
+    if (!_isChkAuth) { // authCode 유효성 검증
+      _email._reqEmailAuthFetch(false);
+    }
+
+    if (_isChkEmail && _isChkAuth) {
+      this.type = "submit";
+      this.click();
+      this.setAttribute("disabled", "disabled");
+    } else {
+      isClicking = false;
+      return;
+    }
+  }
 }

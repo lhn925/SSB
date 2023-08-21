@@ -24,9 +24,9 @@ import org.springframework.util.StringUtils;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.RedisRememberService;
 import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.utill.CustomCookie;
 import sky.board.domain.user.utill.Filter.CustomRememberMeAuthenticationFilter;
 import sky.board.domain.user.utill.Filter.CustomUsernameFilter;
-import sky.board.domain.user.utill.ReadCookie;
 import sky.board.domain.user.utill.handler.CustomAuthenticationFailHandler;
 import sky.board.domain.user.utill.handler.CustomAuthenticationSuccessHandler;
 import sky.board.domain.user.utill.handler.CustomCookieLoginSuccessHandler;
@@ -101,18 +101,22 @@ public class SpringSecurityConfig {
                     dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                     requestMatchers(
 
-                        "/js/common/**",
-                        "/js/errors/**",
-                        "/js/join/**",
-                        "/js/login/**",
+//                        "/js/common/**",
+//                        "/js/errors/**",
+//                        "/js/join/**",
+//                        "/js/login/**",
+                        "/js/**",
                         "/login/**",
                         "/email/**",
-                        "/join/**",
-                        "/image/**",
                         "/image/**",
                         "/example/city",
                         "/login",
                         "/logout",
+//                        "/user/join/api/**",
+//                        "/user/join/**",
+                        "/user/**",
+//                        "/user/help/**",
+                        "/user/**",
                         "/test/**",
                         "/open/**",
                         "/",
@@ -135,7 +139,7 @@ public class SpringSecurityConfig {
 
                 Cookie[] cookies = request.getCookies();
 
-                String hashKey = ReadCookie.readCookie(cookies, RememberCookie.KEY.getValue());
+                String hashKey = CustomCookie.readCookie(cookies, RememberCookie.KEY.getValue());
 
                 if (hashKey != null && StringUtils.hasText(hashKey)) {
                     RedisRememberService redisRememberService = (RedisRememberService) rememberMeServices;

@@ -11,10 +11,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
-import sky.board.domain.user.dto.CustomUserDetails;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.RedisRememberService;
-import sky.board.domain.user.utill.ReadCookie;
+import sky.board.domain.user.utill.CustomCookie;
 import sky.board.domain.user.utill.UserTokenUtil;
 import sky.board.global.redis.dto.RedisKeyDto;
 
@@ -40,7 +40,7 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         RedisRememberService rememberMeServices = (RedisRememberService) super.getRememberMeServices();
 
         // 쿠키에 있는 값을 가져온 뒤
-        String key = ReadCookie.readCookie(request.getCookies(), RememberCookie.KEY.getValue());
+        String key = CustomCookie.readCookie(request.getCookies(), RememberCookie.KEY.getValue());
 
         log.info("rememberMe value = {}", key);
         String redisToken = rememberMeServices.hashing(key);

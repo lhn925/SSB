@@ -8,7 +8,7 @@
 <body>
 
 <div class="container" th:replace="~{template/container/container ::container (~{:: form})}">
-  <form method="get" th:action="@{/join}" th:object="${userJoinAgreeDto}">
+  <form method="get" th:action="@{/user/join}" th:object="${userJoinAgreeDto}">
     <input type="text" class="form-control" th:field="*{agreeToken}" hidden="hidden">
     <div class="form-group mt-5">
       <input type="checkbox" class="form-check-input" id="chk_all">

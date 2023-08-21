@@ -1,6 +1,5 @@
 package sky.board.domain.user.entity;
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.Entity;
@@ -13,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 import sky.board.global.base.BaseTimeEntity;
-import sky.board.domain.user.dto.UserJoinAgreeDto;
+import sky.board.domain.user.dto.join.UserJoinAgreeDto;
 
 @Entity
 @Setter(value = AccessLevel.PRIVATE)

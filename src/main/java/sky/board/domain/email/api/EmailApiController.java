@@ -29,6 +29,7 @@ import sky.board.domain.email.model.EmailSendType;
 import sky.board.domain.email.service.EmailService;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.utill.CustomCookie;
 import sky.board.global.error.dto.ErrorGlobalResultDto;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.Result;
@@ -129,6 +130,7 @@ public class EmailApiController {
 
         return new ResponseEntity(new Result<>(emailAuthCodeDto), HttpStatus.OK);
     }
+
     /**
      * id:emailApi_3
      *
@@ -148,10 +150,12 @@ public class EmailApiController {
             // 등록 이메일 체크
             userJoinService.checkEmail(emailPostDto.getEmail());
         } catch (DuplicateCheckException e) {
+            // 등록한 이메일이 있을경우에 이메일 발송
             return sendEmail(EmailSendType.ID, emailPostDto, request);
         }
-        String subArgs = setArgs(EmailSendType.EMAIL, request);
-        bindingResult.reject("sky.email.find", new Object[]{subArgs}, null);
+
+        // 없으면 찾을수 없다고 경고 뜸
+        bindingResult.reject("sky.email.notFind", null, null);
         return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
     }
 
@@ -168,8 +172,8 @@ public class EmailApiController {
         JSONObject msObject = new JSONObject();
 
         msObject.put("content", ms.getMessage("sky.email.content", null, request.getLocale()));
-        msObject.put("subContent1", ms.getMessage("sky.email.subContent1", new Object[]{subArgs}, request.getLocale()));
-        msObject.put("subContent2", ms.getMessage("sky.email.subContent2", new Object[]{subArgs}, request.getLocale()));
+        msObject.put("subContent1", ms.getMessage("sky.email.subContent1", null, request.getLocale()));
+        msObject.put("subContent2", ms.getMessage("sky.email.subContent2", null, request.getLocale()));
 
         Optional<String> optCode = emailService.sendMail(msObject, email, "/email/sendEmail");
         LocalDateTime issueTime = LocalDateTime.now(); // 인증발급시간

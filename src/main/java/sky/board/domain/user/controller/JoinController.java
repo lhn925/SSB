@@ -5,11 +5,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -20,24 +17,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
-import sky.board.domain.user.dto.UserJoinAgreeDto;
-import sky.board.domain.user.dto.UserJoinPostDto;
+import sky.board.domain.user.dto.join.UserJoinAgreeDto;
+import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.utill.CustomCookie;
 import sky.board.domain.user.utill.PwChecker;
-import sky.board.domain.user.utill.ReadCookie;
 import sky.board.global.error.dto.FieldErrorCustom;
 
 
 @Slf4j
-@RequestMapping("/join")
 @RequiredArgsConstructor
 @Controller
+@RequestMapping("/user/join")
 public class JoinController {
 
     private final UserJoinService userJoinService;
-    private final MessageSource ms;
 
     /**
      * id:join_1
@@ -47,6 +43,7 @@ public class JoinController {
      *
      * @return
      */
+
     /**
      * @param userJoinAgreeDto
      * @param bindingResult
@@ -58,20 +55,21 @@ public class JoinController {
     public String joinForm(@Validated @ModelAttribute UserJoinAgreeDto userJoinAgreeDto,
         BindingResult bindingResult, Model model, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            return "redirect:/join/agree";
+            return "redirect:/user/join/agree";
         }
+        log.info("접근");
         HttpSession session = request.getSession();
 
         if (session.getAttribute("emailAuthCodeDto") != null) {// 인증번호 삭제 (뒤로가기 버그 방지)
             session.removeAttribute("emailAuthCodeDto");
         }
 
-        String agreeToken = ReadCookie.readCookie(request.getCookies(), "agreeToken");
+        String agreeToken = CustomCookie.readCookie(request.getCookies(), "agreeToken");
 
         // agreeToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
         if (!StringUtils.hasText(agreeToken) || (!agreeToken.equals(userJoinAgreeDto.getAgreeToken()))) {
             bindingResult.reject("code.error");
-            return "redirect:/join/agree";
+            return "redirect:/user/join/agree";
         }
 
         // 약관 동의 데이터 session에 저장
@@ -80,7 +78,6 @@ public class JoinController {
         model.addAttribute("userJoinPostDto", new UserJoinPostDto());
         return "user/join/joinForm";
     }
-
 
     /**
      * id:join_2
@@ -114,21 +111,21 @@ public class JoinController {
         // 보안레벨 저장 나중에 -> 보안 위험 표시할 떄 유용
         userJoinPostDto.setPwSecLevel(pwSecLevel);
 
-        // 이메일 인증 여부 확인
         if (bindingResult.hasErrors()) {
             return "user/join/joinForm";
         }
         //cookie 기간 확인
 
+        // 이메일 인증 여부 확인
         Cookie[] cookies = request.getCookies();
 
-        String agreeToken = ReadCookie.readCookie(cookies, "agreeToken");
+        String agreeToken = CustomCookie.readCookie(cookies, "agreeToken");
 
         // 동의 여부 token 이 없을 경우 다시 동의 폼으로
         // 세션에 저장해둔 동의 여부 갖고오기
         UserJoinAgreeDto userJoinAgreeDto = (UserJoinAgreeDto) session.getAttribute(agreeToken);
         if (userJoinAgreeDto == null) {
-            return "redirect:/join/agree";
+            return "redirect:/user/join/agree";
         }
 
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
@@ -174,23 +171,19 @@ public class JoinController {
     @GetMapping("/agree")
     public String joinAgreeForm(Model model, HttpServletResponse response,HttpServletRequest request) {
 
-        Cookie result = ReadCookie.getCookie(request.getCookies(), "agreeToken");
+        Cookie result = CustomCookie.getCookie(request.getCookies(), "agreeToken");
 
         // 뒤로가기 방지
         if (result != null) {
             result.setMaxAge(0);
             response.addCookie(result);
-            return "redirect:/join/agree";
+            return "redirect:/user/join/agree";
         }
 
         // 쿠키 생성
         UserJoinAgreeDto userJoinAgreeDto = UserJoinAgreeDto.createUserJoinAgree();
-        Cookie cookie = new Cookie("agreeToken", userJoinAgreeDto.getAgreeToken());
-        cookie.setMaxAge(900); // 15분 유효
-        cookie.setPath("/join");
 
-        // 쿠키에 agreeToken 저장
-        response.addCookie(cookie);
+        CustomCookie.addCookie("/user/join","agreeToken",900,response,userJoinAgreeDto.getAgreeToken());
 
         //회원가입 토큰 발급
         model.addAttribute("userJoinAgreeDto", userJoinAgreeDto);
@@ -198,3 +191,4 @@ public class JoinController {
     }
 
 }
+

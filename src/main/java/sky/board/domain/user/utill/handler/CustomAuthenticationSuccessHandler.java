@@ -1,26 +1,20 @@
 package sky.board.domain.user.utill.handler;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Optional;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import sky.board.domain.user.dto.CustomUserDetails;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.UserInfoSessionDto;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;

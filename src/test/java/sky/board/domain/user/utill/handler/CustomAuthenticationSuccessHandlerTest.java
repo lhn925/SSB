@@ -1,10 +1,8 @@
 package sky.board.domain.user.utill.handler;
 
 
-import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.board.domain.user.dto.CustomUserDetails;
 
 
 @SpringBootTest
@@ -33,7 +31,7 @@ class CustomAuthenticationSuccessHandlerTest {
 
 *//*
         session.toString() = {"SESss111":
-        {"userDetail":sky.board.domain.user.dto.CustomUserDetails [Username=hi, Password=[PROTECTED], Enabled=true, url=null, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=null]}}
+        {"userDetail":sky.board.domain.user.dto.login.CustomUserDetails [Username=hi, Password=[PROTECTED], Enabled=true, url=null, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=null]}}
         *//*
         System.out.println("session.toString() = " + session.get("login"));*/
 

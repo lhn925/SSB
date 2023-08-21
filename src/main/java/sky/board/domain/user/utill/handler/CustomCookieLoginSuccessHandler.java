@@ -10,7 +10,7 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import sky.board.domain.user.dto.CustomUserDetails;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.UserInfoSessionDto;
 import sky.board.global.redis.dto.RedisKeyDto;
 

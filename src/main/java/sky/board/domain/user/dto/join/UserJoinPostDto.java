@@ -1,4 +1,4 @@
-package sky.board.domain.user.dto;
+package sky.board.domain.user.dto.join;
 
 
 import jakarta.validation.constraints.NotBlank;
