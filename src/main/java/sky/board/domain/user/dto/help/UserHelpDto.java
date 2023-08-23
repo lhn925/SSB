@@ -1,20 +1,20 @@
 package sky.board.domain.user.dto.help;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import sky.board.domain.user.annotation.JoinValid;
-import sky.board.domain.user.utill.UserTokenUtil;
+import sky.board.domain.user.utili.UserTokenUtil;
 
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserHelpIdDto {
+public class UserHelpIdDto implements Serializable {
 
     private String userId;
 
@@ -27,6 +27,7 @@ public class UserHelpIdDto {
 
     private String authCode;
 
+    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime createdDateTime;
 
     public static UserHelpIdDto createUserHelpIdDto() {

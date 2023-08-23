@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EmailPostDto implements Serializable  {
+public class EmailSendDto implements Serializable  {
 
     @NotBlank
     @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$",message = "{userJoinForm.email}")
