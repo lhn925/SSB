@@ -14,7 +14,7 @@ import sky.board.domain.user.utili.UserTokenUtil;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserHelpIdDto implements Serializable {
+public class UserHelpDto implements Serializable {
 
     private String userId;
 
@@ -30,8 +30,8 @@ public class UserHelpIdDto implements Serializable {
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime createdDateTime;
 
-    public static UserHelpIdDto createUserHelpIdDto() {
-        UserHelpIdDto userJoinAgreeResponseDto = new UserHelpIdDto();
+    public static UserHelpDto createUserHelpIdDto() {
+        UserHelpDto userJoinAgreeResponseDto = new UserHelpDto();
         String token = UserTokenUtil.getToken();
         userJoinAgreeResponseDto.setHelpToken(token);
         return userJoinAgreeResponseDto;

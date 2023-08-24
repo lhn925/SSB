@@ -22,8 +22,8 @@ import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.service.UserJoinService;
-import sky.board.domain.user.utill.CustomCookie;
-import sky.board.domain.user.utill.PwChecker;
+import sky.board.domain.user.utili.CustomCookie;
+import sky.board.domain.user.utili.PwChecker;
 import sky.board.global.error.dto.FieldErrorCustom;
 
 
@@ -130,9 +130,6 @@ public class JoinController {
 
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
 
-        log.info("emailAuthCodeDto = {}", emailAuthCodeDto);
-        log.info("emailAuthCodeDto.getIsSuccess() = {}", emailAuthCodeDto.getIsSuccess());
-
         if (emailAuthCodeDto == null || !emailAuthCodeDto.getIsSuccess()) {
             session.removeAttribute("emailAuthCodeDto");
             bindingResult.addError(
@@ -143,6 +140,8 @@ public class JoinController {
             return "user/join/joinForm";
         }
         // 중복 확인
+        // 이메일 인증 체크후 인증되었던 이메일을 넣어줌
+        userJoinPostDto.setEmail(emailAuthCodeDto.getEmail());
         try {
             userJoinService.join(userJoinPostDto, userJoinAgreeDto);
         } catch (DuplicateCheckException e) { // 중복 시
