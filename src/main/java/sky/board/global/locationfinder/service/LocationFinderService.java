@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import sky.board.domain.user.utill.HttpReqRespUtils;
+import sky.board.domain.user.utili.HttpReqRespUtils;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.model.DataPath;
 

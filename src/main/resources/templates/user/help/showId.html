@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+  <th:block th:replace="~{template/header/header :: commonHead}">
+  </th:block>
+
+  <th:block th:replace="~{template/css/css :: css ('helpForm')}">
+  </th:block>
 </head>
 <body>
+<div class="container" th:replace="~{template/container/container ::container (~{:: .card})}">
+
+  <div class="card">
+    <div class="card-header" th:text="#{sky.regid}">
+      가입 한 아이디
+    </div>
+    <div class="card-body">
+      <h5 class="card-title" th:text="${userHelpDto.getUserId()}"></h5>
+      <p class="card-text" th:text="#{sky.join.date}">가입 한 날짜</p>
+      <p class="card-text"
+         th:text="${#temporals.format(userHelpDto.getCreatedDateTime(), 'yyyy-MM-dd HH:mm:ss')}"></p>
+      <a th:href="@{|/login?userId=${userHelpDto.getUserId()}|}" class="btn btn-primary" th:text="#{sky.loginBtn}"></a>
+
+    </div>
+  </div>
 
 
-<h2 th:text="${userHelpIdDto.getUserId()}">
-
-</h2>
-
-
-<h2 th:text="${userHelpIdDto.getCreatedDateTime()}">
-
-</h2>
-
-
-
-
-
-
+</div>
 </body>
+<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+</th:block>
+
 </html>

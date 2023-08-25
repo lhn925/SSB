@@ -35,7 +35,9 @@ Login.prototype._LoginSubBtnClickAddEvent = function () {
     if (isClicking) {
       return;
     }
+
     isClicking = true;
+    // 1초마다 딜레이
     let userIdVal = _login.$userId.value.split(" ").join("");
     let pwVal = _login.$password.value.split(" ").join("");
     let capKeyVal = _login.$captchaKey.value.split(" ").join("");
@@ -88,8 +90,10 @@ Login.prototype._LoginSubBtnClickAddEvent = function () {
       $loginSubBtn.click();
       $loginSubBtn.setAttribute("disabled", "disabled");
     }
+    setTimeout(function () {
+      isClicking = false
+    }, 1000);
 
-    isClicking = false;
   }
 }
 
@@ -99,13 +103,16 @@ Login.prototype._captchaBtnClickAddEvent = function () {
   $captchaBtn.onclick = function () {
 
     if (isClicking) {
-      isClicking = false;
       return;
     }
     isClicking = true;
+    // 1초마다 딜레이
+    setTimeout(function () {
+      isClicking = false
+    }, 1000);
+
     let capKeyVal = _login.$captchaKey.value.split(" ").join("");
     if (capKeyVal == "") {
-      isClicking = false;
       return;
     }
 
@@ -120,9 +127,6 @@ Login.prototype._captchaBtnClickAddEvent = function () {
         $imagePath.src = "/open/image/" + data.imageName;
         _login.$imageName.value = data.imageName;
 
-        console.log(data.imageName)
-        console.log(data.captchaKey)
-        isClicking = false;
         return;
       }).catch((error) => {
         _innerTextByClass("error-Thyme-msg", "");

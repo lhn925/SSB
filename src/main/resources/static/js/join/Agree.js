@@ -28,6 +28,7 @@ Agree.prototype._allCheckBtnEvent = function () { // 전체 동의 버튼
     } else {
       is_checked = false;
     }
+
     for (const checkBox of $agreeCheckBox) {
       checkBox.checked = is_checked;
     }

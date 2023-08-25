@@ -1,4 +1,4 @@
-package sky.board.domain.user.utill.Filter;
+package sky.board.domain.user.utili.Filter;
 
 
 import jakarta.servlet.http.HttpServletRequest;

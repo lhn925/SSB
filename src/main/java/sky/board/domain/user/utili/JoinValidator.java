@@ -1,4 +1,4 @@
-package sky.board.domain.user.utill;
+package sky.board.domain.user.utili;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

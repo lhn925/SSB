@@ -1,4 +1,4 @@
-package sky.board.domain.user.utill;
+package sky.board.domain.user.utili;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,5 +45,10 @@ public class CustomCookie {
             }
         }
         return null;
+    }
+
+    public static void delete(Cookie cookie, String key, HttpServletResponse response) {
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }

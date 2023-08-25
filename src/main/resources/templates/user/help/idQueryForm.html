@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{template/header/header :: commonHead}">
+  </th:block>
+
+  <th:block th:replace="~{template/css/css :: css ('HelpForm')}">
+  </th:block>
+</head>
+<body>
+<div class="container" th:replace="~{template/container/container ::container (~{:: .card})}">
+
+
+  <div class="card">
+    <div class="card-body">
+      <form id="form" th:method="get" th:action="@{/user/help/idquery/check}"
+            th:object="${userIdHelpQueryDto}">
+        <input type="checkbox" hidden="true" id="_isChkUId"/>
+        <div class="form-group">
+          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
+            Flaticon</a>
+          <div th:for="userId" class="input-group form-join form-id"
+               th:classappend="${#fields.hasErrors('userId')} ? 'error' : 'on'">
+            <input type="text" class="form-control" th:field="*{userId}"
+                   th:placeholder="#{sky.id}" th:errorclass="border-danger">
+          </div>
+          <div class="d-grid gap-2 col-6 mx-auto">
+            <button type="button" id="subBtn" class="btn btn-primary btn-block btn-dark mt-5" th:text="#{sky.nextBtn}">
+            </button>
+          </div>
+        </div>
+      </form>
+    </div><!--카드바디-->
+  </div><!--카드-->
+
+
+</div>
+</body>
+
+
+<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+</th:block>
+
+<th:block th:replace="~{template/js/js :: js ('idQueryForm')}">
+</th:block>
+</html>

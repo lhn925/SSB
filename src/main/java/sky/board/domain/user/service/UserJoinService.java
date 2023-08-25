@@ -15,7 +15,7 @@ import sky.board.domain.user.repository.UserAgreeRepository;
 
 import sky.board.domain.user.repository.UserJoinRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
-import sky.board.domain.user.utill.PwEncryptor;
+import sky.board.domain.user.utili.PwEncryptor;
 
 
 @Transactional(readOnly = true)

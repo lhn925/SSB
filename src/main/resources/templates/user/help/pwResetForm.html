@@ -19,14 +19,14 @@
 
   <div class="card mainCard">
     <div class="card-body">
-      <h5 class="card-title text-center" th:text="#{sky.login}">Login</h5>
-      <form class="mt-4" method="post" th:action="@{/login}" th:object="${userLoginFormDto}">
+      <h5 class="card-title text-center" th:text="#{sky.pwReset}">Login</h5>
+      <form class="mt-4" method="post" th:action="@{/login}" th:object="${UserPwResetFormDto}">
         <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
           Flaticon</a>
         <div class="form-group">
           <div th:for="userId" class="input-group form-login form-id">
-            <input type="text" class="form-control" th:field="*{userId}"
-                   th:placeholder="#{sky.id}">
+            <input type="text" class="form-control" th:field="*{password}"
+                   th:placeholder="#{sky.}">
           </div>
         </div>
         <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
@@ -47,7 +47,7 @@
           - Flaticon</a>
 
 
-        <div class="card captchaCard" th:classappend="*{imageName} ? '' : 'display-none' ">
+        <div class="card captchaCard">
           <div class="form-group card-body">
             <img class="captcha-img mb-3" id="imagePath" th:src="*{imageName} ? '/open/image/'+ *{imageName} : '' "/>
             <div class="input-group form-login form-cap">
@@ -74,7 +74,6 @@
         </div>
 
 
-        <input type="hidden" class="form-control" th:field="*{url}">
         <input type="hidden" class="form-control" th:field="*{captchaKey}">
         <input type="hidden" class="form-control" th:field="*{imageName}">
         <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
@@ -86,20 +85,6 @@
     </div>
   </div>
 </div>
-
-<!-- Breadcrumb는 카드 바로 아래에 배치 -->
-<div class="centered-breadcrumb">
-  <div aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a class="text-decoration-none text-dark" th:href="@{/user/help/id}"
-                                     th:text="#{sky.findId}">아이디 찾기</a></li>
-      <li class="breadcrumb-item"><a th:href="@{/user/help/idquery}" class="text-decoration-none text-dark" th:text="#{sky.findPw}">비밀번호 찾기</a></li>
-      <li class="breadcrumb-item"><a class="text-decoration-none text-dark" th:href="@{/user/join/agree}"
-                                     th:text="#{sky.signup}">회원가입</a></li>
-    </ol>
-  </div>
-</div>
-
 </body>
 
 
@@ -110,14 +95,6 @@
 </th:block>
 
 
-<!--<script th:inline="javascript">
-  let image = [[${userLoginFormDto.getImageName()}]];
-  let $captchaImg = _getElementById("captchaImg");
-
-  if (image.length != null) {
-    _removeByClass("captchaCard", "display-none");
-    $captchaImg.src = "/image/" + image;
-  }
 </script>-->
 
 

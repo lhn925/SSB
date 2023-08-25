@@ -16,7 +16,7 @@ Email.prototype._init = function () { //sendCodeButton 이벤트 등록
 }
 
 Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요청
-  // 공백 없앰
+                                                   // 공백 없앰
   let emailVal = this.$email.value.split(" ").join("");
 
   let $errorMsg = _getElementById("email-NotThyme-msg");
@@ -33,11 +33,14 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
     $errorMsg.innerText = messages["userJoinForm.email"];
     _addClassById(_email.$email, "border-danger")
     _addClassByParent(_email.$email, "error");
+    // 형제 error-msg 제거
+    _removeNodesByClass("email-Thyme-msg");
     return;
   }
   $errorMsg.innerText = "";
 
-  _post(_email._url, {email: emailVal})
+  let bodyVal = _email.sendValue(emailVal);
+  _post(_email._url, bodyVal)
   .then((data) => {
         if (_email._countdownInterval != null) { // 유효 시간 중단 및 재 시작
           clearInterval(_email._countdownInterval);
@@ -46,7 +49,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
         _removeClassById(_email.$email, "border-danger")
 
         // 형제 error-msg 제거
-        _removeNodesByClass("email-thyme-msg");
+        _removeNodesByClass("email-Thyme-msg");
 
         // authCode 부모 div error 클래스 제거
         _removeClassByParent($authCode, "error");
@@ -64,8 +67,9 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
         _email._startCountdown($countdown);
       }
   ).catch((error) => {
-    _email._errorResult = JSON.parse(error.message);
     _removeNodesByClass("email-Thyme-msg");
+    _email._errorResult = JSON.parse(error.message);
+    // 형제 error-msg 제거
     _addClassByParent(_email.$email, "error");
     let message = _email._errorResult.message;
     // 에러메시지
@@ -83,7 +87,7 @@ Email.prototype._reqEmailAuthFetch = function (clickCheck) { // 인증번호 체
   let $authCode = _getElementById("authCode");
   let $verificationMsg = _getElementById("verification-msg");
   let $countdown = _getElementById("verification-time");
-
+  let emailVal = _email.$email.value;
   if (!clickCheck) { // submit 버튼을 눌렀는데 인증이 되지 않았을 경우 false가 전해짐
     $verificationMsg.innerText = messages["userJoinForm.email2"];
     _addClassByClass("form-auth", "error");
@@ -136,16 +140,6 @@ Email.prototype._startCountdown = function ( // 유효시간 5분 알림
       = (new Date(_email._emailDto.data.authTimeLimit)
       - new Date(_email._emailDto.data.authIssueTime)) / 1000;
   this._countdownInterval = setInterval(function () {
-    if (parseInt(timer) == 60) { // 유효시간 1분남을시에 text-color 빨강으로 변경
-      $countdown.className += " text-danger";
-    }
-
-    if (timer < 0) {
-      clearInterval(_email._countdownInterval);
-      $countdown.innerText = "인증 시간이 만료되었습니다.";
-      _removeClassById($countdown, "text-danger");
-      // 인증 시간 만료시 수행할 작업 추가
-    }
     timer = (new Date(_email._emailDto.data.authTimeLimit) - new Date()) / 1000;
     minutes = parseInt(timer / 60, 10); // 10진수로 출력
     seconds = parseInt(timer % 60, 10);
@@ -154,13 +148,23 @@ Email.prototype._startCountdown = function ( // 유효시간 5분 알림
     seconds = seconds < 10 ? "0" + seconds : seconds;
 
     $countdown.innerText = ": 인증 유효시간: " + minutes + ":" + seconds;
+    if (timer <= 60) { // 유효시간 1분남을시에 text-color 빨강으로 변경
+      $countdown.classList.add("text-danger");
+    }
+
+    if (timer <= 1) {
+      clearInterval(_email._countdownInterval);
+      $countdown.innerText = "인증 시간이 만료되었습니다.";
+      _removeClassById($countdown, "text-danger");
+      // 인증 시간 만료시 수행할 작업 추가
+    }
 
   }, 1000);
 
 }
 
 Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton 에 이벤트 구현
-                                                            // 중복 클릭 방지
+  // 중복 클릭 방지
   let isClicking = false;
 
   _getElementById("sendCodeButton").onclick = function () {
@@ -168,18 +172,16 @@ Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton �
       return;
     }
     isClicking = true;
-
     // 1초마다 딜레이
     setTimeout(function () {
       isClicking = false
     }, 1000);
-
     _email._sendAuthCodeFetch();
   };
 }
 
 Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 이벤트 구현
-  // 중복 클릭 방지
+                                                       // 중복 클릭 방지
   let isClicking = false;
 
   _getElementById("verifyCodeButton").onclick = function () {
@@ -210,7 +212,12 @@ Email.prototype._SubmitBtnClickAddEvent = function () {
     if (isClicking) {
       return;
     }
+
     isClicking = true;
+    // 1초마다 딜레이
+    setTimeout(function () {
+      isClicking = false
+    }, 1000);
 
     let _isChkEmail = _email.$isChkEmail.checked;
     let _isChkAuth = _email.$isChkAuth.checked;
@@ -229,8 +236,24 @@ Email.prototype._SubmitBtnClickAddEvent = function () {
       this.click();
       this.setAttribute("disabled", "disabled");
     } else {
-      isClicking = false;
       return;
     }
   }
+}
+
+// api에 보낼 데이터
+Email.prototype.sendValue = function (emailVal) {
+  if (_getElementById("helpToken") == undefined) {
+    return {email: emailVal}
+  } else {
+    let helpTypeVal = _getElementById("helpType").value;
+
+    if (helpTypeVal == 'PW') {
+      let userIdVal = _getElementById("userId").value;
+      return {email: emailVal, userId: userIdVal, helpType: helpTypeVal}
+    }
+    return {email: emailVal, helpType: helpTypeVal}
+
+  }
+
 }

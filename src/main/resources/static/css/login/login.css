@@ -53,3 +53,9 @@
   width: 30px;
   height: 39px;
 }
+
+.centered-breadcrumb {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* 조정 가능한 여백 */
+}

@@ -1,4 +1,4 @@
-package sky.board.domain.user.utill.Filter;
+package sky.board.domain.user.utili.Filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,8 +14,8 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.RedisRememberService;
-import sky.board.domain.user.utill.CustomCookie;
-import sky.board.domain.user.utill.UserTokenUtil;
+import sky.board.domain.user.utili.CustomCookie;
+import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j

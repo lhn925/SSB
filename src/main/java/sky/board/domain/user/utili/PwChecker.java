@@ -1,4 +1,4 @@
-package sky.board.domain.user.utill;
+package sky.board.domain.user.utili;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)">
 
+
 <th:block th:if="${page == 'commonJs'}" class="commonJs">
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
           integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
@@ -10,6 +11,7 @@
           crossorigin="anonymous"></script>
 
 
+  <script th:src="@{/js/common/format.js}"></script>
   <script th:src="@{/js/errors/{locale}/errors.js(locale = ${#locale})}"></script>
   <script th:src="@{/js/common/function.js}"></script>
 </th:block>
@@ -43,7 +45,7 @@
   </script>
 </th:block>
 
-<th:block th:if="${page == 'idHelpForm'}" class="idHelpForm">
+<th:block th:if="${page == 'helpForm'}" class="helpForm">
   <script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
   <script th:src="@{/js/join/Email.js}"></script>
   <script th:src="@{/js/help/help_ready.js}"></script>
@@ -53,7 +55,7 @@
   </script>
 </th:block>
 
-<th:block th:if="${page == 'login'}" class="login" >
+<th:block th:if="${page == 'login'}" class="login">
   <script th:src="@{/js/login/messages/{locale}/messages.js(locale = ${#locale})}"></script>
   <script th:src="@{/js/login/login.js}"></script>
   <script th:src="@{/js/login/login_ready.js}"></script>
@@ -66,5 +68,15 @@
   </script>
 </th:block>
 
+
+<th:block th:if="${page == 'idQueryForm'}" class="login">
+  <script th:src="@{/js/login/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{/js/help/idquery.js}"></script>
+  <script th:src="@{/js/help/idquery_ready.js}"></script>
+  <script th:inline="javascript">
+    let _idquery;
+    _idquery_ready_init();
+  </script>
+</th:block>
 
 </html>

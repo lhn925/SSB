@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.rememberme.InvalidCookieE
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
-import sky.board.domain.user.utill.UserTokenUtil;
+import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.redis.service.RedisService;
 
 @Slf4j

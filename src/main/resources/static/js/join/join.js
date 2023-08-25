@@ -38,6 +38,11 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
       return;
     }
     isClicking = true;
+    // 1초마다 딜레이
+    setTimeout(function () {
+      isClicking = false
+    }, 1000);
+
 
     let _isChkUId = _join.$isChkUId.checked;
     let _isChkPw = _join.$isChkPw.checked;
@@ -58,14 +63,14 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
     if (!_isChkUname) { // 유저네임 유효성 검증
       _join.$isChkUname.checked = _join._duplicateCheckFn("userName",
           "userName-NotThyme-msg",
-          "/user/join/api/duplicate/id?userName=", _getElementById("userName"),
+          "/user/join/api/duplicate/userName?userName=", _getElementById("userName"),
           _join.$isChkUname);
     }
 
     if (!_isChkEmail) { // 이메일 유효성 검증
       _join.$isChkEmail.checked = _join._duplicateCheckFn("email",
           "email-NotThyme-msg",
-          "/user/join/api/duplicate/id?email=", _getElementById("email"),
+          "/user/join/api/duplicate/email?email=", _getElementById("email"),
           _join.$isChkEmail);
     }
 
@@ -78,7 +83,6 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
       this.click();
       this.setAttribute("disabled", "disabled");
     } else {
-      isClicking = false;
       return;
     }
   }
