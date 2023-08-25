@@ -34,9 +34,9 @@ Login.prototype._LoginSubBtnClickAddEvent = function () {
 
     isClicking = true;
     // 1초마다 딜레이
-    let userIdVal = _login.$userId.value.split(" ").join("");
-    let pwVal = _login.$password.value.split(" ").join("");
-    let capKeyVal = _login.$captchaKey.value.split(" ").join("");
+    let userIdVal = _removeWhitespace(_login.$userId.value);
+    let pwVal = _removeWhitespace(_login.$password.value);
+    let capKeyVal = _removeWhitespace(_login.$captchaKey.value);
     _innerTextByClass("error-Thyme-msg", "");
     if (userIdVal == "") {
       _removeByClass("err-NotThyme-msg", "display-none");

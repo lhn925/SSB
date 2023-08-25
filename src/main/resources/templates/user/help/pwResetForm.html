@@ -10,22 +10,24 @@
 <body>
 <div class="container" th:replace="~{template/container/container ::container (~{:: .mainCard})}">
 
-  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-    Prabowo -
-    Flaticon</a>
-  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-    Icons -
-    Flaticon</a>
 
-  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-    Prabowo -
-    Flaticon</a>
-  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-    Icons -
-    Flaticon</a>
 
 
   <div class="card mainCard">
+    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
+      Prabowo -
+      Flaticon</a>
+    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
+      Icons -
+      Flaticon</a>
+
+    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
+      Prabowo -
+      Flaticon</a>
+    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
+      Icons -
+      Flaticon</a>
+
     <div class="card-body">
       <h5 class="card-title text-center" th:text="#{sky.pwReset}">Login</h5>
       <form class="mt-4" method="post" th:action="@{|/user/help/reset/${userPwResetFormDto.getUserId()}|}" th:object="${userPwResetFormDto}">

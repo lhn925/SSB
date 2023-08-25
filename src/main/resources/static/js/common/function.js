@@ -177,8 +177,7 @@ function _getElementById(id) {
   return document.getElementById(id);
 }
 
-
-async function  _getFetch(url) {
+async function _getFetch(url) {
 
   const options = {method: "GET"};
 
@@ -191,7 +190,6 @@ async function  _getFetch(url) {
     throw await Error(JSON.stringify(data.data));
   }
 }
-
 
 async function _post(path, body, headers = {}) { //post fetch
   let url = path;
@@ -212,6 +210,7 @@ async function _post(path, body, headers = {}) { //post fetch
     throw Error(JSON.stringify(data.errorDetails[0]));
   }
 }
+
 async function _get(path) { //post fetch
   let url = path;
   const options = {method: "GET"};
@@ -271,7 +270,7 @@ function _captchaBtnClickAddEvent($captchaKey, $imageName) {
       isClicking = false
     }, 1000);
 
-    let capKeyVal = $captchaKey.value.split(" ").join("");
+    let capKeyVal = _removeWhitespace($captchaKey.value);
     if (capKeyVal == "") {
       return;
     }
@@ -297,4 +296,14 @@ function _captchaBtnClickAddEvent($captchaKey, $imageName) {
     }
 
   }
+}
+
+/**
+ * 공백없애줌
+ * @param value
+ * @returns {string}
+ * @private
+ */
+function _removeWhitespace(value) {
+  return value.split(" ").join("");
 }
