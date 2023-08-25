@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.board.domain.user.utill.UserTokenUtil;
+import sky.board.domain.user.utili.UserTokenUtil;
 
 @Getter
 @Setter

@@ -6,7 +6,7 @@ import static lombok.AccessLevel.PROTECTED;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.board.domain.email.dto.EmailPostDto;
+import sky.board.domain.email.dto.EmailSendDto;
 
 @Getter
 @Setter(value = PRIVATE)
@@ -17,11 +17,11 @@ public class Email {
     private String toMail; // 유저
 
 
-    public static Email createJoinEmail(String subject, EmailPostDto emailPostDto) {
+    public static Email createJoinEmail(String subject, EmailSendDto emailSendDto) {
         Email email = new Email();
 
         email.setSubject(subject);
-        email.setToMail(emailPostDto.getEmail());
+        email.setToMail(emailSendDto.getEmail());
         return email;
     }
 

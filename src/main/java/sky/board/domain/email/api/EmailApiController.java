@@ -3,7 +3,9 @@ package sky.board.domain.email.api;
 import static org.springframework.util.StringUtils.hasText;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -12,27 +14,33 @@ import org.json.simple.JSONObject;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.email.dto.AuthTimeResponseDto;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
-import sky.board.domain.email.dto.EmailPostDto;
+import sky.board.domain.email.dto.EmailSendDto;
 import sky.board.domain.email.dto.CodeCheckRequestDto;
+import sky.board.domain.email.dto.HelpEmailSendDto;
 import sky.board.domain.email.entity.Email;
 import sky.board.domain.email.model.EmailSendType;
 import sky.board.domain.email.service.EmailService;
+import sky.board.domain.user.dto.help.UserHelpDto;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.exception.DuplicateCheckException;
+import sky.board.domain.user.model.HelpType;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.UserJoinService;
-import sky.board.domain.user.utill.CustomCookie;
+import sky.board.domain.user.service.UserQueryService;
 import sky.board.global.error.dto.ErrorGlobalResultDto;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.Result;
+import sky.board.global.utili.Alert;
 
 
 @Slf4j
@@ -44,6 +52,7 @@ public class EmailApiController {
 
     private final EmailService emailService;
     private final UserJoinService userJoinService;
+    private final UserQueryService userQueryService;
     private final MessageSource ms;
 
     //
@@ -55,14 +64,14 @@ public class EmailApiController {
      * session에 유효시간과 인증번호 저장
      * body에는 인증발급시간,인증유효시간 전달
      *
-     * @param emailPostDto
+     * @param emailSendDto
      * @param bindingResult
      * @param request
      * @return
      */
     @PostMapping("/join")
     public ResponseEntity sendJoinMail(
-        @Validated @RequestBody EmailPostDto emailPostDto,
+        @Validated @RequestBody EmailSendDto emailSendDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -70,13 +79,13 @@ public class EmailApiController {
 
         try {
             // 이메일 중복 체크
-            userJoinService.checkEmail(emailPostDto.getEmail());
+            userJoinService.checkEmail(emailSendDto.getEmail());
         } catch (DuplicateCheckException e) {
             bindingResult.reject("join.duplication", new Object[]{e.getMessage()}, null);
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 
-        return sendEmail(EmailSendType.JOIN, emailPostDto, request);
+        return sendEmail(EmailSendType.JOIN, emailSendDto, request);
     }
 
 
@@ -133,25 +142,54 @@ public class EmailApiController {
 
     /**
      * id:emailApi_3
+     * <p>
+     * HelpEmailSendDto helpEmailSendDto,
      *
-     * @param emailPostDto
      * @param bindingResult
      * @param request
      * @return
      */
     @PostMapping("/find")
     public ResponseEntity sendFindMail(
-        @Validated @RequestBody EmailPostDto emailPostDto,
+        @Validated @RequestBody HelpEmailSendDto helpEmailSendDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         try {
+            /**
+             * 비밀번호 찾기 시
+             */
+            if (helpEmailSendDto.getHelpType().equals(HelpType.PW)) {
+
+                HttpSession session = request.getSession();
+                UserHelpDto userHelpDto = (UserHelpDto) session.getAttribute("userHelpDto");
+                if (!userHelpDto.getHelpType().equals(HelpType.PW)
+                    || !userHelpDto.getUserId().equals(helpEmailSendDto.getUserId())) {
+                    throw new UsernameNotFoundException("code.error");
+                }
+                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(),
+                    Status.OFF);
+                /**
+                 * 비밀 번호 찾기시
+                 *
+                 * 찾을려는 계정과
+                 * 인증 받을려는 이메일이 서로 다를경우
+                 * throw new UsernameNotFoundException("email.notfound");
+                 */
+                if (!statusUserId.getEmail().equals(helpEmailSendDto.getEmail())) {
+                    throw new UsernameNotFoundException("email.notfound");
+                }
+            }
             // 등록 이메일 체크
-            userJoinService.checkEmail(emailPostDto.getEmail());
+            userJoinService.checkEmail(helpEmailSendDto.getEmail());
         } catch (DuplicateCheckException e) {
             // 등록한 이메일이 있을경우에 이메일 발송
-            return sendEmail(EmailSendType.ID, emailPostDto, request);
+            return sendEmail(EmailSendType.ID, helpEmailSendDto, request);
+        } catch (UsernameNotFoundException e) {
+            // 없으면 찾을수 없다고 경고 뜸
+            bindingResult.reject(e.getMessage(), null, null);
+            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 
         // 없으면 찾을수 없다고 경고 뜸
@@ -160,14 +198,14 @@ public class EmailApiController {
     }
 
 
-    private ResponseEntity sendEmail(EmailSendType sendType, EmailPostDto emailPostDto,
+    private ResponseEntity sendEmail(EmailSendType sendType, EmailSendDto emailSendDto,
         HttpServletRequest request) {
 
         String subject = "sky.email.subject";
         String subArgs = setArgs(sendType, request);
         Email email = Email.createJoinEmail(
             ms.getMessage(subject, new Object[]{subArgs}, request.getLocale()),
-            emailPostDto);
+            emailSendDto);
 
         JSONObject msObject = new JSONObject();
 
@@ -181,7 +219,11 @@ public class EmailApiController {
 
         String code = optCode.orElse(null);
 
-        EmailAuthCodeDto emailResponseDto = new EmailAuthCodeDto(code, authTime, false);
+        EmailAuthCodeDto emailResponseDto = EmailAuthCodeDto.builder()
+            .code(code)
+            .authTimeLimit(authTime)
+            .isSuccess(false)
+            .email(emailSendDto.getEmail()).build();
 
         HttpSession session = request.getSession();
 

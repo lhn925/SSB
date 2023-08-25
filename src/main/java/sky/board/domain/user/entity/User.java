@@ -20,7 +20,7 @@ import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.UserGrade;
-import sky.board.domain.user.utill.UserTokenUtil;
+import sky.board.domain.user.utili.UserTokenUtil;
 
 
 @Getter

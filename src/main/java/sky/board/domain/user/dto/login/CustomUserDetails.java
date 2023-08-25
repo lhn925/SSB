@@ -35,6 +35,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
 
     // username 이랑 겹치는 문제로 바꿈 nickname으로 일시적으로 바꿈
     private String nickname;
+    private String email;
     private String password;
     private String username;
 
@@ -54,6 +55,14 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     private boolean credentialsNonExpired;
 
 
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
     // isEnabled() : 계정이 활성화돼 있는지 리턴 -> true는 활성화 상태 의미
     private boolean enabled;
 
@@ -66,7 +75,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         List<GrantedAuthority> authorities, boolean accountNonExpired, boolean accountNonLocked,
         boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder,
         LocalDateTime createdDateTime
-    ) {
+    ,String email) {
         this.url = url;
         this.token = token;
         this.userId = userId;
@@ -80,11 +89,12 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.passwordEncoder = passwordEncoder;
         this.nickname = nickname;
         this.createdDateTime = createdDateTime;
+        this.email = email;
     }
 
     @Builder
     public CustomUserDetails(String url, String userId, String token, String password, String username,String nickname,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime) {
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email) {
         this.url = url;
         this.token = token;
         this.userId = userId;
@@ -96,6 +106,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.enabled = !enabled;
         this.nickname = nickname;
         this.createdDateTime = createdDateTime;
+        this.email = email;
     }
 
     public LocalDateTime getCreatedDateTime() {

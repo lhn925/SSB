@@ -17,13 +17,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
 import sky.board.domain.user.dto.help.UserHelpDto;
 import sky.board.domain.user.dto.help.UserIdHelpQueryDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.model.HelpType;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.utili.CustomCookie;
@@ -40,42 +40,71 @@ public class HelpController {
     private final MessageSource ms;
 
 
+    /**
+     * @param model
+     * @param request
+     * @param response
+     * @return
+     */
     @GetMapping("/id")
     public String idHelpForm(Model model, HttpServletRequest request, HttpServletResponse response) {
-        return getString(model, "id", "idHelpForm", request, response);
+
+        UserHelpDto userHelpDto = UserHelpDto.createUserHelpIdDto();
+        return getString(userHelpDto, model, HelpType.ID, "id", "helpForm", request, response);
     }
 
-    @GetMapping("/idquery/{userId}")
-    public String idQuery(@PathVariable String userId, HttpServletRequest request, HttpServletResponse response)
+    @GetMapping("/idquery/check")
+    public String idQuery(@ModelAttribute UserIdHelpQueryDto userIdHelpQueryDto, Model model,
+        HttpServletRequest request,
+        HttpServletResponse response)
         throws IOException {
-        if (!StringUtils.hasText(userId)) {
-            Alert.waringAlert("NotBLank", "/user/help/inquery", response);
+        if (!StringUtils.hasText(userIdHelpQueryDto.getUserId())) {
+            Alert.waringAlert(ms.getMessage("NotBlank", null, request.getLocale()), "/user/help/idquery", response);
         }
+
         try {
-            CustomUserDetails userDetails = userQueryService.findStatusUserId(userId, Status.OFF);
+            CustomUserDetails userDetails = userQueryService.findStatusUserId(userIdHelpQueryDto.getUserId(),
+                Status.OFF);
 
             UserHelpDto userHelpDto = UserHelpDto.createUserHelpIdDto();
-            userHelpDto.setUserId(userId);
+            userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
 
-            String email = userDetails.getEmail();
-            int indexFirst = email.indexOf("@");
-            int indexLast = email.lastIndexOf(".");
+            StringBuffer email = new StringBuffer(userDetails.getEmail());
 
-            String subStr1 = email.substring(3, indexFirst - 1).replaceAll(".", "*");
+            // 2221325@naver.com -> 22*****@n****.com
+            anonymousEmail(email);
+            userHelpDto.setEnEmail(email.toString());
+            userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
 
-            String subStr2 = email.substring(indexFirst + 2, indexLast).replaceAll(".", "*");
-
-            userHelpDto.setEmail(userDetails.getEmail());
-
-
+            HttpSession session = request.getSession();
+            model.addAttribute("userHelpDto", userHelpDto);
+            session.setAttribute("userHelpDto", userHelpDto);
+            return getString(userHelpDto, model
+                , HelpType.PW, "idquery", "helpForm", request, response);
         } catch (UsernameNotFoundException e) {
             Alert.waringAlert(ms.getMessage("userId.notfound", null, request.getLocale()), "/user/help/idquery",
                 response);
+
+            return "redirect:/user/help/idquery";
         }
     }
 
     @GetMapping("/idquery")
-    public String idQueryForm(Model model) {
+    public String idQueryForm(Model model, HttpServletRequest request, HttpServletResponse response) {
+
+        HttpSession session = request.getSession();
+
+        EmailAuthCodeDto emailAuthCode = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
+
+        Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
+        if (helpToken != null) {
+            log.info("helpToken.getValue() = {}", helpToken.getValue());
+            CustomCookie.delete(helpToken, "helpToken", response);
+        }
+        if (emailAuthCode != null) {
+            session.removeAttribute("emailAuthCodeDto");
+        }
+
         model.addAttribute("userIdHelpQueryDto", new UserIdHelpQueryDto());
         return "user/help/idQueryForm";
     }
@@ -85,8 +114,9 @@ public class HelpController {
     public String findJoinEmailById(@Validated @ModelAttribute UserHelpDto userHelpDto, BindingResult bindingResult,
         HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return "/user/help/idHelpForm";
+            return "helpForm";
         }
+
         String helpToken = CustomCookie.readCookie(request.getCookies(), "helpToken");
         HttpSession session = request.getSession();
         // helpToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
@@ -108,7 +138,7 @@ public class HelpController {
                     "email", userHelpDto.getEmail(),
                     "userJoinForm.email2",
                     null));
-            return "/user/help/idHelpForm";
+            return "user/help/helpForm";
         }
 
         try {
@@ -148,17 +178,22 @@ public class HelpController {
     }
 
 
-    private String getString(Model model, String url, String view, HttpServletRequest request,
+    private String getString(UserHelpDto userHelpDto, Model model, HelpType helpType, String url, String view,
+        HttpServletRequest request,
         HttpServletResponse response) {
-        Cookie result = CustomCookie.getCookie(request.getCookies(), "helpToken");
+
         // 뒤로가기 방지
         HttpSession session = request.getSession();
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
+
+        log.info("getString 접근");
+        Cookie result = CustomCookie.getCookie(request.getCookies(), "helpToken");
+
         if (result != null) {
-            result.setMaxAge(0);
-            response.addCookie(result);
+            CustomCookie.delete(result, "helpToken", response);
             return "redirect:/user/help/" + url;
         }
+
         /**
          * 뒤로가기 방지
          */
@@ -167,12 +202,29 @@ public class HelpController {
             return "redirect:/user/help/" + url;
         }
         // 쿠키 생성
-        UserHelpDto userHelpDto = UserHelpDto.createUserHelpIdDto();
         CustomCookie.addCookie("/user/help", "helpToken", 900, response, userHelpDto.getHelpToken());
 
+        userHelpDto.setHelpType(helpType);
         model.addAttribute("userHelpDto", userHelpDto);
         return "/user/help/" + view;
     }
 
+
+
+
+    // 2221325@naver.com -> 22*****@n****.com
+    private void anonymousEmail(StringBuffer email) {
+        int one = email.lastIndexOf("@");
+        int two = email.lastIndexOf(".");
+        for (int i = 2; i < email.length(); i++) {
+            if (i == one || i == one + 1) {
+                continue;
+            }
+            if (i == two) {
+                break;
+            }
+            email.setCharAt(i, '*');
+        }
+    }
 
 }

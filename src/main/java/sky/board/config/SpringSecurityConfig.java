@@ -24,12 +24,12 @@ import org.springframework.util.StringUtils;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.RedisRememberService;
 import sky.board.domain.user.service.UserLogService;
-import sky.board.domain.user.utill.CustomCookie;
-import sky.board.domain.user.utill.Filter.CustomRememberMeAuthenticationFilter;
-import sky.board.domain.user.utill.Filter.CustomUsernameFilter;
-import sky.board.domain.user.utill.handler.CustomAuthenticationFailHandler;
-import sky.board.domain.user.utill.handler.CustomAuthenticationSuccessHandler;
-import sky.board.domain.user.utill.handler.CustomCookieLoginSuccessHandler;
+import sky.board.domain.user.utili.CustomCookie;
+import sky.board.domain.user.utili.Filter.CustomRememberMeAuthenticationFilter;
+import sky.board.domain.user.utili.Filter.CustomUsernameFilter;
+import sky.board.domain.user.utili.handler.CustomAuthenticationFailHandler;
+import sky.board.domain.user.utili.handler.CustomAuthenticationSuccessHandler;
+import sky.board.domain.user.utili.handler.CustomCookieLoginSuccessHandler;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.service.RedisService;
 
@@ -42,6 +42,9 @@ public class SpringSecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final RedisService redisService;
+    private final UserLogService userLogService;
+    private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
+
 
     /**
      * 에외 처리하고 싶은 url
@@ -54,12 +57,10 @@ public class SpringSecurityConfig {
     }*/
     @Bean
     public SecurityFilterChain webSecurityFilterChain(
-        AuthenticationManager authenticationManager,
-        UserLogService userLogService,
-        CustomAuthenticationSuccessHandler successHandler,
         CustomCookieLoginSuccessHandler cookieLoginSuccessHandler,
         CustomAuthenticationFailHandler failHandler,
-        ApiExamCaptchaNkeyService apiExamCaptchaNkeyService,
+        CustomAuthenticationSuccessHandler successHandler,
+        AuthenticationManager authenticationManager,
         RememberMeServices rememberMeServices,
         HttpSecurity http) throws Exception {
 
@@ -95,35 +96,33 @@ public class SpringSecurityConfig {
             new CustomRememberMeAuthenticationFilter(authenticationManager, rememberMeServices,
                 cookieLoginSuccessHandler),
             RememberMeAuthenticationFilter.class);
-        http.csrf().disable().
+        http.csrf().disable().cors().disable().
             authorizeHttpRequests(request ->
-                request.
-                    dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
-                    requestMatchers(
+                    request.
+                        dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
+                        requestMatchers(
 
 //                        "/js/common/**",
 //                        "/js/errors/**",
 //                        "/js/join/**",
 //                        "/js/login/**",
-                        "/js/**",
-                        "/login/**",
-                        "/email/**",
-                        "/image/**",
-                        "/example/city",
-                        "/login",
-                        "/logout",
-//                        "/user/join/api/**",
-//                        "/user/join/**",
-                        "/user/**",
-//                        "/user/help/**",
-                        "/user/**",
-                        "/test/**",
-                        "/open/**",
-                        "/",
-                        "/css/**"). // 허용 파일 및 허용 url
-                    permitAll().
-                    anyRequest().
-                    authenticated() // 어떠한 요청이라도 인증필요
+                            "/js/**",
+                            "/login/**",
+                            "/email/**",
+                            "/image/**",
+                            "/example/city",
+                            "/login",
+                            "/logout",
+                            "/user/join/api/**",
+                            "/user/join/**",
+                            "/user/help/**",
+                            "/test/**",
+                            "/open/**",
+                            "/",
+                            "/css/**"). // 허용 파일 및 허용 url
+                        permitAll().
+                        anyRequest().
+                        authenticated() // 어떠한 요청이라도 인증필요
             ).
             formLogin(login -> login. //form 방식 로그인 사용
                 loginPage("/login"). // 커스텀 로그인 페이지 지정
