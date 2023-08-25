@@ -2,8 +2,10 @@ package sky.board.global.locationfinder.dto;
 
 
 import com.maxmind.geoip2.model.CityResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
+import sky.board.domain.user.model.UserAgent;
 
 @Getter
 public class UserLocationDto {
@@ -40,6 +42,14 @@ public class UserLocationDto {
             .ipAddress(ipAddress)
             .latitude(latitude)
             .longitude(longitude).build();
+    }
+    public static UserAgent isDevice(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent").toUpperCase();
+        if (userAgent.indexOf(UserAgent.MOBI.name()) > -1) {
+            return UserAgent.MOBI;
+        } else {
+            return UserAgent.PC;
+        }
     }
 
 }

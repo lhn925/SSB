@@ -49,7 +49,7 @@ public class InitUser {
             userJoinDto.setEmail("2221325@naver.com");
             userJoinDto.setUserName("임하늘");
             userJoinDto.setUserId("lim222");
-            userJoinDto.setPassword("didELd@2");
+            userJoinDto.setPassword("dlagksmf2");
             userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
 
 

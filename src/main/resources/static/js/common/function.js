@@ -251,3 +251,50 @@ function _valueCheck(type, msgId, $elementById,
   }
 }
 
+/**
+ * captcha 재요청 공용 함수
+ * @param $captchaKey
+ * @param $imageName
+ * @private
+ */
+function _captchaBtnClickAddEvent($captchaKey, $imageName) {
+  let $captchaBtn = _getElementById("captchaBtn");
+  let isClicking = false;
+  $captchaBtn.onclick = function () {
+
+    if (isClicking) {
+      return;
+    }
+    isClicking = true;
+    // 1초마다 딜레이
+    setTimeout(function () {
+      isClicking = false
+    }, 1000);
+
+    let capKeyVal = $captchaKey.value.split(" ").join("");
+    if (capKeyVal == "") {
+      return;
+    }
+
+    let $imagePath = _getElementById("imagePath");
+    let imageName = $imagePath.src;
+    if (capKeyVal != "") {
+      _getFetch(
+          "/open/again?captchaKey=" + capKeyVal + "&imageName="
+          + imageName).then()
+      .then((data) => {
+        $captchaKey.value = data.captchaKey;
+        $imagePath.src = "/open/image/" + data.imageName;
+        $imageName.value = data.imageName;
+
+        return;
+      }).catch((error) => {
+        _innerTextByClass("error-Thyme-msg", "");
+        _removeByClass("login-err", "display-none");
+        _innerTextByClass("login-err", errorsMsg["server"])
+        return;
+      });
+    }
+
+  }
+}

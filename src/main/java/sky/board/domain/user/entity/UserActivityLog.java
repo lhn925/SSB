@@ -1,6 +1,5 @@
 package sky.board.domain.user.entity;
 
-
 import static jakarta.persistence.EnumType.STRING;
 
 import com.maxmind.geoip2.exception.GeoIp2Exception;
@@ -20,38 +19,49 @@ import org.springframework.format.annotation.DateTimeFormat;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.model.UserAgent;
+import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
-
-/**
- * 같은 아이디 당 시도
- * <p>
- * 5번이상 틀렸을 경우
- */
 
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)
-public class UserLoginLog {
-
+public class UserActivityLog {
+//    비밀번호 변경(최근 6개월 내) 및 연락처 수정 이력을 제공합니다.
+    /**
+     * 일시
+     * 변경 내용
+     * 변경 방법
+     * 변경 IP
+     */
     @Id
     @GeneratedValue
     private Long id;
 
+    //변경 아이피
     private String ip;
-
-    //사용자 고유 번호
+    //사용자 고유번호
     private Long uId;
+
+    // 변경 내용
+    private String chaContent;
+
+    //변경 방법
+    private String chaMethod;
+
+    //변경 유저
     private String userId;
 
-    // 성공 여부
-    @Enumerated(STRING)
-    private LoginSuccess isSuccess;
-
-    // 로그인시도 국가
+    // 변경 시도 국가
     private String countryName;
 
-    // 접속한 기기
+
+    // 변경 성공 여부
+    @Enumerated(STRING)
+    private ChangeSuccess changeSuccess;
+
+
+    // 변경에 사용된 기기
     @Enumerated(STRING)
     private UserAgent userAgent;
 
@@ -61,41 +71,37 @@ public class UserLoginLog {
     // 경도
     private String longitude;
 
-    // 로그인 유지 여부 값
-
     // 상태 값
     private Boolean isStatus;
 
 
+    // 변경일시
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private LocalDateTime loginDateTime;
+    private LocalDateTime activityLogDateTime;
 
     @Builder
-    public UserLoginLog(String ip,
+    public UserActivityLog(String ip,
         Long uId,
-        String userId, LoginSuccess isSuccess, String countryName,
-        UserAgent userAgent,
-        String latitude, String longitude, Status isStatus) {
+        String userId, String countryName, ChangeSuccess changeSuccess,
+        UserAgent userAgent, String latitude, String longitude, Status isStatus, String chaContent, String chaMethod) {
         this.ip = ip;
+        this.uId = uId;
         this.userId = userId;
-        this.uId = uId == null ? 0 : uId;
-        this.isSuccess = isSuccess;
         this.countryName = countryName;
+        this.changeSuccess = changeSuccess;
         this.userAgent = userAgent;
         this.latitude = latitude;
         this.longitude = longitude;
         this.isStatus = isStatus.getValue();
+        this.chaContent = chaContent;
+        this.chaMethod = chaMethod;
+
     }
 
-    protected UserLoginLog() {
-
-    }
-
-    public static UserLoginLog getLoginLog(Long uId, LocationFinderService locationFinderService,
-        HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
-        String userId = request.getParameter("userId");
-
+    public static UserActivityLog getActivityLog(Long uId,LocationFinderService locationFinderService, String chaContent,
+        String chaMethod, HttpServletRequest request,
+        String userId, ChangeSuccess changeSuccess, Status isStatus) {
         UserLocationDto userLocationDto = null;
         try {
             userLocationDto = locationFinderService.findLocation();
@@ -104,18 +110,24 @@ public class UserLoginLog {
         } catch (GeoIp2Exception e) {
             throw new RuntimeException(e);
         }
-        UserLoginLog userLoginLog = UserLoginLog.builder()
-            .ip(userLocationDto.getIpAddress()) //ip 저장
+        return UserActivityLog.builder()
             .uId(uId)
+            .ip(userLocationDto.getIpAddress()) //ip 저장
             .countryName(userLocationDto.getCountryName()) // iso Code 저장
             .latitude(userLocationDto.getLatitude()) // 위도
             .longitude(userLocationDto.getLongitude()) // 경도
-            .isSuccess(isSuccess) // 실패 여부 확인
+            .changeSuccess(changeSuccess) // 실패 여부 확인
             .userAgent(UserLocationDto.isDevice(request)) // 기기 저장
             .userId(userId) //유저아이디 저장
             .isStatus(isStatus)
+            .chaContent(chaContent)
+            .chaMethod(chaMethod)
             .build();
-        return userLoginLog;
     }
+
+    protected UserActivityLog() {
+
+    }
+
 
 }

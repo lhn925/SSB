@@ -98,10 +98,19 @@ public class User extends BaseTimeEntity {
             enabled(user.getIsStatus()).
             build();
         build.setAuthorities(user.getGrade().getDescription());
-
         return build;
-
     }
 
-
+    /**
+     * 비밀번호 업데이트 및 보안등급 업데이트
+     * @param user
+     * @param password
+     * @param passwordEncoder
+     * @return
+     */
+    public static User updatePw(User user, String password,PwSecLevel pwSecLevel,PasswordEncoder passwordEncoder) {
+        user.setPassword(passwordEncoder.encode(password));
+        user.setPwSecLevel(pwSecLevel);
+        return user;
+    }
 }

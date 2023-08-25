@@ -17,29 +17,30 @@
     Icons -
     Flaticon</a>
 
+  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
+    Prabowo -
+    Flaticon</a>
+  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
+    Icons -
+    Flaticon</a>
+
+
   <div class="card mainCard">
     <div class="card-body">
       <h5 class="card-title text-center" th:text="#{sky.pwReset}">Login</h5>
-      <form class="mt-4" method="post" th:action="@{/login}" th:object="${UserPwResetFormDto}">
+      <form class="mt-4" method="post" th:action="@{|/user/help/reset/${userPwResetFormDto.getUserId()}|}" th:object="${userPwResetFormDto}">
         <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
           Flaticon</a>
         <div class="form-group">
-          <div th:for="userId" class="input-group form-login form-id">
-            <input type="text" class="form-control" th:field="*{password}"
-                   th:placeholder="#{sky.}">
+          <div th:for="newPw" class="input-group form-login form-pw">
+            <input type="password" class="form-control" th:field="*{newPw}"
+                   th:placeholder="#{sky.newPw}">
           </div>
         </div>
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-          Prabowo -
-          Flaticon</a>
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-          Icons -
-          Flaticon</a>
-
         <div class="form-group">
           <div class="input-group form-login form-pw">
-            <input type="password" th:field="*{password}" class="form-control form-control"
-                   th:errorclass="border-danger" th:placeholder="#{sky.pw}">
+            <input type="password" class="form-control" th:field="*{newPwChk}"
+                   th:placeholder="#{sky.newPwChk}">
           </div>
         </div>
         <!--            <th:block th:if="*{captchaKey}">-->
@@ -60,12 +61,7 @@
             </div>
           </div>
         </div>
-        <!--            </th:block>-->
 
-        <div class="form-group form-check mt-3">
-          <input type="checkbox" class="form-check-input" th:field="*{rememberMe}">
-          <label class="form-check-label" th:text="#{sky.remember}" th:for="rememberMe">Remember me</label>
-        </div>
         <div class="form-text text-danger">
           <th:block th:if="${errMsg}">
             <small class="error-Thyme-msg" th:text="${errMsg}"></small>
@@ -78,7 +74,7 @@
         <input type="hidden" class="form-control" th:field="*{imageName}">
         <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
         <button type="button" id="loginSubBtn" class="btn btn-primary btn-login mx-auto d-block mt-3"
-                th:text="#{sky.loginBtn}">
+                th:text="#{sky.pwReset}">
           Login
         </button>
       </form>
@@ -90,8 +86,7 @@
 
 <th:block th:replace="~{template/js/js :: js ('commonJs')}">
 </th:block>
-
-<th:block th:replace="~{template/js/js :: js ('login')}">
+<th:block th:replace="~{template/js/js :: js ('pwResetForm')}">
 </th:block>
 
 

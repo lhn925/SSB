@@ -47,7 +47,7 @@ public class CustomCookie {
         return null;
     }
 
-    public static void delete(Cookie cookie, String key, HttpServletResponse response) {
+    public static void delete(Cookie cookie,  HttpServletResponse response) {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }

@@ -40,7 +40,6 @@ import sky.board.global.redis.service.RedisService;
 public class SpringSecurityConfig {
 
 
-    private final UserDetailsService userDetailsService;
     private final RedisService redisService;
     private final UserLogService userLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
@@ -61,6 +60,7 @@ public class SpringSecurityConfig {
         CustomAuthenticationFailHandler failHandler,
         CustomAuthenticationSuccessHandler successHandler,
         AuthenticationManager authenticationManager,
+        UserDetailsService userDetailsService,
         RememberMeServices rememberMeServices,
         HttpSecurity http) throws Exception {
 
@@ -167,7 +167,7 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public RememberMeServices rememberMeServices() {
+    public RememberMeServices rememberMeServices(UserDetailsService userDetailsService) {
         return new RedisRememberService(RememberCookie.KEY.getValue(), userDetailsService, redisService);
     }
 

@@ -14,7 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
-import sky.board.domain.user.entity.User;
 
 /**
  * getAuthorities() : 계정이 가지고 있는 권한 목록 리턴
@@ -29,6 +28,7 @@ import sky.board.domain.user.entity.User;
 
 public class CustomUserDetails implements Serializable, UserDetails,CredentialsContainer {
 
+    private Long uId;
     private String url;
     private String token;
     private String userId;
@@ -71,12 +71,13 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     public CustomUserDetails() {
     }
 
-    public CustomUserDetails(String url, String token, String userId, String password, String username, String nickname,
+    public CustomUserDetails(Long uId,String url, String token, String userId, String password, String username, String nickname,
         List<GrantedAuthority> authorities, boolean accountNonExpired, boolean accountNonLocked,
         boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder,
         LocalDateTime createdDateTime
     ,String email) {
         this.url = url;
+        this.uId = uId;
         this.token = token;
         this.userId = userId;
         this.password = password;
@@ -93,9 +94,10 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     }
 
     @Builder
-    public CustomUserDetails(String url, String userId, String token, String password, String username,String nickname,
+    public CustomUserDetails(Long uId,String url, String userId, String token, String password, String username,String nickname,
         boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email) {
         this.url = url;
+        this.uId = uId;
         this.token = token;
         this.userId = userId;
         this.password = this.passwordEncoder.apply(password);
@@ -132,7 +134,9 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     }
 
 
-
+    public Long getUId() {
+        return uId;
+    }
 
     @Override
     public String getPassword() {
