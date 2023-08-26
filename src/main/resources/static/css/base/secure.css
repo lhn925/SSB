@@ -1,0 +1,25 @@
+.how-secure {
+  font-size: 5px;
+  border-radius: 10px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: -.4px;
+  vertical-align: middle;
+  font-style: normal;
+  margin-right: -8px;
+  width: 38px;
+  text-align: center;
+}
+
+.how-secure.dangerous {
+  background: rgba(236,62,59,.12);
+  color: #dc3545;
+}
+.how-secure.safe {
+  background: rgba(3,199,90,.12);
+  color: #1aafec;
+}
+.how-secure.normal {
+  background: rgba(255,168,0,.12);
+  color: #ffa41c;
+}

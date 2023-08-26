@@ -18,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -207,6 +208,7 @@ public class HelpController {
     public String pwResetForm(@ModelAttribute UserHelpDto userHelpDto,
         HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
         Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
+
         // helpToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
         if (!StringUtils.hasText(helpToken.getValue()) || (!helpToken.getValue().equals(userHelpDto.getHelpToken()))) {
             Alert.waringAlert(ms.getMessage("code.error", null, request.getLocale()), "/user/help/idquery", response);
@@ -229,76 +231,99 @@ public class HelpController {
         return "user/help/pwResetForm";
     }
 
-    @PutMapping("/reset/{userId}")
-    public String pwReset(@Validated @ModelAttribute UserPwResetFormDto userPwResetFormDto,
-        HttpServletRequest request, BindingResult bindingResult, Model model, HttpServletResponse response)
+    @PostMapping("/reset")
+    public String pwReset(@Validated @ModelAttribute UserPwResetFormDto userPwResetFormDto, BindingResult bindingResult,
+        HttpServletRequest request, Model model, HttpServletResponse response)
         throws IOException {
         if (bindingResult.hasErrors()) {
+            Alert.waringAlert(ms.getMessage("code.error", null, request.getLocale()), null, response);
             return "user/help/pwResetForm";
         }
 
         boolean isCaptcha;
-        Map<String, Object> result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
+        log.info("userPwResetFormDto.getCaptchaKey() = {}", userPwResetFormDto.getCaptchaKey());
+        log.info("userPwResetFormDto.getCaptcha() = {}", userPwResetFormDto.getCaptcha());
+        Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
             userPwResetFormDto.getImageName(),
             userPwResetFormDto.getCaptchaKey(), userPwResetFormDto.getCaptcha());
 
         isCaptcha = (boolean) result.get("result");
 
-     /*   // 자동입력 방지 번호가 맞지 않은 경우
-        if (!isCaptcha) {
-            Alert.waringAlert(ms.getMessage("error.captcha", null, request.getLocale()), null, response);
-            return "user/help/pwResetForm";
-        }*/
+        log.info("isCaptcha = {}", isCaptcha);
 
+        // 자동입력 방지 번호가 맞지 않은 경우
+        if (!isCaptcha) {
+            bindingResult.addError(
+                new FieldErrorCustom("userPwResetFormDto",
+                    "captcha", null,
+                    "error.captcha",
+                    null));
+        }
         // 확인 비밀번호가 불일치 할 경우
         if (!userPwResetFormDto.getNewPw().equals(userPwResetFormDto.getNewPwChk())) {
             bindingResult.addError(
                 new FieldErrorCustom("userPwResetFormDto",
                     "newPwChk", userPwResetFormDto.getNewPw(),
-                    "userJoinForm.password",
+                    "pw.mismatch",
                     null));
-            return "user/help/pwResetForm";
-        }
-
-        //
-        if (StringUtils.hasText(userPwResetFormDto.getNewPw())) { // 비밀번호 재전송
-            model.addAttribute("rePw", userPwResetFormDto.getNewPw());
         }
 
         // 비밀번호 보안 레벨 확인
         PwSecLevel pwSecLevel = PwChecker.checkPw(userPwResetFormDto.getNewPw());
-
         // 비밀번호 값이 유효하지 않은 경우
-        if (pwSecLevel.name().equals(PwSecLevel.NOT)) {
+        log.info("pwSecLevel.name() = {}", pwSecLevel.name());
+        if (pwSecLevel.equals(PwSecLevel.NOT)) {
             bindingResult.addError(
                 new FieldErrorCustom("userPwResetFormDto",
                     "newPw", userPwResetFormDto.getNewPw(),
                     "userJoinForm.password",
                     null));
+        }
+
+        log.info("bindingResult = {}", bindingResult.hasErrors());
+        if (bindingResult.hasErrors()) {
+            setApiCaptcha(userPwResetFormDto);
             return "user/help/pwResetForm";
         }
+        //
+        if (StringUtils.hasText(userPwResetFormDto.getNewPw())) { // 비밀번호 재전송
+            model.addAttribute("rePw", userPwResetFormDto.getNewPw());
+        }
+
         // 보안레벨 저장 나중에 -> 보안 위험 표시할 떄 유용
         userPwResetFormDto.setPwSecLevel(pwSecLevel);
-
-        if (bindingResult.hasErrors()) {
-            return "user/help/pwResetForm";
-        }
-
         try {
             CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.pwUpdate(userPwResetFormDto);
-
             //변경로그
             userLogService.saveActivityLog(userDetails.getUId(), userDetails.getUsername(), "sky.pw",
                 "sky.log.pw.chaContent", request, ChangeSuccess.SUCCESS);
-
             // 비밀번호가 전과 같을시에
+
+            apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
+            Alert.waringAlert(ms.getMessage("sky.newPw.success", null, request.getLocale()), "/login", response);
+            return null;
         } catch (IllegalArgumentException e) {
+            setApiCaptcha(userPwResetFormDto);
             userLogService.saveActivityLog(null, userPwResetFormDto.getUserId(), "sky.pw", "sky.log.pw.chaContent",
                 request, ChangeSuccess.FAIL);
-            Alert.waringAlert(ms.getMessage(e.getMessage(), null, request.getLocale()), null, response);
+            bindingResult.addError(
+                new FieldErrorCustom("userPwResetFormDto",
+                    "newPw", userPwResetFormDto.getNewPw(),
+                    e.getMessage(),
+                    null));
+
             return "user/help/pwResetForm";
         }
-        return "redirect:/login";
+
+    }
+
+    private void setApiCaptcha(UserPwResetFormDto userPwResetFormDto) throws IOException {
+        apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
+        Map<String, Object> apiExamCaptchaNkey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
+        String key = (String) apiExamCaptchaNkey.get("key");
+        String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
+        userPwResetFormDto.setCaptchaKey(key);
+        userPwResetFormDto.setImageName(apiExamCaptchaImage);
     }
 
     private String getString(UserHelpDto userHelpDto, Model model, HelpType helpType, String url, String view,

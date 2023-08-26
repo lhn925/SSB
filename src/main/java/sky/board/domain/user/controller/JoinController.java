@@ -99,7 +99,7 @@ public class JoinController {
         log.info("pwSecLevel.name() = {}", pwSecLevel.name());
 
         // 비밀번호 값이 유효하지 않은 경우
-        if (pwSecLevel.name().equals(PwSecLevel.NOT)) {
+        if (pwSecLevel.equals(PwSecLevel.NOT)) {
             session.removeAttribute("emailAuthCodeDto");
             bindingResult.addError(
                 new FieldErrorCustom("userJoinPostDto",

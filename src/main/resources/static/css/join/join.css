@@ -47,18 +47,6 @@
   background-image: url("../image/free-icon-eye-8024991.png");
 }
 
-.how-secure {
-  font-size: 5px;
-  border-radius: 10px;
-  font-weight: 700;
-  line-height: 30px;
-  letter-spacing: -.4px;
-  vertical-align: middle;
-  font-style: normal;
-  margin-right: -8px;
-  width: 38px;
-  text-align: center;
-}
 
 
 .form-pw:not(.error):before {
@@ -101,60 +89,6 @@
 .form-group {
   padding-bottom: 5px;
 }
-
-.how-secure.dangerous {
-  background: rgba(236,62,59,.12);
-  color: #dc3545;
-}
-.how-secure.safe {
-  background: rgba(3,199,90,.12);
-  color: #1aafec;
-}
-.how-secure.normal {
-  background: rgba(255,168,0,.12);
-  color: #ffa41c;
-}
-
-/*
-
-.form_item {
-  display: flex;
-  align-items: center;
-  position: relative;
-  box-sizing: border-box;
-  max-width: 100%;
-  min-height: 50px;
-  padding: 0 10px 0 45px;
-}
-.form_item::before {
-  position: absolute;
-  top: 10px;
-  left: 9px;
-  content: '';
-}
-
-.form_item.lock.error::before {
-  background-position: -96px -264px;
-  background-repeat: no-repeat;
-  width: 30px;
-  height: 30px;
-}
-form_item:not(.error).lock::before {
-  background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_dark_d5da14a9.png);
-  background-image: url(https://ssl.pstatic.net/static/nid/join/m_sp_06_realname_4c092b41.png);
-  background-size: 159px 146px;
-  background-position: -32px -84px;
-  background-repeat: no-repeat;
-  width: 30px;
-  height: 30px;
-}
-.form_item.lock::before {
-  background-position: -96px -264px;
-  background-repeat: no-repeat;
-  width: 30px;
-  height: 30px;
-}*/
-
 .form-join {
   position: relative;
 }

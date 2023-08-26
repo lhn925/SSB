@@ -153,13 +153,18 @@ function _addClassByClass(className, addClassName) {
 }
 
 //해당 element 에 클래스 추가
-function _addClassById($elementById, className) {
-  $elementById.classList.add(className);
+function _addClassById($element, className) {
+  $element.classList.add(className);
+}
+
+// 해당 element 있는 태그에 text 삽입
+function _innerTextById($element, innerText) {
+  $element.innerText = innerText;
 }
 
 //해당 element 에 클래스 삭제
-function _removeClassById($elementById, className) {
-  $elementById.classList.remove(className);
+function _removeClassById($element, className) {
+  $element.classList.remove(className);
 }
 
 //해당 element 에 부모 태그 클래스 추가
@@ -306,4 +311,148 @@ function _captchaBtnClickAddEvent($captchaKey, $imageName) {
  */
 function _removeWhitespace(value) {
   return value.split(" ").join("");
+}
+
+// 패스워드 Input 타입 변경
+function _BtnShowClickAddEvent($btnShow, ...$pwArray) {
+
+  $btnShow.onclick = function () {
+    let isOn = this.classList.contains("on");
+    if (isOn) {
+      _removeClassById(this, "on");
+      for (const pw of $pwArray) {
+        pw.type = "password";
+      }
+      return;
+    }
+    for (const pw of $pwArray) {
+      pw.type = "text";
+    }
+    _addClassById(this, "on");
+  }
+}
+
+//패스워드 안전도 체크 함수
+function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
+  let $NotThymeMsg = _getElementById(notThymeId);
+  let $secureLevel = _getElementById("secureLevel");
+
+  // 해당 클래스 how-secure를 제외 하고 모두 삭제
+  $secureLevel.classList.forEach(str => {
+    if (str != "how-secure") {
+      _removeClassById($secureLevel, str);
+    }
+  })
+
+  let input_value = $password.value; // 비밀번호 값 갖고오기
+  input_value = input_value.split(" ").join("");
+  if (input_value == "") {
+    _addClassByParent($password, "error");
+    _addClassById($password, "border-danger")
+    $NotThymeMsg.innerText = errorsMsg["NotBlank"];
+    $secureLevel.innerText = "";
+    $isChkPw.checked = false;
+    return;
+  }
+  // 8글자이하 16글자 초과시에
+  if (input_value.length < 8 || input_value.length >= 17) {
+    _addClassByParent($password, "error");
+    _addClassById($password, "border-danger");
+    $NotThymeMsg.innerText = messages["userJoinForm.password"];
+    $secureLevel.innerText = "";
+    $isChkPw.checked = false;
+    return;
+  }
+
+  input_value = _removeWhitespace(input_value);
+  let secLevel = _PwSecureLevel(input_value);
+
+  let secLevelStr;
+  let secLevelClass;
+  switch (secLevel) {
+    case 0:
+      secLevelStr = messages["사용불가"];
+      $secureLevel.innerText = secLevelStr;
+      _addClassById($secureLevel, "dangerous")
+      return false;
+    case 1:
+      secLevelStr = messages["위험"];
+      secLevelClass = "dangerous";
+      break;
+    case 2:
+      secLevelStr = messages["보통"];
+      secLevelClass = "normal";
+      break;
+    case 3:
+      secLevelStr = messages["안전"];
+      secLevelClass = "safe";
+      break;
+    default:
+      return;
+  }
+
+  _removeClassById($password, "border-danger");
+  $NotThymeMsg.innerText = "";
+  $secureLevel.innerText = secLevelStr;
+  _addClassById($secureLevel, secLevelClass);
+  _removeClassByParent($password, "error");
+  $isChkPw.checked = true;
+  return;
+}
+
+/**
+ * 값을 확인 한후
+ * subBtn에 submit 타입을 대입
+ * @param isClicking
+ * @param $subBtn
+ * @param $elements
+ * @returns {boolean}
+ * @private
+ */
+function _subBtnClick(isClicking, $subBtn, $elements) {
+  if (isClicking) {
+    return false;
+  }
+  let isValChk = false;
+  isClicking = true;
+  // 1초마다 딜레이
+
+  for (const element of $elements) {
+    let value = _removeWhitespace(element.value);
+    let $element = _getElementById(element.id + "-NotThyme-msg");
+    if (value == "") {
+      _removeClassById($element,
+          "display-none");
+      _innerTextById($element,
+          messages[element.id + ".NotBlank"]);
+      isValChk = true;
+      isClicking = false;
+    } else {
+      _addClassById($element, "display-none");
+      isValChk = false;
+      isClicking = true;
+    }
+  }
+  if (isValChk) {
+    return false;
+  }
+
+  return isClicking;
+}
+
+// 비밀번호 변경시 새 비밀번호와 값이 일치한지 확인
+function _PwMatchCheck($newPw, $newPwChk, $isChkNewPwChk) {
+
+  let $element = _getElementById($newPwChk.id + "-NotThyme-msg");
+  if ($newPw.value != "" && $newPw.value != $newPwChk.value) {
+    _removeClassById($element,
+        "display-none");
+    _innerTextById($element,
+        messages[$newPwChk.id + ".NotBlank"]);
+    $isChkNewPwChk.checked = false;
+  } else {
+    $isChkNewPwChk.checked = true;
+    _innerTextById($element, "");
+    _addClassById($element, "display-none");
+  }
 }

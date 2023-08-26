@@ -4,15 +4,11 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('login')}">
+  <th:block th:replace="~{template/css/css :: css ('pwResetForm')}">
   </th:block>
 </head>
 <body>
 <div class="container" th:replace="~{template/container/container ::container (~{:: .mainCard})}">
-
-
-
-
   <div class="card mainCard">
     <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
       Prabowo -
@@ -27,58 +23,90 @@
     <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
       Icons -
       Flaticon</a>
-
+    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
+      Flaticon</a>
     <div class="card-body">
-      <h5 class="card-title text-center" th:text="#{sky.pwReset}">Login</h5>
-      <form class="mt-4" method="post" th:action="@{|/user/help/reset/${userPwResetFormDto.getUserId()}|}" th:object="${userPwResetFormDto}">
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
-          Flaticon</a>
+      <h5 class="card-title text-center" th:text="#{sky.pwReset}"></h5>
+      <form class="mt-4" method="post" th:action="@{/user/help/reset}" th:object="${userPwResetFormDto}">
+
+        <input type="text" hidden="true" th:field="*{userId}"/>
+        <input type="text" hidden="true" th:field="*{helpToken}"/>
+        <input type="checkbox" hidden="true" id="_isChkNewPw"/>
+        <input type="checkbox" hidden="true" id="_isChkNewPwChk"/>
+
         <div class="form-group">
-          <div th:for="newPw" class="input-group form-login form-pw">
-            <input type="password" class="form-control" th:field="*{newPw}"
+          <div class="input-group form-join form-pw"
+               th:classappend="${#fields.hasErrors('newPw')} ? 'error' : 'on'">
+            <input type="password" th:field="*{newPw}" class="form-control"
+                   th:errorclass="border-danger"
                    th:placeholder="#{sky.newPw}">
+            <div class="password-info">
+              <em class="how-secure" id="secureLevel"></em>
+              <button type="button" id="btn-show" class="btn-show hide">
+                <span class="blind"></span>
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <div class="input-group form-login form-pw">
-            <input type="password" class="form-control" th:field="*{newPwChk}"
-                   th:placeholder="#{sky.newPwChk}">
+          <div class="form-text text-danger"id="newPw-error-div">
+            <th:block th:if="${#fields.hasErrors('newPw')}"
+                      th:each="err : ${#fields.detailedErrors('newPw')}">
+              <small class="newPw-Thyme-msg" id="newPw-Thyme-msg"  th:text="${err.getMessage()}"></small>
+            </th:block>
+            <small id="newPw-NotThyme-msg"> </small>
           </div>
-        </div>
-        <!--            <th:block th:if="*{captchaKey}">-->
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title="반복 아이콘">반복 아이콘 제작자: Stockes Design
-          - Flaticon</a>
 
 
-        <div class="card captchaCard">
-          <div class="form-group card-body">
-            <img class="captcha-img mb-3" id="imagePath" th:src="*{imageName} ? '/open/image/'+ *{imageName} : '' "/>
-            <div class="input-group form-login form-cap">
-              <input type="text" th:field="*{captcha}" class="form-control captcha" th:placeholder="#{sky.captcha}">
-              <div class="input-group-append">
-                <button type="button" class="btn captchaBtn" id="captchaBtn">
-                  </span>
-                </button>
+          <div class="form-group">
+            <div class="input-group form-join form-pw"
+                 th:classappend="${#fields.hasErrors('newPwChk')} ? 'error' : 'on'">
+              <input type="password" th:field="*{newPwChk}" class="form-control"
+                     th:errorclass="border-danger"
+                     th:placeholder="#{sky.newPwChk}">
+            </div>
+            <div class="form-text text-danger">
+              <th:block th:if="${#fields.hasErrors('newPwChk')}"
+                        th:each="err : ${#fields.detailedErrors('newPwChk')}">
+                <small id="newPwChk-Thyme-msg" th:text="${err.getMessage()}"></small>
+              </th:block>
+              <small id="newPwChk-NotThyme-msg"> </small>
+            </div>
+          </div>
+          <!--            <th:block th:if="*{captchaKey}">-->
+          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title="반복 아이콘">반복 아이콘 제작자: Stockes
+            Design
+            - Flaticon</a>
+
+
+          <div class="card captchaCard">
+            <div class="form-group card-body">
+              <img class="captcha-img mb-3" id="imagePath" th:src="*{imageName} ? '/open/image/'+ *{imageName} : '' "/>
+              <div class="input-group form-login form-cap">
+                <input type="text" th:field="*{captcha}" class="form-control captcha" th:placeholder="#{sky.captcha}">
+                <div class="input-group-append">
+                  <button type="button" class="btn captchaBtn" id="captchaBtn">
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div class="form-text text-danger">
+                <th:block th:if="${#fields.hasErrors('captcha')}"
+                          th:each="err : ${#fields.detailedErrors('captcha')}">
+                  <small th:text="${err.getMessage()}"></small>
+                </th:block>
+                <small id="captcha-NotThyme-msg"> </small>
               </div>
             </div>
           </div>
+
+
+          <input type="hidden" class="form-control" th:field="*{captchaKey}">
+          <input type="hidden" class="form-control" th:field="*{imageName}">
+          <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
+          <button type="button" id="resetSubBtn" class="btn btn-primary btn-login mx-auto d-block mt-3"
+                  th:text="#{sky.pwReset}">
+            Login
+          </button>
         </div>
-
-        <div class="form-text text-danger">
-          <th:block th:if="${errMsg}">
-            <small class="error-Thyme-msg" th:text="${errMsg}"></small>
-          </th:block>
-          <small class="err-NotThyme-msg display-none"></small>
-        </div>
-
-
-        <input type="hidden" class="form-control" th:field="*{captchaKey}">
-        <input type="hidden" class="form-control" th:field="*{imageName}">
-        <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
-        <button type="button" id="loginSubBtn" class="btn btn-primary btn-login mx-auto d-block mt-3"
-                th:text="#{sky.pwReset}">
-          Login
-        </button>
       </form>
     </div>
   </div>
@@ -92,7 +120,7 @@
 </th:block>
 
 
-</script>-->
+</script>
 
 
 </html>

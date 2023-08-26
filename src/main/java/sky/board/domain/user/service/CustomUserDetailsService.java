@@ -46,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @return
      */
     @Transactional
-    public UserDetails pwUpdate(UserPwResetFormDto userPwResetFormDto) {
+    public UserDetails pwUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException{
 
         User findByUser = userQueryRepository.findByUserId(userPwResetFormDto.getUserId());
         //현재 비밀번호 와 대조
@@ -59,7 +59,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             .username(findByUser.getUserId()).build();
     }
 
-    private void isPasswordSameAsNew(UserPwResetFormDto userPwResetFormDto, User findByUser) {
+    private void isPasswordSameAsNew(UserPwResetFormDto userPwResetFormDto, User findByUser) throws IllegalArgumentException {
         //현재 비밀번호 와 대조
         boolean matches = passwordEncoder.matches(userPwResetFormDto.getNewPw(), findByUser.getPassword());
 
