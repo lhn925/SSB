@@ -1,4 +1,4 @@
-package sky.board.domain.user.service;
+package sky.board.domain.user.service.join;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -11,9 +11,9 @@ import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.UserJoinAgreement;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.exception.UserJoinServerErrorException;
-import sky.board.domain.user.repository.UserAgreeRepository;
+import sky.board.domain.user.repository.join.UserAgreeRepository;
 
-import sky.board.domain.user.repository.UserJoinRepository;
+import sky.board.domain.user.repository.join.UserJoinRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.utili.PwEncryptor;
 

@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import sky.board.domain.user.controller.JoinController;
 import sky.board.domain.user.dto.join.UserJoinAgreeDto;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
+import sky.board.domain.user.service.join.UserJoinService;
 
 
 @SpringBootTest

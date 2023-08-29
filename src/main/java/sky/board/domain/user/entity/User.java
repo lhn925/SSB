@@ -6,6 +6,7 @@ import static jakarta.persistence.EnumType.STRING;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -69,19 +70,34 @@ public class User extends BaseTimeEntity {
     // 비활성화(회원 탈퇴) 여부 true:탈퇴,false:탈퇴 x
     private Boolean isStatus;
 
+
+    @Builder
+    private User(String token, String userId, String password, String userName, String email, String pictureUrl,
+        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isStatus) {
+        this.token = token;
+        this.userId = userId;
+        this.password = password;
+        this.userName = userName;
+        this.email = email;
+        this.pictureUrl = pictureUrl;
+        this.userNameModifiedDate = userNameModifiedDate;
+        this.grade = grade;
+        this.pwSecLevel = pwSecLevel;
+        this.salt = salt;
+        this.isStatus = isStatus;
+    }
+
     // 가입할 유저 entity 생성
     public static User createJoinUser(UserJoinPostDto userJoinDto, String salt, PasswordEncoder passwordEncoder) {
-        User user = new User();
-        user.setUserId(userJoinDto.getUserId());
-        user.setEmail(userJoinDto.getEmail());
-        user.setToken(UserTokenUtil.hashing(userJoinDto.getEmail().getBytes(), salt));
-        user.setPassword(passwordEncoder.encode(userJoinDto.getPassword()));
-        user.setUserName(userJoinDto.getUserName());
-        user.setSalt(salt);
-        user.setGrade(UserGrade.USER);
-        user.setPwSecLevel(userJoinDto.getPwSecLevel());
-        user.setIsStatus(Status.OFF.getValue());
-        return user;
+        return User.builder().userId(userJoinDto.getUserId())
+            .email(userJoinDto.getEmail())
+            .token(UserTokenUtil.hashing(userJoinDto.getEmail().getBytes(), salt))
+            .password(passwordEncoder.encode(userJoinDto.getPassword()))
+            .userName(userJoinDto.getUserName())
+            .salt(salt)
+            .grade(UserGrade.USER)
+            .pwSecLevel(userJoinDto.getPwSecLevel())
+            .isStatus(Status.OFF.getValue()).build();
     }
 
 

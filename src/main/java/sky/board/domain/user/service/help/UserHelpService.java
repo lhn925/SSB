@@ -1,15 +1,8 @@
-package sky.board.domain.user.service;
+package sky.board.domain.user.service.help;
 
-
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,25 +12,13 @@ import sky.board.domain.user.entity.User;
 import sky.board.domain.user.repository.UserQueryRepository;
 
 @Slf4j
+@Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserHelpService {
 
     private final UserQueryRepository userQueryRepository;
     private final PasswordEncoder passwordEncoder;
-
-
-
-    @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        log.info("loadUserByUsername userId = {}", userId);
-
-        Optional<User> findUser = Optional.ofNullable(userQueryRepository.findByUserId(userId));
-        User user = findUser.orElseThrow(() -> new UsernameNotFoundException("login.NotFound"));
-        return User.UserBuilder(user);
-    }
-
 
     /**
      * 비밀번호 업데이트
@@ -46,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      * @return
      */
     @Transactional
-    public UserDetails pwUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException{
+    public UserDetails passwordUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException {
 
         User findByUser = userQueryRepository.findByUserId(userPwResetFormDto.getUserId());
         //현재 비밀번호 와 대조
@@ -59,7 +40,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             .username(findByUser.getUserId()).build();
     }
 
-    private void isPasswordSameAsNew(UserPwResetFormDto userPwResetFormDto, User findByUser) throws IllegalArgumentException {
+    private void isPasswordSameAsNew(UserPwResetFormDto userPwResetFormDto, User findByUser)
+        throws IllegalArgumentException {
         //현재 비밀번호 와 대조
         boolean matches = passwordEncoder.matches(userPwResetFormDto.getNewPw(), findByUser.getPassword());
 
@@ -68,6 +50,4 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new IllegalArgumentException("pw.isPasswordSameAsNew");
         }
     }
-
-
 }

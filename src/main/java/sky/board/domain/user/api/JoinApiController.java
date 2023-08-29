@@ -17,7 +17,7 @@ import sky.board.domain.user.dto.join.JoinEmailDuplicateDto;
 import sky.board.domain.user.dto.join.JoinIdDuplicateDto;
 import sky.board.domain.user.dto.join.JoinUserNameDuplicateDto;
 import sky.board.domain.user.exception.DuplicateCheckException;
-import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.FieldErrorCustom;
 import sky.board.global.error.dto.Result;

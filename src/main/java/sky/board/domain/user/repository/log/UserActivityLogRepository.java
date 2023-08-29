@@ -1,4 +1,4 @@
-package sky.board.domain.user.repository;
+package sky.board.domain.user.repository.log;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import sky.board.domain.user.entity.UserActivityLog;

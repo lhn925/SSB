@@ -22,8 +22,8 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.model.RememberCookie;
-import sky.board.domain.user.service.RedisRememberService;
-import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.service.login.RedisRememberService;
+import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.Filter.CustomRememberMeAuthenticationFilter;
 import sky.board.domain.user.utili.Filter.CustomUsernameFilter;
@@ -41,7 +41,7 @@ public class SpringSecurityConfig {
 
 
     private final RedisService redisService;
-    private final UserLogService userLogService;
+    private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
 
@@ -88,7 +88,7 @@ public class SpringSecurityConfig {
         //tokenValiditySeconds(3600) // 쿠키의 만료시간 설정(초), default: 14일
         http.addFilterBefore(new CustomUsernameFilter(
                 rememberMeServices, authenticationManager,
-                userLogService,
+                userLoginLogService,
                 successHandler, failHandler,
                 apiExamCaptchaNkeyService),
             UsernamePasswordAuthenticationFilter.class);

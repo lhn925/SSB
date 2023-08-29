@@ -21,7 +21,7 @@ import sky.board.domain.user.dto.join.UserJoinAgreeDto;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.exception.DuplicateCheckException;
-import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.PwChecker;
 import sky.board.global.error.dto.FieldErrorCustom;

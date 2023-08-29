@@ -1,9 +1,11 @@
-package sky.board.domain.user.entity;
+package sky.board.domain.user.entity.login;
 
 
 import static jakarta.persistence.EnumType.STRING;
+import static lombok.AccessLevel.PROTECTED;
 
 import com.maxmind.geoip2.exception.GeoIp2Exception;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Enumerated;
@@ -12,14 +14,17 @@ import jakarta.persistence.Id;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.model.UserAgent;
+import sky.board.global.base.login.DefaultLoginLog;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
 
@@ -32,6 +37,7 @@ import sky.board.global.locationfinder.service.LocationFinderService;
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = PROTECTED)
 public class UserLoginLog {
 
     @Id
@@ -42,55 +48,36 @@ public class UserLoginLog {
 
     //사용자 고유 번호
     private Long uId;
-    private String userId;
 
     // 성공 여부
     @Enumerated(STRING)
     private LoginSuccess isSuccess;
 
-    // 로그인시도 국가
-    private String countryName;
-
-    // 접속한 기기
-    @Enumerated(STRING)
-    private UserAgent userAgent;
-
-    //위도
-    private String latitude;
-
-    // 경도
-    private String longitude;
-
-    // 로그인 유지 여부 값
-
-    // 상태 값
-    private Boolean isStatus;
-
-
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime loginDateTime;
 
+    @Embedded
+    private DefaultLoginLog defaultLoginLog;
+
     @Builder
-    public UserLoginLog(String ip,
+    private UserLoginLog(String ip,
         Long uId,
         String userId, LoginSuccess isSuccess, String countryName,
         UserAgent userAgent,
         String latitude, String longitude, Status isStatus) {
         this.ip = ip;
-        this.userId = userId;
         this.uId = uId == null ? 0 : uId;
         this.isSuccess = isSuccess;
-        this.countryName = countryName;
-        this.userAgent = userAgent;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.isStatus = isStatus.getValue();
+        this.defaultLoginLog = DefaultLoginLog.builder()
+            .userId(userId)
+            .countryName(countryName)
+            .userAgent(userAgent)
+            .longitude(longitude)
+            .latitude(latitude)
+            .isStatus(isStatus.getValue()).build();
     }
 
-    protected UserLoginLog() {
-
-    }
 
     public static UserLoginLog getLoginLog(Long uId, LocationFinderService locationFinderService,
         HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {

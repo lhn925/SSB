@@ -26,4 +26,11 @@ public interface CustomLoginSuccessHandler extends AuthenticationSuccessHandler 
 
     void setSession(HttpServletRequest request, Authentication authentication);
 
+    /**
+     * 로그인 기기 저장
+     * @param request
+     * @param response
+     * @param authentication
+     */
+    void saveLoginStatus(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
 }

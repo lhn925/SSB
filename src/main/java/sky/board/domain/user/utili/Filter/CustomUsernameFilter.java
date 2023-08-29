@@ -6,15 +6,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -24,15 +20,14 @@ import org.springframework.util.StringUtils;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
-import sky.board.domain.user.model.PathDetails;
 import sky.board.domain.user.model.Status;
-import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 
 @Slf4j
 public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final UserLogService userLogService;
+    private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
     public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "userId";
@@ -46,7 +41,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
     private boolean postOnly = true;
 
     public CustomUsernameFilter(RememberMeServices rememberMeServices, AuthenticationManager authenticationManager,
-        UserLogService userLogService,
+        UserLoginLogService userLoginLogService,
         AuthenticationSuccessHandler successHandler,
         AuthenticationFailureHandler failureHandler,
         ApiExamCaptchaNkeyService apiExamCaptchaNkeyService) {
@@ -56,7 +51,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         super.setAuthenticationFailureHandler(failureHandler);
         super.setUsernameParameter(this.SPRING_SECURITY_FORM_USERNAME_KEY);
         super.setPasswordParameter(this.SPRING_SECURITY_FORM_PASSWORD_KEY);
-        this.userLogService = userLogService;
+        this.userLoginLogService = userLoginLogService;
         this.apiExamCaptchaNkeyService = apiExamCaptchaNkeyService;
     }
 
@@ -75,7 +70,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         String password = obtainPassword(request);
 
         // failCount 전달  success 핸들러에 전달
-        Long failCount = userLogService.getLoginLogCount(userId, LoginSuccess.FAIL, Status.ON);
+        Long failCount = userLoginLogService.getCount(userId, LoginSuccess.FAIL, Status.ON);
         request.setAttribute("failCount", failCount);
 
         String chptchaKey = getRequestValue("captchaKey", request);
@@ -112,7 +107,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         if (Limit <= failCount && !isCaptcha) {
             Map mapKey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
             String key = (String) mapKey.get("key");
-            log.info("key = {}", key);
             String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
             request.setAttribute("captchaKey", key);
             request.setAttribute("imageName", image);

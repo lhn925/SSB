@@ -23,6 +23,10 @@ import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
 
+/**
+ *
+ * 유저정보 수정내역
+ */
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)

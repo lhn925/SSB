@@ -1,4 +1,4 @@
-package sky.board.domain.user.service;
+package sky.board.domain.user.service.login;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +27,7 @@ import sky.board.global.redis.service.RedisService;
 public class RedisRememberService extends AbstractRememberMeServices {
 
     private final RedisService redisService;
+
     private String token;
 
     public RedisRememberService(String key, UserDetailsService userDetailsService, RedisService redisService) {
@@ -51,7 +52,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
             UserDetails user = getUserDetailsService().loadUserByUsername(userId);
             password = user.getPassword();
             if (!StringUtils.hasLength(password)) {
-                log.debug("userId가 존재하지 않음  " + userId);
+                log.debug("password가 존재하지 않음  " + userId);
                 return;
             }
         }
@@ -184,6 +185,11 @@ public class RedisRememberService extends AbstractRememberMeServices {
         return redisData;
     }
 
+    /**
+     * 쿠키 값 해석
+     * @param rememberMeCookie
+     * @return
+     */
     public String hashing(String rememberMeCookie) {
         String[] cookie = rememberMeCookie.split(":");
         rememberMeCookie = UserTokenUtil.hashing(cookie[0].getBytes(), cookie[1]);

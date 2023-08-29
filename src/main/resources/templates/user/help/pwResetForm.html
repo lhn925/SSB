@@ -64,7 +64,7 @@
                      th:errorclass="border-danger"
                      th:placeholder="#{sky.newPwChk}">
             </div>
-            <div class="form-text text-danger">
+            <div class="form-text text-danger" id="newPwChk-error-div">
               <th:block th:if="${#fields.hasErrors('newPwChk')}"
                         th:each="err : ${#fields.detailedErrors('newPwChk')}">
                 <small id="newPwChk-Thyme-msg" th:text="${err.getMessage()}"></small>

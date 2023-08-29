@@ -3,9 +3,7 @@ package sky.board.domain.email.api;
 import static org.springframework.util.StringUtils.hasText;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +32,11 @@ import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.model.HelpType;
 import sky.board.domain.user.model.Status;
-import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.global.error.dto.ErrorGlobalResultDto;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.Result;
-import sky.board.global.utili.Alert;
 
 
 @Slf4j

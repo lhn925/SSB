@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.RememberCookie;
-import sky.board.domain.user.service.RedisRememberService;
+import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.redis.dto.RedisKeyDto;
@@ -27,7 +27,6 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         AuthenticationSuccessHandler successHandler
     ) {
         super(authenticationManager, rememberMeServices);
-        log.info("authenticationManager.getClass() = {}", authenticationManager.getClass());
         super.setAuthenticationSuccessHandler(successHandler);
         ProviderManager providerManager = (ProviderManager) authenticationManager;
         providerManager.getProviders().add(new RememberMeAuthenticationProvider("rememberMe"));

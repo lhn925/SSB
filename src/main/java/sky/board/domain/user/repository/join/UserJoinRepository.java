@@ -1,4 +1,4 @@
-package sky.board.domain.user.repository;
+package sky.board.domain.user.repository.join;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

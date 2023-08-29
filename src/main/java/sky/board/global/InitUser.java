@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.dto.join.UserJoinAgreeDto;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
-import sky.board.domain.user.service.UserJoinService;
+import sky.board.domain.user.service.join.UserJoinService;
 
 @Component
 @Profile("local")

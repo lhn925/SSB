@@ -18,7 +18,7 @@ import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.UserInfoSessionDto;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
-import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
@@ -30,7 +30,7 @@ import sky.board.global.redis.dto.RedisKeyDto;
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler implements
     CustomLoginSuccessHandler {
-    private final UserLogService userLogService;
+    private final UserLoginLogService userLoginLogService;
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final SecurityContextImpl securityContext;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
@@ -61,7 +61,7 @@ public class CustomAuthenticationSuccessHandler implements
         }
         // 로그인 실패 기록 다 삭제
         Optional.ofNullable(request.getAttribute("failCount")).ifPresent(
-            c -> userLogService.deleteLoginLog(request, LoginSuccess.FAIL, Status.OFF)
+            c -> userLoginLogService.delete(request, LoginSuccess.FAIL, Status.OFF)
         );
 
         String url = request.getParameter("url");
@@ -83,7 +83,7 @@ public class CustomAuthenticationSuccessHandler implements
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
         //로그인 성공 기록 저장
-        userLogService.saveLoginLog(request, LoginSuccess.SUCCESS, Status.ON);
+        userLoginLogService.save(request, LoginSuccess.SUCCESS, Status.ON);
     }
 
     /**
@@ -98,5 +98,13 @@ public class CustomAuthenticationSuccessHandler implements
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         UserInfoSessionDto userInfo = UserInfoSessionDto.createUserInfo(userDetails);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
+    }
+
+    @Override
+    public void saveLoginStatus(HttpServletRequest request, HttpServletResponse response,
+        Authentication authentication) {
+
+
+
     }
 }

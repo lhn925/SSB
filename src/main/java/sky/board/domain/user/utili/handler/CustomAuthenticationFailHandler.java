@@ -8,14 +8,13 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
-import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.service.log.UserLoginLogService;
 
 /**
  * 로그인 실패시 로직을 실행하는 핸들러
@@ -26,7 +25,7 @@ import sky.board.domain.user.service.UserLogService;
 public class CustomAuthenticationFailHandler implements AuthenticationFailureHandler {
 
 
-    private final UserLogService userLogService;
+    private final UserLoginLogService userLoginLogService;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -65,7 +64,7 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
             sbPath.append("&captchaKey=" + request.getParameter("captchaKey") + "&");
         }
 
-        userLogService.saveLoginLog(request, LoginSuccess.FAIL, Status.ON);
+        userLoginLogService.save(request, LoginSuccess.FAIL, Status.ON);
         sendRedirect(request, response, errMsg, sbPath, retryTwoFactor);
     }
 

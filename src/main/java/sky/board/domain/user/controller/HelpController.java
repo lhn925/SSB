@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sky.board.domain.email.dto.EmailAuthCodeDto;
@@ -31,8 +30,8 @@ import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.HelpType;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.Status;
-import sky.board.domain.user.service.CustomUserDetailsService;
-import sky.board.domain.user.service.UserLogService;
+import sky.board.domain.user.service.help.UserHelpService;
+import sky.board.domain.user.service.log.UserActivityLogService;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.PwChecker;
@@ -47,10 +46,13 @@ import sky.board.global.utili.Alert;
 public class HelpController {
 
     private final UserQueryService userQueryService;
-    private final CustomUserDetailsService userDetailsService;
+
+    private final UserActivityLogService userActivityLogService;
+
+    private final UserHelpService userHelpService;
     private final MessageSource ms;
+
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
-    private final UserLogService userLogService;
 
 
     /**
@@ -271,7 +273,6 @@ public class HelpController {
         // 비밀번호 보안 레벨 확인
         PwSecLevel pwSecLevel = PwChecker.checkPw(userPwResetFormDto.getNewPw());
         // 비밀번호 값이 유효하지 않은 경우
-        log.info("pwSecLevel.name() = {}", pwSecLevel.name());
         if (pwSecLevel.equals(PwSecLevel.NOT)) {
             bindingResult.addError(
                 new FieldErrorCustom("userPwResetFormDto",
@@ -280,8 +281,8 @@ public class HelpController {
                     null));
         }
 
-        log.info("bindingResult = {}", bindingResult.hasErrors());
         if (bindingResult.hasErrors()) {
+            apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
             setApiCaptcha(userPwResetFormDto);
             return "user/help/pwResetForm";
         }
@@ -293,18 +294,20 @@ public class HelpController {
         // 보안레벨 저장 나중에 -> 보안 위험 표시할 떄 유용
         userPwResetFormDto.setPwSecLevel(pwSecLevel);
         try {
-            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.pwUpdate(userPwResetFormDto);
+            CustomUserDetails userDetails = (CustomUserDetails) userHelpService.passwordUpdate(userPwResetFormDto);
             //변경로그
-            userLogService.saveActivityLog(userDetails.getUId(), userDetails.getUsername(), "sky.pw",
+            userActivityLogService.save(userDetails.getUId(), userDetails.getUsername(), "sky.pw",
                 "sky.log.pw.chaContent", request, ChangeSuccess.SUCCESS);
-            // 비밀번호가 전과 같을시에
+            // 비밀번호가 전과 같을시에 IllegalArgumentException
 
+            //인증 이미지 삭제
             apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
+
             Alert.waringAlert(ms.getMessage("sky.newPw.success", null, request.getLocale()), "/login", response);
             return null;
         } catch (IllegalArgumentException e) {
             setApiCaptcha(userPwResetFormDto);
-            userLogService.saveActivityLog(null, userPwResetFormDto.getUserId(), "sky.pw", "sky.log.pw.chaContent",
+            userActivityLogService.save(null, userPwResetFormDto.getUserId(), "sky.pw", "sky.log.pw.chaContent",
                 request, ChangeSuccess.FAIL);
             bindingResult.addError(
                 new FieldErrorCustom("userPwResetFormDto",
@@ -314,7 +317,6 @@ public class HelpController {
 
             return "user/help/pwResetForm";
         }
-
     }
 
     private void setApiCaptcha(UserPwResetFormDto userPwResetFormDto) throws IOException {

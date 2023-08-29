@@ -53,5 +53,12 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
     }
 
+    @Override
+    public void saveLoginStatus(HttpServletRequest request, HttpServletResponse response,
+        Authentication authentication) {
+        
+
+    }
+
 
 }

@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import java.util.Random;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import sky.board.domain.user.service.UserJoinService;
 import sky.board.domain.email.entity.Email;
-import sky.board.global.openapi.model.code;
 
 @Slf4j
 @RequiredArgsConstructor
