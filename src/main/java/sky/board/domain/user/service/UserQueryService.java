@@ -20,7 +20,6 @@ import sky.board.domain.user.repository.UserQueryRepository;
 public class UserQueryService {
 
     private final UserQueryRepository userQueryRepository;
-    private final MessageSource ms;
 
 
     public CustomUserDetails findByEmailOne(String email)

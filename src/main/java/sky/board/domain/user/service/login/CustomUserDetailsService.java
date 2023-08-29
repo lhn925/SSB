@@ -25,18 +25,13 @@ import sky.board.domain.user.repository.UserQueryRepository;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserQueryRepository userQueryRepository;
-    private final PasswordEncoder passwordEncoder;
-
-
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         log.info("loadUserByUsername userId = {}", userId);
-
         Optional<User> findUser = Optional.ofNullable(userQueryRepository.findByUserId(userId));
         User user = findUser.orElseThrow(() -> new UsernameNotFoundException("login.NotFound"));
         return User.UserBuilder(user);
     }
-
 
 }
