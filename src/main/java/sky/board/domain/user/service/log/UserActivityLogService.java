@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.entity.User;
@@ -32,7 +33,8 @@ public class UserActivityLogService {
     public void save(Long uId, String userId, String chaContent, String chaMethod,
         HttpServletRequest request, ChangeSuccess changeSuccess) {
         if (uId == null) {
-            User findUserId = userQueryRepository.findByUserId(userId);
+            User findUserId = userQueryRepository.findByUserId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
             uId = findUserId.getId();
         }
         UserActivityLog userActivityLog = getUserActivityLog(uId, chaContent, chaMethod, request, userId, changeSuccess,

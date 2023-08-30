@@ -11,18 +11,18 @@ function Reset() {
 }
 
 Reset.prototype._init = function () {
-  this.$captchaKey = _getElementById("captchaKey");
-  this.$captcha = _getElementById("captcha");
+  this.$captchaKey = document.getElementById("captchaKey");
+  this.$captcha = document.getElementById("captcha");
   // 인증하고 삭제할때 필요한 이미지 name
-  this.$imageName = _getElementById("imageName");
-  this.$newPw = _getElementById("newPw");
-  this.$newPwChk = _getElementById("newPwChk");
-  this.$resetSubBtn = _getElementById("resetSubBtn");
+  this.$imageName = document.getElementById("imageName");
+  this.$newPw = document.getElementById("newPw");
+  this.$newPwChk = document.getElementById("newPwChk");
+  this.$resetSubBtn = document.getElementById("resetSubBtn");
 
-  this.$isChkNewPw = _getElementById("_isChkNewPw");
-  this.$isChkNewPwChk = _getElementById("_isChkNewPwChk");
+  this.$isChkNewPw = document.getElementById("_isChkNewPw");
+  this.$isChkNewPwChk = document.getElementById("_isChkNewPwChk");
 
-  _BtnShowClickAddEvent(_getElementById("btn-show"), this.$newPw,
+  _BtnShowClickAddEvent(document.getElementById("btn-show"), this.$newPw,
       this.$newPwChk);
   this._PwResetSubBtnClickAddEvent(this.$resetSubBtn, this.$newPw,
       this.$newPwChk, this.$captcha);
@@ -77,7 +77,7 @@ Reset.prototype._PwResetSubBtnClickAddEvent = function ($subBtn, ...$elements) {
 //패스워드 안전도 체크 이벤트추가
 Reset.prototype._PwSecureCheckAddEvent = function () {
   this.$newPw.onkeyup = function () {
-    _removeClassByParent(_getElementById("newPw-error-div"), "newPw-Thyme-msg");
+    _removeClassByParent(document.getElementById("newPw-error-div"), "newPw-Thyme-msg");
     _PwSecureCheckFn(_reset.$isChkNewPw, _reset.$newPw, "newPw-NotThyme-msg");
   }
 }

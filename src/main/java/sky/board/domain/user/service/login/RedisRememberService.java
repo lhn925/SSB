@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.utili.UserTokenUtil;
+import sky.board.global.redis.dto.RedisKeyDto;
 import sky.board.global.redis.service.RedisService;
 
 @Slf4j
@@ -87,7 +88,8 @@ public class RedisRememberService extends AbstractRememberMeServices {
     }
 
 
-    public void publicSetCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response,String token) {
+    public void publicSetCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response,
+        String token) {
         setToken(token);
         this.setCookie(null, maxAge, request, response);
     }
@@ -99,7 +101,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
         userArray.add("password:" + password);
         userArray.add("expireTime:" + expiryTime);
         log.info("userArray.toString() = {}", userArray.toArray().toString());
-        redisService.setData(redisKey, userArray.toString(), expiryTime);
+        redisService.setRememberData(redisKey, userArray.toString(), expiryTime);
     }
 
 
@@ -161,7 +163,6 @@ public class RedisRememberService extends AbstractRememberMeServices {
 
         userInfo.stream().forEach(u ->
             {
-                log.info("u = {}", u);
                 String[] list = u.split(":");
                 String key = list[0];
                 String value = list[1];
@@ -181,12 +182,13 @@ public class RedisRememberService extends AbstractRememberMeServices {
     public String getRedisData(String rememberMeCookie) {
         rememberMeCookie = hashing(rememberMeCookie);
 
-        String redisData = redisService.getData(rememberMeCookie);
+        String redisData = redisService.getRememberData(rememberMeCookie);
         return redisData;
     }
 
     /**
      * 쿠키 값 해석
+     *
      * @param rememberMeCookie
      * @return
      */

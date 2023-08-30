@@ -112,7 +112,7 @@
 
 <!--<script th:inline="javascript">
   let image = [[${userLoginFormDto.getImageName()}]];
-  let $captchaImg = _getElementById("captchaImg");
+  let $captchaImg = document.getElementById("captchaImg");
 
   if (image.length != null) {
     _removeByClass("captchaCard", "display-none");

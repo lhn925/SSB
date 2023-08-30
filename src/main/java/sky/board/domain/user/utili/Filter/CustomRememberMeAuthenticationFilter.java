@@ -60,10 +60,8 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
 
         String deleteKey = key.split(":")[0];
 
-        log.info("deleteKey = {}", deleteKey);
-        log.info("RedisKeyDto.SESSION_KEY = {}", RedisKeyDto.SESSION_KEY);
-        rememberMeServices.getRedisService().deleteData(redisToken);
-        rememberMeServices.getRedisService().deleteData(RedisKeyDto.SESSION_KEY + deleteKey);
+        rememberMeServices.getRedisService().rememberDeleteData(redisToken);
+        rememberMeServices.getRedisService().sessionDeleteData(deleteKey);
     }
 
     @Override

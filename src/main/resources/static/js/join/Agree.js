@@ -5,9 +5,9 @@ function Agree() {
 }
 
 Agree.prototype._init = function () {
-  this.$sbbAgreement = _getElementById("sbbAgreement1");// 사이트 이용약관 동의
-  this.$infoAgreement = _getElementById("infoAgreement1");// 개인정보 이용약관 동의
-  let $chk_all = _getElementById("chk_all");
+  this.$sbbAgreement = document.getElementById("sbbAgreement1");// 사이트 이용약관 동의
+  this.$infoAgreement = document.getElementById("infoAgreement1");// 개인정보 이용약관 동의
+  let $chk_all = document.getElementById("chk_all");
 
   this.$sbbAgreement.checked = false;
   this.$infoAgreement.checked = false;
@@ -21,7 +21,7 @@ Agree.prototype._init = function () {
 
 Agree.prototype._allCheckBtnEvent = function () { // 전체 동의 버튼
   let is_checked = false;
-  _getElementById("chk_all").onclick = function () {
+  document.getElementById("chk_all").onclick = function () {
     let $agreeCheckBox = document.getElementsByClassName("agreeCheck");
     if (!is_checked) {
       is_checked = true;
@@ -39,11 +39,11 @@ Agree.prototype._allCheckBtnEvent = function () { // 전체 동의 버튼
 Agree.prototype._isChecked = function () {
   let sbbChecked = this.$sbbAgreement.checked;
   let infoChecked = this.$infoAgreement.checked;
-  let $agreeSubBtn = _getElementById("agreeSubBtn"); // 버튼 비활성화
+  let $agreeSubBtn = document.getElementById("agreeSubBtn"); // 버튼 비활성화
   if (sbbChecked && infoChecked) {
     $agreeSubBtn.disabled = false;
   } else {
-    _getElementById("chk_all").checked = false;
+    document.getElementById("chk_all").checked = false;
     $agreeSubBtn.disabled = true;
   }
 }

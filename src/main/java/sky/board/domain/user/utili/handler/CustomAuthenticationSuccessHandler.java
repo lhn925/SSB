@@ -83,7 +83,7 @@ public class CustomAuthenticationSuccessHandler implements
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
         //로그인 성공 기록 저장
-        userLoginLogService.save(request, LoginSuccess.SUCCESS, Status.ON);
+            userLoginLogService.save(request, LoginSuccess.SUCCESS, Status.ON);
     }
 
     /**

@@ -10,18 +10,18 @@ function Email(url) {
 Email.prototype._init = function () { //sendCodeButton 이벤트 등록
   this._sendCodeButtonOnclickEvent();
   this._verifyCodeButtonEvent();
-  this.$isChkEmail = _getElementById("_isChkEmail");
-  this.$isChkAuth = _getElementById("_isChkAuth");
-  this.$email = _getElementById("email");
+  this.$isChkEmail = document.getElementById("_isChkEmail");
+  this.$isChkAuth = document.getElementById("_isChkAuth");
+  this.$email = document.getElementById("email");
 }
 
 Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요청
                                                    // 공백 없앰
   let emailVal = this.$email.value.split(" ").join("");
 
-  let $errorMsg = _getElementById("email-NotThyme-msg");
-  let $verificationMsg = _getElementById("verification-msg");
-  let $authCode = _getElementById("authCode");
+  let $errorMsg = document.getElementById("email-NotThyme-msg");
+  let $verificationMsg = document.getElementById("verification-msg");
+  let $authCode = document.getElementById("authCode");
 
   if (emailVal == "") { // 이메일 형식 확인 및 경고메세지 띄움
     $errorMsg.innerText = errorsMsg["NotBlank"];
@@ -63,7 +63,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
         // 사용자가 이메일을 보낸 후, 인증 코드 유효시간 - 인증 코드 발급시간 / 1000
         // let verifyTime = (new Date(_email._emailDto.data.authTimeLimit)
         //     - new Date(_email._emailDto.data.authIssueTime)) / 1000
-        let $countdown = _getElementById("verification-time");
+        let $countdown = document.getElementById("verification-time");
         _email._startCountdown($countdown);
       }
   ).catch((error) => {
@@ -84,9 +84,9 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
  */
 
 Email.prototype._reqEmailAuthFetch = function (clickCheck) { // 인증번호 체크 함수
-  let $authCode = _getElementById("authCode");
-  let $verificationMsg = _getElementById("verification-msg");
-  let $countdown = _getElementById("verification-time");
+  let $authCode = document.getElementById("authCode");
+  let $verificationMsg = document.getElementById("verification-msg");
+  let $countdown = document.getElementById("verification-time");
   let emailVal = _email.$email.value;
   if (!clickCheck) { // submit 버튼을 눌렀는데 인증이 되지 않았을 경우 false가 전해짐
     $verificationMsg.innerText = messages["userJoinForm.email2"];
@@ -167,7 +167,7 @@ Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton �
   // 중복 클릭 방지
   let isClicking = false;
 
-  _getElementById("sendCodeButton").onclick = function () {
+  document.getElementById("sendCodeButton").onclick = function () {
     if (isClicking) {
       return;
     }
@@ -184,7 +184,7 @@ Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 �
                                                        // 중복 클릭 방지
   let isClicking = false;
 
-  _getElementById("verifyCodeButton").onclick = function () {
+  document.getElementById("verifyCodeButton").onclick = function () {
     if (isClicking) {
       return;
     }
@@ -206,7 +206,7 @@ Email.prototype._isAuthEmail = function (checked) {
 }
 
 Email.prototype._SubmitBtnClickAddEvent = function () {
-  let $subBtn = _getElementById("subBtn");
+  let $subBtn = document.getElementById("subBtn");
   let isClicking = false;
   $subBtn.onclick = function () {
     if (isClicking) {
@@ -224,7 +224,7 @@ Email.prototype._SubmitBtnClickAddEvent = function () {
 
     if (!_isChkEmail) {
       _email.$isChkEmail.checked = _valueCheck("email",
-          "email-NotThyme-msg", _getElementById("email"),
+          "email-NotThyme-msg", document.getElementById("email"),
           _email.$isChkEmail);
     }
     if (!_isChkAuth) { // authCode 유효성 검증
@@ -243,13 +243,13 @@ Email.prototype._SubmitBtnClickAddEvent = function () {
 
 // api에 보낼 데이터
 Email.prototype.sendValue = function (emailVal) {
-  if (_getElementById("helpToken") == undefined) {
+  if (document.getElementById("helpToken") == undefined) {
     return {email: emailVal}
   } else {
-    let helpTypeVal = _getElementById("helpType").value;
+    let helpTypeVal = document.getElementById("helpType").value;
 
     if (helpTypeVal == 'PW') {
-      let userIdVal = _getElementById("userId").value;
+      let userIdVal = document.getElementById("userId").value;
       return {email: emailVal, userId: userIdVal, helpType: helpTypeVal}
     }
     return {email: emailVal, helpType: helpTypeVal}

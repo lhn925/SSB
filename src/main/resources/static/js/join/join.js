@@ -9,14 +9,14 @@ function Join() {
 }
 
 Join.prototype._init = function () {
-  this.$password = _getElementById("password");
-  this.$isChkUId = _getElementById("_isChkUId");
-  this.$isChkPw = _getElementById("_isChkPw");
-  this.$isChkUname = _getElementById("_isChkUname");
-  this.$isChkEmail = _getElementById("_isChkEmail");
-  this.$isChkAuth = _getElementById("_isChkAuth");
+  this.$password = document.getElementById("password");
+  this.$isChkUId = document.getElementById("_isChkUId");
+  this.$isChkPw = document.getElementById("_isChkPw");
+  this.$isChkUname = document.getElementById("_isChkUname");
+  this.$isChkEmail = document.getElementById("_isChkEmail");
+  this.$isChkAuth = document.getElementById("_isChkAuth");
 
-  _BtnShowClickAddEvent(_getElementById("btn-show"), $password);
+  _BtnShowClickAddEvent(document.getElementById("btn-show"), $password);
   this.$isChkUId.checked = this._DuplicateCheckAddEvent("userId",
       "id-NotThyme-msg",
       "/user/join/api/duplicate/id?userId=", this.$isChkUId);
@@ -31,7 +31,7 @@ Join.prototype._init = function () {
 // 회원가입 버튼 클릭시 전체가 유효한값이 입력되었는지 확인하는 함수
 Join.prototype._SubmitBtnClickAddEvent = function () {
 
-  let $subBtn = _getElementById("subBtn");
+  let $subBtn = document.getElementById("subBtn");
   let isClicking = false;
   $subBtn.onclick = function () {
     if (isClicking) {
@@ -51,7 +51,7 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
     if (!_isChkUId) { // 아이디 유효성 검증이 안 됐을 경우
       _join.$isChkEmail.checked = _join._duplicateCheckFn("userId",
           "id-NotThyme-msg",
-          "/user/join/api/duplicate/id?userId=", _getElementById("userId"),
+          "/user/join/api/duplicate/id?userId=", document.getElementById("userId"),
           _join.$isChkUId);
     }
 
@@ -64,14 +64,14 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
       _join.$isChkUname.checked = _join._duplicateCheckFn("userName",
           "userName-NotThyme-msg",
           "/user/join/api/duplicate/userName?userName=",
-          _getElementById("userName"),
+          document.getElementById("userName"),
           _join.$isChkUname);
     }
 
     if (!_isChkEmail) { // 이메일 유효성 검증
       _join.$isChkEmail.checked = _join._duplicateCheckFn("email",
           "email-NotThyme-msg",
-          "/user/join/api/duplicate/email?email=", _getElementById("email"),
+          "/user/join/api/duplicate/email?email=", document.getElementById("email"),
           _join.$isChkEmail);
     }
 
@@ -106,7 +106,7 @@ Join.prototype._PwSecureCheckAddEvent = function () {
 // 중복 체크 이벤트 추가
 Join.prototype._DuplicateCheckAddEvent = function (type, msgId, path,
     $isChkElement) {
-  let $elementById = _getElementById(type);
+  let $elementById = document.getElementById(type);
   $elementById.onkeyup = function () {
     _join._duplicateCheckFn(type, msgId, path,
         $elementById, $isChkElement);
@@ -115,7 +115,7 @@ Join.prototype._DuplicateCheckAddEvent = function (type, msgId, path,
 // 중복체크
 Join.prototype._duplicateCheckFn = function (type, msgId, path, $elementById,
     $isChkElement) {
-  let $NotThymeMsg = _getElementById(msgId);
+  let $NotThymeMsg = document.getElementById(msgId);
   let input_value = $elementById.value; // 아이디값 갖고오기
   // 유효검사
   input_value = input_value.split(" ").join("");

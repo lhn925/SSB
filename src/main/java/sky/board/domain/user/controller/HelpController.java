@@ -319,6 +319,12 @@ public class HelpController {
         }
     }
 
+
+
+
+
+
+
     private void setApiCaptcha(UserPwResetFormDto userPwResetFormDto) throws IOException {
         apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
         Map<String, Object> apiExamCaptchaNkey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();

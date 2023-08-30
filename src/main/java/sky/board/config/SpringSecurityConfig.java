@@ -143,7 +143,7 @@ public class SpringSecurityConfig {
                 if (hashKey != null && StringUtils.hasText(hashKey)) {
                     RedisRememberService redisRememberService = (RedisRememberService) rememberMeServices;
                     String redisKey = redisRememberService.hashing(hashKey);
-                    redisService.deleteData(redisKey);
+                    redisService.rememberDeleteData(redisKey);
                 }
                 String url = request.getParameter("url");
 

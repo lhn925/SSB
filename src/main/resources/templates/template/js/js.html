@@ -34,7 +34,7 @@
   <script th:src="@{/js/join/join.js}"></script>
   <script th:src="@{/js/join/join_ready.js}"></script>
   <script th:inline="javascript">
-    const $password = _getElementById("password");
+    const $password = document.getElementById("password");
     const rePw = [[${rePw}]];
     $password.value = rePw;
     let _email;

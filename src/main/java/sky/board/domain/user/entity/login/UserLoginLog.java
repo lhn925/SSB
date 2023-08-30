@@ -44,8 +44,6 @@ public class UserLoginLog {
     @GeneratedValue
     private Long id;
 
-    private String ip;
-
     //사용자 고유 번호
     private Long uId;
 
@@ -61,21 +59,10 @@ public class UserLoginLog {
     private DefaultLoginLog defaultLoginLog;
 
     @Builder
-    private UserLoginLog(String ip,
-        Long uId,
-        String userId, LoginSuccess isSuccess, String countryName,
-        UserAgent userAgent,
-        String latitude, String longitude, Status isStatus) {
-        this.ip = ip;
+    private UserLoginLog(Long uId, LoginSuccess isSuccess, DefaultLoginLog defaultLoginLog) {
         this.uId = uId == null ? 0 : uId;
         this.isSuccess = isSuccess;
-        this.defaultLoginLog = DefaultLoginLog.builder()
-            .userId(userId)
-            .countryName(countryName)
-            .userAgent(userAgent)
-            .longitude(longitude)
-            .latitude(latitude)
-            .isStatus(isStatus.getValue()).build();
+        this.defaultLoginLog = defaultLoginLog;
     }
 
 
@@ -92,15 +79,12 @@ public class UserLoginLog {
             throw new RuntimeException(e);
         }
         UserLoginLog userLoginLog = UserLoginLog.builder()
-            .ip(userLocationDto.getIpAddress()) //ip 저장
             .uId(uId)
-            .countryName(userLocationDto.getCountryName()) // iso Code 저장
-            .latitude(userLocationDto.getLatitude()) // 위도
-            .longitude(userLocationDto.getLongitude()) // 경도
-            .isSuccess(isSuccess) // 실패 여부 확인
-            .userAgent(UserLocationDto.isDevice(request)) // 기기 저장
-            .userId(userId) //유저아이디 저장
-            .isStatus(isStatus)
+            .isSuccess(isSuccess)
+            .defaultLoginLog(DefaultLoginLog.createDefaultLoginLog(
+                    userId, isStatus, userLocationDto, request
+                )
+            )
             .build();
         return userLoginLog;
     }

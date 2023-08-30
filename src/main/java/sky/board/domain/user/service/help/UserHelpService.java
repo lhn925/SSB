@@ -3,6 +3,7 @@ package sky.board.domain.user.service.help;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ public class UserHelpService {
     @Transactional
     public UserDetails passwordUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException {
 
-        User findByUser = userQueryRepository.findByUserId(userPwResetFormDto.getUserId());
+        User findByUser = userQueryRepository.findByUserId(userPwResetFormDto.getUserId()).orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
         //현재 비밀번호 와 대조
         isPasswordSameAsNew(userPwResetFormDto, findByUser);
         User.updatePw(findByUser, userPwResetFormDto.getNewPw(), userPwResetFormDto.getPwSecLevel(), passwordEncoder);

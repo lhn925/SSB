@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.entity.login.UserLoginLog;
@@ -35,8 +36,10 @@ public class UserLoginLogService {
 
         Long uId = null;
         if (isSuccess.equals(LoginSuccess.SUCCESS)) {
-            uId = userQueryRepository.findByUserId(request.getParameter("userId")).getId();
+            uId = userQueryRepository.findByUserId(request.getParameter("userId"))
+                .orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind")).getId();
         }
+
         UserLoginLog userLoginLog = getUserLoginLog(uId, request, isSuccess, isStatus);
         Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));
         saveLog.orElseThrow(() -> new RuntimeException());

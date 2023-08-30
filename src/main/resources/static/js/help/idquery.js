@@ -6,13 +6,13 @@ function Idquery() {
 }
 
 Idquery.prototype._init = function () {
-  this.$userId = _getElementById("userId");
+  this.$userId = document.getElementById("userId");
   this._SubmitBtnClickAddEvent()
 }
 
 Idquery.prototype._SubmitBtnClickAddEvent = function () {
 
-  let $subBtn = _getElementById("subBtn");
+  let $subBtn = document.getElementById("subBtn");
   let isClicking = false;
   $subBtn.onclick = function () {
     if (isClicking) {

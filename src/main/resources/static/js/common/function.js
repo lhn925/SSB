@@ -177,11 +177,6 @@ function _removeClassByParent($elementById, className) {
   $elementById.parentElement.classList.remove(className);
 }
 
-// 아이디로 element 가져오기
-function _getElementById(id) {
-  return document.getElementById(id);
-}
-
 async function _getFetch(url) {
 
   const options = {method: "GET"};
@@ -231,7 +226,7 @@ async function _get(path) { //post fetch
 
 function _valueCheck(type, msgId, $elementById,
     $isChkElement) {
-  let $NotThymeMsg = _getElementById(msgId);
+  let $NotThymeMsg = document.getElementById(msgId);
   let input_value = $elementById.value; // 아이디값 갖고오기
 // 유효검사
   input_value = input_value.split(" ").join("");
@@ -262,7 +257,7 @@ function _valueCheck(type, msgId, $elementById,
  * @private
  */
 function _captchaBtnClickAddEvent($captchaKey, $imageName) {
-  let $captchaBtn = _getElementById("captchaBtn");
+  let $captchaBtn = document.getElementById("captchaBtn");
   let isClicking = false;
   $captchaBtn.onclick = function () {
 
@@ -280,7 +275,7 @@ function _captchaBtnClickAddEvent($captchaKey, $imageName) {
       return;
     }
 
-    let $imagePath = _getElementById("imagePath");
+    let $imagePath = document.getElementById("imagePath");
     let imageName = $imagePath.src;
     if (capKeyVal != "") {
       _getFetch(
@@ -334,8 +329,8 @@ function _BtnShowClickAddEvent($btnShow, ...$pwArray) {
 
 //패스워드 안전도 체크 함수
 function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
-  let $NotThymeMsg = _getElementById(notThymeId);
-  let $secureLevel = _getElementById("secureLevel");
+  let $NotThymeMsg = document.getElementById(notThymeId);
+  let $secureLevel = document.getElementById("secureLevel");
 
   // 해당 클래스 how-secure를 제외 하고 모두 삭제
   $secureLevel.classList.forEach(str => {
@@ -419,7 +414,7 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
 
   for (const element of $elements) {
     let value = _removeWhitespace(element.value);
-    let $element = _getElementById(element.id + "-NotThyme-msg");
+    let $element = document.getElementById(element.id + "-NotThyme-msg");
     if (value == "") {
       _removeClassById($element,
           "display-none");
@@ -443,7 +438,7 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
 // 비밀번호 변경시 새 비밀번호와 값이 일치한지 확인
 function _PwMatchCheck($newPw, $newPwChk, $isChkNewPwChk) {
 
-  let $element = _getElementById($newPwChk.id + "-NotThyme-msg");
+  let $element = document.getElementById($newPwChk.id + "-NotThyme-msg");
   if ($newPw.value != "" && $newPw.value != $newPwChk.value) {
     _removeClassById($element,
         "display-none");
