@@ -64,7 +64,7 @@ public class UserLoginStatusService {
         Optional.ofNullable(save).orElseThrow(() -> new LoginException("error"));
     }
 
-    public void delete(String userId) {
+    public void removeLoginStatus(String userId) {
         Optional<User> findUser = userQueryRepository.findByUserId(userId);
         User user = findUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
 

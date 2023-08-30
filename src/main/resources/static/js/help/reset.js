@@ -22,7 +22,7 @@ Reset.prototype._init = function () {
   this.$isChkNewPw = document.getElementById("_isChkNewPw");
   this.$isChkNewPwChk = document.getElementById("_isChkNewPwChk");
 
-  _BtnShowClickAddEvent(document.getElementById("btn-show"), this.$newPw,
+  _typePwToText(document.getElementById("btn-show"), this.$newPw,
       this.$newPwChk);
   this._PwResetSubBtnClickAddEvent(this.$resetSubBtn, this.$newPw,
       this.$newPwChk, this.$captcha);
@@ -77,7 +77,7 @@ Reset.prototype._PwResetSubBtnClickAddEvent = function ($subBtn, ...$elements) {
 //패스워드 안전도 체크 이벤트추가
 Reset.prototype._PwSecureCheckAddEvent = function () {
   this.$newPw.onkeyup = function () {
-    _removeClassByParent(document.getElementById("newPw-error-div"), "newPw-Thyme-msg");
+    document.getElementById("newPw-error-div").parentElement.classList.remove("newPw-Thyme-msg");
     _PwSecureCheckFn(_reset.$isChkNewPw, _reset.$newPw, "newPw-NotThyme-msg");
   }
 }

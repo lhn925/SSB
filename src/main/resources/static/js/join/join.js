@@ -16,7 +16,7 @@ Join.prototype._init = function () {
   this.$isChkEmail = document.getElementById("_isChkEmail");
   this.$isChkAuth = document.getElementById("_isChkAuth");
 
-  _BtnShowClickAddEvent(document.getElementById("btn-show"), $password);
+  _typePwToText(document.getElementById("btn-show"), $password);
   this.$isChkUId.checked = this._DuplicateCheckAddEvent("userId",
       "id-NotThyme-msg",
       "/user/join/api/duplicate/id?userId=", this.$isChkUId);
@@ -90,12 +90,6 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
 
 }
 
-// 패스워드 Input 타입 변경
-Join.prototype._BtnShowClickAddEvent = function () {
-
-  _BtnShowClickAddEvent();
-}
-
 //패스워드 안전도 체크 이벤트추가
 Join.prototype._PwSecureCheckAddEvent = function () {
   this.$password.onkeyup = function () {
@@ -122,8 +116,8 @@ Join.prototype._duplicateCheckFn = function (type, msgId, path, $elementById,
 
   // 공백값 체크
   if (input_value == "") {
-    _addClassByParent($elementById, "error");
-    _addClassById($elementById, "border-danger");
+    $elementById.parentElement.classList.add( "error");
+    $elementById.classList.add( "border-danger");
     $NotThymeMsg.innerText = errorsMsg["NotBlank"];
     $isChkElement.checked = false;
     return false;
@@ -131,8 +125,8 @@ Join.prototype._duplicateCheckFn = function (type, msgId, path, $elementById,
 
   //정규표현식 체크
   if (!_regex(type, input_value)) {
-    _addClassByParent($elementById, "error")
-    _addClassById($elementById, "border-danger");
+    $elementById.parentElement.classList.add( "error")
+    $elementById.classList.add( "border-danger");
     $NotThymeMsg.innerText = messages["userJoinForm." + type];
     $isChkElement.checked = false;
     return false;
@@ -140,16 +134,16 @@ Join.prototype._duplicateCheckFn = function (type, msgId, path, $elementById,
   // 중복 검사
   _get(path + input_value)
   .then((data) => {
-    _removeClassById($elementById, "border-danger");
-    _removeClassByParent($elementById, "error");
+    $elementById.classList.remove( "border-danger");
+    $elementById.parentElement.classList.remove("error");
     $NotThymeMsg.innerText = "";
     $isChkElement.checked = true;
     return;
   }).catch((error) => {
     // 중복되거나 사용할수 없는 아이디일 경우
     let joinResult = JSON.parse(error.message);
-    _addClassById($elementById, "border-danger");
-    _addClassByParent($elementById, "error");
+    $elementById.classList.add( "border-danger");
+    $elementById.parentElement.classList.add( "error");
     $NotThymeMsg.innerText = joinResult.message;
     $isChkElement.checked = false;
     return;

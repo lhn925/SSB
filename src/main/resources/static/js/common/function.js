@@ -152,31 +152,6 @@ function _addClassByClass(className, addClassName) {
   }
 }
 
-//해당 element 에 클래스 추가
-function _addClassById($element, className) {
-  $element.classList.add(className);
-}
-
-// 해당 element 있는 태그에 text 삽입
-function _innerTextById($element, innerText) {
-  $element.innerText = innerText;
-}
-
-//해당 element 에 클래스 삭제
-function _removeClassById($element, className) {
-  $element.classList.remove(className);
-}
-
-//해당 element 에 부모 태그 클래스 추가
-function _addClassByParent($elementById, className) {
-  $elementById.parentElement.classList.add(className);
-}
-
-//해당 element 에 부모 태크 클래스 삭제
-function _removeClassByParent($elementById, className) {
-  $elementById.parentElement.classList.remove(className);
-}
-
 async function _getFetch(url) {
 
   const options = {method: "GET"};
@@ -233,8 +208,8 @@ function _valueCheck(type, msgId, $elementById,
 
 // 공백값 체크
   if (input_value == "") {
-    _addClassByParent($elementById, "error");
-    _addClassById($elementById, "border-danger");
+    $elementById.parentElement.classList.add("error");
+    $elementById.classList.add("border-danger");
     $NotThymeMsg.innerText = errorsMsg["NotBlank"];
     $isChkElement.checked = false;
     return false;
@@ -242,8 +217,8 @@ function _valueCheck(type, msgId, $elementById,
 
 //정규표현식 체크
   if (!_regex(type, input_value)) {
-    _addClassByParent($elementById, "error")
-    _addClassById($elementById, "border-danger");
+    $elementById.parentElement.classList.add("error")
+    $elementById.classList.add("border-danger");
     $NotThymeMsg.innerText = messages["userJoinForm." + type];
     $isChkElement.checked = false;
     return false;
@@ -309,7 +284,7 @@ function _removeWhitespace(value) {
 }
 
 // 패스워드 Input 타입 변경
-function _BtnShowClickAddEvent($btnShow, ...$pwArray) {
+function _typePwToText($btnShow, ...$pwArray) {
 
   $btnShow.onclick = function () {
     let isOn = this.classList.contains("on");
@@ -323,7 +298,7 @@ function _BtnShowClickAddEvent($btnShow, ...$pwArray) {
     for (const pw of $pwArray) {
       pw.type = "text";
     }
-    _addClassById(this, "on");
+    this.classList.add("on");
   }
 }
 
@@ -335,15 +310,15 @@ function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
   // 해당 클래스 how-secure를 제외 하고 모두 삭제
   $secureLevel.classList.forEach(str => {
     if (str != "how-secure") {
-      _removeClassById($secureLevel, str);
+      $secureLevel.classList.remove(str);
     }
   })
 
   let input_value = $password.value; // 비밀번호 값 갖고오기
   input_value = input_value.split(" ").join("");
   if (input_value == "") {
-    _addClassByParent($password, "error");
-    _addClassById($password, "border-danger")
+    $password.parentElement.classList.add("error");
+    $password.classList.add("border-danger")
     $NotThymeMsg.innerText = errorsMsg["NotBlank"];
     $secureLevel.innerText = "";
     $isChkPw.checked = false;
@@ -351,8 +326,8 @@ function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
   }
   // 8글자이하 16글자 초과시에
   if (input_value.length < 8 || input_value.length >= 17) {
-    _addClassByParent($password, "error");
-    _addClassById($password, "border-danger");
+    $password.parentElement.classList.add("error");
+    $password.classList.add("border-danger");
     $NotThymeMsg.innerText = messages["userJoinForm.password"];
     $secureLevel.innerText = "";
     $isChkPw.checked = false;
@@ -368,7 +343,7 @@ function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
     case 0:
       secLevelStr = messages["사용불가"];
       $secureLevel.innerText = secLevelStr;
-      _addClassById($secureLevel, "dangerous")
+      $secureLevel.classList.add("dangerous")
       return false;
     case 1:
       secLevelStr = messages["위험"];
@@ -386,11 +361,11 @@ function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
       return;
   }
 
-  _removeClassById($password, "border-danger");
+  $password.classList.remove("border-danger");
   $NotThymeMsg.innerText = "";
   $secureLevel.innerText = secLevelStr;
-  _addClassById($secureLevel, secLevelClass);
-  _removeClassByParent($password, "error");
+  $secureLevel.classList.add(secLevelClass);
+  $password.parentElement.classList.remove("error");
   $isChkPw.checked = true;
   return;
 }
@@ -416,14 +391,13 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
     let value = _removeWhitespace(element.value);
     let $element = document.getElementById(element.id + "-NotThyme-msg");
     if (value == "") {
-      _removeClassById($element,
+      $element.classList.remove(
           "display-none");
-      _innerTextById($element,
-          messages[element.id + ".NotBlank"]);
+      $element.innerText = messages[element.id + ".NotBlank"];
       isValChk = true;
       isClicking = false;
     } else {
-      _addClassById($element, "display-none");
+      $element.classList.add("display-none");
       isValChk = false;
       isClicking = true;
     }
@@ -440,14 +414,14 @@ function _PwMatchCheck($newPw, $newPwChk, $isChkNewPwChk) {
 
   let $element = document.getElementById($newPwChk.id + "-NotThyme-msg");
   if ($newPw.value != "" && $newPw.value != $newPwChk.value) {
-    _removeClassById($element,
+    $element.classList.remove(
         "display-none");
-    _innerTextById($element,
-        messages[$newPwChk.id + ".NotBlank"]);
+    $element.innerText =
+        messages[$newPwChk.id + ".NotBlank"];
     $isChkNewPwChk.checked = false;
   } else {
     $isChkNewPwChk.checked = true;
-    _innerTextById($element, "");
-    _addClassById($element, "display-none");
+    $element.innerText = "";
+    $element.classList.add("display-none");
   }
 }

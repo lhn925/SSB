@@ -16,7 +16,7 @@ Email.prototype._init = function () { //sendCodeButton 이벤트 등록
 }
 
 Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요청
-                                                   // 공백 없앰
+  // 공백 없앰
   let emailVal = this.$email.value.split(" ").join("");
 
   let $errorMsg = document.getElementById("email-NotThyme-msg");
@@ -25,14 +25,14 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
 
   if (emailVal == "") { // 이메일 형식 확인 및 경고메세지 띄움
     $errorMsg.innerText = errorsMsg["NotBlank"];
-    _addClassById(_email.$email, "border-danger")
-    _addClassByParent(_email.$email, "error");
+    _email.$email.classList.add("border-danger");
+    _email.$email.parentElement.classList.add("error");
     return;
   }
   if (!_regex("email", emailVal)) { // 이메일 형식 확인 및 경고메세지 띄움
     $errorMsg.innerText = messages["userJoinForm.email"];
-    _addClassById(_email.$email, "border-danger")
-    _addClassByParent(_email.$email, "error");
+    _email.$email.classList.add("border-danger");
+    _email.$email.parentElement.classList.add("error");
     // 형제 error-msg 제거
     _removeNodesByClass("email-Thyme-msg");
     return;
@@ -52,8 +52,8 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
         _removeNodesByClass("email-Thyme-msg");
 
         // authCode 부모 div error 클래스 제거
-        _removeClassByParent($authCode, "error");
-        _removeClassByParent(_email.$email, "error");
+        $authCode.parentElement.classList.remove("error");
+        _email.$email.parentElement.classList.remove(_email.$email, "error");
 
         // 오류메시지 제거
         $verificationMsg.innerText = "";
@@ -70,7 +70,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
     _removeNodesByClass("email-Thyme-msg");
     _email._errorResult = JSON.parse(error.message);
     // 형제 error-msg 제거
-    _addClassByParent(_email.$email, "error");
+    _email.$email.parentElement.classList.add("error");
     let message = _email._errorResult.message;
     // 에러메시지
     $errorMsg.innerText = message;
@@ -155,7 +155,7 @@ Email.prototype._startCountdown = function ( // 유효시간 5분 알림
     if (timer <= 1) {
       clearInterval(_email._countdownInterval);
       $countdown.innerText = "인증 시간이 만료되었습니다.";
-      _removeClassById($countdown, "text-danger");
+      $countdown.classList.remove("text-danger");
       // 인증 시간 만료시 수행할 작업 추가
     }
 
@@ -164,7 +164,7 @@ Email.prototype._startCountdown = function ( // 유효시간 5분 알림
 }
 
 Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton 에 이벤트 구현
-  // 중복 클릭 방지
+                                                            // 중복 클릭 방지
   let isClicking = false;
 
   document.getElementById("sendCodeButton").onclick = function () {
@@ -181,7 +181,7 @@ Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton �
 }
 
 Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 이벤트 구현
-                                                       // 중복 클릭 방지
+  // 중복 클릭 방지
   let isClicking = false;
 
   document.getElementById("verifyCodeButton").onclick = function () {
