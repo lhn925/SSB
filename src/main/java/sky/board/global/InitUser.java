@@ -51,8 +51,6 @@ public class InitUser {
             userJoinDto.setUserId("lim222");
             userJoinDto.setPassword("dlagksmf2");
             userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
-
-
         }
     }
 }

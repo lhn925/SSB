@@ -35,10 +35,8 @@ public class UserLoginLogService {
     public void save(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
 
         Long uId = null;
-        if (isSuccess.equals(LoginSuccess.SUCCESS)) {
-            uId = userQueryRepository.findByUserId(request.getParameter("userId"))
-                .orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind")).getId();
-        }
+        uId = userQueryRepository.findByUserId(request.getParameter("userId"))
+            .orElse((null)).getId();
 
         UserLoginLog userLoginLog = getUserLoginLog(uId, request, isSuccess, isStatus);
         Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));

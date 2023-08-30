@@ -7,18 +7,23 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Optional;
+import javax.security.auth.login.LoginException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.UserInfoSessionDto;
 import sky.board.domain.user.model.LoginSuccess;
+import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.log.UserLoginLogService;
+import sky.board.domain.user.service.login.RedisRememberService;
+import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
@@ -30,11 +35,12 @@ import sky.board.global.redis.dto.RedisKeyDto;
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler implements
     CustomLoginSuccessHandler {
+
     private final UserLoginLogService userLoginLogService;
     private final HttpSessionSecurityContextRepository securityContextRepository;
     private final SecurityContextImpl securityContext;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
-
+    private final UserLoginStatusService userLoginStatusService;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
         Authentication authentication) throws IOException, ServletException {
@@ -56,7 +62,7 @@ public class CustomAuthenticationSuccessHandler implements
         saveContext(request, response, authentication);
 
         String imageName = request.getParameter("imageName");
-        if (StringUtils.hasText(imageName)){ // 성공시 삭제
+        if (StringUtils.hasText(imageName)) { // 성공시 삭제
             apiExamCaptchaNkeyService.deleteImage(imageName);
         }
         // 로그인 실패 기록 다 삭제
@@ -64,6 +70,7 @@ public class CustomAuthenticationSuccessHandler implements
             c -> userLoginLogService.delete(request, LoginSuccess.FAIL, Status.OFF)
         );
 
+        saveLoginStatus(request, response, authentication);
         String url = request.getParameter("url");
         String redirectUrl = request.getContextPath() + "/";
         sendRedirect(response, url, redirectUrl);
@@ -83,7 +90,7 @@ public class CustomAuthenticationSuccessHandler implements
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
         //로그인 성공 기록 저장
-            userLoginLogService.save(request, LoginSuccess.SUCCESS, Status.ON);
+        userLoginLogService.save(request, LoginSuccess.SUCCESS, Status.ON);
     }
 
     /**
@@ -103,8 +110,17 @@ public class CustomAuthenticationSuccessHandler implements
     @Override
     public void saveLoginStatus(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
+        try {
+            String remember = (String) request.getSession().getAttribute(RememberCookie.KEY.getValue());
 
-
-
+            log.info("remember = {}", remember);
+            if (remember != null) {
+                request.setAttribute(RememberCookie.KEY.getValue(), remember);
+                request.getSession().removeAttribute(RememberCookie.KEY.getValue());
+            }
+            userLoginStatusService.save(request);
+        } catch (LoginException e) {
+            throw new RuntimeException("saveLoginStatus: "+e.getMessage());
+        }
     }
 }

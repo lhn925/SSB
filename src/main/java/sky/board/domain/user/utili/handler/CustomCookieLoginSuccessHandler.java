@@ -7,17 +7,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import javax.security.auth.login.LoginException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.UserInfoSessionDto;
+import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandler {
 
+
+    private final UserLoginStatusService userLoginStatusService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
@@ -56,8 +62,11 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
     @Override
     public void saveLoginStatus(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
-        
-
+        try {
+            userLoginStatusService.save(request);
+        } catch (LoginException e) {
+            throw new RuntimeException("saveLoginStatus:" + e);
+        }
     }
 
 

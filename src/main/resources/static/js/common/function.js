@@ -289,7 +289,7 @@ function _typePwToText($btnShow, ...$pwArray) {
   $btnShow.onclick = function () {
     let isOn = this.classList.contains("on");
     if (isOn) {
-      _removeClassById(this, "on");
+      this.classList.remove("on");
       for (const pw of $pwArray) {
         pw.type = "password";
       }

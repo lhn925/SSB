@@ -19,9 +19,18 @@ Login.prototype._init = function () {
   this.$captcha = document.getElementById("captcha");
 
   this._LoginSubBtnClickAddEvent();
-  _captchaBtnClickAddEvent(this.$captchaKey,this.$imageName);
-}
+  this._addEnterKeyEvent();
+  _captchaBtnClickAddEvent(this.$captchaKey, this.$imageName);
 
+}
+Login.prototype._addEnterKeyEvent = function () {
+  document.onkeyup = function (event) {
+    if (event.key == "Enter") {
+      document.getElementById("loginSubBtn").onclick();
+    }
+  };
+
+}
 // 로그인이시 체크 함수
 Login.prototype._LoginSubBtnClickAddEvent = function () {
   const $loginSubBtn = document.getElementById("loginSubBtn");

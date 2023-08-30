@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import javax.security.auth.login.LoginException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -32,5 +33,6 @@ public interface CustomLoginSuccessHandler extends AuthenticationSuccessHandler 
      * @param response
      * @param authentication
      */
-    void saveLoginStatus(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
+    void saveLoginStatus(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+        throws LoginException;
 }

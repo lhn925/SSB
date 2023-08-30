@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.UserInfoSessionDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.model.LoginSuccess;
+import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.model.UserAgent;
 import sky.board.domain.user.utili.CustomCookie;
@@ -110,7 +111,7 @@ public class UserLoginStatus extends BaseTimeEntity {
             ).session(request.getSession().getId())
             .browser(UserLocationDto.getClientBrowser(request))
             .os(UserLocationDto.getClientOS(request));
-        String rememberMe = CustomCookie.readCookie(request.getCookies(), "RememberMe");
+        String rememberMe = (String) request.getAttribute(RememberCookie.KEY.getValue());
 
         /**
          * rememberMe가 있을 경우

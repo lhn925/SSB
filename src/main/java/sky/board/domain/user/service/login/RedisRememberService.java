@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.rememberme.InvalidCookieE
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.redis.dto.RedisKeyDto;
 import sky.board.global.redis.service.RedisService;
@@ -37,7 +38,6 @@ public class RedisRememberService extends AbstractRememberMeServices {
         super.setCookieName(key);
         this.redisService = redisService;
     }
-
 
     @Override
     public void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -84,6 +84,10 @@ public class RedisRememberService extends AbstractRememberMeServices {
         cookie.setMaxAge(maxAge);
         cookie.setDomain(request.getContextPath());
         cookie.setHttpOnly(true);
+        /**
+         * userLoginStatus 에 저장을 위해 세션에 임시 저장
+         */
+        session.setAttribute(RememberCookie.KEY.getValue(), session.getId() + ":" + this.getToken());
         response.addCookie(cookie);
     }
 
@@ -100,7 +104,6 @@ public class RedisRememberService extends AbstractRememberMeServices {
         userArray.add("userId:" + userId);
         userArray.add("password:" + password);
         userArray.add("expireTime:" + expiryTime);
-        log.info("userArray.toString() = {}", userArray.toArray().toString());
         redisService.setRememberData(redisKey, userArray.toString(), expiryTime);
     }
 

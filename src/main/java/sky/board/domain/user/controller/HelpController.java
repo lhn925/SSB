@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Map;
+import javax.security.auth.login.LoginException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -33,6 +34,7 @@ import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.help.UserHelpService;
 import sky.board.domain.user.service.log.UserActivityLogService;
 import sky.board.domain.user.service.UserQueryService;
+import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.PwChecker;
 import sky.board.global.error.dto.FieldErrorCustom;
@@ -47,6 +49,7 @@ public class HelpController {
 
     private final UserQueryService userQueryService;
 
+    private final UserLoginStatusService userLoginStatusService;
     private final UserActivityLogService userActivityLogService;
 
     private final UserHelpService userHelpService;
@@ -300,9 +303,11 @@ public class HelpController {
                 "sky.log.pw.chaContent", request, ChangeSuccess.SUCCESS);
             // 비밀번호가 전과 같을시에 IllegalArgumentException
 
+            // 로그인된 기기 로그아웃
+            userLoginStatusService.removeLoginStatus(userDetails.getUserId());
+
             //인증 이미지 삭제
             apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
-
             Alert.waringAlert(ms.getMessage("sky.newPw.success", null, request.getLocale()), "/login", response);
             return null;
         } catch (IllegalArgumentException e) {
@@ -314,7 +319,6 @@ public class HelpController {
                     "newPw", userPwResetFormDto.getNewPw(),
                     e.getMessage(),
                     null));
-
             return "user/help/pwResetForm";
         }
     }
