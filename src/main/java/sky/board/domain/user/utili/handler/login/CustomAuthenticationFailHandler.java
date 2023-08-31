@@ -1,4 +1,4 @@
-package sky.board.domain.user.utili.handler;
+package sky.board.domain.user.utili.handler.login;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

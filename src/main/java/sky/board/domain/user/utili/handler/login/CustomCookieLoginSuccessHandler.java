@@ -1,4 +1,4 @@
-package sky.board.domain.user.utili.handler;
+package sky.board.domain.user.utili.handler.login;
 
 
 import jakarta.servlet.FilterChain;
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.dto.login.CustomUserDetails;
-import sky.board.domain.user.dto.UserInfoSessionDto;
+import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
@@ -55,7 +55,7 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
     public void setSession(HttpServletRequest request, Authentication authentication) {
         HttpSession session = request.getSession();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserInfoSessionDto userInfo = UserInfoSessionDto.createUserInfo(userDetails);
+        UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
     }
 

@@ -1,4 +1,4 @@
-package sky.board.domain.user.utili.handler;
+package sky.board.domain.user.utili.handler.login;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,17 +12,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
-import sky.board.domain.user.dto.UserInfoSessionDto;
+import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.log.UserLoginLogService;
-import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.dto.RedisKeyDto;
@@ -103,7 +101,7 @@ public class CustomAuthenticationSuccessHandler implements
     public void setSession(HttpServletRequest request, Authentication authentication) {
         HttpSession session = request.getSession();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserInfoSessionDto userInfo = UserInfoSessionDto.createUserInfo(userDetails);
+        UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
     }
 
@@ -113,7 +111,6 @@ public class CustomAuthenticationSuccessHandler implements
         try {
             String remember = (String) request.getSession().getAttribute(RememberCookie.KEY.getValue());
 
-            log.info("remember = {}", remember);
             if (remember != null) {
                 request.setAttribute(RememberCookie.KEY.getValue(), remember);
                 request.getSession().removeAttribute(RememberCookie.KEY.getValue());
