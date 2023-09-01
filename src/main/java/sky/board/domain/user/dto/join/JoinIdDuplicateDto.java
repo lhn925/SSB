@@ -1,7 +1,9 @@
 package sky.board.domain.user.dto.join;
 
 import java.io.Serializable;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.board.domain.user.annotation.JoinValid;
 
@@ -11,6 +13,7 @@ import sky.board.domain.user.annotation.JoinValid;
  */
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JoinIdDuplicateDto implements Serializable  {
 
     @JoinValid(regexp = "^[a-z0-9_-]{5,20} *$", message = "{userJoinForm.userId}")

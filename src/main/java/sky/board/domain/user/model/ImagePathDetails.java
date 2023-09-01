@@ -4,9 +4,12 @@ package sky.board.domain.user.model;
 /**
  * 각종 URL 정보
  */
-public class PathDetails {
+public class ImagePathDetails {
 
     public static final String CAPTCHA_IMAGE_URL = "src/main/resources/static/image/";
+    public static final String USER_DEFAULT_URL = "src/main/resources/static/css/myInfo/image/user/";
+    public static final String USER_DEFAULT_IMAGE = "defaultImage.png";
+
     public static final String PATH_IMAGE_URL = "/image/";
 
 

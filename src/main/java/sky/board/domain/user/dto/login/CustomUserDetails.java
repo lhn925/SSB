@@ -18,7 +18,7 @@ import org.springframework.util.Assert;
 /**
  * getAuthorities() : 계정이 가지고 있는 권한 목록 리턴
  * getPassword() : 계정의 비밀번호 리턴
- * getUsername() : 계정 이름 리턴
+ * getUserName() : 계정 이름 리턴
  * isAccountNonExpired() : 계정이 만료됐는지 리턴 -> true는 완료되지 않음 의미
  * isAccountNonLocked() : 계정이 잠겨있는지 리턴 -> true는 잠기지 않음
  * isCredentialNonExpired() : 비밀번호가 만료됐는지 리턴 -> true는 만료X 의미
@@ -32,6 +32,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     private String url;
     private String token;
     private String userId;
+    private String pictureUrl;
 
     // username 이랑 겹치는 문제로 바꿈 nickname으로 일시적으로 바꿈
     private String nickname;
@@ -54,6 +55,9 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     //isCredentialNonExpired() : 비밀번호가 만료됐는지 리턴 -> true는 만료X 의미
     private boolean credentialsNonExpired;
 
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
 
     public String getNickname() {
         return nickname;
@@ -74,8 +78,8 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     public CustomUserDetails(Long uId,String url, String token, String userId, String password, String username, String nickname,
         List<GrantedAuthority> authorities, boolean accountNonExpired, boolean accountNonLocked,
         boolean credentialsNonExpired, boolean enabled, Function<String, String> passwordEncoder,
-        LocalDateTime createdDateTime
-    ,String email) {
+        LocalDateTime createdDateTime,String pictureUrl,
+    String email) {
         this.url = url;
         this.uId = uId;
         this.token = token;
@@ -91,11 +95,12 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.nickname = nickname;
         this.createdDateTime = createdDateTime;
         this.email = email;
+        this.pictureUrl = pictureUrl;
     }
 
     @Builder
     public CustomUserDetails(Long uId,String url, String userId, String token, String password, String username,String nickname,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email) {
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email,String pictureUrl) {
         this.url = url;
         this.uId = uId;
         this.token = token;
@@ -109,6 +114,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.nickname = nickname;
         this.createdDateTime = createdDateTime;
         this.email = email;
+        this.pictureUrl = pictureUrl;
     }
 
     public LocalDateTime getCreatedDateTime() {

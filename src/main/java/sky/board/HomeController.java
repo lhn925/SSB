@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 
 @Controller
 @Slf4j
@@ -26,6 +27,7 @@ public class HomeController {
         log.info("authentication.getDetails() = {}", authentication.getDetails());
         log.info("authentication.getAuthorities().toString() = {}", authentication.getAuthorities());
         log.info("authentication.isAuthenticated() = {}", authentication.isAuthenticated());
+        log.info("authentication = {}", authentication.getDetails());
 
 //        Optional<String> ss_id = CustomCookie.readCookie(cookies, "SS_ID");
 

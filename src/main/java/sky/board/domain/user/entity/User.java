@@ -109,6 +109,8 @@ public class User extends BaseTimeEntity {
             userId(user.getUserId()).
             username(user.getUserId()).
             token(user.getToken()).
+            email(user.getEmail()).
+            pictureUrl(user.getPictureUrl()).
             nickname(user.getUserName()).
             password(user.getPassword()).
             enabled(user.getIsStatus()).

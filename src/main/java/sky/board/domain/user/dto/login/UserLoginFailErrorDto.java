@@ -2,11 +2,14 @@ package sky.board.domain.user.dto.login;
 
 
 import java.io.Serializable;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserLoginFailErrorDto implements Serializable  {
 
     // 에러 메시지

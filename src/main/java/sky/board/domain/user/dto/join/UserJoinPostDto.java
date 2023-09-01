@@ -3,7 +3,9 @@ package sky.board.domain.user.dto.join;
 
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.board.domain.user.annotation.JoinValid;
 import sky.board.domain.user.model.PwSecLevel;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +22,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
-import sky.board.domain.user.model.PathDetails;
+import sky.board.domain.user.model.ImagePathDetails;
 import sky.board.global.openapi.entity.OpenApi;
-import sky.board.global.openapi.model.code;
 
 /**
  * 네이버 API 로그인 2차 보안키 발급 및 인증 서비스
@@ -125,7 +123,7 @@ public class ApiExamCaptchaNkeyService {
     }
 
     public void deleteImage(String filename) throws IOException {
-        Path filePath = Paths.get(PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, filename, "jpg"));
+        Path filePath = Paths.get(ImagePathDetails.getFilePath(ImagePathDetails.CAPTCHA_IMAGE_URL, filename, "jpg"));
         Files.delete(filePath);
     }
 
@@ -134,7 +132,7 @@ public class ApiExamCaptchaNkeyService {
         byte[] bytes = new byte[1024];
         // 랜덤한 이름으로  파일 생성
         String filename = Long.valueOf(new Date().getTime()).toString();
-        String fullName = PathDetails.getFilePath(PathDetails.CAPTCHA_IMAGE_URL, filename, "jpg");
+        String fullName = ImagePathDetails.getFilePath(ImagePathDetails.CAPTCHA_IMAGE_URL, filename, "jpg");
         File f = new File(fullName);
         try (OutputStream outputStream = new FileOutputStream(f)) {
             f.createNewFile();
