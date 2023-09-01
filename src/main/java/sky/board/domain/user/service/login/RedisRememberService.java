@@ -92,7 +92,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
     }
 
 
-    public void publicSetCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response,
+    public void publicSetCookie(int maxAge, HttpServletRequest request, HttpServletResponse response,
         String token) {
         setToken(token);
         this.setCookie(null, maxAge, request, response);

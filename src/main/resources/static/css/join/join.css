@@ -108,3 +108,9 @@
   color: #dc3545;
   text-decoration: underline;
 }
+
+.centered-breadcrumb {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* 조정 가능한 여백 */
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)" th:with="lan = ${#locale.toString().substring(0,2)}">
 
 
 <th:block th:if="${page == 'commonJs'}" class="commonJs">
@@ -12,12 +12,17 @@
 
 
   <script th:src="@{/js/common/format.js}"></script>
-  <script th:src="@{/js/errors/{locale}/errors.js(locale = ${#locale})}"></script>
+  <script th:src="@{|/js/errors/${lan}/errors.js|}"></script>
   <script th:src="@{/js/common/function.js}"></script>
+
+  <script>
+
+  </script>
 </th:block>
 
+
 <th:block th:if="${page == 'joinAgreeForm'}" class="joinAgreeForm">
-  <script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{|/js/join/messages/${lan}/messages.js|}"></script>
   <script th:src="@{/js/common/function.js}"></script>
   <script th:src="@{/js/join/Agree.js}"></script>
   <script th:src="@{/js/join/join_ready.js}"></script>
@@ -28,8 +33,8 @@
   </script>
 </th:block>
 
-<th:block th:if="${page == 'joinForm'}" class="joinForm">
-  <script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+<th:block th:if="${page == 'joinForm'}" class="joinForm" >
+  <script th:src="@{|/js/join/messages/${lan}/messages.js|}"></script>
   <script th:src="@{/js/join/Email.js}"></script>
   <script th:src="@{/js/join/join.js}"></script>
   <script th:src="@{/js/join/join_ready.js}"></script>
@@ -46,7 +51,7 @@
 </th:block>
 
 <th:block th:if="${page == 'helpForm'}" class="helpForm">
-  <script th:src="@{/js/join/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{|/js/join/messages/${lan}/messages.js|}"></script>
   <script th:src="@{/js/join/Email.js}"></script>
   <script th:src="@{/js/help/help_ready.js}"></script>
   <script th:inline="javascript">
@@ -56,7 +61,7 @@
 </th:block>
 
 <th:block th:if="${page == 'login'}" class="login">
-  <script th:src="@{/js/login/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{|/js/login/messages/${lan}/messages.js|}"></script>
   <script th:src="@{/js/login/login.js}"></script>
   <script th:src="@{/js/login/login_ready.js}"></script>
   <script th:inline="javascript">
@@ -69,7 +74,7 @@
 </th:block>
 
 <th:block th:if="${page == 'pwResetForm'}" class="pwResetForm">
-  <script th:src="@{/js/help/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{|/js/help/messages/${lan}/messages.js|}"></script>
   <script th:src="@{/js/help/reset.js}"></script>
   <script th:src="@{/js/help/reset_ready.js}"></script>
   <script th:inline="javascript">
@@ -79,9 +84,8 @@
 </th:block>
 
 
-
 <th:block th:if="${page == 'idQueryForm'}" class="idQueryForm">
-  <script th:src="@{/js/login/messages/{locale}/messages.js(locale = ${#locale})}"></script>
+  <script th:src="@{|/js/login/messages/${lan}/messages.js|}"></script>
   <script th:src="@{/js/help/idquery.js}"></script>
   <script th:src="@{/js/help/idquery_ready.js}"></script>
   <script th:inline="javascript">

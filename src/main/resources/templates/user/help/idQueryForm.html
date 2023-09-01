@@ -4,7 +4,7 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('HelpForm')}">
+  <th:block th:replace="~{template/css/css :: css ('helpForm')}">
   </th:block>
 </head>
 <body>
@@ -15,6 +15,9 @@
     <div class="card-body">
       <form id="form" th:method="get" th:action="@{/user/help/idquery/check}"
             th:object="${userIdHelpQueryDto}">
+        <div class="text-center mb-4">
+          <span class="logo-text" th:text="#{sky.idqueryForm}"></span>
+        </div>
         <input type="checkbox" hidden="true" id="_isChkUId"/>
         <div class="form-group">
           <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
@@ -32,8 +35,17 @@
       </form>
     </div><!--카드바디-->
   </div><!--카드-->
+</div>
+<!-- Breadcrumb는 카드 바로 아래에 배치 -->
+<div class="centered-breadcrumb">
+  <div aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item" ><span th:text="#{sky.idqueryForm2}"></span></li>
+      <li class="breadcrumb-item"><a class="text-decoration-none mainLogo" th:href="@{/user/help/id}"
+                                     th:text="#{sky.findId}">아이디 찾기</a></li>
 
-
+    </ol>
+  </div>
 </div>
 </body>
 

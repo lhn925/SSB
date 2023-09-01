@@ -16,7 +16,7 @@ Email.prototype._init = function () { //sendCodeButton 이벤트 등록
 }
 
 Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요청
-  // 공백 없앰
+                                                   // 공백 없앰
   let emailVal = this.$email.value.split(" ").join("");
 
   let $errorMsg = document.getElementById("email-NotThyme-msg");
@@ -46,14 +46,14 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
           clearInterval(_email._countdownInterval);
         }
         // 오류시 border-danger 제거
-        _removeClassById(_email.$email, "border-danger")
+        _email.$email.classList.remove("border-danger")
 
         // 형제 error-msg 제거
         _removeNodesByClass("email-Thyme-msg");
 
         // authCode 부모 div error 클래스 제거
         $authCode.parentElement.classList.remove("error");
-        _email.$email.parentElement.classList.remove(_email.$email, "error");
+        _email.$email.parentElement.classList.remove( "error");
 
         // 오류메시지 제거
         $verificationMsg.innerText = "";
@@ -164,7 +164,7 @@ Email.prototype._startCountdown = function ( // 유효시간 5분 알림
 }
 
 Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton 에 이벤트 구현
-                                                            // 중복 클릭 방지
+  // 중복 클릭 방지
   let isClicking = false;
 
   document.getElementById("sendCodeButton").onclick = function () {
@@ -181,7 +181,7 @@ Email.prototype._sendCodeButtonOnclickEvent = function () { //  sendCodeButton �
 }
 
 Email.prototype._verifyCodeButtonEvent = function () { //  sendCodeButton 에 이벤트 구현
-  // 중복 클릭 방지
+                                                       // 중복 클릭 방지
   let isClicking = false;
 
   document.getElementById("verifyCodeButton").onclick = function () {

@@ -4,6 +4,7 @@ package sky.board.config;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,18 +19,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.service.log.UserLoginLogService;
+import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.domain.user.utili.CustomCookie;
+import sky.board.domain.user.utili.Filter.CustomLogoutFilter;
 import sky.board.domain.user.utili.Filter.CustomRememberMeAuthenticationFilter;
 import sky.board.domain.user.utili.Filter.CustomUsernameFilter;
-import sky.board.domain.user.utili.handler.CustomAuthenticationFailHandler;
-import sky.board.domain.user.utili.handler.CustomAuthenticationSuccessHandler;
-import sky.board.domain.user.utili.handler.CustomCookieLoginSuccessHandler;
+import sky.board.domain.user.utili.handler.login.CustomAuthenticationFailHandler;
+import sky.board.domain.user.utili.handler.login.CustomAuthenticationSuccessHandler;
+import sky.board.domain.user.utili.handler.login.CustomCookieLoginSuccessHandler;
+import sky.board.domain.user.utili.handler.logout.CustomSimpleUrlLogoutSuccessHandler;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.service.RedisService;
 
@@ -37,6 +43,7 @@ import sky.board.global.redis.service.RedisService;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SpringSecurityConfig {
 
 
@@ -59,6 +66,8 @@ public class SpringSecurityConfig {
         CustomCookieLoginSuccessHandler cookieLoginSuccessHandler,
         CustomAuthenticationFailHandler failHandler,
         CustomAuthenticationSuccessHandler successHandler,
+        CustomSimpleUrlLogoutSuccessHandler logoutSuccessHandler,
+        UserLoginStatusService userLoginStatusService,
         AuthenticationManager authenticationManager,
         UserDetailsService userDetailsService,
         RememberMeServices rememberMeServices,
@@ -86,22 +95,25 @@ public class SpringSecurityConfig {
             .userDetailsService(userDetailsService);
         // 기능을 사용할 때 사용자 정보가 필요함. 반드시 이 설정 필요함.
         //tokenValiditySeconds(3600) // 쿠키의 만료시간 설정(초), default: 14일
+
         http.addFilterBefore(new CustomUsernameFilter(
                 rememberMeServices, authenticationManager,
                 userLoginLogService,
                 successHandler, failHandler,
                 apiExamCaptchaNkeyService),
             UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(
+            new CustomLogoutFilter(logoutSuccessHandler, userLoginStatusService), LogoutFilter.class);
         http.addFilterBefore(
             new CustomRememberMeAuthenticationFilter(authenticationManager, rememberMeServices,
                 cookieLoginSuccessHandler),
             RememberMeAuthenticationFilter.class);
+
         http.csrf().disable().cors().disable().
             authorizeHttpRequests(request ->
                     request.
                         dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                         requestMatchers(
-
 //                        "/js/common/**",
 //                        "/js/errors/**",
 //                        "/js/join/**",
@@ -112,7 +124,6 @@ public class SpringSecurityConfig {
                             "/image/**",
                             "/example/city",
                             "/login",
-                            "/logout",
                             "/user/join/api/**",
                             "/user/join/**",
                             "/user/help/**",
@@ -121,38 +132,23 @@ public class SpringSecurityConfig {
                             "/",
                             "/css/**"). // 허용 파일 및 허용 url
                         permitAll().
-                        anyRequest().
-                        authenticated() // 어떠한 요청이라도 인증필요
+                        anyRequest()
+                        .authenticated()
+                // 어떠한 요청이라도 인증필요
             ).
+
             formLogin(login -> login. //form 방식 로그인 사용
                 loginPage("/login"). // 커스텀 로그인 페이지 지정
                 usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                 passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
                 permitAll()
             );
-
         // logout 구현 부분
         http.logout()
             .logoutUrl("/logout")
-            .logoutSuccessHandler((request, response, authentication) -> {
+            .logoutSuccessHandler(logoutSuccessHandler) // 로그아웃 성공 핸들러
+            .deleteCookies(RememberCookie.KEY.getValue());// 로그아웃 후 삭제할 쿠키 지정
 
-                Cookie[] cookies = request.getCookies();
-
-                String hashKey = CustomCookie.readCookie(cookies, RememberCookie.KEY.getValue());
-
-                if (hashKey != null && StringUtils.hasText(hashKey)) {
-                    RedisRememberService redisRememberService = (RedisRememberService) rememberMeServices;
-                    String redisKey = redisRememberService.hashing(hashKey);
-                    redisService.rememberDeleteData(redisKey);
-                }
-                String url = request.getParameter("url");
-
-                if (url == null || !StringUtils.hasText(url)) {
-                    url = "/";
-                }
-                response.sendRedirect(url);
-            }) // 로그아웃 성공 핸들러
-            .deleteCookies(RememberCookie.KEY.getValue()); // 로그아웃 후 삭제할 쿠키 지정
         return http.build();
     }
 

@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,18 +18,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import sky.board.domain.user.dto.UserInfoSessionDto;
+import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.entity.User;
-import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.Status;
-import sky.board.domain.user.model.UserAgent;
-import sky.board.domain.user.utili.CustomCookie;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.global.base.login.DefaultLoginLog;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
-import sky.board.global.redis.dto.RedisKeyDto;
 
 @Entity
 @Getter
@@ -85,13 +80,13 @@ public class UserLoginStatus extends BaseTimeEntity {
     /**
      *
      * 객체 생성
-     * @param userInfoSessionDto
+     * @param userInfoDto
      * @param locationFinderService
      * @param request
      * @param user
      * @return
      */
-    public static UserLoginStatus getLoginStatus(UserInfoSessionDto userInfoSessionDto,
+    public static UserLoginStatus getLoginStatus(UserInfoDto userInfoDto,
         LocationFinderService locationFinderService,
         HttpServletRequest request, User user) {
         UserLocationDto userLocationDto;
@@ -128,9 +123,9 @@ public class UserLoginStatus extends BaseTimeEntity {
      * isStatus 상태 변경
      * @param userLoginStatus
      */
-    public static void loginStatusUpdate(UserLoginStatus userLoginStatus) {
-        userLoginStatus.setLoginStatus(Status.OFF.getValue());
-        userLoginStatus.getDefaultLoginLog().changeIsStatus(Status.OFF.getValue());
+    public static void loginStatusUpdate(UserLoginStatus userLoginStatus,Status loginStatus,Status isStatus) {
+        userLoginStatus.setLoginStatus(loginStatus.getValue());
+        userLoginStatus.getDefaultLoginLog().changeIsStatus(loginStatus.getValue());
     }
 
 }

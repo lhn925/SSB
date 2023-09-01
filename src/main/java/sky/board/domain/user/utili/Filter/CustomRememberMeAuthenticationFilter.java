@@ -41,10 +41,7 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         // 쿠키에 있는 값을 가져온 뒤
         String key = CustomCookie.readCookie(request.getCookies(), RememberCookie.KEY.getValue());
 
-        log.info("rememberMe value = {}", key);
         String redisToken = rememberMeServices.hashing(key);
-
-        log.info("redisToken = {}", redisToken);
 
         // 새롭게 쿠키에 저장될 토큰 생성
         String token = UserTokenUtil.getToken();
@@ -54,14 +51,14 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         int tokenLifetime = RedisRememberService.TWO_WEEKS_S; // 2주
         long expiryTime = rememberMeServices.getExpiryTime(tokenLifetime);
 
-        rememberMeServices.publicSetCookie(null, tokenLifetime, request, response, token);
+        rememberMeServices.publicSetCookie( tokenLifetime, request, response, token);
         rememberMeServices.setRedis(principal.getUserId(), principal.getPassword(), request.getSession(), expiryTime,
             token);
 
         String deleteKey = key.split(":")[0];
 
-        rememberMeServices.getRedisService().rememberDeleteData(redisToken);
-        rememberMeServices.getRedisService().sessionDeleteData(deleteKey);
+        rememberMeServices.getRedisService().deleteRemember(redisToken);
+        rememberMeServices.getRedisService().deleteSession(deleteKey);
     }
 
     @Override

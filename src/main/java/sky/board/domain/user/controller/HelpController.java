@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Map;
-import javax.security.auth.login.LoginException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -116,7 +115,6 @@ public class HelpController {
 
         Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
         if (helpToken != null) {
-            log.info("helpToken.getValue() = {}", helpToken.getValue());
             CustomCookie.delete(helpToken, response);
         }
         if (emailAuthCode != null) {
@@ -246,15 +244,11 @@ public class HelpController {
         }
 
         boolean isCaptcha;
-        log.info("userPwResetFormDto.getCaptchaKey() = {}", userPwResetFormDto.getCaptchaKey());
-        log.info("userPwResetFormDto.getCaptcha() = {}", userPwResetFormDto.getCaptcha());
         Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
             userPwResetFormDto.getImageName(),
             userPwResetFormDto.getCaptchaKey(), userPwResetFormDto.getCaptcha());
 
         isCaptcha = (boolean) result.get("result");
-
-        log.info("isCaptcha = {}", isCaptcha);
 
         // 자동입력 방지 번호가 맞지 않은 경우
         if (!isCaptcha) {
@@ -303,12 +297,14 @@ public class HelpController {
                 "sky.log.pw.chaContent", request, ChangeSuccess.SUCCESS);
             // 비밀번호가 전과 같을시에 IllegalArgumentException
 
+            HttpSession session = request.getSession(false);
             // 로그인된 기기 로그아웃
-            userLoginStatusService.removeLoginStatus(userDetails.getUserId());
+
+            userLoginStatusService.removeAllLoginStatus(userDetails.getUserId(),session.getId());
 
             //인증 이미지 삭제
             apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
-            Alert.waringAlert(ms.getMessage("sky.newPw.success", null, request.getLocale()), "/login", response);
+            Alert.waringAlert(ms.getMessage("sky.newPw.success", null, request.getLocale()), "/logout", response);
             return null;
         } catch (IllegalArgumentException e) {
             setApiCaptcha(userPwResetFormDto);
@@ -346,7 +342,6 @@ public class HelpController {
         HttpSession session = request.getSession();
         EmailAuthCodeDto emailAuthCodeDto = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
 
-        log.info("getString 접근");
         Cookie result = CustomCookie.getCookie(request.getCookies(), "helpToken");
 
         if (result != null) {
