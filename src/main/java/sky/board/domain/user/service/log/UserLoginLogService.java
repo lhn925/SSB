@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.login.UserLoginLog;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
@@ -35,8 +36,12 @@ public class UserLoginLogService {
     public void save(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
 
         Long uId = null;
-        uId = userQueryRepository.findByUserId(request.getParameter("userId"))
-            .orElse((null)).getId();
+        Optional<User> userId = userQueryRepository.findByUserId(request.getParameter("userId"));
+
+        User user = userId.orElse(null);
+        if (user != null) {
+            uId = user.getId();
+        }
 
         UserLoginLog userLoginLog = getUserLoginLog(uId, request, isSuccess, isStatus);
         Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));

@@ -1,11 +1,66 @@
-body {
-  /*min-width: 768px; !* <-- 이렇게 *!*/
-  margin: 0;
+
+/*body {
+  !*min-width: 768px; !* <-- 이렇게 *!*!
+  margin: 0 auto;
   height: 100%;
+  background: #fff;
+  line-height: 1.6;
+}*/
+body {
+  line-height: 1.6;
+  height: 100%;
+  margin: 0 auto;
 }
-.container {
-  margin-top: 70px;
+/*
+:root[color-theme='light'] {
+  --background: #fff;
+  --text: #363636;
+  --heading-text: #000;
+  --anchor-text: #0076d1;
+  --code-background: #efefef;
+  --code-text: #000;
 }
+
+:root[color-theme='dark'] {
+  --background: #18191a;
+  --text: #ffffff;
+  --heading-text: #fff;
+  --anchor-text: #0076d1;
+  --code-background: #18191a;
+  --code-text: #ffbe85;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--heading-text);
+}
+.nav-link,
+ul,
+li,
+p,
+dl {
+  color: var(--text);
+}
+
+a {
+  color: var(--text);
+  text-decoration: none;
+}
+*/
+
+
+code {
+  color: var(--code-text);
+  background: var(--code-background);
+  border-radius: 6px;
+  padding: 2.5px 5px;
+}
+
+/*html{
+  background: var(--background);
+}*/
+
 .btn-primary {
   background-color: #1aafec;
   border-color: #1aafec;
@@ -49,3 +104,4 @@ body {
   background-color: #8C9CEC;
   text-align: center;
 }
+

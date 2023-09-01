@@ -32,7 +32,7 @@ public class LoginController {
      * @return
      */
 
-    @GetMapping()
+    @GetMapping
     public String loginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
         @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
         HttpServletRequest request, Model model) {
@@ -40,6 +40,13 @@ public class LoginController {
         if (userLoginFailErrorDto.isError() || userLoginFailErrorDto.isRetryTwoFactor()) {
             model.addAttribute("errMsg", ms.getMessage(userLoginFailErrorDto.getErrMsg(),
                 null, request.getLocale()));
+        }
+
+        // 이전페이지 url 저장
+        String referer = request.getHeader("referer");
+        if (StringUtils.hasText(referer) && !StringUtils.hasText(userLoginFormDto.getUrl()) ) {
+            String url = referer.equals(request.getRequestURL()) ? null : referer;
+            userLoginFormDto.setUrl(url);
         }
 
         model.addAttribute("userLoginFormDto", userLoginFormDto);
@@ -61,11 +68,11 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    /**
+/*    *//**
      * 로그인 성공 후 호출되는 API
      * 0dksmf071
      * 0dlagksmf2
-     */
+     *//*
     @GetMapping("/logout")
     public String logout(HttpSession httpSession) {
         Object user_id = httpSession.getAttribute(RedisKeyDto.USER_KEY);
@@ -78,5 +85,5 @@ public class LoginController {
             redisTemplate.delete(RedisKeyDto.SESSION_KEY + httpSession.getId());
         }
         return "redirect:/";
-    }
+    }*/
 }

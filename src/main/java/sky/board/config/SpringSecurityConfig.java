@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.model.RememberCookie;
+import sky.board.domain.user.model.UserGrade;
 import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
@@ -50,6 +51,27 @@ public class SpringSecurityConfig {
     private final RedisService redisService;
     private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
+
+
+/*       "/js/**",
+           "/login/**",
+           "/email/**",
+           "/image/**",
+           "/example/city",
+           "/login",
+           "/user/join/api/**",
+           "/user/join/**",
+           "/user/help/**",
+           "/test/**",
+           "/open/**",
+           "/",
+           "/css/**"*/
+
+
+    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/open/**", "/test/**" ,
+        "/example/city", "/email/**","/user/help/**","/user/join/**","/login","/login/**"};
+    private final String[] USER_URL = {"/user/myInfo"};
+    private final String[] ADMIN_URL = {"/board"};
 
 
     /**
@@ -108,30 +130,14 @@ public class SpringSecurityConfig {
             new CustomRememberMeAuthenticationFilter(authenticationManager, rememberMeServices,
                 cookieLoginSuccessHandler),
             RememberMeAuthenticationFilter.class);
-
+// 허용 파일 및 허용 url
         http.csrf().disable().cors().disable().
             authorizeHttpRequests(request ->
                     request.
                         dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
-                        requestMatchers(
-//                        "/js/common/**",
-//                        "/js/errors/**",
-//                        "/js/join/**",
-//                        "/js/login/**",
-                            "/js/**",
-                            "/login/**",
-                            "/email/**",
-                            "/image/**",
-                            "/example/city",
-                            "/login",
-                            "/user/join/api/**",
-                            "/user/join/**",
-                            "/user/help/**",
-                            "/test/**",
-                            "/open/**",
-                            "/",
-                            "/css/**"). // 허용 파일 및 허용 url
-                        permitAll().
+                        requestMatchers(ALL_URL).permitAll().
+                        requestMatchers(USER_URL).hasRole(UserGrade.USER.getDescription()).
+//                        requestMatchers(ADMIN_URL).hasRole(UserGrade.ADMIN.getDescription()).
                         anyRequest()
                         .authenticated()
                 // 어떠한 요청이라도 인증필요
@@ -140,8 +146,8 @@ public class SpringSecurityConfig {
             formLogin(login -> login. //form 방식 로그인 사용
                 loginPage("/login"). // 커스텀 로그인 페이지 지정
                 usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
-                passwordParameter("password"). // submit 패스워드 input 에 아이디,네임 속성명
-                permitAll()
+                passwordParameter("password") // submit 패스워드 input 에 아이디,네임 속성명
+                .permitAll()
             );
         // logout 구현 부분
         http.logout()
