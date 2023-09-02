@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
-import sky.board.domain.user.model.ImagePathDetails;
+import sky.board.global.file.FileStore;
 import sky.board.global.openapi.entity.OpenApi;
 
 /**
@@ -34,6 +34,7 @@ import sky.board.global.openapi.entity.OpenApi;
 public class ApiExamCaptchaNkeyService {
 
     private final OpenApi openApi;
+    private final FileStore fileStore;
 
     // 키 발급시 0,  캡차 이미지 비교시 1로 세팅
     // 네이버 캡차 API 예제 - 키발급
@@ -123,7 +124,7 @@ public class ApiExamCaptchaNkeyService {
     }
 
     public void deleteImage(String filename) throws IOException {
-        Path filePath = Paths.get(ImagePathDetails.getFilePath(ImagePathDetails.CAPTCHA_IMAGE_URL, filename, "jpg"));
+        Path filePath = Paths.get(fileStore.getFilePath(FileStore.CAPTCHA_IMAGE_URL, filename, "jpg"));
         Files.delete(filePath);
     }
 
@@ -132,7 +133,7 @@ public class ApiExamCaptchaNkeyService {
         byte[] bytes = new byte[1024];
         // 랜덤한 이름으로  파일 생성
         String filename = Long.valueOf(new Date().getTime()).toString();
-        String fullName = ImagePathDetails.getFilePath(ImagePathDetails.CAPTCHA_IMAGE_URL, filename, "jpg");
+        String fullName = fileStore.getFilePath(FileStore.CAPTCHA_IMAGE_URL, filename, "jpg");
         File f = new File(fullName);
         try (OutputStream outputStream = new FileOutputStream(f)) {
             f.createNewFile();

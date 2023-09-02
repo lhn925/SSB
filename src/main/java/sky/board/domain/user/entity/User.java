@@ -4,6 +4,7 @@ package sky.board.domain.user.entity;
 import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -18,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.Status;
 import sky.board.global.base.BaseTimeEntity;
@@ -25,6 +27,8 @@ import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.UserGrade;
 import sky.board.domain.user.utili.UserTokenUtil;
+import sky.board.global.file.FileStore;
+import sky.board.global.file.UploadFile;
 
 
 @Getter
@@ -146,5 +150,20 @@ public class User extends BaseTimeEntity {
         this.setUserName(updateName);
         // 3개월 동안 변경 불가능
         this.setUserNameModifiedDate(plusMonthsDate);
+    }
+
+    public void updatePicture(UploadFile uploadFile) {
+        this.setPictureUrl(uploadFile.getStoreFileName());
+    }
+
+    /**
+     * 기존에 있던 프로필 이미지 삭제
+     * @param fileStore
+     * @throws IOException
+     */
+    public void deletePicture(FileStore fileStore) throws IOException {
+        if (StringUtils.hasText(this.getPictureUrl())) {
+            fileStore.deleteFile(fileStore.getFileDir(),this.getPictureUrl());
+        }
     }
 }
