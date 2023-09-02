@@ -258,7 +258,7 @@ function _captchaBtnClickAddEvent($captchaKey, $imageName) {
           + imageName).then()
       .then((data) => {
         $captchaKey.value = data.captchaKey;
-        $imagePath.src = "/$elementById.parentElement.classList.add(/" + data.imageName;
+        $imagePath.src = "/open/image/" + data.imageName;
         $imageName.value = data.imageName;
 
         return;

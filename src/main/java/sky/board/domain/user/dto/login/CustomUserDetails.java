@@ -33,6 +33,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     private String token;
     private String userId;
     private String pictureUrl;
+    private LocalDateTime userNameModifiedDate;
 
     // username 이랑 겹치는 문제로 바꿈 nickname으로 일시적으로 바꿈
     private String nickname;
@@ -100,7 +101,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
 
     @Builder
     public CustomUserDetails(Long uId,String url, String userId, String token, String password, String username,String nickname,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email,String pictureUrl) {
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email,String pictureUrl,LocalDateTime userNameModifiedDate) {
         this.url = url;
         this.uId = uId;
         this.token = token;
@@ -115,6 +116,12 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.createdDateTime = createdDateTime;
         this.email = email;
         this.pictureUrl = pictureUrl;
+        this.userNameModifiedDate = userNameModifiedDate;
+    }
+
+
+    public LocalDateTime getUserNameModifiedDate() {
+        return userNameModifiedDate;
     }
 
     public LocalDateTime getCreatedDateTime() {

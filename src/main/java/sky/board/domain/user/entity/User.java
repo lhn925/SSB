@@ -114,6 +114,7 @@ public class User extends BaseTimeEntity {
             nickname(user.getUserName()).
             password(user.getPassword()).
             enabled(user.getIsStatus()).
+            userNameModifiedDate(user.getUserNameModifiedDate()).
             build();
         build.setAuthorities(user.getGrade().getDescription());
         return build;
