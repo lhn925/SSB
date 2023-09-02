@@ -77,7 +77,7 @@ public class EmailApiController {
             // 이메일 중복 체크
             userJoinService.checkEmail(emailSendDto.getEmail());
         } catch (DuplicateCheckException e) {
-            bindingResult.reject("join.duplication", new Object[]{e.getMessage()}, null);
+            bindingResult.reject("duplication", new Object[]{e.getMessage()}, null);
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 

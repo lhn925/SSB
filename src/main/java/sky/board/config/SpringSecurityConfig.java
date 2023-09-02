@@ -70,7 +70,7 @@ public class SpringSecurityConfig {
 
     private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/open/**", "/test/**" ,
         "/example/city", "/email/**","/user/help/**","/user/join/**","/login","/login/**"};
-    private final String[] USER_URL = {"/user/myInfo"};
+    private final String[] USER_URL = {"/user/myInfo/**"};
     private final String[] ADMIN_URL = {"/board"};
 
 

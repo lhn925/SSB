@@ -1,4 +1,4 @@
-package sky.board.domain.user.api;
+package sky.board.domain.user.api.join;
 
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,6 @@ public class JoinApiController {
     private final UserJoinService userJoinService;
     private final MessageSource ms;
 
-
     /**
      * id:joinApi_1
      * 유저아이디 중복체크
@@ -55,7 +54,7 @@ public class JoinApiController {
                 new FieldErrorCustom(
                     "JoinDuplicateDto",
                     e.getFieldName(), e.getRejectValue(),
-                    "join.duplication",
+                    "duplication",
                     new String[]{e.getMessage()}));
 
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -86,7 +85,7 @@ public class JoinApiController {
                 new FieldErrorCustom(
                     "JoinDuplicateDto",
                     e.getFieldName(), e.getRejectValue(),
-                    "join.duplication",
+                    "duplication",
                     new String[]{e.getMessage()}));
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
@@ -114,7 +113,7 @@ public class JoinApiController {
                 new FieldErrorCustom(
                     "JoinDuplicateDto",
                     e.getFieldName(), e.getRejectValue(),
-                    "join.duplication",
+                    "duplication",
                     new String[]{e.getMessage()}));
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }

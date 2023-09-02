@@ -150,7 +150,7 @@ public class JoinController {
                     "userJoinPostDto",
                     e.getFieldName(),
                     e.getRejectValue(),
-                    "join.duplication",
+                    "duplication",
                     new String[]{e.getMessage()}));
             return "user/join/joinForm";
         }

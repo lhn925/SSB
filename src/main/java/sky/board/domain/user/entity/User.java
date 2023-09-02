@@ -5,15 +5,18 @@ import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.Status;
@@ -28,6 +31,7 @@ import sky.board.domain.user.utili.UserTokenUtil;
 @Setter(value = AccessLevel.PRIVATE)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@SequenceGenerator(name="userTable_id_sequence",sequenceName = "userTable_id_sequence",initialValue = 1,allocationSize = 50)
 @Table(uniqueConstraints = {
@@ -52,8 +56,7 @@ public class User extends BaseTimeEntity {
     // 프로필 사진
     private String pictureUrl;
 
-    // 유저네임마지막 수정일
-    @LastModifiedDate
+    // 유저네임 마지막 수정일 한번 바꾼후 3개월 동안 바꾸질 못함
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime userNameModifiedDate;
 
@@ -100,7 +103,6 @@ public class User extends BaseTimeEntity {
             .isStatus(Status.OFF.getValue()).build();
     }
 
-
     //  User 클래스 (org.springframework.security.core.UserDetails.User)의 빌더를
     //  사용해서 username 에 아이디, password 에 비밀번호,
     //  roles 에 권한(역할)을 넣어주고 리턴
@@ -120,16 +122,29 @@ public class User extends BaseTimeEntity {
         return build;
     }
 
+    public static User getOptionalUser(Optional<User> optionalUser) {
+        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
+        return user;
+    }
+
     /**
      * 비밀번호 업데이트 및 보안등급 업데이트
+     *
      * @param user
      * @param password
      * @param passwordEncoder
      * @return
      */
-    public static User updatePw(User user, String password,PwSecLevel pwSecLevel,PasswordEncoder passwordEncoder) {
+    public static User updatePw(User user, String password, PwSecLevel pwSecLevel, PasswordEncoder passwordEncoder) {
         user.setPassword(passwordEncoder.encode(password));
         user.setPwSecLevel(pwSecLevel);
         return user;
+    }
+
+
+    public void updateUserName(String updateName, LocalDateTime plusMonthsDate) {
+        this.setUserName(updateName);
+        // 3개월 동안 변경 불가능
+        this.setUserNameModifiedDate(plusMonthsDate);
     }
 }

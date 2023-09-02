@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.myInfo.UserMyInfoDto;
-import sky.board.domain.user.dto.myInfo.UserMyInfoUpdateDto;
+import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
+import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -23,7 +24,6 @@ import sky.board.global.redis.dto.RedisKeyDto;
 @RequiredArgsConstructor
 @RequestMapping("/user/myInfo")
 public class MyInfoController {
-
 
     @GetMapping
     public String myPageForm(HttpServletRequest request, Model model) {
@@ -33,18 +33,6 @@ public class MyInfoController {
         // 유저 정보 반환
         model.addAttribute("userMyInfo", UserMyInfoDto.createUserMyInfo(userInfoDto));
         return "user/myInfo/myInfoForm";
-    }
-
-    @PostMapping
-    public String myInfoUpdate (@Validated @ModelAttribute UserMyInfoUpdateDto userMyInfoUpdateDto, BindingResult bindingResult,HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            return "user/myInfo/myInfoForm";
-        }
-
-
-
-
-        return "redirect:/user/myInfo";
     }
 
 }

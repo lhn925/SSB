@@ -56,9 +56,7 @@ public class UserLoginStatusService {
         }
         String userId = userInfoDto.getUserId();
 
-        Optional<User> findUser = userQueryRepository.findByUserId(userId);
-
-        User user = findUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
+        User user = User.getOptionalUser(userQueryRepository.findByUserId(userId));
 
         // UserLoginStatus 생성 후
         UserLoginStatus userLoginStatus = UserLoginStatus.getLoginStatus(locationFinderService,
@@ -76,8 +74,7 @@ public class UserLoginStatusService {
         String sessionId = session.getId();// 세션 아이디
 //        해당 세션 정보 가져옴
 
-        Optional<User> findUser = userQueryRepository.findByUserId(userId);
-        User user = findUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
+        User user = User.getOptionalUser(userQueryRepository.findByUserId(userId));
 
         userId = user.getUserId();
 
@@ -91,9 +88,7 @@ public class UserLoginStatusService {
 
     @Transactional
     public void removeAllLoginStatus(String userId,String sessionId) {
-        Optional<User> findUser = userQueryRepository.findByUserId(userId);
-
-        User user = findUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
+        User user = User.getOptionalUser(userQueryRepository.findByUserId(userId));
 
         // 로그인 되어 있는 기기 검색
         // 현재 접속하고 있는 세션 제외

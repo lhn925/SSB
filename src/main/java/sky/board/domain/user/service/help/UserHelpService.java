@@ -30,7 +30,7 @@ public class UserHelpService {
     @Transactional
     public UserDetails passwordUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException {
 
-        User findByUser = userQueryRepository.findByUserId(userPwResetFormDto.getUserId()).orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
+        User findByUser = User.getOptionalUser(userQueryRepository.findByUserId(userPwResetFormDto.getUserId()));
         //현재 비밀번호 와 대조
         isPasswordSameAsNew(userPwResetFormDto, findByUser);
         User.updatePw(findByUser, userPwResetFormDto.getNewPw(), userPwResetFormDto.getPwSecLevel(), passwordEncoder);

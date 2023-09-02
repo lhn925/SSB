@@ -8,6 +8,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.model.Status;
@@ -44,5 +45,20 @@ public class UserQueryService {
             .email(user.getEmail())
             .createdDateTime(user.getCreatedDateTime()).build();
     }
+
+    public CustomUserDetails findByUser(UserInfoDto userInfoDto)
+        throws UsernameNotFoundException {
+        User user = User.getOptionalUser(userQueryRepository.findByUserId(userInfoDto.getUserId()));
+
+        return CustomUserDetails.builder()
+            .userId(user.getUserId())
+            .nickname(user.getUserName())
+            .email(user.getEmail())
+            .createdDateTime(user.getCreatedDateTime()).build();
+    }
+
+
+
+
 
 }

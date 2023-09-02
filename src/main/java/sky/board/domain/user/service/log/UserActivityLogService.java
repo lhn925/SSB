@@ -39,9 +39,9 @@ public class UserActivityLogService {
     public void save(Long uId, String userId, String chaContent, String chaMethod,
         HttpServletRequest request, ChangeSuccess changeSuccess) {
         if (uId == null) {
-            User findUserId = userQueryRepository.findByUserId(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
-            uId = findUserId.getId();
+            User user = User.getOptionalUser(userQueryRepository.findByUserId(userId));
+
+            uId = user.getId();
         }
 
         //비 로그인으로 접근시 저장할 userId
