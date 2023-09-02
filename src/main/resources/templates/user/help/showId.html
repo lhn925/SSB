@@ -19,7 +19,8 @@
       <p class="card-text" th:text="#{sky.join.date}">가입 한 날짜</p>
       <p class="card-text"
          th:text="${#temporals.format(userHelpDto.getCreatedDateTime(), 'yyyy-MM-dd HH:mm:ss')}"></p>
-      <a th:href="@{|/login?userId=${userHelpDto.getUserId()}|}" class="btn btn-primary" th:text="#{sky.loginBtn}"></a>
+      <a th:href="@{/login (userId=${userHelpDto.getUserId()},url='/')}" class="btn btn-primary"
+         th:text="#{sky.loginBtn}"></a>
 
     </div>
   </div>

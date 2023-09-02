@@ -11,8 +11,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
-import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.join.UserJoinAgreeDto;
+import sky.board.global.base.BaseTimeEntity;
 
 @Entity
 @Setter(value = AccessLevel.PRIVATE)

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum UserGrade {
-    ADMIN("ADMIN"), MANAGER("MANAGER"), USER("USER"),ANONYMOUS("ANONYMOUS");
+    ADMIN("ADMIN"), MANAGER("MANAGER"), USER("USER"), ANONYMOUS("ANONYMOUS");
     private String description;
 
     UserGrade(String description) {
@@ -13,5 +13,9 @@ public enum UserGrade {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getRole() {
+        return "ROLE_" + description;
     }
 }

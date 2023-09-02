@@ -16,11 +16,8 @@ public class BaseEntity extends BaseTimeEntity {
 
     @CreatedBy
     @Column(updatable = false)
-    private String createdByUserName; // 작성자 유저네임
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdById; // 작성자 고유 아이디 값 혹은 토큰 값으로 변경 예정
+    private String userId; // 작성자 고유 아이디 값 혹은 토큰 값으로 변경 예정
     @LastModifiedBy
-    private String modifiedBy;
+    private String modifiedByUserId;
 
 }

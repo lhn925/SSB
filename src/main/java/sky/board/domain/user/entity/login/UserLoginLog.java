@@ -24,6 +24,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.model.UserAgent;
+import sky.board.global.base.BaseEntity;
+import sky.board.global.base.BaseTimeEntity;
 import sky.board.global.base.login.DefaultLoginLog;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
@@ -38,7 +40,7 @@ import sky.board.global.locationfinder.service.LocationFinderService;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = PROTECTED)
-public class UserLoginLog {
+public class UserLoginLog extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -68,7 +70,6 @@ public class UserLoginLog {
 
     public static UserLoginLog getLoginLog(Long uId, LocationFinderService locationFinderService,
         HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
-        String userId = request.getParameter("userId");
 
         UserLocationDto userLocationDto = null;
         try {
@@ -82,7 +83,7 @@ public class UserLoginLog {
             .uId(uId)
             .isSuccess(isSuccess)
             .defaultLoginLog(DefaultLoginLog.createDefaultLoginLog(
-                    userId, isStatus, userLocationDto, request
+                    isStatus, userLocationDto, request
                 )
             )
             .build();

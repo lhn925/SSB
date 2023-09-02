@@ -61,7 +61,7 @@ public class UserLoginStatusService {
         User user = findUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
 
         // UserLoginStatus 생성 후
-        UserLoginStatus userLoginStatus = UserLoginStatus.getLoginStatus(userInfoDto, locationFinderService,
+        UserLoginStatus userLoginStatus = UserLoginStatus.getLoginStatus(locationFinderService,
             request,
             user);
         //저장

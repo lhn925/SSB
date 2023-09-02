@@ -22,10 +22,12 @@ public class HomeController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        log.info("authentication.toString() = {}", authentication);
-        log.info("authentication.getPrincipal().toString() = {}", authentication.getPrincipal().getClass());
-        log.info("authentication.getDetails() = {}", authentication.getDetails());
-        log.info("authentication.getAuthorities().toString() = {}", authentication.getAuthorities());
+
+        log.info("authentication  = {}", authentication);
+        log.info("authentication.getPrincipal() = {}", authentication.getPrincipal());
+        log.info("authentication.getPrincipal().getClass() = {}", authentication.getPrincipal().getClass());
+        log.info("authentication.getDetails()", authentication.getDetails());
+        log.info("authentication.getAuthorities() = {}", authentication.getAuthorities().stream().toList().get(0));
         log.info("authentication.isAuthenticated() = {}", authentication.isAuthenticated());
         log.info("authentication = {}", authentication.getDetails());
 

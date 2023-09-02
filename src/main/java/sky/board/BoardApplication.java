@@ -1,15 +1,8 @@
 package sky.board;
 
-import static org.springframework.data.repository.config.BootstrapMode.DEFAULT;
-import static org.springframework.data.repository.config.BootstrapMode.DEFERRED;
-
-import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -35,14 +28,6 @@ public class BoardApplication {
             사용한다.*/
     }
 
-    /**
-     * 생성자 및 수정자의 아이디나 구별값을 db 컬럼에 저장
-     *
-     * @return
-     */
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        return () -> Optional.of(UUID.randomUUID().toString());
-    }
+
 
 }

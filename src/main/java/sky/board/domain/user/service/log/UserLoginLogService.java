@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.log.LoginLogRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
+import sky.board.global.auditor.AuditorAwareImpl;
 import sky.board.global.locationfinder.service.LocationFinderService;
 
 @Service
@@ -26,6 +28,7 @@ public class UserLoginLogService {
     private final LoginLogRepository loginLogRepository;
     private final LocationFinderService locationFinderService;
     private final UserQueryRepository userQueryRepository;
+    private final AuditorAware auditorAware;
 
     // 로그인 기록은 최근 90일까지의 기록을 최대 1,000 건 까지 제공합니다.
 
@@ -36,13 +39,15 @@ public class UserLoginLogService {
     public void save(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
 
         Long uId = null;
-        Optional<User> userId = userQueryRepository.findByUserId(request.getParameter("userId"));
+        String userId = request.getParameter("userId");
+        Optional<User> findOne = userQueryRepository.findByUserId(userId);
 
-        User user = userId.orElse(null);
+        User user = findOne.orElse(null);
         if (user != null) {
             uId = user.getId();
         }
-
+        //비 로그인으로 접근시 저장할 userId
+        AuditorAwareImpl.changeUserId(auditorAware, userId);
         UserLoginLog userLoginLog = getUserLoginLog(uId, request, isSuccess, isStatus);
         Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));
         saveLog.orElseThrow(() -> new RuntimeException());

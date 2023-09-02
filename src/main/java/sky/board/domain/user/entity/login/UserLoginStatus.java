@@ -6,6 +6,7 @@ import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -17,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.entity.User;
@@ -80,13 +82,12 @@ public class UserLoginStatus extends BaseTimeEntity {
     /**
      *
      * 객체 생성
-     * @param userInfoDto
      * @param locationFinderService
      * @param request
      * @param user
      * @return
      */
-    public static UserLoginStatus getLoginStatus(UserInfoDto userInfoDto,
+    public static UserLoginStatus getLoginStatus(
         LocationFinderService locationFinderService,
         HttpServletRequest request, User user) {
         UserLocationDto userLocationDto;
@@ -102,7 +103,7 @@ public class UserLoginStatus extends BaseTimeEntity {
             .uid(user)
             .loginStatus(Status.ON.getValue())
             .defaultLoginLog(
-                DefaultLoginLog.createDefaultLoginLog(user.getUserId(), Status.ON, userLocationDto, request)
+                DefaultLoginLog.createDefaultLoginLog(Status.ON, userLocationDto, request)
             ).session(request.getSession().getId())
             .browser(UserLocationDto.getClientBrowser(request))
             .os(UserLocationDto.getClientOS(request));
