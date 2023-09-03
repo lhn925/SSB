@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
+import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.join.UserJoinService;
+import sky.board.domain.user.service.myInfo.UserMyInfoService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -25,11 +27,18 @@ import sky.board.global.redis.dto.RedisKeyDto;
 @RequestMapping("/user/myInfo")
 public class MyInfoController {
 
+
+    private final UserQueryService userQueryService;
+
     @GetMapping
     public String myPageForm(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession();
 
+
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+        // 유저 정보 조회
+        userQueryService.findByUser(userInfoDto);
+
         // 유저 정보 반환
         model.addAttribute("userMyInfo", UserMyInfoDto.createUserMyInfo(userInfoDto));
         return "user/myInfo/myInfoForm";

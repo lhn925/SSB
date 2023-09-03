@@ -8,12 +8,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
-import sky.board.global.file.FileStore;
+import sky.board.global.file.utili.FileStore;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Getter
@@ -43,16 +42,18 @@ public class UserInfoDto implements Serializable {
         this.userNameModifiedDate = userNameModifiedDate;
     }
 
-    public static UserInfoDto createUserInfo(CustomUserDetails userDetails) {
+    public static UserInfoDto createUserInfo(UserDetails userDetails) {
+
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         return UserInfoDto.builder()
-            .userId(userDetails.getUserId())
-            .userName(userDetails.getNickname())
-            .token(userDetails.getToken())
-            .email(userDetails.getEmail())
-            .userNameModifiedDate(userDetails.getUserNameModifiedDate())
+            .userId(customUserDetails.getUserId())
+            .userName(customUserDetails.getNickname())
+            .token(customUserDetails.getToken())
+            .email(customUserDetails.getEmail())
+            .userNameModifiedDate(customUserDetails.getUserNameModifiedDate())
             .pictureUrl(
-                userDetails.getPictureUrl() == null ? FileStore.USER_DEFAULT_IMAGE : userDetails.getPictureUrl())
-            .grantedAuthority((List<GrantedAuthority>) userDetails.getAuthorities())
+                customUserDetails.getPictureUrl() == null ? FileStore.USER_DEFAULT_IMAGE : customUserDetails.getPictureUrl())
+            .grantedAuthority((List<GrantedAuthority>) customUserDetails.getAuthorities())
             .build();
     }
 

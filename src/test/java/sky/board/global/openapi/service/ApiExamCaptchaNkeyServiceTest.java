@@ -40,7 +40,7 @@ class ApiExamCaptchaNkeyServiceTest {
 */
     @Test
     public void 키값인증() throws IOException {
-        Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult("1691229980714","fr2foLQK2Rlyf6SN", "1ACU9");
+        Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult("fr2foLQK2Rlyf6SN", "1ACU9");
 
         System.out.println("result = " + result.get("result"));
 

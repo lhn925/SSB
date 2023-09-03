@@ -1,4 +1,4 @@
-package sky.board.global.file;
+package sky.board.global.file.dto;
 
 import lombok.Getter;
 import lombok.Setter;

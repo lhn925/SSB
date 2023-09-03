@@ -5,11 +5,13 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.UserQueryRepository;
@@ -46,15 +48,14 @@ public class UserQueryService {
             .createdDateTime(user.getCreatedDateTime()).build();
     }
 
-    public CustomUserDetails findByUser(UserInfoDto userInfoDto)
+    public UserInfoDto findByUser(UserInfoDto userInfoDto)
         throws UsernameNotFoundException {
         User user = User.getOptionalUser(userQueryRepository.findByUserId(userInfoDto.getUserId()));
 
-        return CustomUserDetails.builder()
-            .userId(user.getUserId())
-            .nickname(user.getUserName())
-            .email(user.getEmail())
-            .createdDateTime(user.getCreatedDateTime()).build();
+        UserDetails userDetails = User.UserBuilder(user);
+
+
+        return UserInfoDto.createUserInfo( userDetails);
     }
 
 

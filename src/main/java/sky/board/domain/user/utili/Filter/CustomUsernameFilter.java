@@ -92,7 +92,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             }
             // 2차 인증 키 검증
             Map result = null;
-            result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(filename, chptchaKey,
+            result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(chptchaKey,
                 captcha);
 
             isCaptcha = (boolean) result.get("result");

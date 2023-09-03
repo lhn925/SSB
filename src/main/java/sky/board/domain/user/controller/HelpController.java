@@ -245,7 +245,6 @@ public class HelpController {
 
         boolean isCaptcha;
         Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
-            userPwResetFormDto.getImageName(),
             userPwResetFormDto.getCaptchaKey(), userPwResetFormDto.getCaptcha());
 
         isCaptcha = (boolean) result.get("result");

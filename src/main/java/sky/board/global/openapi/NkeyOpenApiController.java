@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.user.model.LoginSuccess;
-import sky.board.global.file.FileStore;
+import sky.board.global.file.utili.FileStore;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.global.error.dto.ErrorResultDto;
@@ -29,10 +29,10 @@ import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 
 
 @Slf4j
-@RequestMapping("/open")
+@RequestMapping("/Nkey/open")
 @RestController
 @RequiredArgsConstructor
-public class OpenApiController {
+public class NkeyOpenApiController {
 
     private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
@@ -62,7 +62,7 @@ public class OpenApiController {
 
     @GetMapping("/image/{fileName}")
     public Resource getImage(@PathVariable String fileName) throws MalformedURLException {
-        return new UrlResource("file:" + fileStore.getFilePath(FileStore.CAPTCHA_IMAGE_URL, fileName, "jpg"));
+        return new UrlResource("file:" + fileStore.getFilePath(fileStore.getCaptchaImageUrl(), fileName, "jpg"));
     }
 
     @GetMapping("/again")
@@ -78,9 +78,8 @@ public class OpenApiController {
 
         String fileName = fileStore.getFileName(captchaNkeyDto.getImageName());
         log.info("fileName = {}", fileName);
-            //받은 이미지 삭제
+        //받은 이미지 삭제
         apiExamCaptchaNkeyService.deleteImage(fileName);
-
 
         String key = (String) apiExamCaptchaNkeyService.getApiExamCaptchaNkey().get("key");
         String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);

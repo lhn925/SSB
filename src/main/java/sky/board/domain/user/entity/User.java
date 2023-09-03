@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,8 +26,8 @@ import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.UserGrade;
 import sky.board.domain.user.utili.UserTokenUtil;
-import sky.board.global.file.FileStore;
-import sky.board.global.file.UploadFile;
+import sky.board.global.file.utili.FileStore;
+import sky.board.global.file.dto.UploadFile;
 
 
 @Getter
@@ -158,12 +157,19 @@ public class User extends BaseTimeEntity {
 
     /**
      * 기존에 있던 프로필 이미지 삭제
+     *
      * @param fileStore
      * @throws IOException
      */
     public void deletePicture(FileStore fileStore) throws IOException {
         if (StringUtils.hasText(this.getPictureUrl())) {
-            fileStore.deleteFile(fileStore.getFileDir(),this.getPictureUrl());
+            fileStore.deleteFile(User.getPictureFullUrl(fileStore, this.token),
+                this.getPictureUrl());
         }
     }
+
+    public static String getPictureFullUrl(FileStore fileStore, String token) {
+        return fileStore.getFileDir() + fileStore.getUserPictureUrl() + token + "/";
+    }
+
 }
