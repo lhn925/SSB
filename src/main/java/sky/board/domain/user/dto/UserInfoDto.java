@@ -52,14 +52,15 @@ public class UserInfoDto implements Serializable {
             .email(customUserDetails.getEmail())
             .userNameModifiedDate(customUserDetails.getUserNameModifiedDate())
             .pictureUrl(
-                customUserDetails.getPictureUrl() == null ? FileStore.USER_DEFAULT_IMAGE : customUserDetails.getPictureUrl())
+                customUserDetails.getPictureUrl() == null ? FileStore.USER_DEFAULT_DIR : customUserDetails.getPictureUrl())
             .grantedAuthority((List<GrantedAuthority>) customUserDetails.getAuthorities())
             .build();
     }
 
     public static void sessionUserInfoUpdate(HttpSession session, User user) {
         UserDetails userDetails = User.UserBuilder(user);
-        UserInfoDto userInfo = UserInfoDto.createUserInfo((CustomUserDetails) userDetails);
+        UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
+        session.removeAttribute(RedisKeyDto.USER_KEY);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
     }
 

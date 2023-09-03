@@ -62,8 +62,9 @@ public class NkeyOpenApiController {
 
     @GetMapping("/image/{fileName}")
     public Resource getImage(@PathVariable String fileName) throws MalformedURLException {
-        return new UrlResource("file:" + fileStore.getFilePath(fileStore.getCaptchaImageUrl(), fileName, "jpg"));
+        return fileStore.getCaptchaUrlResource(fileName);
     }
+
 
     @GetMapping("/again")
     public ResponseEntity captchaKEyAgain(@Validated @ModelAttribute CaptchaNkeyDto captchaNkeyDto,
@@ -75,8 +76,7 @@ public class NkeyOpenApiController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-
-        String fileName = fileStore.getFileName(captchaNkeyDto.getImageName());
+        String fileName = captchaNkeyDto.getImageName();
         log.info("fileName = {}", fileName);
         //받은 이미지 삭제
         apiExamCaptchaNkeyService.deleteImage(fileName);

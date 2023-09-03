@@ -1,5 +1,6 @@
 package sky.board.global.error.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import lombok.Getter;
@@ -18,6 +19,11 @@ public class ErrorGlobalResultDto implements ErrorResult {
             .stream()
             .map(error -> new ErrorGlobalDetailDto(error, messageSource, locale))
             .toList();
+    }
+
+    public ErrorGlobalResultDto(String code, MessageSource messageSource, Locale locale) {
+        this.errorDetails = new ArrayList<>();
+        errorDetails.add(new ErrorGlobalDetailDto(code, messageSource, locale));
     }
 
 }

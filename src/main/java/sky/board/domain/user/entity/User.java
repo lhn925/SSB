@@ -151,8 +151,8 @@ public class User extends BaseTimeEntity {
         this.setUserNameModifiedDate(plusMonthsDate);
     }
 
-    public void updatePicture(UploadFile uploadFile) {
-        this.setPictureUrl(uploadFile.getStoreFileName());
+    public void updatePicture(String uploadFile) {
+        this.setPictureUrl(uploadFile);
     }
 
     /**
@@ -169,7 +169,7 @@ public class User extends BaseTimeEntity {
     }
 
     public static String getPictureFullUrl(FileStore fileStore, String token) {
-        return fileStore.getFileDir() + fileStore.getUserPictureUrl() + token + "/";
+        return fileStore.getFileDir() + fileStore.getUserPictureDir() + token + "/";
     }
 
 }

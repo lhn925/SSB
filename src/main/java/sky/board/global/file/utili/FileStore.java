@@ -3,6 +3,7 @@ package sky.board.global.file.utili;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import sky.board.global.file.dto.UploadFile;
@@ -27,60 +29,23 @@ public class FileStore {
 
 
     // 2차 인증 사진 url
-    public static final String CAPTCHA_IMAGE_URL = "captcha/";
-    public static final String USER_PICTURE_URL = "picture/";
+    public static final String CAPTCHA_IMAGE_DIR = "captcha/";
+    public static final String USER_PICTURE_DIR = "picture/";
     //default Image url및 사진
-    public static final String USER_DEFAULT_URL = "default/";
-    public static final String USER_DEFAULT_IMAGE = "defaultImage.png";
-    private String userPictureUrl = USER_PICTURE_URL;
-    private String captchaImageUrl = CAPTCHA_IMAGE_URL;
-    private String userDefaultUrl = USER_DEFAULT_URL;
-    private String userDefaultImage = USER_DEFAULT_IMAGE;
+    public static final String USER_DEFAULT_IMAGE_URL = "default/defaultImage.png";
+    public static final String USER_DEFAULT_DIR = "default";
+    private String userPictureDir = USER_PICTURE_DIR;
+    private String captchaImageDir = CAPTCHA_IMAGE_DIR;
+    private String userDefaultImageUrl = USER_DEFAULT_IMAGE_URL;
 
     @Value("${file.dir}")
     public String fileDir;
 
-    public String getFilePath(String path, String filename, String ext) {
-        return fileDir + path + filename + "." + ext;
-    }
+
+
 
     public String getFullPath(String path, String fileName) {
         return path + fileName;
-    }
-
-    public String getFileName(String file) {
-        int first = 0;
-        int end = file.length();
-
-        if (file.contains("/")) {
-            first = file.lastIndexOf("/") + 1;
-        }
-        if (file.contains(".")) {
-            end = file.lastIndexOf(".");
-        }
-        return file.substring(first, end);
-    }
-
-
-    /**
-     * 이미지 여러개 저장
-     *
-     * @param multipartFile
-     * @param token
-     *     // 저장 위치
-     * @return
-     * @throws IOException
-     */
-    public List<UploadFile> storeFiles(List<MultipartFile> multipartFile, String type, String token)
-        throws IOException {
-        List<UploadFile> uploadFiles = new ArrayList<>();
-        for (MultipartFile file : multipartFile) {
-            if (!file.isEmpty()) {
-                uploadFiles.add(storeFile(file, type, token));
-
-            }
-        }
-        return uploadFiles;
     }
 
     public void deleteFile(String path, String filename) throws IOException {
@@ -88,6 +53,14 @@ public class FileStore {
         Files.delete(filePath);
     }
 
+
+
+    /**
+     * 파일 폴더 + type + 파일이름  + 확장자명 생성
+     */
+    public String getFilePathAndExt(String type, String filename, String ext) {
+        return fileDir + type + filename + "." + ext;
+    }
     /**
      * 하나의 이미지 저장
      *
@@ -112,8 +85,32 @@ public class FileStore {
         multipartFile.transferTo(new File(getFullPath(dirPath, storeFileName)));
         return new UploadFile(originalFilename, storeFileName);
     }
+    /**
+     * 파일 여러개 저장
+     *
+     * @param multipartFile
+     * @param token
+     *     // 저장 위치
+     * @return
+     * @throws IOException
+     */
+    public List<UploadFile> storeFiles(List<MultipartFile> multipartFile, String type, String token)
+        throws IOException {
+        List<UploadFile> uploadFiles = new ArrayList<>();
+        for (MultipartFile file : multipartFile) {
+            if (!file.isEmpty()) {
+                uploadFiles.add(storeFile(file, type, token));
 
+            }
+        }
+        return uploadFiles;
+    }
 
+    /**
+     * 디렉터리 생성
+     * @param path type + token
+     * @return
+     */
     private String createDir(String path) {
         Path directoryPath = Paths.get(fileDir + path);
         try {
@@ -124,6 +121,11 @@ public class FileStore {
         return fileDir + path + "/";
     }
 
+    /**
+     *  서버에 저장할 이름 생성
+     * @param originalFilename
+     * @return
+     */
     private String createStoreFileName(String originalFilename) {
         String ext = extractExt(originalFilename);
 
@@ -132,8 +134,25 @@ public class FileStore {
     }
 
 
+    /**
+     * 확장 추출
+     * @param originalFilename
+     * @return
+     */
     public String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf("."); // 확장자 위치
         return originalFilename.substring(pos + 1);// 추출
     }
+
+    public UrlResource getCaptchaUrlResource(String fileName) throws MalformedURLException {
+        return new UrlResource("file:" + this.getFilePathAndExt(this.getCaptchaImageDir(), fileName, "jpg"));
+    }
+
+
+    public UrlResource getPictureUrlResource(String fileName) throws MalformedURLException {
+
+        UrlResource resource = new UrlResource("file:" + fileDir + fileName);
+        return new UrlResource("file:" + fileDir + fileName);
+    }
+
 }

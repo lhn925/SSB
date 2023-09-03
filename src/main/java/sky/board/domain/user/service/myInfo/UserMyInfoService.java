@@ -3,14 +3,18 @@ package sky.board.domain.user.service.myInfo;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
@@ -34,16 +38,12 @@ public class UserMyInfoService {
     private final FileStore fileStore;
 
     @Transactional
-    public void userNameUpdate(HttpServletRequest request, UserNameUpdateDto userNameUpdateDto) {
+    public void updateUserName(HttpServletRequest request, UserNameUpdateDto userNameUpdateDto) {
         HttpSession session = request.getSession();
 
         // 변경 가능 여부
         boolean isChange = false;
-        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-
-        Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-
-        User user = User.getOptionalUser(optionalUser);
+        User user = getUser(session);
 
         LocalDateTime userNameModifiedDate = user.getUserNameModifiedDate();
 
@@ -69,15 +69,17 @@ public class UserMyInfoService {
         }
         userNameUpdateDto.setUserNameModifiedDate(plusMonthsDate);
     }
-
     @Transactional
-    public UploadFile userPictureUpdate(HttpServletRequest request, MultipartFile file)
+    public UploadFile updatePicture(HttpServletRequest request, MultipartFile file)
         throws IOException {
         HttpSession session = request.getSession();
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+
         UploadFile uploadFile = null;
         if (!file.isEmpty()) {
-            uploadFile = fileStore.storeFile(file, fileStore.getUserPictureUrl(), userInfoDto.getToken());
+            uploadFile = fileStore.storeFile(file, fileStore.getUserPictureDir(), userInfoDto.getToken());
+        } else {
+            throw new FileNotFoundException("error.file.NotBlank");
         }
 
         if (uploadFile != null) {
@@ -87,7 +89,7 @@ public class UserMyInfoService {
             user.deletePicture(fileStore);
 
             // 서버에 저장되는 파일이름 저장
-            user.updatePicture(uploadFile);
+            user.updatePicture(uploadFile.getStoreFileName());
 
             UserInfoDto.sessionUserInfoUpdate(session, user);
 
@@ -95,5 +97,41 @@ public class UserMyInfoService {
         return uploadFile;
     }
 
+
+    @Transactional
+    public void deletePicture(HttpServletRequest request) throws IOException {
+        HttpSession session = request.getSession();
+
+        User user = getUser(session);
+
+        String pictureUrl = user.getPictureUrl();
+
+        // 프로필 사진이 없을 경우
+        if (!StringUtils.hasText(pictureUrl)) {
+            throw new FileNotFoundException("error.file.delete");
+        }
+        //유저 이미지 삭제
+        user.deletePicture(fileStore);
+
+        user.updatePicture(null);
+        UserInfoDto.sessionUserInfoUpdate(session,user);
+
+    }
+    private User getUser(HttpSession session) {
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+
+        Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
+
+        User user = User.getOptionalUser(optionalUser);
+        return user;
+    }
+
+    public UrlResource getPictureImage(String imageName) {
+        try {
+            return fileStore.getPictureUrlResource(imageName);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

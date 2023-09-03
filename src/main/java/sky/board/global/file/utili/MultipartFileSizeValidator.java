@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import sky.board.global.annotation.MultipartFileSizeValid;
 
-public class MultipartFileSizeValidator implements ConstraintValidator<MultipartFileSizeValid, MultipartFile > {
+public class MultipartFileSizeValidator implements ConstraintValidator<MultipartFileSizeValid, MultipartFile> {
 
     private static final String ERROR_MESSAGE = "{error.fileSize.Limit}";
 
@@ -16,13 +16,23 @@ public class MultipartFileSizeValidator implements ConstraintValidator<Multipart
     public void initialize(MultipartFileSizeValid constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
+
     @Override
     public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
+
+        if (value == null) {
+            // 기본메세지 제거
+            context.disableDefaultConstraintViolation();
+
+            context.buildConstraintViolationWithTemplate("error.file.NotBlank")
+                .addConstraintViolation();
+            return false;
+        }
         context.buildConstraintViolationWithTemplate(ERROR_MESSAGE).addConstraintViolation();
-            boolean isSize = value.getSize() > FILE_SIZE;
-            if (isSize) {
-                return false;
-            }
+        boolean isSize = value.getSize() > FILE_SIZE;
+        if (isSize) {
+            return false;
+        }
         return true;
     }
 

@@ -124,7 +124,7 @@ public class ApiExamCaptchaNkeyService {
     }
 
     public void deleteImage(String filename) throws IOException {
-        Path filePath = Paths.get(fileStore.getFilePath(fileStore.getCaptchaImageUrl(), filename, "jpg"));
+        Path filePath = Paths.get(fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), filename, "jpg"));
         Files.delete(filePath);
     }
 
@@ -133,7 +133,7 @@ public class ApiExamCaptchaNkeyService {
         byte[] bytes = new byte[1024];
         // 랜덤한 이름으로  파일 생성
         String filename = Long.valueOf(new Date().getTime()).toString();
-        String fullName = fileStore.getFilePath(fileStore.getCaptchaImageUrl(), filename, "jpg");
+        String fullName = fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), filename, "jpg");
         File f = new File(fullName);
         try (OutputStream outputStream = new FileOutputStream(f)) {
             f.createNewFile();

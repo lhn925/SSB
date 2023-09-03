@@ -8,7 +8,7 @@ import sky.board.global.annotation.MultipartPictureValid;
 
 
 public class MultipartPictureValidator implements ConstraintValidator<MultipartPictureValid, MultipartFile> {
-
+    private String message;
     @Override
     public void initialize(MultipartPictureValid constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
@@ -16,6 +16,14 @@ public class MultipartPictureValidator implements ConstraintValidator<MultipartP
 
     @Override
     public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
+        if (value == null) {
+            // 기본메세지 제거
+            context.disableDefaultConstraintViolation();
+
+            context.buildConstraintViolationWithTemplate("{error.file.NotBlank}")
+                .addConstraintViolation();
+            return false;
+        }
         return FileUtils.validImgFile(value);
     }
 }
