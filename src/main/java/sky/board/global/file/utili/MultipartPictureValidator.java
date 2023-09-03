@@ -4,21 +4,18 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.web.multipart.MultipartFile;
 import sky.board.global.annotation.MultipartFileSizeValid;
+import sky.board.global.annotation.MultipartPictureValid;
 
-public class MultipartFileSizeValidator implements ConstraintValidator<MultipartFileSizeValid, MultipartFile> {
 
-    private static final String ERROR_MESSAGE = "{error.fileSize.Limit}";
+public class MultipartPictureValidator implements ConstraintValidator<MultipartPictureValid, MultipartFile> {
 
-    private static final long FILE_SIZE = 5242880L;
     @Override
-    public void initialize(MultipartFileSizeValid constraintAnnotation) {
+    public void initialize(MultipartPictureValid constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
     @Override
     public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
-        context.buildConstraintViolationWithTemplate(ERROR_MESSAGE).addConstraintViolation();
-
-        return value.getSize() < FILE_SIZE;
+        return FileUtils.validImgFile(value);
     }
 }
