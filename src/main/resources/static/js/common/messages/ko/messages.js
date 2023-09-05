@@ -10,4 +10,11 @@ const messages = {
   "안전":"안전",
   "보통":"보통",
   "위험":"위험",
+  "userId.NotBlank": "아이디를 입력해주세요",
+  "password.NotBlank": "비밀번호를 입력해주세요",
+  "captcha.NotBlank": "인증코드를 입력해주세요",
+  "newPw.NotBlank": "새 비밀번호를 입력해주세요",
+  "newPwChk.NotBlank": "비밀번호 확인을 위해 한번 더 입력해주세요",
+  "change.picture":"프로필 사진을 바꾸시겠습니까?",
+  "picture.success":"프로필 사진이 바뀌었습니다."
 }

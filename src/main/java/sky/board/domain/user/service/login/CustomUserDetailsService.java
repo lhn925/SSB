@@ -2,6 +2,7 @@ package sky.board.domain.user.service.login;
 
 
 import java.util.Optional;
+import jdk.jfr.Enabled;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.dto.help.UserPwResetFormDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.UserQueryRepository;
 
 @Slf4j
@@ -31,6 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("loadUserByUsername userId = {}", userId);
         User findUser = userQueryRepository.findByUserId(userId)
             .orElseThrow(() -> new UsernameNotFoundException("login.NotFound"));
+
         return User.UserBuilder(findUser);
     }
 

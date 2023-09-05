@@ -68,6 +68,8 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         return email;
     }
 
+
+    // 자 트루가 활성화 지금 탈퇴 X , False가 탈퇴
     // isEnabled() : 계정이 활성화돼 있는지 리턴 -> true는 활성화 상태 의미
     private boolean enabled;
 
@@ -111,7 +113,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.accountNonExpired = !accountNonExpired;
         this.accountNonLocked = !accountNonLocked;
         this.credentialsNonExpired = !credentialsNonExpired;
-        this.enabled = !enabled;
+        this.enabled = enabled;
         this.nickname = nickname;
         this.createdDateTime = createdDateTime;
         this.email = email;

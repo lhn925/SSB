@@ -27,14 +27,14 @@ public class UserPwResetFormDto implements Serializable {
 
     private PwSecLevel pwSecLevel;
     // 인증번호
-//    @NotBlank
+    @NotBlank
     private String captcha;
     // 인증키
-//    @NotBlank
+    @NotBlank
     private String captchaKey;
 
     // 이미지 이름
-//    @NotBlank
+    @NotBlank
     private String imageName;
 
     @Builder

@@ -26,6 +26,7 @@
   transform: translateY(-50%); /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
   z-index: 10;
 }
+
 .btn-show {
   display: contents;
 }

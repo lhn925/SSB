@@ -35,6 +35,7 @@ import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.global.error.dto.ErrorGlobalResultDto;
+import sky.board.global.error.dto.ErrorResult;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.Result;
 
@@ -112,21 +113,15 @@ public class EmailApiController {
             "emailAuthCodeDto");
 
         if (emailAuthCodeDto == null || !hasText(emailAuthCodeDto.getCode())) { // 인증코드가 발급되지 않았을 경우
-            bindingResult.reject("join.code.error");
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
+            return getErrorResultResponseEntity(bindingResult, "join.code.error", request);
         }
 
         if (requestTime.isAfter(emailAuthCodeDto.getAuthTimeLimit())) { // 인증 유효시간 체크 후 error시 반환
-            bindingResult.reject("join.code.timeOut");
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
+            return getErrorResultResponseEntity(bindingResult, "join.code.timeOut", request);
         }
 
         if (!(authCode.getAuthCode().equals(emailAuthCodeDto.getCode()))) { // 인증 코드 체크
-            bindingResult.reject("join.code.mismatch");
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
+            return getErrorResultResponseEntity(bindingResult, "join.code.mismatch", request);
         }
 
         // 이메일 인증 성공시 성공 여부 값에 true
@@ -134,6 +129,13 @@ public class EmailApiController {
         session.setAttribute("emailAuthCodeDto", emailAuthCodeDto);
 
         return new ResponseEntity(new Result<>(emailAuthCodeDto), HttpStatus.OK);
+    }
+
+    private ResponseEntity<ErrorResult> getErrorResultResponseEntity(BindingResult bindingResult, String errorCode,
+        HttpServletRequest request) {
+        bindingResult.reject(errorCode);
+        return Result.getErrorResult(
+            new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
     }
 
     /**

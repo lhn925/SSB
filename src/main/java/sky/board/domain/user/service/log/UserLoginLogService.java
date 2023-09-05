@@ -42,7 +42,6 @@ public class UserLoginLogService {
         String userId = request.getParameter("userId");
         Optional<User> findOne = userQueryRepository.findByUserId(userId);
 
-
         User user = findOne.orElse(null);
         if (user != null) {
             uId = user.getId();

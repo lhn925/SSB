@@ -1,0 +1,116 @@
+.container {
+  width: 100%;
+}
+
+.main-body {
+  padding: 15px;
+}
+.card {
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 0 solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  min-height: 1px;
+  padding: 1rem;
+}
+
+.gutters-sm {
+  margin-right: -8px;
+  margin-left: -8px;
+}
+
+.gutters-sm>.col, .gutters-sm>[class*=col-] {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+.mb-3, .my-3 {
+  margin-bottom: 1rem!important;
+}
+
+.bg-gray-300 {
+  background-color: #e2e8f0;
+}
+.h-100 {
+  height: 100%!important;
+}
+.shadow-none {
+  box-shadow: none!important;
+}
+
+.list-group-title-text {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: -.19px;
+  color: #fff;
+}
+
+.list-group-title{
+  padding: 14px 25px 0px 14px;
+  border-radius: 12px 12px 0 0;
+  background-image: linear-gradient(98deg, #1aafec, #15c8dc);
+}
+
+.list-group-item svg {
+  width: 24px;
+  height: 24px;
+}
+.btn-div{
+  height: 20px;
+}
+.btn-div > button{
+  margin-top: -11px;
+}
+
+.btn-div img{
+  width: 30px;
+}
+
+.list-group-title .pageTitleBtn {
+  margin-top:-15px;
+}
+.pageTitleBtn > img {
+  width: 20px;
+  height: 15px;
+}
+
+.imageCard .picture-img {
+  width: 150px;
+  height: 150px;
+}
+
+
+.picture-div {
+
+}
+.pictureBtn {
+  position: relative;
+}
+.photo-edit::before {
+  content: "";
+  background-size: 20px 20px;
+  background-position: 0px 6px;
+  background-repeat: no-repeat;
+  /*font-family: "Font Awesome"; !* 폰트 아이콘 라이브러리를 사용하는 경우 해당 폰트 패밀리로 변경하세요 *!*/
+  position: absolute;
+  left: 118px;
+  top: 141px;
+  transform: translateY(-50%); /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  width: 30px;
+  height: 30px;
+  z-index: 10;
+  background-image: url("../image/imagePencil.png");
+}

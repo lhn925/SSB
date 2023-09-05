@@ -64,7 +64,7 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
         Authentication authentication) {
         try {
             userLoginStatusService.save(request);
-        } catch (LoginException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus:" + e);
         }
     }

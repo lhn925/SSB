@@ -47,12 +47,12 @@ public class UserLoginStatusService {
      * 저장
      */
     @Transactional
-    public void save(HttpServletRequest request) throws LoginException {
+    public void save(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
         if (userInfoDto == null) {
-            throw new LoginException("code.error");
+            throw new IllegalArgumentException("code.error");
         }
         String userId = userInfoDto.getUserId();
 
@@ -64,7 +64,7 @@ public class UserLoginStatusService {
             user);
         //저장
         UserLoginStatus save = userLoginStatusRepository.save(userLoginStatus);
-        Optional.ofNullable(save).orElseThrow(() -> new LoginException("error"));
+        Optional.ofNullable(save).orElseThrow(() -> new IllegalArgumentException("error"));
     }
 
 
@@ -87,13 +87,14 @@ public class UserLoginStatusService {
     }
 
     @Transactional
-    public void removeAllLoginStatus(String userId,String sessionId) {
+    public void removeAllLoginStatus(String userId, String sessionId) {
         User user = User.getOptionalUser(userQueryRepository.findByUserId(userId));
 
         // 로그인 되어 있는 기기 검색
         // 현재 접속하고 있는 세션 제외
-        List<UserLoginStatus> userLoginStatusList = userLoginStatusRepository.findAllByUidAndLoginStatusAndSessionNot(user,
-            Status.ON.getValue(),sessionId);
+        List<UserLoginStatus> userLoginStatusList = userLoginStatusRepository.findAllByUidAndLoginStatusAndSessionNot(
+            user,
+            Status.ON.getValue(), sessionId);
         /**
          * 로그인 기기 로그아웃
          */
@@ -112,7 +113,11 @@ public class UserLoginStatusService {
                     redisService.deleteRemember(hashing(userLoginStatus.getRemember()));
                 }
             }
-            userLoginStatusRepository.updateAll(user, Status.OFF.getValue(), Status.OFF.getValue());
+            Integer integer = userLoginStatusRepository.updateAll(user, Status.OFF.getValue(), Status.OFF.getValue());
+
+            if (integer <= 0) {
+                throw new IllegalStateException();
+            }
         }
     }
 

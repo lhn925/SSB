@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.model.Enabled;
 import sky.board.domain.user.model.Status;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
@@ -73,13 +74,13 @@ public class User extends BaseTimeEntity {
 
     private String salt;
 
-    // 비활성화(회원 탈퇴) 여부 true:탈퇴,false:탈퇴 x
-    private Boolean isStatus;
+    // 비활성화(회원 탈퇴) 여부 true:탈퇴x ,false:탈퇴
+    private Boolean isEnabled;
 
 
     @Builder
     private User(String token, String userId, String password, String userName, String email, String pictureUrl,
-        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isStatus) {
+        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled) {
         this.token = token;
         this.userId = userId;
         this.password = password;
@@ -90,7 +91,7 @@ public class User extends BaseTimeEntity {
         this.grade = grade;
         this.pwSecLevel = pwSecLevel;
         this.salt = salt;
-        this.isStatus = isStatus;
+        this.isEnabled = isEnabled;
     }
 
     // 가입할 유저 entity 생성
@@ -103,7 +104,7 @@ public class User extends BaseTimeEntity {
             .salt(salt)
             .grade(UserGrade.USER)
             .pwSecLevel(userJoinDto.getPwSecLevel())
-            .isStatus(Status.OFF.getValue()).build();
+            .isEnabled(Enabled.ENABLED()).build();
     }
 
     //  User 클래스 (org.springframework.security.core.UserDetails.User)의 빌더를
@@ -118,7 +119,7 @@ public class User extends BaseTimeEntity {
             pictureUrl(user.getPictureUrl()).
             nickname(user.getUserName()).
             password(user.getPassword()).
-            enabled(user.getIsStatus()).
+            enabled(user.getIsEnabled()).
             userNameModifiedDate(user.getUserNameModifiedDate()).
             build();
         build.setAuthorities(user.getGrade().getDescription());
@@ -126,7 +127,7 @@ public class User extends BaseTimeEntity {
     }
 
     public static User getOptionalUser(Optional<User> optionalUser) {
-        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("sky.userId.notFind"));
+        User user = optionalUser.orElseThrow(() -> new IllegalArgumentException("sky.userId.notFind"));
         return user;
     }
 

@@ -186,6 +186,22 @@ async function _post(path, body, headers = {}) { //post fetch
   }
 }
 
+async function _filePost(path, body) { //post fetch
+  let url = path;
+  const options = {
+    method: "POST",
+    headers: {},
+    body: body
+  };
+  const res = await fetch(url, options);
+  const data = await res.json();
+  if (res.ok) {
+    return data;
+  } else {
+    throw Error(JSON.stringify(data.errorDetails[0]));
+  }
+}
+
 async function _get(path) { //post fetch
   let url = path;
   const options = {method: "GET"};
@@ -223,6 +239,20 @@ function _valueCheck(type, msgId, $elementById,
     $isChkElement.checked = false;
     return false;
   }
+}
+
+/**
+ * 프로필 사진 타입 체크
+ */
+function fileImageTypeCheck (type) {
+  const fileTypes = ["image/jpg", "image/jpeg", "image/pjpeg", "image/png",
+    "image/bmp", "image/x-windows-bmp"]
+  for (const fileType of fileTypes) {
+    if (fileType === type) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**

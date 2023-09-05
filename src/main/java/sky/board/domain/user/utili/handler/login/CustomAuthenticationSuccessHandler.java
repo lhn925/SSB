@@ -116,7 +116,7 @@ public class CustomAuthenticationSuccessHandler implements
                 request.getSession().removeAttribute(RememberCookie.KEY.getValue());
             }
             userLoginStatusService.save(request);
-        } catch (LoginException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus: "+e.getMessage());
         }
     }

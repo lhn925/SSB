@@ -30,7 +30,7 @@ Idquery.prototype._SubmitBtnClickAddEvent = function () {
     userIdVal = userIdVal.split(" ").join("");
 
     if (userIdVal == "") {
-      alert(messages["userId.NotBlank"]);
+      _error(messages["userId.NotBlank"]);
       return;
     }
     this.type = "submit";

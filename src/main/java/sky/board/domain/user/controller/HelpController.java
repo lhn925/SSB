@@ -34,6 +34,7 @@ import sky.board.domain.user.service.help.UserHelpService;
 import sky.board.domain.user.service.log.UserActivityLogService;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
+import sky.board.domain.user.service.myInfo.UserMyInfoService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.PwChecker;
 import sky.board.global.error.dto.FieldErrorCustom;
@@ -51,6 +52,8 @@ public class HelpController {
     private final UserLoginStatusService userLoginStatusService;
     private final UserActivityLogService userActivityLogService;
 
+
+    private final UserMyInfoService userMyInfoService;
     private final UserHelpService userHelpService;
     private final MessageSource ms;
 
@@ -158,7 +161,7 @@ public class HelpController {
         }
 
         try {
-            CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail());
+            CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(),Status.OFF);
             if (!findOne.isEnabled()) {
                 throw new UsernameNotFoundException("email.notfound");
             }
@@ -211,11 +214,14 @@ public class HelpController {
     public String pwResetForm(@ModelAttribute UserHelpDto userHelpDto,
         HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
         Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
-
         // helpToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
         if (!StringUtils.hasText(helpToken.getValue()) || (!helpToken.getValue().equals(userHelpDto.getHelpToken()))) {
             Alert.waringAlert(ms.getMessage("code.error", null, request.getLocale()), "/user/help/idquery", response);
         }
+        if (userIdCheck(userHelpDto.getUserId(), request, response)) {
+            return null;
+        }
+
         //시간 900초 다시
         helpToken.setMaxAge(900);
         response.addCookie(helpToken);
@@ -243,6 +249,9 @@ public class HelpController {
             return "user/help/pwResetForm";
         }
 
+        if (userIdCheck(userPwResetFormDto.getUserId(), request, response)) {
+            return null;
+        }
         boolean isCaptcha;
         Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
             userPwResetFormDto.getCaptchaKey(), userPwResetFormDto.getCaptcha());
@@ -318,11 +327,16 @@ public class HelpController {
         }
     }
 
-
-
-
-
-
+    private boolean userIdCheck(String userId, HttpServletRequest request,
+        HttpServletResponse response) throws IOException {
+        try {
+            userQueryService.findOne(userId);
+        } catch (IllegalArgumentException e) { //유저를 찾을 수 없는 경우
+            Alert.waringAlert(ms.getMessage(e.getMessage(), null, request.getLocale()), "/", response);
+            return true;
+        }
+        return false;
+    }
 
     private void setApiCaptcha(UserPwResetFormDto userPwResetFormDto) throws IOException {
         apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());

@@ -49,17 +49,10 @@ a {
 }
 */
 
-
-code {
-  color: var(--code-text);
-  background: var(--code-background);
-  border-radius: 6px;
-  padding: 2.5px 5px;
-}
-
 /*html{
   background: var(--background);
 }*/
+
 
 .btn-primary {
   background-color: #1aafec;
@@ -103,5 +96,10 @@ code {
   line-height: 30px;
   background-color: #8C9CEC;
   text-align: center;
+}
+
+.navbar-picture {
+  width: 40px;
+  height: 40px;
 }
 

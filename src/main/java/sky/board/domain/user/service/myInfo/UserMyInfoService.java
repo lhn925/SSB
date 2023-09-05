@@ -12,14 +12,19 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import sky.board.domain.user.dto.UserInfoDto;
+import sky.board.domain.user.dto.help.UserPwResetFormDto;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
+import sky.board.domain.user.dto.myInfo.UserPwUpdateFormDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.repository.UserQueryRepository;
+import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.global.file.utili.FileStore;
 import sky.board.global.file.dto.UploadFile;
@@ -31,11 +36,12 @@ import sky.board.global.redis.dto.RedisKeyDto;
 @Transactional(readOnly = true)
 public class UserMyInfoService {
 
-
     private final Long MONTHS = 1L;
     private final UserQueryRepository userQueryRepository;
     private final UserJoinService userJoinService;
     private final FileStore fileStore;
+    private final UserQueryService userQueryService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void updateUserName(HttpServletRequest request, UserNameUpdateDto userNameUpdateDto) {
@@ -43,7 +49,7 @@ public class UserMyInfoService {
 
         // 변경 가능 여부
         boolean isChange = false;
-        User user = getUser(session);
+        User user = userQueryService.findOne(session);
 
         LocalDateTime userNameModifiedDate = user.getUserNameModifiedDate();
 
@@ -59,7 +65,7 @@ public class UserMyInfoService {
         if (userNameModifiedDate != null && !now.isAfter(userNameModifiedDate)) {
             // 1개월이 넘지못했다면
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd E HH:mm");
-            throw new IllegalArgumentException(userNameModifiedDate.format(dateTimeFormatter));
+            throw new RuntimeException(userNameModifiedDate.format(dateTimeFormatter));
         }
 
         isChange = true;
@@ -69,62 +75,65 @@ public class UserMyInfoService {
         }
         userNameUpdateDto.setUserNameModifiedDate(plusMonthsDate);
     }
+
     @Transactional
-    public UploadFile updatePicture(HttpServletRequest request, MultipartFile file)
-        throws IOException {
+    public UploadFile updatePicture(HttpServletRequest request, MultipartFile file) {
         HttpSession session = request.getSession();
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
         UploadFile uploadFile = null;
         if (!file.isEmpty()) {
-            uploadFile = fileStore.storeFile(file, fileStore.getUserPictureDir(), userInfoDto.getToken());
+            try {
+                uploadFile = fileStore.storeFile(file, fileStore.getUserPictureDir(), userInfoDto.getToken());
+                if (uploadFile != null) {
+                    Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(),
+                        userInfoDto.getToken());
+                    User user = User.getOptionalUser(optionalUser);
+                    //기존에 있던 이미지 삭제 없으면 삭제 x
+                    user.deletePicture(fileStore);
+
+                    // 서버에 저장되는 파일이름 저장
+                    user.updatePicture(uploadFile.getStoreFileName());
+
+                    UserInfoDto.sessionUserInfoUpdate(session, user);
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException("error");
+            }
+
         } else {
-            throw new FileNotFoundException("error.file.NotBlank");
+            throw new RuntimeException("error.file.NotBlank");
         }
 
-        if (uploadFile != null) {
-            Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-            User user = User.getOptionalUser(optionalUser);
-            //기존에 있던 이미지 삭제 없으면 삭제 x
-            user.deletePicture(fileStore);
-
-            // 서버에 저장되는 파일이름 저장
-            user.updatePicture(uploadFile.getStoreFileName());
-
-            UserInfoDto.sessionUserInfoUpdate(session, user);
-
-        }
         return uploadFile;
     }
 
 
     @Transactional
-    public void deletePicture(HttpServletRequest request) throws IOException {
+    public void deletePicture(HttpServletRequest request) throws FileNotFoundException {
         HttpSession session = request.getSession();
 
-        User user = getUser(session);
+        User user = userQueryService.findOne(session);
 
         String pictureUrl = user.getPictureUrl();
 
-        // 프로필 사진이 없을 경우
-        if (!StringUtils.hasText(pictureUrl)) {
+        // 프로필 사진이 있는 경우
+        if (StringUtils.hasText(pictureUrl)) {
+            try {
+                //유저 이미지 삭제
+                user.deletePicture(fileStore);
+                user.updatePicture(null);
+                UserInfoDto.sessionUserInfoUpdate(session, user);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
             throw new FileNotFoundException("error.file.delete");
         }
-        //유저 이미지 삭제
-        user.deletePicture(fileStore);
-
-        user.updatePicture(null);
-        UserInfoDto.sessionUserInfoUpdate(session,user);
-
     }
-    private User getUser(HttpSession session) {
-        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
-        Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-
-        User user = User.getOptionalUser(optionalUser);
-        return user;
-    }
 
     public UrlResource getPictureImage(String imageName) {
         try {
@@ -133,5 +142,6 @@ public class UserMyInfoService {
             throw new RuntimeException(e);
         }
     }
+
 
 }

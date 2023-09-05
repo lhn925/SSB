@@ -1,20 +1,20 @@
 package sky.board.domain.user.service;
 
 
+import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
-import sky.board.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.UserQueryRepository;
+import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Service
@@ -25,9 +25,9 @@ public class UserQueryService {
     private final UserQueryRepository userQueryRepository;
 
 
-    public CustomUserDetails findByEmailOne(String email)
+    public CustomUserDetails findByEmailOne(String email, Status isStatus)
         throws UsernameNotFoundException {
-        Optional<User> findOne = userQueryRepository.findByEmail(email);
+        Optional<User> findOne = userQueryRepository.findByEmailAndIsEnabled(email, isStatus.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
 
         return CustomUserDetails.builder()
@@ -38,7 +38,7 @@ public class UserQueryService {
 
     public CustomUserDetails findStatusUserId(String userId, Status status)
         throws UsernameNotFoundException {
-        Optional<User> findOne = userQueryRepository.findByUserIdAndIsStatus(userId, status.getValue());
+        Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, status.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
 
         return CustomUserDetails.builder()
@@ -50,16 +50,28 @@ public class UserQueryService {
 
     public UserInfoDto findByUser(UserInfoDto userInfoDto)
         throws UsernameNotFoundException {
-        User user = User.getOptionalUser(userQueryRepository.findByUserId(userInfoDto.getUserId()));
+        User user = User.getOptionalUser(
+            userQueryRepository.findByUserId(userInfoDto.getUserId()));
 
         UserDetails userDetails = User.UserBuilder(user);
 
-
-        return UserInfoDto.createUserInfo( userDetails);
+        return UserInfoDto.createUserInfo(userDetails);
     }
 
+    public User findOne(HttpSession session) {
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
+        Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
 
+        User user = User.getOptionalUser(optionalUser);
+        return user;
+    }
+
+    public User findOne(String userId) {
+        Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
+        User user = User.getOptionalUser(optionalUser);
+        return user;
+    }
 
 
 }
