@@ -18,20 +18,20 @@ class CustomAuthenticationSuccessHandlerTest {
 
         JSONObject jsonObject = new JSONObject();
 
-        CustomUserDetails hi = CustomUserDetails.builder()
+        UserAccount hi = UserAccount.builder()
             .password("1234")
             .username("hi").build();
 
         jsonObject.put("userDetail",hi);
         jo1.put("SESss111", jsonObject);
 
-        CustomUserDetails h2 = CustomUserDetails.builder()
+        UserAccount h2 = UserAccount.builder()
             .password("1235")
             .username("hi").build();
 
 *//*
         session.toString() = {"SESss111":
-        {"userDetail":sky.board.domain.user.dto.login.CustomUserDetails [Username=hi, Password=[PROTECTED], Enabled=true, url=null, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=null]}}
+        {"userDetail":sky.board.domain.user.dto.login.UserAccount [Username=hi, Password=[PROTECTED], Enabled=true, url=null, AccountNonExpired=true, credentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=null]}}
         *//*
         System.out.println("session.toString() = " + session.get("login"));*/
 

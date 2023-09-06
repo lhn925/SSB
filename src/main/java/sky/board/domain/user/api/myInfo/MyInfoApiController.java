@@ -1,13 +1,10 @@
 package sky.board.domain.user.api.myInfo;
 
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -20,9 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,7 +50,6 @@ import sky.board.global.file.dto.UploadFile;
 import sky.board.global.file.utili.FileStore;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.dto.RedisKeyDto;
-import sky.board.global.utili.Alert;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,8 +60,6 @@ public class MyInfoApiController {
     private final MessageSource ms;
 
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
-
-
     private final UserMyInfoService userMyInfoService;
     private final UserActivityLogService userActivityLogService;
     private final UserHelpService userHelpService;
@@ -218,6 +209,7 @@ public class MyInfoApiController {
 
     @PostMapping("/login/status")
     public ResponseEntity updateLoginStatus(HttpServletRequest request) {
+
         HttpSession session = request.getSession();
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 

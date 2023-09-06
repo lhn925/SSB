@@ -80,6 +80,12 @@ file:
   dir: /Users/imhaneul/skyLife/toy/image/
 
 
+ssb:
+  http:
+    auth-token-header:
+      name: Authorization
+      auth-token: fdasrv34atdzbt4zeex7y
+
 
 
 ##email.getProps().put("mail.smtp.host", "smtp.gmail.com"); // use Gmail

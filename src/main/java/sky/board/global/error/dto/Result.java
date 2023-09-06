@@ -17,4 +17,5 @@ public class Result<T>{
     public static ResponseEntity<ErrorResult> getErrorResult(ErrorResult errorResult) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResult);
     }
+
 }

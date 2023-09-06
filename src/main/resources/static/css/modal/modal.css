@@ -1,0 +1,112 @@
+#modal.modal-overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /*background: rgba(255, 255, 255, 0.25);*/
+  background-color: rgba(0,0,0,.5);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  /*backdrop-filter: blur(1.5px);*/
+  /*-webkit-backdrop-filter: blur(1.5px);*/
+  border-radius: 10px;
+  z-index: 12;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+#modal .modal-window {
+  /*background: rgba( 69, 139, 197, 0.70 );*/
+  background: #ffffff;
+  box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+  /*backdrop-filter: blur( 13.5px );*/
+  /*-webkit-backdrop-filter: blur( 13.5px );*/
+  border-radius: 10px;
+  border: 1px solid rgba( 255, 255, 255, 0.18 );
+  width: 400px;
+  height: 500px;
+  position: relative;
+  top: -100px;
+  padding: 10px;
+}
+#modal .title {
+  padding-left: 10px;
+  display: inline;
+/*  text-shadow: 1px 1px 2px gray;
+  color: white;*/
+}
+
+#modal .title h4 {
+  margin-bottom: 20px;
+  padding: 30px 0 14px;
+  border-bottom: 1px solid #303038;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 28px;
+  letter-spacing: -.8px;
+  color: #1e1e23;
+  word-break: break-all;
+}
+#modal .close-area {
+  /*
+  display: inline;
+  float: right;
+  padding-right: 10px;
+  cursor: pointer;
+  color: #1aafec;
+  */
+
+  position: absolute;
+  top: 10px;
+  right: 5px;
+  vertical-align: top;
+  background-position: 0 -164px;
+  background-repeat: no-repeat;
+  width: 40px;
+  height: 40px;
+
+}
+.blind{
+  font-size: 25px;
+}
+#modal .content {
+  margin-top: 20px;
+  padding: 0px 10px;
+  color: black;
+}
+.btn_duo_popup {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  text-align: center;
+}
+.btn_duo_popup .btn_item.on {
+  background-color: #1aafec;
+}
+.btn_duo_popup .btn_item:first-child {
+  width: 35%;
+  background-color: #959eae;
+  border-radius: 0 0 0 12px;
+}
+
+.btn_duo_popup .btn_item:last-child {
+  width: 65%;
+  border-radius: 0 0 12px 0;
+}
+
+.btn_duo_popup .btn_item {
+  float: left;
+  padding: 19px 0 18px;
+  vertical-align: middle;
+  background-color: #959eae;
+}
+.btn_duo_popup .btn_item .btn_text {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  color: #fff;
+}

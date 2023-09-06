@@ -64,9 +64,10 @@ a {
   border-color: #439cb9;
 }
 
-.mainLogo {
+.mainLogo,.mainColor {
   color: #1aafec;
 }
+
 
 .error-msg {
   color: #dc3545;

@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.model.Enabled;
-import sky.board.domain.user.model.Status;
 import sky.board.global.file.utili.FileStore;
 import sky.board.global.redis.dto.RedisKeyDto;
 

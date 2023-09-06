@@ -9,6 +9,11 @@
 </head>
 
 
+<th:block th:if="${session.USER_ID == null}">
+  <script>
+    location.href = "/login";
+  </script>
+</th:block>
 <body>
 <!-- Breadcrumb -->
 <section class="header row justify-content-center border-bottom">
@@ -67,8 +72,6 @@
               <div class="mt-3">
                 <h4 th:text="${userMyInfo.userId}"></h4>
                 <p class="text-secondary mb-1" th:text="${userMyInfo.email}"></p>
-                <!--    <button class="btn btn-primary">닉네임 수정</button>
-                    <button class="btn btn-outline-primary">Message</button>-->
               </div>
             </div>
           </div>
@@ -76,17 +79,17 @@
         <div class="card mt-3">
           <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-              <span class="mb-0">
+              <span class="mb-0" th:text="#{sky.myProfile}">
                 내프로필
               </span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-              <span class="mb-0">
+              <span class="mb-0" th:text="#{sky.security.set}">
                 보안설정
               </span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-              <span class="mb-0">
+              <span class="mb-0" th:text="#{sky.log.manage}">
                 이력관리
               </span>
             </li>
@@ -97,70 +100,60 @@
         <div class="card mb-3">
           <div class="card-body">
             <div class="card mt-3">
-              <ul class="list-group list-group-flush">
+              <ul class="list-group list-group-flush myProfileList">
                 <li class="list-group-title list-group-item d-flex justify-content-between align-items-center flex-wrap">
                   <div class="d-flex align-items-center">
-                    <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text">내 프로필</h2></a>
-                  </div>
-                  <div class="ms-auto">
-                    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title="다음 아이콘">다음 아이콘 제작자:
-                      Roundicons - Flaticon</a>
-                    <button class="btn pageTitleBtn myProfileBtn" type="button" id="myProfileBtn">
-                      <img th:src="@{/css/image/right-arrow.png}">
-                    </button>
+                    <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text" th:text="#{sky.myProfile}">내 프로필</h2></a>
                   </div>
                 </li>
-                <li class="list-group-item d-flex align-items-center flex-wrap">
+                <li class="list-group-item profileImg d-flex align-items-center flex-wrap">
                   <h6 class="mb-0">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="feather feather-globe mr-2 icon-inline">
                     </svg>
                   </h6>
-                  <span class="ms-3" th:text="${userMyInfo.userId}"></span>
-
+                  <span class="ms-4" th:text="${userMyInfo.userId}"></span>
                 </li>
-                <li class="list-group-item d-flex align-items-center flex-wrap">
+                <li class="list-group-item profileImg d-flex align-items-center flex-wrap">
                   <div class="d-flex align-items-center">
                     <h6 class="mb-0">
                       <svg xmlns="http://www.w3.org/2000/svg"
                            class="feather feather-globe mr-2 icon-inline">
                       </svg>
                     </h6>
-                    <span class="ms-3" th:text="${userMyInfo.username}">비밀번호</span>
+                    <span class="ms-4" th:text="${userMyInfo.username}"></span>
                   </div>
                   <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Pixel
                     perfect - Flaticon</a>
                   <div class="btn-div ms-auto">
-                    <button class="btn changeUserNameBtn" type="button" id="changeUserNameBtn"
-                            th:src="@{/css/image/pencil.png}">
+                    <button class="btn changeUserNameBtn" type="button" id="changeUserNameBtn">
                       <img th:src="@{/css/image/pencil.png}">
                     </button>
                   </div>
                 </li>
-                <li class="list-group-item d-flex  align-items-center flex-wrap">
+                <li class="list-group-item emailImg d-flex  align-items-center flex-wrap">
                   <h6 class="mb-0">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="feather feather-globe mr-2 icon-inline">
                     </svg>
                   </h6>
-                  <span class="ms-3" th:text="${userMyInfo.email}"></span>
+                  <span class="ms-4" th:text="${userMyInfo.email}"></span>
                 </li>
               </ul>
             </div>
             <div class="card mt-3">
               <ul class="list-group list-group-flush">
-
                 <li class="list-group-title list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                  <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text">보안설정</h2></a>
+                  <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text" th:text="#{sky.security.set}">보안설정</h2></a>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <li class="list-group-item d-flex pwImg justify-content-between align-items-center flex-wrap">
                   <div class="d-flex align-items-center">
                     <h6 class="mb-0">
                       <svg xmlns="http://www.w3.org/2000/svg"
                            class="feather feather-globe mr-2 icon-inline">
                       </svg>
                     </h6>
-                    <span class="ms-3">비밀번호</span>
+                    <span class="ms-4" th:text="#{sky.pw}">비밀번호</span>
                   </div>
                   <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Pixel
                     perfect - Flaticon</a>
@@ -178,7 +171,7 @@
                            class="feather feather-globe mr-2 icon-inline">
                       </svg>
                     </h6>
-                    <span class="ms-3">해외 로그인 차단
+                    <span class="ms-4" th:text="#{sky.overseas.login.block}">해외 로그인 차단
                   </span>
                   </div>
                   <div class="form-check form-switch ">
@@ -191,7 +184,7 @@
             <div class="card mt-3">
               <ul class="list-group list-group-flush">
                 <li class="list-group-title list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                  <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text">이력관리</h2></a>
+                  <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text" th:text="#{sky.log.manage}">이력관리</h2></a>
                 </li>
                 <li class="list-group-item d-flex  align-items-center flex-wrap">
                   <h6 class="mb-0">
@@ -199,7 +192,7 @@
                          class="feather feather-globe mr-2 icon-inline">
                     </svg>
                   </h6>
-                  <span class="ms-3">로그인 목록</span>
+                  <span class="ms-4" th:text="#{sky.login.list}">로그인 목록</span>
                 </li>
               </ul>
             </div>
@@ -207,11 +200,73 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
-</body>
 
+<div id="modal" class="modal-overlay">
+  <div class="modal-window">
+    <div class="title">
+      <h4>
+        <strong>닉네임 변경 <br></strong>
+        <small>(닉네임은 한달에 한번 바꿀수 있습니다)</small>
+      </h4>
+    </div>
+    <div class="close-area model-cancel"><span class="blind">X</span></div>
+    <div class="content">
+
+    </div>
+
+    <div class="btn_duo_popup">
+      <a class="model-cancel btn_item text-decoration-none" role="button">
+        <span class="btn_text">취소</span>
+      </a>
+      <a  class="btn_item on text-decoration-none" role="button">
+        <span id="b_txt_phoneNo_reg" class="btn_text">변경</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("modal");
+  const $changeUserNameBtn = document.getElementById("changeUserNameBtn");
+  $changeUserNameBtn.addEventListener("click", e => {
+    modal.style.display = "flex"
+  })
+
+  const closeBtn = modal.querySelector(".close-area")
+  closeBtn.addEventListener("click", e => {
+    modal.style.display = "none"
+  })
+
+
+  const cancelBtn = modal.querySelector(".model-cancel")
+  cancelBtn.addEventListener("click", e => {
+    modal.style.display = "none"
+  })
+
+  /**
+   *
+   * 바깥영역 클릭시 닫힘
+   */
+  modal.addEventListener("click", e => {
+    const evTarget = e.target
+    if(evTarget.classList.contains("modal-overlay")) {
+      modal.style.display = "none"
+    }
+  })
+
+  /**
+   * esc를 누를경우 닫힘
+   */
+  window.addEventListener("keyup", e => {
+    if(modal.style.display === "flex" && e.key === "Escape") {
+      modal.style.display = "none"
+    }
+  })
+</script>
+
+</body>
 <th:block th:replace="~{template/js/js :: js ('commonJs')}">
 </th:block>
 

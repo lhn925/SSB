@@ -5,13 +5,17 @@ import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,6 +34,8 @@ import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.domain.user.utili.CustomCookie;
+import sky.board.domain.user.utili.Filter.ApiKeyAuthFilter;
+import sky.board.domain.user.utili.Filter.ApikeyAuthExceptionHandlerFilter;
 import sky.board.domain.user.utili.Filter.CustomLogoutFilter;
 import sky.board.domain.user.utili.Filter.CustomRememberMeAuthenticationFilter;
 import sky.board.domain.user.utili.Filter.CustomUsernameFilter;
@@ -52,6 +58,8 @@ public class SpringSecurityConfig {
     private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
+    @Value("${ssb.http.auth-token-header.name}")
+    private String principalRequestHeader;
 
 /*       "/js/**",
            "/login/**",
@@ -68,13 +76,14 @@ public class SpringSecurityConfig {
            "/css/**"*/
 
 
-    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**" ,
-        "/example/city", "/email/**","/user/help/**","/user/join/**","/login","/login/**"};
+    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**",
+        "/example/city", "/email/**", "/user/help/**", "/user/join/**", "/login", "/login/**"};
     private final String[] USER_URL = {"/user/myInfo/**"};
     private final String[] ADMIN_URL = {"/board"};
 
 
     /**
+     * ㅡㅛ
      * 에외 처리하고 싶은 url
      *
      * @return
@@ -93,8 +102,10 @@ public class SpringSecurityConfig {
         AuthenticationManager authenticationManager,
         UserDetailsService userDetailsService,
         RememberMeServices rememberMeServices,
+        MessageSource messageSource,
         HttpSecurity http) throws Exception {
-
+        ApiKeyAuthFilter apiKeyAuthFilter = new ApiKeyAuthFilter();
+        ApikeyAuthExceptionHandlerFilter apikeyAuthExceptionHandlerFilter = new ApikeyAuthExceptionHandlerFilter(messageSource);
         /**
          * cors
          * Cross-Origin Resource Sharing
@@ -118,6 +129,17 @@ public class SpringSecurityConfig {
         // 기능을 사용할 때 사용자 정보가 필요함. 반드시 이 설정 필요함.
         //tokenValiditySeconds(3600) // 쿠키의 만료시간 설정(초), default: 14일
 
+        http.addFilter(apiKeyAuthFilter).authorizeHttpRequests(
+            request -> {
+                request.requestMatchers("/user/myInfo/**").hasRole(UserGrade.USER.getDescription());
+            }
+        );
+        http.addFilterBefore(apikeyAuthExceptionHandlerFilter, ApiKeyAuthFilter.class).authorizeHttpRequests(
+            request -> {
+                request.requestMatchers("/user/myInfo/**").permitAll();
+            }
+        );
+
         http.addFilterBefore(new CustomUsernameFilter(
                 rememberMeServices, authenticationManager,
                 userLoginLogService,
@@ -130,20 +152,19 @@ public class SpringSecurityConfig {
             new CustomRememberMeAuthenticationFilter(authenticationManager, rememberMeServices,
                 cookieLoginSuccessHandler),
             RememberMeAuthenticationFilter.class);
+
 // 허용 파일 및 허용 url
+//                        requestMatchers(ADMIN_URL).hasRole(UserGrade.ADMIN.getDescription()).
         http.csrf().disable().cors().disable().
             authorizeHttpRequests(request ->
                     request.
                         dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                         requestMatchers(ALL_URL).permitAll().
                         requestMatchers(USER_URL).hasRole(UserGrade.USER.getDescription()).
-//                        requestMatchers(ADMIN_URL).hasRole(UserGrade.ADMIN.getDescription()).
                         anyRequest()
                         .authenticated()
                 // 어떠한 요청이라도 인증필요
-            ).
-
-            formLogin(login -> login. //form 방식 로그인 사용
+            ).formLogin(login -> login. //form 방식 로그인 사용
                 loginPage("/login"). // 커스텀 로그인 페이지 지정
                 usernameParameter("userId"). // submit 유저아이디 input 에 아이디,네임 속성명
                 passwordParameter("password") // submit 패스워드 input 에 아이디,네임 속성명

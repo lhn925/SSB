@@ -15,6 +15,6 @@ const messages = {
   "captcha.NotBlank": "인증코드를 입력해주세요",
   "newPw.NotBlank": "새 비밀번호를 입력해주세요",
   "newPwChk.NotBlank": "비밀번호 확인을 위해 한번 더 입력해주세요",
-  "change.picture":"프로필 사진을 바꾸시겠습니까?",
-  "picture.success":"프로필 사진이 바뀌었습니다."
+  "change.picture":"프로필 사진을 변경하시겠습니까?",
+  "picture.success":"프로필 사진이 변경 되었습니다."
 }

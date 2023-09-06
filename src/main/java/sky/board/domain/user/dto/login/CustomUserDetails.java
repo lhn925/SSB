@@ -75,7 +75,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
 
     private transient Function<String, String> passwordEncoder = (password) -> password;
 
-    public CustomUserDetails() {
+    protected CustomUserDetails() {
     }
 
     public CustomUserDetails(Long uId,String url, String token, String userId, String password, String username, String nickname,

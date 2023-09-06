@@ -7,13 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import javax.security.auth.login.LoginException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.UserInfoDto;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.global.redis.dto.RedisKeyDto;
 

@@ -16,7 +16,6 @@ import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.UserTokenUtil;
-import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticationFilter {

@@ -6,6 +6,7 @@ import static jakarta.persistence.EnumType.STRING;
 import jakarta.persistence.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,19 +17,17 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.exception.UserInfoNotFoundException;
 import sky.board.domain.user.model.Enabled;
-import sky.board.domain.user.model.Status;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.UserGrade;
 import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.file.utili.FileStore;
-import sky.board.global.file.dto.UploadFile;
 
 
 @Getter
@@ -127,7 +126,7 @@ public class User extends BaseTimeEntity {
     }
 
     public static User getOptionalUser(Optional<User> optionalUser) {
-        User user = optionalUser.orElseThrow(() -> new IllegalArgumentException("sky.userId.notFind"));
+        User user = optionalUser.orElseThrow(() -> new UserInfoNotFoundException("sky.userId.notFind"));
         return user;
     }
 
