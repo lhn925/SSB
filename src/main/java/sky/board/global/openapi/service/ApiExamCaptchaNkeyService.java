@@ -124,7 +124,10 @@ public class ApiExamCaptchaNkeyService {
     }
 
     public void deleteImage(String filename) throws IOException {
-        Path filePath = Paths.get(fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), filename, "jpg"));
+        int i = filename.lastIndexOf("/");
+        String substring = filename.substring(i + 1);
+
+        Path filePath = Paths.get(fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), substring, "jpg"));
         Files.delete(filePath);
     }
 
