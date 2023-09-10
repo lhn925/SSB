@@ -27,6 +27,7 @@ import sky.board.domain.user.dto.help.UserIdHelpQueryDto;
 import sky.board.domain.user.dto.help.UserPwResetFormDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.ChangeSuccess;
+import sky.board.domain.user.model.Enabled;
 import sky.board.domain.user.model.HelpType;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.Status;
@@ -84,7 +85,7 @@ public class HelpController {
 
         try {
             CustomUserDetails userDetails = userQueryService.findStatusUserId(userIdHelpQueryDto.getUserId(),
-                Status.OFF);
+                Enabled.ENABLED);
 
             UserHelpDto userHelpDto = UserHelpDto.createUserHelpIdDto();
             userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
@@ -161,8 +162,8 @@ public class HelpController {
         }
 
         try {
-            CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(),Status.OFF);
-            if (!findOne.isEnabled()) {
+            CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(),Enabled.ENABLED);
+            if (findOne.isEnabled()) {
                 throw new UsernameNotFoundException("email.notfound");
             }
             // 회원가입 날짜 전달
@@ -221,6 +222,7 @@ public class HelpController {
         if (userIdCheck(userHelpDto.getUserId(), request, response)) {
             return null;
         }
+        log.info("helpToken = {}", helpToken);
 
         //시간 900초 다시
         helpToken.setMaxAge(900);
@@ -287,7 +289,6 @@ public class HelpController {
         }
 
         if (bindingResult.hasErrors()) {
-            apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
             setApiCaptcha(userPwResetFormDto);
             return "user/help/pwResetForm";
         }
@@ -339,7 +340,9 @@ public class HelpController {
     }
 
     private void setApiCaptcha(UserPwResetFormDto userPwResetFormDto) throws IOException {
+        log.info("setApiCaptcha= {}", userPwResetFormDto.getImageName());
         apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
+
         Map<String, Object> apiExamCaptchaNkey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
         String key = (String) apiExamCaptchaNkey.get("key");
         String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);

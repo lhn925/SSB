@@ -17,14 +17,14 @@ public class UserMyInfoDto implements Serializable {
 
     private String userId;
     private String email;
-    private String username;
+    private String userName;
     private String pictureUrl;
 
     @Builder
-    private UserMyInfoDto(String userId, String email, String username, String pictureUrl) {
+    private UserMyInfoDto(String userId, String email, String userName, String pictureUrl) {
         this.userId = userId;
         this.email = email;
-        this.username = username;
+        this.userName = userName;
         this.pictureUrl = pictureUrl;
     }
 
@@ -34,7 +34,7 @@ public class UserMyInfoDto implements Serializable {
             .userId(userInfoDto.getUserId())
             .email(userInfoDto.getEmail())
             .pictureUrl(userInfoDto.getPictureUrl())
-            .username(userInfoDto.getUserName()).build();
+            .userName(userInfoDto.getUserName()).build();
     }
 
 

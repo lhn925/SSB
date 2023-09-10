@@ -182,6 +182,11 @@ async function _post(path, body, headers = {}) { //post fetch
   if (res.ok) {
     return data;
   } else {
+    if (res.status == HttpStatusCode.FORBIDDEN) {
+      alert(errorsMsg["error.unAuth"]);
+      const href = location.href;
+      location.href = "/login?url=" + href;
+    }
     throw Error(JSON.stringify(data.errorDetails[0]));
   }
 }
@@ -198,6 +203,15 @@ async function _filePost(path, body) { //post fetch
   if (res.ok) {
     return data;
   } else {
+    if (res.status == HttpStatusCode.FORBIDDEN) {
+      toastr.options.onHidden = function() {
+        location.href = "/login?url=" + href;
+      }
+      toastr.error(errorsMsg["error.unAuth"]);
+      let href = location.href;
+
+
+    }
     throw Error(JSON.stringify(data.errorDetails[0]));
   }
 }
@@ -244,7 +258,7 @@ function _valueCheck(type, msgId, $elementById,
 /**
  * 프로필 사진 타입 체크
  */
-function fileImageTypeCheck (type) {
+function fileImageTypeCheck(type) {
   const fileTypes = ["image/jpg", "image/jpeg", "image/pjpeg", "image/png",
     "image/bmp", "image/x-windows-bmp"]
   for (const fileType of fileTypes) {
@@ -419,15 +433,13 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
 
   for (const element of $elements) {
     let value = _removeWhitespace(element.value);
-    let $element = document.getElementById(element.id + "-NotThyme-msg");
+    let $element = document.getElementById(element.id + "-msg");
     if (value == "") {
-      $element.classList.remove(
-          "display-none");
       $element.innerText = messages[element.id + ".NotBlank"];
       isValChk = true;
       isClicking = false;
     } else {
-      $element.classList.add("display-none");
+      // $element.classList.add("display-none");
       isValChk = false;
       isClicking = true;
     }
@@ -442,7 +454,7 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
 // 비밀번호 변경시 새 비밀번호와 값이 일치한지 확인
 function _PwMatchCheck($newPw, $newPwChk, $isChkNewPwChk) {
 
-  let $element = document.getElementById($newPwChk.id + "-NotThyme-msg");
+  let $element = document.getElementById($newPwChk.id + "-msg");
   if ($newPw.value != "" && $newPw.value != $newPwChk.value) {
     $element.classList.remove(
         "display-none");

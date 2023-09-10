@@ -1,5 +1,6 @@
 const messages = {
   "auth.success": "이메일 인증이 완료 되었습니다.",
+  "userName.change.success": "닉네임이 성공적으로 변경되었습니다.",
   "userJoinForm.userId":"5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
   "userJoinForm.userName": "닉네임은 특수문자를 제외한 2~8자리여야 합니다.",
   "userJoinForm.password": "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.",

@@ -26,4 +26,8 @@ public class ErrorGlobalResultDto implements ErrorResult {
         errorDetails.add(new ErrorGlobalDetailDto(code, messageSource, locale));
     }
 
+    public ErrorGlobalResultDto(String code, MessageSource messageSource, Locale locale, Object[] args) {
+        this.errorDetails = new ArrayList<>();
+        errorDetails.add(new ErrorGlobalDetailDto(code, messageSource, locale, args));
+    }
 }

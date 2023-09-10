@@ -33,6 +33,7 @@ public class AuditorAwareImpl implements AuditorAware<String> {
             List<? extends GrantedAuthority> grantedAuthorities = authentication.getAuthorities().stream().toList();
             // anonymous 가 아니면 userDetails 객체 생성 후 userId
 
+            log.info("grantedAuthorities.size() = {}", grantedAuthorities.size());
             for (GrantedAuthority auth : grantedAuthorities) {
                 log.info("auth = {}", auth);
 

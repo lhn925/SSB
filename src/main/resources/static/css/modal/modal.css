@@ -8,15 +8,26 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /*background: rgba(255, 255, 255, 0.25);*/
+  vertical-align: middle;
   background-color: rgba(0,0,0,.5);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  /*backdrop-filter: blur(1.5px);*/
-  /*-webkit-backdrop-filter: blur(1.5px);*/
   border-radius: 10px;
   z-index: 12;
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
+
+@media (max-height: 900px){
+  #modal.modal-overlay {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0px;
+    vertical-align: middle;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 #modal .modal-window {
   /*background: rgba( 69, 139, 197, 0.70 );*/
   background: #ffffff;
@@ -27,6 +38,14 @@
   border: 1px solid rgba( 255, 255, 255, 0.18 );
   width: 400px;
   height: 500px;
+  position: relative;
+  top: -100px;
+  padding: 10px;
+}
+
+#modal .modal-logout {
+  width: 600px;
+  height: 400px;
   position: relative;
   top: -100px;
   padding: 10px;
@@ -68,7 +87,7 @@
   height: 40px;
 
 }
-.blind{
+#modal .close-area > .blind{
   font-size: 25px;
 }
 #modal .content {
@@ -76,7 +95,7 @@
   padding: 0px 10px;
   color: black;
 }
-.btn_duo_popup {
+.btn_duo_popup , .btn_one_popup {
   position: absolute;
   left: 0;
   right: 0;
@@ -84,6 +103,7 @@
   display: block;
   text-align: center;
 }
+
 .btn_duo_popup .btn_item.on {
   background-color: #1aafec;
 }
@@ -97,14 +117,25 @@
   width: 65%;
   border-radius: 0 0 12px 0;
 }
+.btn_one_popup  .modal-logout-btn {
+  width: 100%;
+  border-radius: 0 0 0 12px;
+}
+.btn_one_popup .btn_item {
+  background-color: #1aafec;
+}
 
-.btn_duo_popup .btn_item {
+.btn_duo_popup .btn_item,.btn_one_popup .btn_item {
   float: left;
   padding: 19px 0 18px;
   vertical-align: middle;
+}
+.btn_duo_popup .btn_item {
   background-color: #959eae;
 }
-.btn_duo_popup .btn_item .btn_text {
+
+
+.btn_duo_popup .btn_item .btn_text ,.btn_one_popup .btn_item .btn_text{
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -.5px;

@@ -13,14 +13,10 @@ import sky.board.domain.user.model.PwSecLevel;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserPwUpdateFormDto {
 
-
-    @NotBlank
-    private String userId;
-
     private String password;
-    private String updatePw;
+    private String newPw;
 
-    private String updatePwChk;
+    private String newPwChk;
 
     private PwSecLevel pwSecLevel;
     // 인증번호
@@ -35,12 +31,11 @@ public class UserPwUpdateFormDto {
     private String imageName;
 
     @Builder
-    public UserPwUpdateFormDto(String userId, String password, String updatePw, String updatePwChk, PwSecLevel pwSecLevel,
+    public UserPwUpdateFormDto(String password, String newPw, String newPwChk, PwSecLevel pwSecLevel,
         String captcha, String captchaKey, String imageName) {
-        this.userId = userId;
         this.password = password;
-        this.updatePw = updatePw;
-        this.updatePwChk = updatePwChk;
+        this.newPw = newPw;
+        this.newPwChk = newPwChk;
         this.pwSecLevel = pwSecLevel;
         this.captcha = captcha;
         this.captchaKey = captchaKey;

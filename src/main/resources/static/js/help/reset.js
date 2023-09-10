@@ -46,7 +46,7 @@ Reset.prototype._subBtnClickAddEvent = function ($subBtn, ...$elements) {
 
     // 새 비밀번호 값 확인
     if (!isChkNewPwVal) {
-      _PwSecureCheckFn(_reset.$isChkNewPw, _reset.$newPw, "newPw-NotThyme-msg");
+      _PwSecureCheckFn(_reset.$isChkNewPw, _reset.$newPw, "newPw-msg");
       isClicking = false;
     }
 
@@ -77,8 +77,8 @@ Reset.prototype._PwResetSubBtnClickAddEvent = function ($subBtn, ...$elements) {
 //패스워드 안전도 체크 이벤트추가
 Reset.prototype._PwSecureCheckAddEvent = function () {
   this.$newPw.onkeyup = function () {
-    document.getElementById("newPw-error-div").parentElement.classList.remove("newPw-Thyme-msg");
-    _PwSecureCheckFn(_reset.$isChkNewPw, _reset.$newPw, "newPw-NotThyme-msg");
+    // document.getElementById("newPw-error-div").parentElement.classList.remove("newPw-Thyme-msg");
+    _PwSecureCheckFn(_reset.$isChkNewPw, _reset.$newPw, "newPw-msg");
   }
 }
 

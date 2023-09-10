@@ -2,10 +2,12 @@ package sky.board.config;
 
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,12 +23,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.UserGrade;
@@ -104,8 +109,9 @@ public class SpringSecurityConfig {
         RememberMeServices rememberMeServices,
         MessageSource messageSource,
         HttpSecurity http) throws Exception {
-        ApiKeyAuthFilter apiKeyAuthFilter = new ApiKeyAuthFilter();
-        ApikeyAuthExceptionHandlerFilter apikeyAuthExceptionHandlerFilter = new ApikeyAuthExceptionHandlerFilter(messageSource);
+        ApiKeyAuthFilter apiKeyAuthFilter = new ApiKeyAuthFilter("/user/myInfo/api/**", messageSource);
+        ApikeyAuthExceptionHandlerFilter apikeyAuthExceptionHandlerFilter = new ApikeyAuthExceptionHandlerFilter(
+            messageSource);
         /**
          * cors
          * Cross-Origin Resource Sharing
@@ -129,17 +135,6 @@ public class SpringSecurityConfig {
         // 기능을 사용할 때 사용자 정보가 필요함. 반드시 이 설정 필요함.
         //tokenValiditySeconds(3600) // 쿠키의 만료시간 설정(초), default: 14일
 
-        http.addFilter(apiKeyAuthFilter).authorizeHttpRequests(
-            request -> {
-                request.requestMatchers("/user/myInfo/**").hasRole(UserGrade.USER.getDescription());
-            }
-        );
-        http.addFilterBefore(apikeyAuthExceptionHandlerFilter, ApiKeyAuthFilter.class).authorizeHttpRequests(
-            request -> {
-                request.requestMatchers("/user/myInfo/**").permitAll();
-            }
-        );
-
         http.addFilterBefore(new CustomUsernameFilter(
                 rememberMeServices, authenticationManager,
                 userLoginLogService,
@@ -152,6 +147,9 @@ public class SpringSecurityConfig {
             new CustomRememberMeAuthenticationFilter(authenticationManager, rememberMeServices,
                 cookieLoginSuccessHandler),
             RememberMeAuthenticationFilter.class);
+
+        http.addFilterBefore(apiKeyAuthFilter, BasicAuthenticationFilter.class);
+//        http.addFilterBefore(apikeyAuthExceptionHandlerFilter, ApiKeyAuthFilter.class);
 
 // 허용 파일 및 허용 url
 //                        requestMatchers(ADMIN_URL).hasRole(UserGrade.ADMIN.getDescription()).
@@ -170,6 +168,12 @@ public class SpringSecurityConfig {
                 passwordParameter("password") // submit 패스워드 input 에 아이디,네임 속성명
                 .permitAll()
             );
+
+/*        addFilterBefore(apikeyAuthExceptionHandlerFilter, ApiKeyAuthFilter.class).authorizeHttpRequests(
+                request -> {
+                    request.requestMatchers("/user/myInfo/**").permitAll();
+                }
+            )*/
         // logout 구현 부분
         http.logout()
             .logoutUrl("/logout")
@@ -179,6 +183,23 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
+
+    /*    @Bean
+        public FilterRegistrationBean apiKeyAuthFilter () {
+            FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+            registrationBean.setFilter(new ApiKeyAuthFilter());
+            registrationBean.addUrlPatterns("/user/myInfo/api/**");
+            registrationBean.setOrder(0);
+            return registrationBean;
+        }
+        @Bean
+        public FilterRegistrationBean apiKeyAuthExceptionFilter (MessageSource ms) {
+            FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
+            registrationBean.setFilter(new ApikeyAuthExceptionHandlerFilter(ms));
+            registrationBean.addUrlPatterns("/user/myInfo/api/**");
+            registrationBean.setOrder(1);
+            return registrationBean;
+        }*/
     @Bean
     public HttpSessionSecurityContextRepository httpSessionSecurityContextRepository() {
         return new HttpSessionSecurityContextRepository();

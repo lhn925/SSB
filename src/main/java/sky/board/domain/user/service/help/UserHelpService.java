@@ -56,7 +56,7 @@ public class UserHelpService {
             userQueryRepository.findByUserId(userInfoDto.getUserId()));
 
         isPasswordSameAsNew(userPwUpdateFormDto, findByUser);
-        User.updatePw(findByUser, userPwUpdateFormDto.getUpdatePw(), userPwUpdateFormDto.getPwSecLevel(),
+        User.updatePw(findByUser, userPwUpdateFormDto.getNewPw(), userPwUpdateFormDto.getPwSecLevel(),
             passwordEncoder);
         return getCustomUserDetails(findByUser);
     }
@@ -89,7 +89,7 @@ public class UserHelpService {
         // 입력한 비밀번호가 지금 비밀번호랑 맞아야하고
         boolean authMatches = passwordEncoder.matches(userPwUpdateFormDto.getPassword(), findByUser.getPassword());
         // 현재비밀번호랑 같으면 안되고
-        boolean matches = passwordEncoder.matches(userPwUpdateFormDto.getUpdatePw(), findByUser.getPassword());
+        boolean matches = passwordEncoder.matches(userPwUpdateFormDto.getNewPw(), findByUser.getPassword());
 
         log.info("authMatches = {}", authMatches);
         log.info("matches = {}", matches);

@@ -17,4 +17,7 @@ public class ErrorGlobalDetailDto extends ErrorDetail {
     public ErrorGlobalDetailDto(String code, MessageSource ms, Locale locale) {
         super(code, ms.getMessage(code, null, locale));
     }
+    public ErrorGlobalDetailDto(String code, MessageSource ms, Locale locale,Object[] args) {
+        super(code, ms.getMessage(code, args, locale));
+    }
 }

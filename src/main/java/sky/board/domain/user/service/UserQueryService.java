@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
+import sky.board.domain.user.model.Enabled;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.global.redis.dto.RedisKeyDto;
@@ -25,9 +26,9 @@ public class UserQueryService {
     private final UserQueryRepository userQueryRepository;
 
 
-    public CustomUserDetails findByEmailOne(String email, Status isStatus)
+    public CustomUserDetails findByEmailOne(String email, Enabled enabled)
         throws UsernameNotFoundException {
-        Optional<User> findOne = userQueryRepository.findByEmailAndIsEnabled(email, isStatus.getValue());
+        Optional<User> findOne = userQueryRepository.findByEmailAndIsEnabled(email, enabled.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
 
         return CustomUserDetails.builder()
@@ -36,9 +37,9 @@ public class UserQueryService {
             .createdDateTime(user.getCreatedDateTime()).build();
     }
 
-    public CustomUserDetails findStatusUserId(String userId, Status status)
+    public CustomUserDetails findStatusUserId(String userId, Enabled enabled)
         throws UsernameNotFoundException {
-        Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, status.getValue());
+        Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
 
         return CustomUserDetails.builder()

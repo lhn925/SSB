@@ -5,8 +5,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,6 @@ import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPictureUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPwUpdateFormDto;
-import sky.board.domain.user.exception.DuplicateCheckException;
 import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.service.UserQueryService;
@@ -42,8 +42,6 @@ import sky.board.domain.user.service.log.UserActivityLogService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.domain.user.service.myInfo.UserMyInfoService;
 import sky.board.domain.user.utili.PwChecker;
-import sky.board.global.error.dto.ErrorGlobalResultDto;
-import sky.board.global.error.dto.ErrorResult;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.Result;
 import sky.board.global.file.dto.UploadFile;
@@ -66,33 +64,17 @@ public class MyInfoApiController {
     private final UserLoginStatusService userLoginStatusService;
     private final UserQueryService userQueryService;
 
-    @PutMapping
-    public ResponseEntity putUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
+    @PostMapping("/userName")
+    public ResponseEntity updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
         BindingResult bindingResult,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-        try {
-            // 중복체크
-            userMyInfoService.updateUserName(request, userNameUpdateDto);
-
-            return new ResponseEntity(new Result<>(userNameUpdateDto), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            bindingResult.reject(e.getMessage());
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
-        } catch (DuplicateCheckException e) {
-            bindingResult.reject("duplication", new String[]{e.getMessage()}, null);
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
-        } catch (RuntimeException e) {
-            bindingResult.reject("change.isNotAfter", new String[]{e.getMessage()}, null);
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
-        }
+        // 중복체크
+        userMyInfoService.updateUserName(request, userNameUpdateDto);
+        return new ResponseEntity(new Result<>(userNameUpdateDto), HttpStatus.OK);
     }
-
 
     @PostMapping("/picture")
     public ResponseEntity updateUserProfilePicture(@Validated @ModelAttribute UserPictureUpdateDto file,
@@ -101,15 +83,10 @@ public class MyInfoApiController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         UploadFile uploadFile = null;
-        try {
-            uploadFile = userMyInfoService.updatePicture(request, file.getFile());
-        } catch (Exception e) {
-            bindingResult.reject(e.getMessage());
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
-        }
+        uploadFile = userMyInfoService.updatePicture(request, file.getFile());
         return new ResponseEntity(new Result<>(uploadFile), HttpStatus.OK);
     }
+
 
     @GetMapping("/picture/{fileName}")
     public ResponseEntity<Resource> getUserProfilePicture(@PathVariable String fileName, HttpServletRequest request)
@@ -140,51 +117,45 @@ public class MyInfoApiController {
     }
 
     @DeleteMapping("/picture")
-    public ResponseEntity deleteUserProfilePicture(HttpServletRequest request) {
-        try {
+    public ResponseEntity deleteUserProfilePicture(HttpServletRequest request) throws FileNotFoundException {
             userMyInfoService.deletePicture(request);
             return ResponseEntity.ok(HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto("error", ms, request.getLocale()));
-        } catch (FileNotFoundException e) {
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale()));
-        }
     }
 
 
-    @PostMapping("/pw/update")
+    @PostMapping("/pw")
     public ResponseEntity updateUserPassWord(@Validated @RequestBody UserPwUpdateFormDto userPwUpdateFormDto,
         BindingResult bindingResult, HttpServletRequest request) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
 
+
+        //디코딩
+        log.info("encoding userPwUpdateFormDto.getPassword() = {}", userPwUpdateFormDto.getPassword());
+        byte[] dePw = Base64.getDecoder().decode(userPwUpdateFormDto.getPassword().getBytes());
+        byte[] deNewPw = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPw().getBytes());
+        byte[] deNewPwChk = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPwChk().getBytes());
+
+        userPwUpdateFormDto.setPassword(new String(dePw, StandardCharsets.UTF_8));
+        log.info("decoding userPwUpdateFormDto.getPassword() = {}", userPwUpdateFormDto.getPassword());
+        userPwUpdateFormDto.setNewPw(new String(deNewPw, StandardCharsets.UTF_8));
+        userPwUpdateFormDto.setNewPwChk(new String(deNewPwChk, StandardCharsets.UTF_8));
+
+
         boolean isCaptcha;
         Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
             userPwUpdateFormDto.getCaptchaKey(), userPwUpdateFormDto.getCaptcha());
 
         isCaptcha = (boolean) result.get("result");
-
-        // 자동입력 방지 번호가 맞지 않은 경우
-        if (!isCaptcha) {
-            return getErrorResultResponseEntity(bindingResult, "error.captcha", userPwUpdateFormDto, request);
-
-        }
-
-        // 확인 비밀번호가 불일치 할 경우
-        if (!userPwUpdateFormDto.getUpdatePw().equals(userPwUpdateFormDto.getUpdatePwChk())) {
-            return getErrorResultResponseEntity(bindingResult, "pw.mismatch", userPwUpdateFormDto, request);
-        }
         // 비밀번호 보안 레벨 확인
-        PwSecLevel pwSecLevel = PwChecker.checkPw(userPwUpdateFormDto.getUpdatePwChk());
-        // 비밀번호 값이 유효하지 않은 경우
-        if (pwSecLevel.equals(PwSecLevel.NOT)) {
-            return getErrorResultResponseEntity(bindingResult, "updatePw", userPwUpdateFormDto, request);
-        }
-        if (bindingResult.hasErrors()) {
+        PwSecLevel pwSecLevel = PwChecker.checkPw(userPwUpdateFormDto.getNewPw());
+        try {
+            // 입력값 체크
+            valueCheck(userPwUpdateFormDto, isCaptcha, pwSecLevel);
+        } catch (IllegalArgumentException e) {
             setApiCaptcha(userPwUpdateFormDto);
+            throw new IllegalArgumentException(e.getMessage());
         }
         // 보안레벨 저장 나중에 -> 보안 위험 표시할 떄 유용
         userPwUpdateFormDto.setPwSecLevel(pwSecLevel);
@@ -197,56 +168,46 @@ public class MyInfoApiController {
             userActivityLogService.save(userDetails.getUId(), userDetails.getUsername(), "sky.pw",
                 "sky.log.pw.update", request, ChangeSuccess.SUCCESS);
             //인증 이미지 삭제
-            apiExamCaptchaNkeyService.deleteImage(userPwUpdateFormDto.getImageName());
+            deleteImage(userPwUpdateFormDto);
             return ResponseEntity.ok(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             userActivityLogService.save(null, userInfoDto.getUserId(), "sky.pw", "sky.log.pw.update",
                 request, ChangeSuccess.FAIL);
-            return getErrorResultResponseEntity(bindingResult, e.getMessage(), userPwUpdateFormDto, request);
+            deleteImage(userPwUpdateFormDto);
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 
+    private static void valueCheck(UserPwUpdateFormDto userPwUpdateFormDto, boolean isCaptcha, PwSecLevel pwSecLevel) {
+        if (!isCaptcha) {
+            throw new IllegalArgumentException("error.captcha");
+        }
+        // 확인 비밀번호가 불일치 할 경우
+        if (!userPwUpdateFormDto.getNewPw().equals(userPwUpdateFormDto.getNewPwChk())) {
+            throw new IllegalArgumentException("pw.mismatch");
+        }
+        // 비밀번호 값이 유효하지 않은 경우
+        if (pwSecLevel.equals(PwSecLevel.NOT)) {
+            throw new IllegalArgumentException("updatePw");
+        }
+    }
 
     @PostMapping("/login/status")
     public ResponseEntity updateLoginStatus(HttpServletRequest request) {
-
-        HttpSession session = request.getSession();
-        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-
-        String check = userIdCheck(request);
-
-        // 아이디가 있는 지 체크 유무
-        if (check != null) {
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto(check, ms, request.getLocale()));
-        }
         try {
+            HttpSession session = request.getSession(false);
+
+            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
             userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(),session.getId());
-        }catch (Exception e) {
-            return Result.getErrorResult(
-                new ErrorGlobalResultDto("error", ms, request.getLocale()));
+        } catch (RuntimeException e) {
+            throw new RuntimeException("error");
         }
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    private String userIdCheck(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession();
-            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-            userQueryService.findOne(userInfoDto.getUserId());
-        } catch (IllegalArgumentException e) {
-            return e.getMessage();
-        }
-        return null;
-    }
-
-
-    private ResponseEntity<ErrorResult> getErrorResultResponseEntity(BindingResult bindingResult, String errorCode,
-        UserPwUpdateFormDto userPwUpdateFormDto, HttpServletRequest request) throws IOException {
-        bindingResult.reject(errorCode);
+    private void deleteImage(
+        UserPwUpdateFormDto userPwUpdateFormDto) throws IOException {
         apiExamCaptchaNkeyService.deleteImage(userPwUpdateFormDto.getImageName());
-        return Result.getErrorResult(
-            new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
     }
 
     private void setApiCaptcha(UserPwUpdateFormDto userPwUpdateFormDto) {

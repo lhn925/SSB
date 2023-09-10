@@ -51,6 +51,9 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         long expiryTime = rememberMeServices.getExpiryTime(tokenLifetime);
 
         rememberMeServices.publicSetCookie( tokenLifetime, request, response, token);
+        log.info("principal.getPassword() = {}", principal.getPassword());
+        log.info("principal.getUserId() = {}", principal.getUserId());
+
         rememberMeServices.setRedis(principal.getUserId(), principal.getPassword(), request.getSession(), expiryTime,
             token);
 

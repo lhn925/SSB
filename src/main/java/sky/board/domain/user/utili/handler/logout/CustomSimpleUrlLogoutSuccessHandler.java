@@ -42,6 +42,7 @@ public class CustomSimpleUrlLogoutSuccessHandler extends SimpleUrlLogoutSuccessH
         if (hashKey != null && StringUtils.hasText(hashKey)) {
             RedisRememberService redisRememberService = (RedisRememberService) rememberMeServices;
             String redisKey = redisRememberService.hashing(hashKey);
+
             redisService.deleteRemember(redisKey);
         }
         setUrl(request);

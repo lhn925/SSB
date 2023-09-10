@@ -6,18 +6,15 @@ function _setToastr(toastr) {
 }
 
 function _info(content,title) {
-  toastr.info(title,content,{timeout:3000});
+  toastr.info(title,content,{timeout:2000});
 }
 function _success(content,title) {
-  toastr.success(title,content,{timeout:3000});
+  toastr.success(title,content,{timeout:2000});
 }
-
 function _error(content,title) {
-  toastr.error(title,content,{timeout:3000});
+  toastr.error(title,content,{timeout:2000});
 }
-
-
 function _warning(content,title) {
-  toastr.warning(title,content,{timeout:3000});
+  toastr.warning(title,content,{timeout:2000});
 }
 

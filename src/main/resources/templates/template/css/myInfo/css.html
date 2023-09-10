@@ -7,4 +7,14 @@
   <link th:href="@{/css/modal/modal.css}" rel="stylesheet">
   <title th:text="#{sky.logo} +':'+ #{sky.myInfo}"></title>
 </th:block>
+
+<th:block th:if="${page == 'pwUpdateForm'}">
+  <link th:href="@{/css/base/secure.css}" rel="stylesheet">
+  <link th:href="@{/css/modal/modal.css}" rel="stylesheet">
+  <link th:href="@{/css/join/join.css}" rel="stylesheet">
+  <link th:href="@{/css/help/help.css}" rel="stylesheet">
+  <title th:text="#{sky.logo} +':' + #{sky.pwReset}"></title>
+</th:block>
+
+
 </html>

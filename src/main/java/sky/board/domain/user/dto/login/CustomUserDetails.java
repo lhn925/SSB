@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
+import sky.board.domain.user.entity.User;
 
 /**
  * getAuthorities() : 계정이 가지고 있는 권한 목록 리턴
@@ -27,6 +28,7 @@ import org.springframework.util.Assert;
 
 
 public class CustomUserDetails implements Serializable, UserDetails,CredentialsContainer {
+
 
     private Long uId;
     private String url;
@@ -120,7 +122,6 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.pictureUrl = pictureUrl;
         this.userNameModifiedDate = userNameModifiedDate;
     }
-
 
     public LocalDateTime getUserNameModifiedDate() {
         return userNameModifiedDate;

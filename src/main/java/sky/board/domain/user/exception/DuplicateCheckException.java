@@ -25,7 +25,9 @@ public class DuplicateCheckException extends RuntimeException {
         this.rejectValue = rejectValue;
     }
 
-
+    public DuplicateCheckException(String message) {
+        this.message = message;
+    }
 
     @Override
     public String getMessage() {

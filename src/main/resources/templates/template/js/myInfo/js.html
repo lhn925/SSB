@@ -5,13 +5,27 @@
 
 
 
-<th:block th:if="${page == 'myInfoForm'}" class="joinAgreeForm">
+<th:block th:if="${page == 'myInfoForm'}" class="myInfoForm">
   <script th:src="@{/js/myInfo/picture.js}"></script>
-
+  <script th:src="@{/js/myInfo/modal.js}"></script>
+  <script th:src="@{/js/myInfo/myInfo.js}"></script>
+  <script th:src="@{/js/myInfo/myInfo_ready.js}"></script>
   <script>
-    let picture = new Picture();
+    let _myInfo;
+    let _picture;
+    _myInfo_ready_init();
   </script>
 
 </th:block>
+<th:block th:if="${page == 'pwUpdateForm'}" class="pwUpdateForm">
+  <script th:src="@{/js/myInfo/modal.js}"></script>
+  <script th:src="@{/js/myInfo/pwUpdate.js}"></script>
+  <script th:src="@{/js/myInfo/pwUpdate_ready.js}"></script>
+  <script th:inline="javascript">
+    let _pwUpdate;
+    _pwUpdate_ready_init();
+  </script>
+</th:block>
+
 
 </html>

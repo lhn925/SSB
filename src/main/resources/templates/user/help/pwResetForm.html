@@ -4,7 +4,7 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('pwResetForm')}">
+  <th:block th:replace="~{template/css/css :: css ('pwUpdateForm')}">
   </th:block>
 </head>
 <body>
@@ -47,12 +47,9 @@
               </button>
             </div>
           </div>
-          <div class="form-text text-danger"id="newPw-error-div">
-            <th:block th:if="${#fields.hasErrors('newPw')}"
-                      th:each="err : ${#fields.detailedErrors('newPw')}">
-              <small class="newPw-Thyme-msg" id="newPw-Thyme-msg"  th:text="${err.getMessage()}"></small>
-            </th:block>
-            <small id="newPw-NotThyme-msg"> </small>
+          <div class="form-text text-danger"  th:with="err = ${#fields.detailedErrors('newPw')}"  id="newPw-error-div">
+              <small th:text="${err.size() > 0 ? err.get(0).getMessage() : ''}"
+                     id="newPw-msg"> </small>
           </div>
 
 
@@ -64,12 +61,9 @@
                      th:errorclass="border-danger"
                      th:placeholder="#{sky.newPwChk}">
             </div>
-            <div class="form-text text-danger" id="newPwChk-error-div">
-              <th:block th:if="${#fields.hasErrors('newPwChk')}"
-                        th:each="err : ${#fields.detailedErrors('newPwChk')}">
-                <small id="newPwChk-Thyme-msg" th:text="${err.getMessage()}"></small>
-              </th:block>
-              <small id="newPwChk-NotThyme-msg"> </small>
+            <div class="form-text text-danger" th:with="err = ${#fields.detailedErrors('newPwChk')}" id="newPwChk-error-div">
+                <small th:text="${err.size() > 0 ? err.get(0).getMessage() : ''}"
+                       id="newPwChk-msg"> </small>
             </div>
           </div>
           <!--            <th:block th:if="*{captchaKey}">-->
@@ -89,12 +83,9 @@
                   </button>
                 </div>
               </div>
-              <div class="form-text text-danger">
-                <th:block th:if="${#fields.hasErrors('captcha')}"
-                          th:each="err : ${#fields.detailedErrors('captcha')}">
-                  <small th:text="${err.getMessage()}"></small>
-                </th:block>
-                <small id="captcha-NotThyme-msg"> </small>
+              <div class="form-text text-danger" th:with="err = ${#fields.detailedErrors('captcha')}">
+                  <small th:text="${err.size() > 0 ? err.get(0).getMessage() : ''}"
+                         id="captcha-msg"> </small>
               </div>
             </div>
           </div>
@@ -112,6 +103,7 @@
     </div>
   </div>
 </div>
+
 </body>
 
 
@@ -121,7 +113,6 @@
 </th:block>
 
 
-</script>
 
 
 </html>

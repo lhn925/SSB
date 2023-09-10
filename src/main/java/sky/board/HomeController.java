@@ -18,7 +18,9 @@ public class HomeController {
 
 
     @GetMapping("/")
-    public String home(HttpServletRequest request) {
+    public String home() {
+
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

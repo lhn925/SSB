@@ -16,9 +16,11 @@ import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.login.UserLoginStatus;
+import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.repository.login.UserLoginStatusRepository;
+import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.locationfinder.service.LocationFinderService;
 import sky.board.global.redis.dto.RedisKeyDto;
@@ -62,6 +64,7 @@ public class UserLoginStatusService {
         UserLoginStatus userLoginStatus = UserLoginStatus.getLoginStatus(locationFinderService,
             request,
             user);
+
         //저장
         UserLoginStatus save = userLoginStatusRepository.save(userLoginStatus);
         Optional.ofNullable(save).orElseThrow(() -> new IllegalArgumentException("error"));
@@ -78,12 +81,26 @@ public class UserLoginStatusService {
 
         userId = user.getUserId();
 
-        Optional<UserLoginStatus> findStatus = userLoginStatusRepository.findOne(user, userId, sessionId);
+        log.info("sessionId = {}", sessionId);
+        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findSessionList(user, userId, sessionId);
+        if (findStatusList.size() > 0) {
+            userLoginStatusRepository.update(user, loginStatus.getValue(), isStatus.getValue(), sessionId);
+        }
+    }
+    @Transactional
+    public void updateRememberLoginStatus(HttpServletRequest request, String userId, Status loginStatus, Status isStatus) {
+        HttpSession session = request.getSession();
+        String rememberValue = CustomCookie.readCookie(request.getCookies(), RememberCookie.KEY.getValue());
+//        해당 세션 정보 가져옴
 
-        findStatus.ifPresent(
-            userLoginStatus -> UserLoginStatus.loginStatusUpdate(userLoginStatus, loginStatus, isStatus)
-        );
+        User user = User.getOptionalUser(userQueryRepository.findByUserId(userId));
 
+        userId = user.getUserId();
+
+        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findRememberList(user, userId, rememberValue);
+        if (findStatusList.size() > 0) {
+            userLoginStatusRepository.updateRemember(user, loginStatus.getValue(), isStatus.getValue(), rememberValue);
+        }
     }
 
     @Transactional
@@ -98,8 +115,29 @@ public class UserLoginStatusService {
         /**
          * 로그인 기기 로그아웃
          */
-
         // 로그인 되어 있는기기가 있을 경우
+        removeStatus(user, userLoginStatusList);
+    }
+
+    @Transactional
+    public void removeAllLoginStatus(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+        User user = User.getOptionalUser(userQueryRepository.findOne(userInfoDto.getUserId(),userInfoDto.getToken()));
+
+        // 로그인 되어 있는 기기 검색
+        // 현재 접속하고 있는 세션 제외
+        List<UserLoginStatus> userLoginStatusList = userLoginStatusRepository.findAllByUidAndLoginStatus(
+            user,
+            Status.ON.getValue());
+        /**
+         * 로그인 기기 로그아웃
+         */
+        // 로그인 되어 있는기기가 있을 경우
+        removeStatus(user, userLoginStatusList);
+    }
+    private void removeStatus(User user, List<UserLoginStatus> userLoginStatusList) {
         if (userLoginStatusList.size() != 0) {
             for (UserLoginStatus userLoginStatus : userLoginStatusList) {
                 // 해당 기기의 세션 값 삭제

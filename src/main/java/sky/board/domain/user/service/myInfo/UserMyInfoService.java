@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.entity.User;
+import sky.board.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.join.UserJoinService;
@@ -62,7 +63,7 @@ public class UserMyInfoService {
         if (userNameModifiedDate != null && !now.isAfter(userNameModifiedDate)) {
             // 1개월이 넘지못했다면
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd E HH:mm");
-            throw new RuntimeException(userNameModifiedDate.format(dateTimeFormatter));
+            throw new ChangeUserNameIsNotAfterException(userNameModifiedDate.format(dateTimeFormatter));
         }
 
         isChange = true;
@@ -98,7 +99,6 @@ public class UserMyInfoService {
             } catch (IOException e) {
                 throw new RuntimeException("error");
             }
-
         } else {
             throw new RuntimeException("error.file.NotBlank");
         }
@@ -139,6 +139,8 @@ public class UserMyInfoService {
             throw new RuntimeException(e);
         }
     }
+
+
 
 
 }

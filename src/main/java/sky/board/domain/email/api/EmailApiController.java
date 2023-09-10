@@ -30,6 +30,7 @@ import sky.board.domain.email.service.EmailService;
 import sky.board.domain.user.dto.help.UserHelpDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.exception.DuplicateCheckException;
+import sky.board.domain.user.model.Enabled;
 import sky.board.domain.user.model.HelpType;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.join.UserJoinService;
@@ -166,8 +167,7 @@ public class EmailApiController {
                     || !userHelpDto.getUserId().equals(helpEmailSendDto.getUserId())) {
                     throw new UsernameNotFoundException("code.error");
                 }
-                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(),
-                    Status.OFF);
+                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(), Enabled.ENABLED);
                 /**
                  * 비밀 번호 찾기시
                  *
