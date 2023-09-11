@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="container"  th:fragment="container (page)" >
+  <div class="row justify-content-center main-body">
+    <div class="row justify-content-center gutters-sm  col-lg-8">
+      <div class="col-md-4 mb-3">
+        <div class="card imageCard">
+          <div class="card-body">
+            <div class="picture-div d-flex flex-column align-items-center text-center">
+              <button type="button" class="btn pictureBtn" id="pictureBtn">
+                <img th:src="@{|/user/myInfo/api/picture/${userMyInfo.getPictureUrl()}|}"
+                     class="userPicture picture-img rounded-circle p-1">
+                <input id="pictureFile" type="file" class="display-none">
+                <span class="photo-edit">
+                  </span>
+              </button>
+              <div class="mt-3">
+                <h4 th:text="${userMyInfo.userId}"></h4>
+                <p class="text-secondary mb-1" th:text="${userMyInfo.email}"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mt-3">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+              <span class="mb-0" th:text="#{sky.myProfile}">
+                내프로필
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+              <span class="mb-0" th:text="#{sky.security.set}">
+                보안설정
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+              <span class="mb-0" th:text="#{sky.log.manage}">
+                이력관리
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <th:block th:replace="${page}">
+
+      </th:block>
+    </div>
+  </div>
+</div>
+</html>
