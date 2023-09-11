@@ -71,7 +71,7 @@ public class ApiExamCaptchaNkeyService {
             ObjectMapper objectMapper = new ObjectMapper();
             map = objectMapper.readValue(result, HashMap.class);
         } catch (JsonProcessingException e) {
-            throw new CaptchaMisMatchFactorException("잘못된 요청");
+            throw new CaptchaMisMatchFactorException("login.error.captcha");
         }
         return map;
     }

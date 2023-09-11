@@ -12,12 +12,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.model.UserAgent;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 
+@Slf4j
 @Getter
 @Setter(value = PRIVATE)
 @Embeddable
@@ -57,6 +59,7 @@ public class DefaultLoginLog {
     public static DefaultLoginLog createDefaultLoginLog(Status isStatus,
         UserLocationDto userLocationDto,
         HttpServletRequest request) {
+
         return DefaultLoginLog.builder()
             .ip(userLocationDto.getIpAddress()) //ip 저장
             .countryName(userLocationDto.getCountryName()) // iso Code 저장

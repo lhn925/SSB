@@ -1,6 +1,10 @@
 package sky.board.domain.user.service.log;
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.Locale.IsoCountryCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,13 +14,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.login.UserLoginLog;
+import sky.board.domain.user.exception.LoginBlockException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.log.LoginLogRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
+import sky.board.domain.user.service.UserQueryService;
 import sky.board.global.auditor.AuditorAwareImpl;
+import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
 
 @Service
@@ -29,6 +37,7 @@ public class UserLoginLogService {
     private final LocationFinderService locationFinderService;
     private final UserQueryRepository userQueryRepository;
     private final AuditorAware auditorAware;
+    private final UserQueryService userQueryService;
 
     // 로그인 기록은 최근 90일까지의 기록을 최대 1,000 건 까지 제공합니다.
 
@@ -55,7 +64,6 @@ public class UserLoginLogService {
 
 
     public Long getCount(String userId, LoginSuccess loginSuccess, Status isStatus) {
-
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<UserLoginLog> loginLogPage = loginLogRepository.getLoginLogPageable(userId, loginSuccess,
             isStatus.getValue(),
@@ -78,6 +86,27 @@ public class UserLoginLogService {
     public void delete(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
         String userId = request.getParameter("userId");
         loginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
+    }
+
+    /**
+     * 해외 로그인 여부 확인
+     * @param request
+     * @param userId
+     * @throws UsernameNotFoundException
+     * @throws IOException
+     * @throws GeoIp2Exception
+     */
+    public void isLoginBlockChecked(HttpServletRequest request,String userId)
+        throws UsernameNotFoundException, IOException, GeoIp2Exception {
+        User findByUser = userQueryService.findOne(userId);
+        if (findByUser.getIsLoginBlocked()) {
+            UserLocationDto userLocationDto = locationFinderService.findLocation();
+            log.info("Locale.KOREA = {}", Locale.KOREA.getCountry());
+            log.info("Locale.KOREA = {}", Locale.KOREAN);
+            if (!userLocationDto.getCountryName().equals(Locale.KOREA.getCountry())) {
+                throw new LoginBlockException("login.error.blocked");
+            }
+        }
     }
 
 }

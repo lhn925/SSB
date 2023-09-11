@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
+import sky.board.domain.user.exception.LoginBlockException;
 import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
@@ -52,17 +53,14 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
 
 
         // 인증번호는 맞는데 비밀번호가 틀렸을 경우
-        if (exception instanceof LoginFailCountException) {
+        if (exception instanceof LoginFailCountException || exception instanceof CaptchaMisMatchFactorException || isCaptcha) {
             retryTwoFactor = true;
-            errMsg = "login.error";
+            errMsg = exception.getMessage();
             sbPath.append("imageName=" + request.getAttribute("imageName"));
             sbPath.append("&captchaKey=" + request.getAttribute("captchaKey") + "&");
-        } else if (exception instanceof CaptchaMisMatchFactorException || isCaptcha) {
-            retryTwoFactor = true;
-            errMsg = "login.error.captcha";
-            sbPath.append("imageName=" + request.getParameter("imageName"));
-            sbPath.append("&captchaKey=" + request.getParameter("captchaKey") + "&");
-        } 
+        } else if (exception instanceof LoginBlockException) {
+            errMsg = exception.getMessage();
+        }
 
         userLoginLogService.save(request, LoginSuccess.FAIL, Status.ON);
         sendRedirect(request, response, errMsg, sbPath, retryTwoFactor);

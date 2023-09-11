@@ -1,9 +1,12 @@
 package sky.board.domain.user.utili.Filter;
 
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,11 +20,14 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
+import sky.board.domain.user.exception.LoginBlockException;
 import sky.board.domain.user.exception.LoginFailCountException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.log.UserLoginLogService;
+import sky.board.global.locationfinder.service.LocationFinderService;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 
 @Slf4j
@@ -69,6 +75,15 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         String userId = obtainUsername(request);
         String password = obtainPassword(request);
 
+        try {
+            userLoginLogService.isLoginBlockChecked(request,userId);
+        } catch (LoginBlockException e) {
+            throw new LoginBlockException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("error");
+        }
+
+
         // failCount 전달  success 핸들러에 전달
         Long failCount = userLoginLogService.getCount(userId, LoginSuccess.FAIL, Status.ON);
         request.setAttribute("failCount", failCount);
@@ -86,7 +101,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             String captcha = getRequestValue("captcha", request);
 
             if (!StringUtils.hasText(captcha)) {
-                throw new CaptchaMisMatchFactorException("captcha Not found");
+                throw new CaptchaMisMatchFactorException("login.error.captcha");
             }
             // 2차 인증 키 검증
             Map result = null;
@@ -97,7 +112,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
             // 번호가 맞지 않은 경우
             if (!isCaptcha) {
-                throw new CaptchaMisMatchFactorException("CaptchaMisMatchFactorException");
+                throw new CaptchaMisMatchFactorException("login.error.captcha");
             }
         }
 
@@ -109,7 +124,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
             request.setAttribute("captchaKey", key);
             request.setAttribute("imageName", image);
-            throw new LoginFailCountException("LoginVerificationFilter count < 5");
+            throw new LoginFailCountException("login.error");
         }
 
 
@@ -119,7 +134,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         super.setDetails(request, authRequest);
 
         Authentication authenticate = super.getAuthenticationManager().authenticate(authRequest);
-
         return authenticate;
     }
 

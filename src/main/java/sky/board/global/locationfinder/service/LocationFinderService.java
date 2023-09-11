@@ -20,6 +20,8 @@ import sky.board.global.locationfinder.model.DataPath;
 public class LocationFinderService {
 
 
+
+
     public UserLocationDto findLocation() throws IOException, GeoIp2Exception {
         DatabaseReader databaseReader = getClassPathResource(DataPath.CITY_DB.getValue());
         InetAddress ipAddress = getInetAddress();
@@ -41,6 +43,7 @@ public class LocationFinderService {
     private DatabaseReader getClassPathResource(String mmdbPath) throws IOException {
         ClassPathResource resource = new ClassPathResource(mmdbPath);
         DatabaseReader databaseReader = new Builder(resource.getFile()).build();
+
         return databaseReader;
     }
 
