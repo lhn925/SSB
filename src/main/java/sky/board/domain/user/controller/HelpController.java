@@ -306,7 +306,7 @@ public class HelpController {
                 "sky.log.pw.chaContent", request, ChangeSuccess.SUCCESS);
             // 비밀번호가 전과 같을시에 IllegalArgumentException
 
-            HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession();
             // 로그인된 기기 로그아웃
 
             userLoginStatusService.removeAllLoginStatus(userDetails.getUserId(),session.getId());

@@ -34,7 +34,7 @@ public class MyInfoController {
 
     @GetMapping
     public String myPageForm(HttpServletRequest request, Model model) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
         // 유저 정보 조회
         userQueryService.findOne(session);
@@ -47,7 +47,7 @@ public class MyInfoController {
 
     @GetMapping("/pw")
     public String pwUpdateForm(HttpServletRequest request, Model model) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
         // 유저 정보 조회
         userQueryService.findOne(session);

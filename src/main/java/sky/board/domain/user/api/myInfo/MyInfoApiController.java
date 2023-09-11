@@ -56,13 +56,11 @@ import sky.board.global.redis.dto.RedisKeyDto;
 public class MyInfoApiController {
 
     private final MessageSource ms;
-
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final UserMyInfoService userMyInfoService;
     private final UserActivityLogService userActivityLogService;
     private final UserHelpService userHelpService;
     private final UserLoginStatusService userLoginStatusService;
-    private final UserQueryService userQueryService;
 
     @PostMapping("/userName")
     public ResponseEntity updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
@@ -132,13 +130,11 @@ public class MyInfoApiController {
 
 
         //디코딩
-        log.info("encoding userPwUpdateFormDto.getPassword() = {}", userPwUpdateFormDto.getPassword());
         byte[] dePw = Base64.getDecoder().decode(userPwUpdateFormDto.getPassword().getBytes());
         byte[] deNewPw = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPw().getBytes());
         byte[] deNewPwChk = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPwChk().getBytes());
 
         userPwUpdateFormDto.setPassword(new String(dePw, StandardCharsets.UTF_8));
-        log.info("decoding userPwUpdateFormDto.getPassword() = {}", userPwUpdateFormDto.getPassword());
         userPwUpdateFormDto.setNewPw(new String(deNewPw, StandardCharsets.UTF_8));
         userPwUpdateFormDto.setNewPwChk(new String(deNewPwChk, StandardCharsets.UTF_8));
 
@@ -209,6 +205,7 @@ public class MyInfoApiController {
         UserPwUpdateFormDto userPwUpdateFormDto) throws IOException {
         apiExamCaptchaNkeyService.deleteImage(userPwUpdateFormDto.getImageName());
     }
+
 
     private void setApiCaptcha(UserPwUpdateFormDto userPwUpdateFormDto) {
         Map<String, Object> apiExamCaptchaNkey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();

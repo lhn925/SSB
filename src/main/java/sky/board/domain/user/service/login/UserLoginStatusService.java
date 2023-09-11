@@ -73,7 +73,7 @@ public class UserLoginStatusService {
 
     @Transactional
     public void updateLoginStatus(HttpServletRequest request, String userId, Status loginStatus, Status isStatus) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         String sessionId = session.getId();// 세션 아이디
 //        해당 세션 정보 가져옴
 
@@ -89,7 +89,7 @@ public class UserLoginStatusService {
     }
     @Transactional
     public void updateRememberLoginStatus(HttpServletRequest request, String userId, Status loginStatus, Status isStatus) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         String rememberValue = CustomCookie.readCookie(request.getCookies(), RememberCookie.KEY.getValue());
 //        해당 세션 정보 가져옴
 

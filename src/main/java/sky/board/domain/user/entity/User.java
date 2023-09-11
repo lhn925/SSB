@@ -55,7 +55,6 @@ public class User extends BaseTimeEntity {
     private String userName;
     private String email;
 
-
     // 프로필 사진
     private String pictureUrl;
 
@@ -72,6 +71,9 @@ public class User extends BaseTimeEntity {
     private PwSecLevel pwSecLevel;
 
     private String salt;
+
+    // 차단: true , 차단 x : false
+    private Boolean isLoginBlocked;
 
     // 비활성화(회원 탈퇴) 여부 true:탈퇴x ,false:탈퇴
     private Boolean isEnabled;

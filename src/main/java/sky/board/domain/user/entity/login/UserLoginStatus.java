@@ -104,7 +104,7 @@ public class UserLoginStatus extends BaseTimeEntity {
             .loginStatus(Status.ON.getValue())
             .defaultLoginLog(
                 DefaultLoginLog.createDefaultLoginLog(Status.ON, userLocationDto, request)
-            ).session(request.getSession().getId())
+            ).session(request.getSession(false).getId())
             .browser(UserLocationDto.getClientBrowser(request))
             .os(UserLocationDto.getClientOS(request));
         String rememberMe = (String) request.getAttribute(RememberCookie.KEY.getValue());

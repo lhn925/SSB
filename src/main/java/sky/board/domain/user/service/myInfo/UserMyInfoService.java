@@ -43,7 +43,7 @@ public class UserMyInfoService {
 
     @Transactional
     public void updateUserName(HttpServletRequest request, UserNameUpdateDto userNameUpdateDto) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
 
         // 변경 가능 여부
         boolean isChange = false;
@@ -76,7 +76,7 @@ public class UserMyInfoService {
 
     @Transactional
     public UploadFile updatePicture(HttpServletRequest request, MultipartFile file) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
         UploadFile uploadFile = null;
@@ -109,7 +109,7 @@ public class UserMyInfoService {
 
     @Transactional
     public void deletePicture(HttpServletRequest request) throws FileNotFoundException {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
 
         User user = userQueryService.findOne(session);
 
