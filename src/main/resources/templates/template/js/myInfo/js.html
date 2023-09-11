@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)" th:with="lan = ${#locale.toString().substring(0,2)}">
-
-
-
-
-
 <th:block th:if="${page == 'myInfoForm'}" class="myInfoForm">
   <script th:src="@{/js/myInfo/picture.js}"></script>
   <script th:src="@{/js/myInfo/modal.js}"></script>

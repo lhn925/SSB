@@ -4,18 +4,11 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('login')}">
+  <th:block th:replace="~{template/css/login/css :: css ('login')}">
   </th:block>
 </head>
 <body>
 <div class="container" th:replace="~{template/container/container ::container (~{:: .mainCard})}">
-
-  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-    Prabowo -
-    Flaticon</a>
-  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-    Icons -
-    Flaticon</a>
 
   <div class="card mainCard">
     <div class="card-body">
@@ -29,12 +22,6 @@
                    th:placeholder="#{sky.id}">
           </div>
         </div>
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-          Prabowo -
-          Flaticon</a>
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-          Icons -
-          Flaticon</a>
 
         <div class="form-group">
           <div class="input-group form-login form-pw">
@@ -42,10 +29,6 @@
                    th:errorclass="border-danger" th:placeholder="#{sky.pw}">
           </div>
         </div>
-        <!--            <th:block th:if="*{captchaKey}">-->
-        <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title="반복 아이콘">반복 아이콘 제작자: Stockes Design
-          - Flaticon</a>
-
 
         <div class="card captchaCard" th:classappend="*{imageName} ? '' : 'display-none' ">
           <div class="form-group card-body">
@@ -103,10 +86,11 @@
 </body>
 
 
-<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+
+<th:block th:replace="~{template/js/common/common :: js ('commonJs')}">
 </th:block>
 
-<th:block th:replace="~{template/js/js :: js ('login')}">
+<th:block th:replace="~{template/js/login/js :: js ('login')}">
 </th:block>
 
 

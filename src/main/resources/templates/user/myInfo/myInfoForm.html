@@ -8,50 +8,11 @@
   </th:block>
 </head>
 
-
-<th:block th:if="${session.USER_ID == null}">
-  <script>
-    location.href = "/login";
-  </script>
-</th:block>
 <body>
 <!-- Breadcrumb -->
-<section class="header row justify-content-center border-bottom">
-  <nav class="col-lg-8 navbar navbar-expand-md navbar-light">
-    <div class="container-fluid">
-      <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav" data-bs-theme="dark">
-        <ul class="navbar-nav ms-auto">
-          <th:block th:if="${session.USER_ID != null}">
 
-            <li class="nav-item">
-              <img th:src="@{|/user/myInfo/api/picture/${userMyInfo.getPictureUrl()}|}" alt="Admin"
-                   class="userPicture navbar-picture rounded-circle p-1">
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-dark"
-                 th:href="@{|/logout|}"
-              ><small class="userNameInfo" th:text="${userMyInfo.getUserName()}"></small></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-dark"
-                 th:href="@{|/logout|}"
-                 th:text="#{sky.alarm.none}"></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-dark"
-                 th:href="@{|/logout|}"
-                 th:text="#{sky.logout}"></a>
-            </li>
-          </th:block>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</section>
+<th:block th:replace="~{template/header/myInfo/header :: header}">
+</th:block>
 <!-- /Breadcrumb -->
 <div class="container">
   <div class="row justify-content-center main-body">
@@ -59,8 +20,6 @@
       <div class="col-md-4 mb-3">
         <div class="card imageCard">
           <div class="card-body">
-            <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
-              Flaticon</a>
             <div class="picture-div d-flex flex-column align-items-center text-center">
               <button type="button" class="btn pictureBtn" id="pictureBtn">
                 <img th:src="@{|/user/myInfo/api/picture/${userMyInfo.getPictureUrl()}|}"
@@ -125,8 +84,6 @@
                     <input class="display-none" hidden="true" id="ogUserName"th:value="${userMyInfo.userName}">
                     <span class="ms-4 userNameInfo" th:text="${userMyInfo.userName}"></span>
                   </div>
-                  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Pixel
-                    perfect - Flaticon</a>
                   <div class="btn-div ms-auto">
                     <button class="btn changeUserNameBtn" type="button" id="changeUserNameBtn">
                       <img th:src="@{/css/image/pencil.png}">
@@ -158,8 +115,6 @@
                     </h6>
                     <span class="ms-4" th:text="#{sky.pw}">비밀번호</span>
                   </div>
-                  <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Pixel
-                    perfect - Flaticon</a>
                   <div class="btn-div ms-auto">
                     <button class="btn changePwBtn" type="button" id="changePwBtn">
                       <img th:src="@{/css/image/pencil.png}">
@@ -182,7 +137,6 @@
                 </li>
               </ul>
             </div>
-
             <div class="card mt-3">
               <ul class="list-group list-group-flush">
                 <li class="list-group-title list-group-item d-flex justify-content-between align-items-center flex-wrap">
@@ -206,45 +160,12 @@
   </div>
 </div>
 
-<div id="modal" class="modal-overlay">
-  <div class="modal-window">
-    <div class="title">
-      <h4>
-        <strong>닉네임 변경 <br></strong>
-        <small>(닉네임은 한달에 한번 바꿀수 있습니다)</small>
-      </h4>
-    </div>
-    <div class="close-area model-cancel"><span class="blind">X</span></div>
-    <div class="content">
-      <ul class="list-group list-group-flush">
-        <li class="modal-List list-group-item d-flex align-items-center flex-wrap">
-          <h6 class="mb-0">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="feather feather-globe mr-2 icon-inline">
-            </svg>
-          </h6>
-          <div class="input-group form-join form-name">
-            <input class="form-control" th:field="${userMyInfo.userName}">
-          </div>
-        </li>
-      </ul>
-    </div>
-
-    <div class="btn_duo_popup">
-      <a class="model-cancel btn_item text-decoration-none" role="button">
-        <span class="btn_text">취소</span>
-      </a>
-      <a class="btn_item on text-decoration-none" role="button">
-        <span id="b_txt_phoneNo_reg" class="btn_text">변경</span>
-      </a>
-    </div>
-  </div>
-</div>
-
-</body>
-<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+<th:block th:replace="~{template/modal/myInfo/modal :: modal ('myInfoForm')}">
 </th:block>
+</body>
 
+<th:block th:replace="~{template/js/common/common :: js ('commonJs')}">
+</th:block>
 
 <th:block th:replace="~{template/js/myInfo/js :: js ('myInfoForm')}">
 </th:block>

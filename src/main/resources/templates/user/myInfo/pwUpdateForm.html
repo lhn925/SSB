@@ -10,21 +10,6 @@
 <body>
 <div class="container" th:replace="~{template/container/container ::container (~{:: .mainCard})}">
   <div class="card mainCard">
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-      Prabowo -
-      Flaticon</a>
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-      Icons -
-      Flaticon</a>
-
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-      Prabowo -
-      Flaticon</a>
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-      Icons -
-      Flaticon</a>
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
-      Flaticon</a>
     <div class="card-body">
       <h5 class="card-title text-center" th:text="#{sky.pwReset}"></h5>
       <form class="mt-4" method="post" th:action="@{/user/myInfo/pw}" th:object="${userPwUpdateFormDto}">
@@ -119,54 +104,11 @@
     </div>
   </div>
 </div>
-<div id="modal" class="modal-overlay">
-  <div class="modal-window modal-logout">
-    <div class="title text-center">
-      <h4>
-        <strong th:text="#{sky.modal.pwUpdateForm.title}">비밀번호가 변경 되었습니다.</strong>
-      </h4>
-    </div>
-    <div class="content">
-      <ul class="list-group list-group-flush">
-        <li class="modal-List list-group-item d-flex align-items-center flex-wrap">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="logoutRadio" id="allLogoutRadio" checked="true">
-            <label class="form-check-label" for="allLogoutRadio" th:text="#{sky.modal.pwUpdateForm.logout}">
-              모드 기기 및 브라우저에서 로그아웃
-            </label>
-          </div>
-          <div class="form-text">
-            <small th:text="#{sky.modal.pwUpdateForm.logout.content}">
-              다른 사람이 회원님의 비밀번호를 알고 있다고 생각된다면
-              모든 기기에서 로그아웃하시는 것이 안전합니다.</small>
-          </div>
-        </li>
-        <li class="modal-List list-group-item d-flex align-items-center flex-wrap">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="logoutRadio" id="logoutNoneRadio">
-            <label th:text="#{sky.modal.pwUpdateForm.logoutnone}" class="form-check-label" for="logoutNoneRadio">
-              로그인 상태 유지
-            </label>
-          </div>
-            <div class="form-text">
-              <small th:text="#{sky.modal.pwUpdateForm.logoutnone.content}">
-                회원님의 아이디로 로그인한 목록은 보안 설정의 로그인 관리 > 로그인 목록에서 확인 가능합니다.</small>
-            </div>
-        </li>
-      </ul>
-    </div>
 
-    <div id="modal-logout-btn" class="btn_one_popup">
-      <button class="btn modal-logout-btn btn_item on text-decoration-none" role="button">
-        <span id="radioCheckBtn" class="btn_text" th:text="#{sky.check}">확인</span>
-      </button>
-    </div>
-  </div>
-</div>
+<th:block th:replace="~{template/modal/myInfo/modal :: modal ('pwUpdateForm')}">
+</th:block>
 </body>
-
-
-<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+<th:block th:replace="~{template/js/common/common :: js ('commonJs')}">
 </th:block>
 <th:block th:replace="~{template/js/myInfo/js :: js ('pwUpdateForm')}">
 </th:block>

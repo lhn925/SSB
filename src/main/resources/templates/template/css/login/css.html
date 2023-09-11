@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="css (page)">
+
+<th:block th:if="${page == 'login'}">
+  <link th:href="@{/css/login/login.css}" rel="stylesheet">
+  <title th:text="#{sky.logo}+ ':' + #{sky.login}"></title>
+</th:block>
+
+</html>

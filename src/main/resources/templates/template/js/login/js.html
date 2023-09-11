@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)" th:with="lan = ${#locale.toString().substring(0,2)}">
+
+
+<th:block th:if="${page == 'login'}" class="login">
+  <script th:src="@{/js/login/login.js}"></script>
+  <script th:src="@{/js/login/login_ready.js}"></script>
+  <script th:inline="javascript">
+    let _login;
+    _login_ready_init();
+  </script>
+</th:block>
+
+</html>

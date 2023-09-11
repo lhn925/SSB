@@ -1,29 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)" th:with="lan = ${#locale.toString().substring(0,2)}">
 
-
-<th:block th:if="${page == 'commonJs'}" class="commonJs">
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
-          integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
-          crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
-          integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
-          crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-  <script th:src="@{/js/common/format.js}"></script>
-  <script th:src="@{|/js/errors/${lan}/errors.js|}"></script>
-  <script th:src="@{|/js/common/messages/${lan}/messages.js|}"></script>
-  <script th:src="@{/js/common/CustomToastr.js}"></script>
-  <script th:src="@{/js/common/HttpStatusCode.js}"></script>
-  <script th:src="@{/js/common/function.js}"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  <script>
-    _setToastr(toastr);
-  </script>
-</th:block>
-
-
 <th:block th:if="${page == 'joinAgreeForm'}" class="joinAgreeForm">
   <script th:src="@{/js/common/function.js}"></script>
   <script th:src="@{/js/join/Agree.js}"></script>

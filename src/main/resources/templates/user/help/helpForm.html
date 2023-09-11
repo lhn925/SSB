@@ -4,15 +4,11 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('helpForm')}">
+  <th:block th:replace="~{template/css/help/css :: css ('helpForm')}">
   </th:block>
 </head>
 <body>
 <div class="container" th:replace="~{template/container/container ::container (~{:: .card})}">
-
-  <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a>
-    from
-    <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
 
   <div class="card">
     <div class="card-body">
@@ -53,9 +49,6 @@
             </div>
           </div>
           <div class="form-group">
-            <div class="display-none"> Icons made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a>
-              from
-              <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com'</a></div>
             <div class="input-group form-join form-auth"
                  th:classappend="${#fields.hasErrors('authCode')} ? 'error' : 'on'">
               <input type="text" class="form-control authCode" th:field="*{authCode}"
@@ -92,11 +85,10 @@
 </body>
 
 
-<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+<th:block th:replace="~{template/js/common/common :: js ('commonJs')}">
 </th:block>
 
-
-<th:block th:replace="~{template/js/js :: js ('helpForm')}">
+<th:block th:replace="~{template/js/help/js :: js ('helpForm')}">
 </th:block>
 
 </html>

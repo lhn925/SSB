@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="js (page)" th:with="lan = ${#locale.toString().substring(0,2)}">
+
+
+
+<th:block th:if="${page == 'helpForm'}" class="helpForm">
+  <script th:src="@{/js/join/Email.js}"></script>
+  <script th:src="@{/js/help/help_ready.js}"></script>
+  <script th:inline="javascript">
+    let _email;
+    _id_help_ready_init();
+  </script>
+</th:block>
+
+<th:block th:if="${page == 'pwResetForm'}" class="pwResetForm">
+  <script th:src="@{/js/help/reset.js}"></script>
+  <script th:src="@{/js/help/reset_ready.js}"></script>
+  <script th:inline="javascript">
+    let _reset;
+    _reset_ready_init();
+  </script>
+</th:block>
+
+
+<th:block th:if="${page == 'idQueryForm'}" class="idQueryForm">
+  <script th:src="@{/js/help/idquery.js}"></script>
+  <script th:src="@{/js/help/idquery_ready.js}"></script>
+  <script th:inline="javascript">
+    let _idquery;
+    _idquery_ready_init();
+  </script>
+</th:block>
+
+</html>

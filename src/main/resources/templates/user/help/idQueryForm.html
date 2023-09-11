@@ -4,7 +4,7 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('helpForm')}">
+  <th:block th:replace="~{template/css/help/css :: css ('helpForm')}">
   </th:block>
 </head>
 <body>
@@ -20,8 +20,6 @@
         </div>
         <input type="checkbox" hidden="true" id="_isChkUId"/>
         <div class="form-group">
-          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
-            Flaticon</a>
           <div th:for="userId" class="input-group form-join form-id"
                th:classappend="${#fields.hasErrors('userId')} ? 'error' : 'on'">
             <input type="text" class="form-control" th:field="*{userId}"
@@ -40,7 +38,7 @@
 <div class="centered-breadcrumb">
   <div aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item" ><span th:text="#{sky.idqueryForm2}"></span></li>
+      <li class="breadcrumb-item"><span th:text="#{sky.idqueryForm2}"></span></li>
       <li class="breadcrumb-item"><a class="text-decoration-none mainLogo" th:href="@{/user/help/id}"
                                      th:text="#{sky.findId}">아이디 찾기</a></li>
 
@@ -50,9 +48,9 @@
 </body>
 
 
-<th:block th:replace="~{template/js/js :: js ('commonJs')}">
-</th:block>
 
-<th:block th:replace="~{template/js/js :: js ('idQueryForm')}">
+<th:block th:replace="~{template/js/common/common :: js ('commonJs')}">
+</th:block>
+<th:block th:replace="~{template/js/help/js :: js ('idQueryForm')}">
 </th:block>
 </html>

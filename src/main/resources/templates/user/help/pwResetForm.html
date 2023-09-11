@@ -4,27 +4,12 @@
   <th:block th:replace="~{template/header/header :: commonHead}">
   </th:block>
 
-  <th:block th:replace="~{template/css/css :: css ('pwUpdateForm')}">
+  <th:block th:replace="~{template/css/help/css :: css ('pwUpdateForm')}">
   </th:block>
 </head>
 <body>
 <div class="container" th:replace="~{template/container/container ::container (~{:: .mainCard})}">
   <div class="card mainCard">
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-      Prabowo -
-      Flaticon</a>
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-      Icons -
-      Flaticon</a>
-
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: Andrean
-      Prabowo -
-      Flaticon</a>
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/-" title="- 아이콘">- 아이콘 제작자: Bharat
-      Icons -
-      Flaticon</a>
-    <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title=" 아이콘"> 아이콘 제작자: inkubators -
-      Flaticon</a>
     <div class="card-body">
       <h5 class="card-title text-center" th:text="#{sky.pwReset}"></h5>
       <form class="mt-4" method="post" th:action="@{/user/help/reset}" th:object="${userPwResetFormDto}">
@@ -51,9 +36,6 @@
               <small th:text="${err.size() > 0 ? err.get(0).getMessage() : ''}"
                      id="newPw-msg"> </small>
           </div>
-
-
-
           <div class="form-group">
             <div class="input-group form-join form-pw"
                  th:classappend="${#fields.hasErrors('newPwChk')} ? 'error' : 'on'">
@@ -66,12 +48,6 @@
                        id="newPwChk-msg"> </small>
             </div>
           </div>
-          <!--            <th:block th:if="*{captchaKey}">-->
-          <a class="display-none" href="https://www.flaticon.com/kr/free-icons/" title="반복 아이콘">반복 아이콘 제작자: Stockes
-            Design
-            - Flaticon</a>
-
-
           <div class="card captchaCard">
             <div class="form-group card-body">
               <img class="captcha-img mb-3" id="imagePath" th:src="*{imageName} ? '/Nkey/open/image/'+ *{imageName} : '' "/>
@@ -89,8 +65,6 @@
               </div>
             </div>
           </div>
-
-
           <input type="hidden" class="form-control" th:field="*{captchaKey}">
           <input type="hidden" class="form-control" th:field="*{imageName}">
           <!-- 로그인 버튼을 크게 만들고 가운데 정렬 -->
@@ -107,9 +81,9 @@
 </body>
 
 
-<th:block th:replace="~{template/js/js :: js ('commonJs')}">
+<th:block th:replace="~{template/js/common/common :: js ('commonJs')}">
 </th:block>
-<th:block th:replace="~{template/js/js :: js ('pwResetForm')}">
+<th:block th:replace="~{template/js/help/js :: js ('pwResetForm')}">
 </th:block>
 
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modal">
+  <div id="modal" class="modal-overlay">
+    <div class="modal-window">
+      <div class="title">
+        <h4>
+          <strong>닉네임 변경 <br></strong>
+          <small>(닉네임은 한달에 한번 바꿀수 있습니다)</small>
+        </h4>
+      </div>
+      <div class="close-area model-cancel"><span class="blind">X</span></div>
+      <div class="content">
+        <ul class="list-group list-group-flush">
+          <li class="modal-List list-group-item d-flex align-items-center flex-wrap">
+            <h6 class="mb-0">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   class="feather feather-globe mr-2 icon-inline">
+              </svg>
+            </h6>
+            <div class="input-group form-join form-name">
+              <input class="form-control" th:field="${userMyInfo.userName}">
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="btn_duo_popup">
+        <a class="model-cancel btn_item text-decoration-none" role="button">
+          <span class="btn_text">취소</span>
+        </a>
+        <a class="btn_item on text-decoration-none" role="button">
+          <span id="b_txt_phoneNo_reg" class="btn_text">변경</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</th:block>
+</html>

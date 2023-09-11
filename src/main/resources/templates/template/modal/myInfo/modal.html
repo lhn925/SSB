@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="modal (page)">
+
+<th:block th:if="${page == 'myInfoForm'}">
+  <th:block th:replace="~{template/modal/myInfo/myInfoForm :: modal}">
+  </th:block>
+</th:block>
+
+<th:block th:if="${page == 'pwUpdateForm'}">
+  <th:block th:replace="~{template/modal/myInfo/pwUpdateForm :: modal}">
+  </th:block>
+</th:block>
+</html>

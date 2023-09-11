@@ -7,7 +7,7 @@ function PwUpdate() {
   this.$newPwChk = null;
   this.$imageName = null;
   this.$resetSubBtn = null;
-  this.$radioCheckBtn = null;
+  this.$modalLogoutBtn = null;
   this.modal = new Modal();
   this._init();
 }
@@ -164,7 +164,7 @@ PwUpdate.prototype._PwSecureCheckAddEvent = function () {
 }
 //패스워드 안전도 체크 이벤트추가
 PwUpdate.prototype._cancelBtn = function () {
-  document.getElementById("cancel").onkeyup = function () {
+  document.getElementById("cancel").onclick = function () {
     location.href = "/user/myInfo";
   }
 }

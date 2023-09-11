@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="css (page)">
+<th:block th:if="${page == 'pwResetForm'}">
+  <link th:href="@{/css/base/secure.css}" rel="stylesheet">
+  <link th:href="@{/css/join/join.css}" rel="stylesheet">
+  <link th:href="@{/css/help/help.css}" rel="stylesheet">
+  <title th:text="#{sky.logo} +':' + #{sky.pwReset}"></title>
+</th:block>
+
+
+<th:block th:if="${page == 'helpForm'}">
+  <link th:href="@{/css/join/join.css}" rel="stylesheet">
+  <title th:text="#{sky.logo} +':' + #{sky.idHelp}"></title>
+</th:block>
+
+</html>
