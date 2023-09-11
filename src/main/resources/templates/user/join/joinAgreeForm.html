@@ -21,14 +21,14 @@
       <label th:for="sbbAgreement"><em class="agreeOption agreePoint" th:text="#{sky.required}">[필수]</em>[[#{sky.logo}]]
         [[#{sky.agree1}]]
       </label>
-      <div th:replace="~{template/agreeLayout :: agrre1}">
+      <div th:replace="~{template/layout/join/agreeLayout :: agrre1}">
 
       </div>
     </div>
     <div class="form-group mt-5">
       <input type="checkbox" class="form-check-input agreeCheck" th:field="*{infoAgreement}">
       <label th:for="infoAgreement"><em class="agreeOption agreePoint" th:text="#{sky.required}"></em>[[#{sky.agree2}]]</label>
-      <div th:replace="~{template/agreeLayout :: agrre2}">
+      <div th:replace="~{template/layout/join/agreeLayout :: agrre2}">
 
       </div>
     </div>
