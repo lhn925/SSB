@@ -88,7 +88,10 @@
 .pwImg svg{
   background-image: url("../image/free-icon-padlock-4503885.png");
 }
-
+.earthImg svg {
+  height: 25.5px;
+  background-image: url("../image/globe.png");
+}
 
 .btn-div{
   height: 20px;

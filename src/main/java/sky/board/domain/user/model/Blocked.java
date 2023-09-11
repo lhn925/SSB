@@ -16,16 +16,16 @@ public enum Blocked {
         return this.enabled;
     }
 
-    public static boolean ENABLED() {
+    public static boolean BLOCKED() {
         return BLOCKED.getValue();
     }
 
-    public static boolean UNABlED() {
+    public static boolean UNBLOCKED() {
         return UNBLOCKED.getValue();
     }
 
-    public static Blocked valueOf(Boolean enabled) {
-        if (enabled) {
+    public static Blocked valueOf(Boolean blocked) {
+        if (blocked) {
             return Blocked.BLOCKED;
         } else {
             return Blocked.UNBLOCKED;

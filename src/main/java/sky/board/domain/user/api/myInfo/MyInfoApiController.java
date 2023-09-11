@@ -31,12 +31,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPictureUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPwUpdateFormDto;
 import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.PwSecLevel;
-import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.help.UserHelpService;
 import sky.board.domain.user.service.log.UserActivityLogService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
@@ -116,8 +116,8 @@ public class MyInfoApiController {
 
     @DeleteMapping("/picture")
     public ResponseEntity deleteUserProfilePicture(HttpServletRequest request) throws FileNotFoundException {
-            userMyInfoService.deletePicture(request);
-            return ResponseEntity.ok(HttpStatus.OK);
+        userMyInfoService.deletePicture(request);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
@@ -128,7 +128,6 @@ public class MyInfoApiController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
 
-
         //디코딩
         byte[] dePw = Base64.getDecoder().decode(userPwUpdateFormDto.getPassword().getBytes());
         byte[] deNewPw = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPw().getBytes());
@@ -137,7 +136,6 @@ public class MyInfoApiController {
         userPwUpdateFormDto.setPassword(new String(dePw, StandardCharsets.UTF_8));
         userPwUpdateFormDto.setNewPw(new String(deNewPw, StandardCharsets.UTF_8));
         userPwUpdateFormDto.setNewPwChk(new String(deNewPwChk, StandardCharsets.UTF_8));
-
 
         boolean isCaptcha;
         Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
@@ -174,6 +172,31 @@ public class MyInfoApiController {
         }
     }
 
+    @PostMapping("/login/status")
+    public ResponseEntity updateLoginStatus(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);
+
+            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+            userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(), session.getId());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("error");
+        }
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PostMapping("/block")
+    public ResponseEntity loginBlockedUpdate(@RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
+        HttpServletRequest request) {
+        try {
+            userMyInfoService.updateLoginBlocked(userLoginBlockDto, request);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("error");
+        }
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     private static void valueCheck(UserPwUpdateFormDto userPwUpdateFormDto, boolean isCaptcha, PwSecLevel pwSecLevel) {
         if (!isCaptcha) {
             throw new IllegalArgumentException("error.captcha");
@@ -186,19 +209,6 @@ public class MyInfoApiController {
         if (pwSecLevel.equals(PwSecLevel.NOT)) {
             throw new IllegalArgumentException("updatePw");
         }
-    }
-
-    @PostMapping("/login/status")
-    public ResponseEntity updateLoginStatus(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession(false);
-
-            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-            userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(),session.getId());
-        } catch (RuntimeException e) {
-            throw new RuntimeException("error");
-        }
-        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     private void deleteImage(

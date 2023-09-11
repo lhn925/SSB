@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.entity.User;
+import sky.board.domain.user.model.Blocked;
 import sky.board.domain.user.model.Enabled;
 import sky.board.global.file.utili.FileStore;
 import sky.board.global.redis.dto.RedisKeyDto;
@@ -27,6 +28,7 @@ public class UserInfoDto implements Serializable {
     private String token;
     private String pictureUrl;
     private Enabled enabled;
+    private Blocked isLoginBlocked;
     private LocalDateTime userNameModifiedDate;
 
     private List<GrantedAuthority> grantedAuthority;
@@ -34,7 +36,7 @@ public class UserInfoDto implements Serializable {
     @Builder
     private UserInfoDto(String userId, String email, String userName, String token,
         List<GrantedAuthority> grantedAuthority,
-        String pictureUrl, LocalDateTime userNameModifiedDate, Enabled enabled) {
+        String pictureUrl, LocalDateTime userNameModifiedDate, Enabled enabled,Blocked isLoginBlocked) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
@@ -43,12 +45,10 @@ public class UserInfoDto implements Serializable {
         this.pictureUrl = pictureUrl;
         this.userNameModifiedDate = userNameModifiedDate;
         this.enabled = enabled;
+        this.isLoginBlocked = isLoginBlocked;
     }
 
     public static UserInfoDto createUserInfo(UserDetails userDetails) {
-
-
-
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
         return UserInfoDto.builder()
             .userId(customUserDetails.getUserId())
@@ -57,6 +57,7 @@ public class UserInfoDto implements Serializable {
             .email(customUserDetails.getEmail())
             .userNameModifiedDate(customUserDetails.getUserNameModifiedDate())
             .enabled(Enabled.valueOf(userDetails.isEnabled()))
+            .isLoginBlocked(Blocked.valueOf(customUserDetails.getLoginBlocked()))
             .pictureUrl(
                 customUserDetails.getPictureUrl() == null ? FileStore.USER_DEFAULT_DIR : customUserDetails.getPictureUrl())
             .grantedAuthority((List<GrantedAuthority>) customUserDetails.getAuthorities())

@@ -19,21 +19,24 @@ public class UserMyInfoDto implements Serializable {
     private String email;
     private String userName;
     private String pictureUrl;
+    private Boolean isLoginBlocked;
+
 
     @Builder
-    private UserMyInfoDto(String userId, String email, String userName, String pictureUrl) {
+    public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
         this.pictureUrl = pictureUrl;
+        this.isLoginBlocked = isLoginBlocked;
     }
-
 
     public static UserMyInfoDto createUserMyInfo(UserInfoDto userInfoDto) {
         return UserMyInfoDto.builder()
             .userId(userInfoDto.getUserId())
             .email(userInfoDto.getEmail())
             .pictureUrl(userInfoDto.getPictureUrl())
+            .isLoginBlocked(userInfoDto.getIsLoginBlocked().getValue())
             .userName(userInfoDto.getUserName()).build();
     }
 

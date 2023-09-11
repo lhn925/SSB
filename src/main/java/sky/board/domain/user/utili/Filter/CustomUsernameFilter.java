@@ -58,7 +58,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
         throws AuthenticationException {
-        log.info("CustomUsernameFilter");
         if (this.postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
@@ -85,7 +84,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         // 2차인증키가 있고 failCount가 5를 넘어야 보안코드 발급
         if (StringUtils.hasText(chptchaKey) && failCount >= Limit) {
             String captcha = getRequestValue("captcha", request);
-            String filename = getRequestValue("imageName", request);
 
             if (!StringUtils.hasText(captcha)) {
                 throw new CaptchaMisMatchFactorException("captcha Not found");

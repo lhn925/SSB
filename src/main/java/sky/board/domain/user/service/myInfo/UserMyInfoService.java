@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import sky.board.domain.user.dto.UserInfoDto;
+import sky.board.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.exception.ChangeUserNameIsNotAfterException;
@@ -84,9 +85,7 @@ public class UserMyInfoService {
             try {
                 uploadFile = fileStore.storeFile(file, fileStore.getUserPictureDir(), userInfoDto.getToken());
                 if (uploadFile != null) {
-                    Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(),
-                        userInfoDto.getToken());
-                    User user = User.getOptionalUser(optionalUser);
+                    User user = userQueryService.findOne(session);
                     //기존에 있던 이미지 삭제 없으면 삭제 x
                     user.deletePicture(fileStore);
 
@@ -131,6 +130,17 @@ public class UserMyInfoService {
         }
     }
 
+    @Transactional
+    public void updateLoginBlocked(UserLoginBlockUpdateDto userLoginBlockUpdateDto, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        User user = userQueryService.findOne(session);
+        // block 여부 업데이트
+        log.info("userLoginBlockUpdateDto = {}", userLoginBlockUpdateDto.getIsLoginBlocked());
+        User.changeIsLoginBlocked(user,userLoginBlockUpdateDto);
+        // 세션 업데이트
+        UserInfoDto.sessionUserInfoUpdate(session,user);
+    }
+
 
     public UrlResource getPictureImage(String imageName) {
         try {
@@ -139,8 +149,6 @@ public class UserMyInfoService {
             throw new RuntimeException(e);
         }
     }
-
-
 
 
 }

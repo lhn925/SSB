@@ -11,9 +11,11 @@ MyInfo.prototype._init = function () {
   this.body = document.querySelector("body")
   this.$changeUserNameBtn = document.getElementById("changeUserNameBtn");
   this.$changePwBtn = document.getElementById("changePwBtn");
+  this.$isLoginBlocked = document.getElementById("isLoginBlocked1");
   this._changeUserNameBtnClickAddEvent(this.$modal, this.body);
   this._modalCancelBtnClickAddEvent(this.$modal, this.body);
   this._modalSaveBtnClickAddEvent(this.$modal, this.body);
+  this._blockCheckedChangeAddEvent();
   this._changePwBtnClickAddEvent();
 }
 
@@ -27,6 +29,23 @@ MyInfo.prototype._changePwBtnClickAddEvent = function () {
     location.href = "/user/myInfo/pw";
   }
 }
+MyInfo.prototype._blockCheckedChangeAddEvent = function () {
+  this.$isLoginBlocked.onchange = function () {
+    let isChecked = this.checked;
+    _post("/user/myInfo/api/block", {isLoginBlocked: isChecked})
+    .then(() => {
+      let code = "loginUnblock";
+      if (isChecked) {
+        code = "loginBlock"
+      }
+      _success(messages[code]);
+    }).catch((error) => {
+      error = JSON.parse(error.message);
+      _error(error.message);
+    })
+  }
+}
+
 MyInfo.prototype._modalCancelBtnClickAddEvent = function ($modal, body) {
   const closeBtnList = $modal.querySelectorAll(".model-cancel")
   for (const closeBtnListElement of closeBtnList) {
@@ -39,7 +58,6 @@ MyInfo.prototype._modalCancelBtnClickAddEvent = function ($modal, body) {
       _myInfo.modal._close($modal, body);
     })
   }
-
 }
 MyInfo.prototype._modalSaveBtnClickAddEvent = function ($modal, body) {
   const saveBtn = $modal.querySelector(".btn_duo_popup").lastElementChild;

@@ -27,7 +27,6 @@ public class LocationFinderService {
         return UserLocationDto.createUserLocationDto(response);
     }
 
-
     // 사용자 ip추출
     private String getIp() {
         String ip = HttpReqRespUtils.getClientIpAddressIfServletRequestExist();

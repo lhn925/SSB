@@ -62,7 +62,7 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
             errMsg = "login.error.captcha";
             sbPath.append("imageName=" + request.getParameter("imageName"));
             sbPath.append("&captchaKey=" + request.getParameter("captchaKey") + "&");
-        }
+        } 
 
         userLoginLogService.save(request, LoginSuccess.FAIL, Status.ON);
         sendRedirect(request, response, errMsg, sbPath, retryTwoFactor);

@@ -20,7 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
 import sky.board.domain.user.exception.UserInfoNotFoundException;
+import sky.board.domain.user.model.Blocked;
 import sky.board.domain.user.model.Enabled;
 import sky.board.global.base.BaseTimeEntity;
 import sky.board.domain.user.dto.join.UserJoinPostDto;
@@ -81,7 +83,7 @@ public class User extends BaseTimeEntity {
 
     @Builder
     private User(String token, String userId, String password, String userName, String email, String pictureUrl,
-        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled) {
+        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled,Boolean isLoginBlocked) {
         this.token = token;
         this.userId = userId;
         this.password = password;
@@ -93,6 +95,7 @@ public class User extends BaseTimeEntity {
         this.pwSecLevel = pwSecLevel;
         this.salt = salt;
         this.isEnabled = isEnabled;
+        this.isLoginBlocked = isLoginBlocked;
     }
 
     // 가입할 유저 entity 생성
@@ -104,9 +107,14 @@ public class User extends BaseTimeEntity {
             .userName(userJoinDto.getUserName())
             .salt(salt)
             .grade(UserGrade.USER)
+            .isLoginBlocked(Blocked.UNBLOCKED())
             .pwSecLevel(userJoinDto.getPwSecLevel())
             .isEnabled(Enabled.ENABLED()).build();
     }
+
+
+
+
 
     //  User 클래스 (org.springframework.security.core.UserDetails.User)의 빌더를
     //  사용해서 username 에 아이디, password 에 비밀번호,
@@ -122,6 +130,7 @@ public class User extends BaseTimeEntity {
             password(user.getPassword()).
             enabled(user.getIsEnabled()).
             userNameModifiedDate(user.getUserNameModifiedDate()).
+            isLoginBlocked(user.getIsLoginBlocked()).
             build();
         build.setAuthorities(user.getGrade().getDescription());
         return build;
@@ -172,6 +181,11 @@ public class User extends BaseTimeEntity {
 
     public static String getPictureFullUrl(FileStore fileStore, String token) {
         return fileStore.getFileDir() + fileStore.getUserPictureDir() + token + "/";
+    }
+
+    public static User changeIsLoginBlocked(User user, UserLoginBlockUpdateDto userLoginBlockUpdateDto) {
+        user.setIsLoginBlocked(userLoginBlockUpdateDto.getIsLoginBlocked());
+        return user;
     }
 
 }

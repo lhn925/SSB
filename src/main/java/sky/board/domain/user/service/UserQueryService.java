@@ -40,7 +40,7 @@ public class UserQueryService {
     public CustomUserDetails findStatusUserId(String userId, Enabled enabled)
         throws UsernameNotFoundException {
         Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
-        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
+        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
 
         return CustomUserDetails.builder()
             .userId(user.getUserId())

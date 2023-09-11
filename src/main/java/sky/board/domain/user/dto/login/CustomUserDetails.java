@@ -42,6 +42,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
     private String email;
     private String password;
     private String username;
+    private boolean isLoginBlocked;
 
     //가입한 날짜
     private LocalDateTime createdDateTime;
@@ -105,7 +106,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
 
     @Builder
     public CustomUserDetails(Long uId,String url, String userId, String token, String password, String username,String nickname,
-        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email,String pictureUrl,LocalDateTime userNameModifiedDate) {
+        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled , LocalDateTime createdDateTime,String email,String pictureUrl,LocalDateTime userNameModifiedDate,Boolean isLoginBlocked) {
         this.url = url;
         this.uId = uId;
         this.token = token;
@@ -121,6 +122,7 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
         this.email = email;
         this.pictureUrl = pictureUrl;
         this.userNameModifiedDate = userNameModifiedDate;
+        this.isLoginBlocked = isLoginBlocked;
     }
 
     public LocalDateTime getUserNameModifiedDate() {
@@ -137,6 +139,10 @@ public class CustomUserDetails implements Serializable, UserDetails,CredentialsC
 
     public String getUserId() {
         return userId;
+    }
+
+    public boolean getLoginBlocked() {
+        return isLoginBlocked;
     }
 
     public List<GrantedAuthority> roles(String... roles) {

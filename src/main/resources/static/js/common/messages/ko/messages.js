@@ -17,5 +17,7 @@ const messages = {
   "newPw.NotBlank": "새 비밀번호를 입력해주세요",
   "newPwChk.NotBlank": "비밀번호 확인을 위해 한번 더 입력해주세요",
   "change.picture":"프로필 사진을 변경하시겠습니까?",
-  "picture.success":"프로필 사진이 변경 되었습니다."
+  "picture.success":"프로필 사진이 변경 되었습니다.",
+  "loginUnblock":"해외 로그인 차단을 해제 하였습니다.",
+  "loginBlock":"해외 로그인 차단을 설정하였습니다."
 }
