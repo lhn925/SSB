@@ -113,11 +113,9 @@ PwUpdate.prototype._subBtnClickAddEvent = function ($subBtn, ...$elements) {
       _post("/user/myInfo/api/pw", body).then((data) => {
         _pwUpdate.modal._open(_pwUpdate.$modal, _pwUpdate.body);
       }).catch((error) => {
-        toastr.options.onHidden = function () {
-          location.reload();
-        }
         error = JSON.parse(error.message);
-        _error(error.message);
+        alert(error.message);
+        location.reload();
       });
     }
     setTimeout(function () {

@@ -2,7 +2,10 @@ package sky.board.domain.user.service.log;
 
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Locale.IsoCountryCode;
 import java.util.Optional;
@@ -14,7 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.domain.user.dto.myInfo.UserLoginLogListDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.login.UserLoginLog;
 import sky.board.domain.user.exception.LoginBlockException;
@@ -26,6 +31,7 @@ import sky.board.domain.user.service.UserQueryService;
 import sky.board.global.auditor.AuditorAwareImpl;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
+import sky.board.global.redis.dto.RedisKeyDto;
 
 @Service
 @RequiredArgsConstructor
@@ -63,12 +69,39 @@ public class UserLoginLogService {
     }
 
 
+    /**
+     *
+     * 로그인 로그 출력
+     * @param request
+     * @param startDate
+     * @param endDate
+     * @param pageRequest
+     * @return
+     */
+    public Page<UserLoginLogListDto> getUserLoginLogList(HttpServletRequest request, LocalDate startDate, LocalDate endDate,
+        PageRequest pageRequest) {
+        HttpSession session = request.getSession(false);
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+        Page<UserLoginLogListDto> loginLogPageable = loginLogRepository.getLoginLogPageable(userInfoDto.getUserId(),
+                LoginSuccess.SUCCESS, Status.ON.getValue(), startDate, endDate, pageRequest)
+            .map(UserLoginLogListDto::new);
+
+        return loginLogPageable;
+    }
+
+
     public Long getCount(String userId, LoginSuccess loginSuccess, Status isStatus) {
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<UserLoginLog> loginLogPage = loginLogRepository.getLoginLogPageable(userId, loginSuccess,
             isStatus.getValue(),
             pageRequest);
         return loginLogPage.getTotalElements();
+    }
+
+    @Transactional
+    public void delete(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
+        String userId = request.getParameter("userId");
+        loginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
     }
 
     /**
@@ -82,27 +115,20 @@ public class UserLoginLogService {
         return UserLoginLog.getLoginLog(uId, locationFinderService, request, isSuccess, isStatus);
     }
 
-    @Transactional
-    public void delete(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
-        String userId = request.getParameter("userId");
-        loginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
-    }
-
     /**
      * 해외 로그인 여부 확인
+     *
      * @param request
      * @param userId
      * @throws UsernameNotFoundException
      * @throws IOException
      * @throws GeoIp2Exception
      */
-    public void isLoginBlockChecked(HttpServletRequest request,String userId)
+    public void isLoginBlockChecked(HttpServletRequest request, String userId)
         throws UsernameNotFoundException, IOException, GeoIp2Exception {
         User findByUser = userQueryService.findOne(userId);
         if (findByUser.getIsLoginBlocked()) {
             UserLocationDto userLocationDto = locationFinderService.findLocation();
-            log.info("Locale.KOREA = {}", Locale.KOREA.getCountry());
-            log.info("Locale.KOREA = {}", Locale.KOREAN);
             if (!userLocationDto.getCountryName().equals(Locale.KOREA.getCountry())) {
                 throw new LoginBlockException("login.error.blocked");
             }

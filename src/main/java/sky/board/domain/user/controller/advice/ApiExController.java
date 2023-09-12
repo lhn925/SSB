@@ -7,6 +7,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,17 @@ public class ApiExController {
      */
     @ExceptionHandler({IOException.class, RuntimeException.class, IllegalArgumentException.class})
     public ResponseEntity IoExHandle(Exception e, HttpServletRequest request) {
-        return getErrorResultResponseEntity(e.getMessage(), request, HttpStatus.BAD_REQUEST);
+
+        ResponseEntity<ErrorResult> errorResultResponseEntity = null;
+        try {
+            errorResultResponseEntity = getErrorResultResponseEntity(e.getMessage(),
+                request, HttpStatus.BAD_REQUEST);
+        } catch (NoSuchMessageException ex) {
+            errorResultResponseEntity = getErrorResultResponseEntity("error",
+                request, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return errorResultResponseEntity;
     }
 
 

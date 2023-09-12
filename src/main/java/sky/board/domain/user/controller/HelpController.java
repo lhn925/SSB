@@ -163,7 +163,7 @@ public class HelpController {
 
         try {
             CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(),Enabled.ENABLED);
-            if (findOne.isEnabled()) {
+            if (!findOne.isEnabled()) {
                 throw new UsernameNotFoundException("email.notfound");
             }
             // 회원가입 날짜 전달

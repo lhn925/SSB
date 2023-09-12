@@ -63,11 +63,7 @@ public class UserHelpService {
 
 
     private static CustomUserDetails getCustomUserDetails(User findByUser) {
-        return CustomUserDetails.builder()
-            .userId(findByUser.getUserId())
-            .email(findByUser.getEmail())
-            .uId(findByUser.getId())
-            .username(findByUser.getUserId()).build();
+        return (CustomUserDetails) User.UserBuilder(findByUser);
     }
 
 
@@ -90,9 +86,6 @@ public class UserHelpService {
         boolean authMatches = passwordEncoder.matches(userPwUpdateFormDto.getPassword(), findByUser.getPassword());
         // 현재비밀번호랑 같으면 안되고
         boolean matches = passwordEncoder.matches(userPwUpdateFormDto.getNewPw(), findByUser.getPassword());
-
-        log.info("authMatches = {}", authMatches);
-        log.info("matches = {}", matches);
         String code = null;
 
         if (!authMatches) {

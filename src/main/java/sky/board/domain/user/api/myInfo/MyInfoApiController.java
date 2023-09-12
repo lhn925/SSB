@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,21 +32,28 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
+import sky.board.domain.user.dto.myInfo.UserLoginStatusUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPictureUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPwUpdateFormDto;
+import sky.board.domain.user.entity.UserActivityLog;
+import sky.board.domain.user.entity.login.UserLoginStatus;
 import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.PwSecLevel;
+import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.help.UserHelpService;
 import sky.board.domain.user.service.log.UserActivityLogService;
+import sky.board.domain.user.service.log.UserLoginLogService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.domain.user.service.myInfo.UserMyInfoService;
 import sky.board.domain.user.utili.PwChecker;
@@ -61,6 +76,7 @@ public class MyInfoApiController {
     private final UserActivityLogService userActivityLogService;
     private final UserHelpService userHelpService;
     private final UserLoginStatusService userLoginStatusService;
+    private final UserLoginLogService userLoginLogService;
 
     @PostMapping("/userName")
     public ResponseEntity updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
@@ -185,9 +201,29 @@ public class MyInfoApiController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @PatchMapping("/login/status")
+    public ResponseEntity logoutStatus(@Validated @RequestBody UserLoginStatusUpdateDto userLoginStatusUpdateDto,
+        BindingResult bindingResult, HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
+        // 로그인 되어 있는 디바이스 기기 로그아웃
+        try {
+            userLoginStatusService.logoutDevice(request, userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON);
+        } catch (Exception e) {
+            throw new RuntimeException("error");
+        }
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     @PostMapping("/block")
-    public ResponseEntity loginBlockedUpdate(@RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
+    public ResponseEntity loginBlockedUpdate(@Validated @RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
+        BindingResult bindingResult,
         HttpServletRequest request) {
+        if (bindingResult.hasErrors()) {
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+        }
+
         try {
             userMyInfoService.updateLoginBlocked(userLoginBlockDto, request);
         } catch (RuntimeException e) {
@@ -195,6 +231,49 @@ public class MyInfoApiController {
         }
 
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+
+    @GetMapping("/loginDevice")
+    public ResponseEntity getLoginList(@RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
+        Page<UserLoginStatus> pagingStatusList = userLoginStatusService.getUserLoginStatusList(request, Status.ON,
+            pageRequest);
+        return ResponseEntity.ok(new Result<>(pagingStatusList));
+    }
+
+
+    @GetMapping("/userLoginLog")
+    public ResponseEntity getLoginLogList(
+        @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
+        if (endDate == null || startDate == null) { // 조회할려는 날짜가 없을 경우
+            startDate = LocalDate.now().minusDays(7);
+            endDate = LocalDate.now();
+        }
+        Page pagingLoginLoginList = userLoginLogService.getUserLoginLogList(request, startDate, endDate, pageRequest);
+        return ResponseEntity.ok(new Result<>(pagingLoginLoginList));
+    }
+
+    @GetMapping("/userActivityLog")
+    public ResponseEntity getActivityLogList(
+        @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
+        if (endDate == null || startDate == null) { // 조회할려는 날짜가 없을 경우
+            startDate = LocalDate.now().minusDays(7);
+            endDate = LocalDate.now();
+        }
+
+        Page pagingLoginLoginList = userActivityLogService.getUserActivityLogList(request, ChangeSuccess.SUCCESS,
+            Status.ON, startDate, endDate, pageRequest);
+        return ResponseEntity.ok(new Result<>(pagingLoginLoginList));
     }
 
     private static void valueCheck(UserPwUpdateFormDto userPwUpdateFormDto, boolean isCaptcha, PwSecLevel pwSecLevel) {

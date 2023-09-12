@@ -31,10 +31,7 @@ public class UserQueryService {
         Optional<User> findOne = userQueryRepository.findByEmailAndIsEnabled(email, enabled.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
 
-        return CustomUserDetails.builder()
-            .userId(user.getUserId())
-            .nickname(user.getUserName())
-            .createdDateTime(user.getCreatedDateTime()).build();
+        return (CustomUserDetails) User.UserBuilder(user);
     }
 
     public CustomUserDetails findStatusUserId(String userId, Enabled enabled)
@@ -42,11 +39,7 @@ public class UserQueryService {
         Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
 
-        return CustomUserDetails.builder()
-            .userId(user.getUserId())
-            .nickname(user.getUserName())
-            .email(user.getEmail())
-            .createdDateTime(user.getCreatedDateTime()).build();
+        return (CustomUserDetails) User.UserBuilder(user);
     }
 
     public UserInfoDto findByUser(UserInfoDto userInfoDto)
@@ -70,6 +63,12 @@ public class UserQueryService {
 
     public User findOne(String userId) {
         Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
+        User user = User.getOptionalUser(optionalUser);
+        return user;
+    }
+
+    public User findOne(String userId,String token) {
+        Optional<User> optionalUser = userQueryRepository.findOne(userId,token);
         User user = User.getOptionalUser(optionalUser);
         return user;
     }

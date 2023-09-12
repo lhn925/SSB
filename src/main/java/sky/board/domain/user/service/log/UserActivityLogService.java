@@ -2,23 +2,28 @@ package sky.board.domain.user.service.log;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.board.domain.user.dto.UserInfoDto;
+import sky.board.domain.user.dto.myInfo.UserActivityLogListDto;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.UserActivityLog;
 import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.repository.log.UserActivityLogRepository;
 import sky.board.domain.user.repository.UserQueryRepository;
+import sky.board.domain.user.service.UserQueryService;
 import sky.board.global.auditor.AuditorAwareImpl;
 import sky.board.global.locationfinder.service.LocationFinderService;
+import sky.board.global.redis.dto.RedisKeyDto;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class UserActivityLogService {
     private final UserActivityLogRepository userActivityLogRepository;
     private final LocationFinderService locationFinderService;
     private final UserQueryRepository userQueryRepository;
+    private final UserQueryService userQueryService;
 
     private final AuditorAware<String> auditorAware;
 
@@ -62,5 +68,19 @@ public class UserActivityLogService {
         return UserActivityLog.getActivityLog(uId, locationFinderService, chaContent, chaMethod, request,
             changeSuccess, isStatus);
 
+    }
+
+    public Page<UserActivityLogListDto> getUserActivityLogList(HttpServletRequest request, ChangeSuccess changeSuccess,
+        Status isStatus,
+        LocalDate startDate, LocalDate endDate,
+        PageRequest pageRequest) {
+        HttpSession session = request.getSession(false);
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+        User findUser = userQueryService.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
+
+        Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(findUser.getId(), changeSuccess,
+            isStatus.getValue(), startDate,
+            endDate, pageRequest).map(u -> new UserActivityLogListDto(u));
+        return userActivityLogListDtoPage;
     }
 }

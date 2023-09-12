@@ -130,7 +130,7 @@ public class User extends BaseTimeEntity {
             password(user.getPassword()).
             enabled(user.getIsEnabled()).
             userNameModifiedDate(user.getUserNameModifiedDate()).
-            isLoginBlocked(user.getIsLoginBlocked()).
+            isLoginBlocked(user.getIsLoginBlocked()).createdDateTime(user.getCreatedDateTime()).
             build();
         build.setAuthorities(user.getGrade().getDescription());
         return build;
