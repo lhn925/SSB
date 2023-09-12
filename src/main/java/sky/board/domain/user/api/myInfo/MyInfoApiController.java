@@ -190,14 +190,10 @@ public class MyInfoApiController {
 
     @PostMapping("/login/status")
     public ResponseEntity updateLoginStatus(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);
 
-            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-            userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(), session.getId());
-        } catch (RuntimeException e) {
-            throw new RuntimeException("error");
-        }
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+        userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(), session.getId());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -208,11 +204,8 @@ public class MyInfoApiController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         // 로그인 되어 있는 디바이스 기기 로그아웃
-        try {
-            userLoginStatusService.logoutDevice(request, userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON);
-        } catch (Exception e) {
-            throw new RuntimeException("error");
-        }
+        userLoginStatusService.logoutDevice(request, userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -223,12 +216,7 @@ public class MyInfoApiController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-
-        try {
-            userMyInfoService.updateLoginBlocked(userLoginBlockDto, request);
-        } catch (RuntimeException e) {
-            throw new RuntimeException("error");
-        }
+        userMyInfoService.updateLoginBlocked(userLoginBlockDto, request);
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
