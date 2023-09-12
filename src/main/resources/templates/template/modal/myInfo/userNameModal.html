@@ -3,12 +3,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <th:block th:fragment="modal">
-  <div id="modal" class="modal-overlay">
+  <div id="userNameModal" class="modal modal-overlay">
     <div class="modal-window">
       <div class="title">
         <h4>
-          <strong>닉네임 변경 <br></strong>
-          <small>(닉네임은 한달에 한번 바꿀수 있습니다)</small>
+          <strong th:text="#{sky.userName.change}">닉네임 변경 </strong><br/>
+          <small th:text="#{sky.userName.change.role}">(닉네임은 한달에 한번 바꿀수 있습니다)</small>
         </h4>
       </div>
       <div class="close-area model-cancel"><span class="blind">X</span></div>
@@ -32,7 +32,7 @@
           <span class="btn_text">취소</span>
         </a>
         <a class="btn_item on text-decoration-none" role="button">
-          <span id="b_txt_phoneNo_reg" class="btn_text">변경</span>
+          <span id="b_txt_phoneNo_reg" class="btn_text" th:text="#{sky.changeBtn}">변경</span>
         </a>
       </div>
     </div>

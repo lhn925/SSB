@@ -40,7 +40,7 @@ Email.prototype._sendAuthCodeFetch = function () { // 이메일 인증코드 요
   $errorMsg.innerText = "";
 
   let bodyVal = _email.sendValue(emailVal);
-  _post(_email._url, bodyVal)
+  _fetch("POST",_email._url, bodyVal)
   .then((data) => {
         if (_email._countdownInterval != null) { // 유효 시간 중단 및 재 시작
           clearInterval(_email._countdownInterval);
@@ -104,7 +104,7 @@ Email.prototype._reqEmailAuthFetch = function (clickCheck) { // 인증번호 체
     return;
   }
 
-  _post("/email/codeCheck", {authCode: authCodeVal}).then(
+  _fetch("POST","/email/codeCheck", {authCode: authCodeVal}).then(
       (data) => {
         $verificationMsg.innerText = messages["auth.success"];
         $verificationMsg.className = "success-msg";

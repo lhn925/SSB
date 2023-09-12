@@ -110,7 +110,7 @@ PwUpdate.prototype._subBtnClickAddEvent = function ($subBtn, ...$elements) {
       };
 
       // 비밀번호 변경
-      _post("/user/myInfo/api/pw", body).then((data) => {
+      _fetch("POST","/user/myInfo/api/pw", body).then((data) => {
         _pwUpdate.modal._open(_pwUpdate.$modal, _pwUpdate.body);
       }).catch((error) => {
         error = JSON.parse(error.message);
@@ -137,7 +137,7 @@ PwUpdate.prototype._radioCheckBtnClickAddEvent = function () {
     let allLogoutChecked = $allLogoutRadio.checked;
     let logoutNonChecked = $logoutNoneRadio.checked;
     if (allLogoutChecked) {
-      _post("/user/myInfo/api/login/status").then(() =>{
+      _fetch("POST","/user/myInfo/api/login/status").then(() =>{
         location.href = "/logout";
       }).catch((error) => {
         error = JSON.parse(error.message);

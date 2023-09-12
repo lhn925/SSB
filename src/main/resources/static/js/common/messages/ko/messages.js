@@ -19,5 +19,9 @@ const messages = {
   "change.picture":"프로필 사진을 변경하시겠습니까?",
   "picture.success":"프로필 사진이 변경 되었습니다.",
   "loginUnblock":"해외 로그인 차단을 해제 하였습니다.",
-  "loginBlock":"해외 로그인 차단을 설정하였습니다."
+  "loginBlock":"해외 로그인 차단을 설정하였습니다.",
+  "device.logout":"해당 기기를 로그아웃 하시겠습니까?",
+  "device.logout.success":"해당 기기가 로그아웃 되었습니다.",
+  "page.nextBtn":"다음",
+  "page.prevBtn":"이전"
 }

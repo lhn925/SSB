@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
+import sky.board.domain.user.dto.myInfo.UserLoginListDto;
 import sky.board.domain.user.dto.myInfo.UserLoginStatusUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPictureUpdateDto;
@@ -204,6 +205,7 @@ public class MyInfoApiController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         // 로그인 되어 있는 디바이스 기기 로그아웃
+
         userLoginStatusService.logoutDevice(request, userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON);
 
         return ResponseEntity.ok(HttpStatus.OK);
@@ -217,16 +219,15 @@ public class MyInfoApiController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         userMyInfoService.updateLoginBlocked(userLoginBlockDto, request);
-
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
     @GetMapping("/loginDevice")
-    public ResponseEntity getLoginList(@RequestParam(name = "page", defaultValue = "0") Integer page,
-        @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
-        Page<UserLoginStatus> pagingStatusList = userLoginStatusService.getUserLoginStatusList(request, Status.ON,
+    public ResponseEntity getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
+        @RequestParam(name = "size", defaultValue = "10", required = false) Integer size, HttpServletRequest request) {
+        PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
+        Page<UserLoginListDto> pagingStatusList = userLoginStatusService.getUserLoginStatusList(request, Status.ON,
             pageRequest);
         return ResponseEntity.ok(new Result<>(pagingStatusList));
     }
@@ -236,9 +237,9 @@ public class MyInfoApiController {
     public ResponseEntity getLoginLogList(
         @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
         @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "offset", defaultValue = "0") Integer offset,
         @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
+        PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
         if (endDate == null || startDate == null) { // 조회할려는 날짜가 없을 경우
             startDate = LocalDate.now().minusDays(7);
             endDate = LocalDate.now();
@@ -251,9 +252,9 @@ public class MyInfoApiController {
     public ResponseEntity getActivityLogList(
         @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
         @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "offset", defaultValue = "0") Integer offset,
         @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
+        PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
         if (endDate == null || startDate == null) { // 조회할려는 날짜가 없을 경우
             startDate = LocalDate.now().minusDays(7);
             endDate = LocalDate.now();

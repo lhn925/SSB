@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modal">
+  <div id="loginDeviceModal" class="modal modal-overlay">
+    <div class="modal-window modal-logout">
+      <div class="title text-center">
+        <h4>
+          <strong th:text="#{sky.login.list}">로그인 관리<br></strong>
+        </h4>
+      </div>
+      <div class="close-area model-cancel"><span class="blind">X</span></div>
+      <div class="content table-responsive">
+        <table class="table table-hover text-center">
+          <thead>
+          <tr>
+            <th th:text="#{sky.os}">운영체제</th>
+            <th th:text="#{sky.browser}">브라우저/앱</th>
+            <th th:text="#{sky.login.ip}">로그인 IP</th>
+            <th th:text="#{sky.first.login}">최근 로그인</th>
+            <th th:text="#{sky.manage}">관리</th>
+          </tr>
+          </thead>
+          <tbody class="align-middle" id="loginDeviceTbody">
+
+          <tr>
+            <td>모바일 [OS]</td>
+            <td>모바일 앱</td>
+            <td>
+              218.239.21.150
+              (대한민국)
+            </td>
+            <td>2023/09/12 (화) 12:45</td>
+            <td>
+              <button class="btn btn-primary">로그아웃</button>
+            </td>
+          </tr>
+
+          </tbody>
+        </table>
+        <nav aria-label="Page navigation example" >
+          <ul class="pagination justify-content-center" id="loginDevicePaging">
+            <li class="page-item">
+              <a class="page-link mainColor" id="pagingPrev" href="#" th:text="#{sky.prevBtn}">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link text-dark bg-gray-300" href="#">1</a></li>
+            <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+            <li class="page-item"><a class="page-link text-dark" href="#">3</a></li>
+            <li class="page-item"><a class="page-link text-dark" href="#">4</a></li>
+            <li class="page-item">
+              <a class="page-link mainColor" href="#" id="pagingNext" th:text="#{sky.nextBtn}">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</th:block>
+</html>

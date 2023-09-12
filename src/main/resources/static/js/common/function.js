@@ -166,17 +166,16 @@ async function _getFetch(url) {
   }
 }
 
-async function _post(path, body, headers = {}) { //post fetch
+async function _fetch(method,path, body, headers = {}) { //post fetch
   let url = path;
   const options = {
-    method: "POST",
+    method: method,
     headers: {
       "Content-Type": "application/json",
       ...headers,
     },
     body: JSON.stringify(body)
   };
-
   const res = await fetch(url, options);
   const data = await res.json();
   if (res.ok) {
