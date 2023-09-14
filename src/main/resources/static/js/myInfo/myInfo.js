@@ -2,8 +2,12 @@ function MyInfo() {
   this.$userNameModal = null;
   this.body = null;
   this.$changeUserNameBtn = null;
-  this.$loginDeviceModal = null;
-  this.$loginDeviceBtn = null;
+  this.$userManageModal = null;
+  this.userManageBtn = null;
+
+  this.$userManageModal = null;
+
+  this.modalType = null;
   this._paging = null;
   this._init();
 
@@ -12,19 +16,21 @@ function MyInfo() {
 
 MyInfo.prototype._init = function () {
   this.$userNameModal = document.getElementById("userNameModal");
-  this.$loginDeviceModal = document.getElementById("loginDeviceModal");
   this.body = document.querySelector("body")
   this.$changeUserNameBtn = document.getElementById("changeUserNameBtn");
-  this.$loginDeviceBtn = document.getElementById("loginDeviceBtn");
+
+  this.$userManageModal = document.getElementById("userManageModal");
+  this.userManageBtn = document.getElementsByClassName("userManageBtn");
+
   this.$changePwBtn = document.getElementById("changePwBtn");
   this.$isLoginBlocked = document.getElementById("isLoginBlocked1");
   this._changeUserNameBtnClickAddEvent(this.$userNameModal, this.body);
   this._modalCancelBtnClickAddEvent(this.$userNameModal, this.body);
   this._modalSaveBtnClickAddEvent(this.$userNameModal, this.body);
   const offset = 0;
-  this._loginDeviceBtnClickAddEvent(this.$loginDeviceModal,
+  this._userManageBtnClickAddEvent(this.$userManageModal,
       this.body, offset);
-  this._loginDeviceModalCancelBtnClickAddEvent(this.$loginDeviceModal,
+  this._loginDeviceModalCancelBtnClickAddEvent(this.$userManageModal,
       this.body);
   this._blockCheckedChangeAddEvent();
   this._changePwBtnClickAddEvent();
@@ -56,7 +62,7 @@ MyInfo.prototype._getPatchLoginDeviceList = function (offset) {
     if (!isEmpty) {
       let contents = pageData.content; // 갖고온 컨텐츠
 
-      let $loginDevicePaging = _myInfo.$loginDeviceModal.querySelector(
+      let $loginDevicePaging = _myInfo.$userManageModal.querySelector(
           "#loginDevicePaging");
       _myInfo._loginDeviceInnerHtml(contents);
       if (_myInfo._paging == null) {
@@ -66,40 +72,53 @@ MyInfo.prototype._getPatchLoginDeviceList = function (offset) {
         _myInfo._paging.pageNumber = pageData.pageable.pageNumber;
       }
       _myInfo._pagingNumberClickAddEvent();
-
+      // 이전페이지 다음페이지 버튼 존재 여부 확인후 이벤트 추가
+      if (_myInfo._paging.prevPage || _myInfo._paging.nextPage) {
+        _myInfo._pagingViewBtnClickAddEvent();
+      }
     } else { // 컨텐츠가 없으면
       _myInfo._loginDeviceEmpty();
     }
-
   }).catch((error) => {
     error = JSON.parse(error.message);
     _error(error.message);
-    _myInfo.modal._close(_myInfo.$loginDeviceModal, _myInfo.body);
+    _myInfo.modal._close(_myInfo.$userManageModal, _myInfo.body);
   });
 }
 
 /**
  * 로그인 기기관리 modal창 open
- * @param $loginDeviceModal
+ * @param $userManagerModal
  * @param body
  * @param offset
  * @private
  */
-MyInfo.prototype._loginDeviceBtnClickAddEvent = function ($loginDeviceModal,
+MyInfo.prototype._userManageBtnClickAddEvent = function ($userManagerModal,
     body, offset) {
-  this.$loginDeviceBtn.addEventListener("click", e => {
-    _myInfo._getPatchLoginDeviceList(offset)
-    _myInfo.modal._open($loginDeviceModal, body);
-  })
+  for (const userManage of this.userManageBtn) {
+    userManage.onclick = function () {
+      _myInfo.modalType = this.dataset.id;
+      if (_myInfo.modalType === "loginDevice") {
+        _myInfo._getPatchLoginDeviceList(offset)
+      } else if (_myInfo.modalType === "userLoginLog") {
+
+      } else {
+
+      }
+      _myInfo.modal._open($userManagerModal, body);
+    };
+  }
+
 }
+
 /**
  * 내용 없음 출력
  * @private
  */
 MyInfo.prototype._loginDeviceEmpty = function () {
-  let $loginDeviceTbody = this.$loginDeviceModal.querySelector(
+  let $loginDeviceTbody = this.$userManageModal.querySelector(
       "#loginDeviceTbody");
-  let $loginDevicePaging = this.$loginDeviceModal.querySelector(
+  let $loginDevicePaging = this.$userManageModal.querySelector(
       "#loginDevicePaging");
   //table 초기화
   //페이지 초기화
@@ -113,24 +132,12 @@ MyInfo.prototype._loginDeviceEmpty = function () {
  * @private
  */
 MyInfo.prototype._loginDeviceInnerHtml = function (contents) {
-  let $loginDeviceTbody = this.$loginDeviceModal.querySelector(
+  let $loginDeviceTbody = this.$userManageModal.querySelector(
       "#loginDeviceTbody");
   $loginDeviceTbody.innerHTML = "";// 초기화
 
   for (const content of contents) {
-
-    let language = navigator.language;
-    let timeString = new Date(content.createdDateTime).toLocaleTimeString(
-        language);
-    let dateString = new Date(
-        content.createdDateTime).toLocaleDateString().split(".").join(
-        ":").split(" ").join("");
-    dateString = dateString.slice(0, dateString.length - 1);
-    let localeString = new Date(content.createdDateTime).toLocaleString(
-        language, {weekday: 'short'});
-
-    let fullDateTime = dateString + " " + localeString + " " + timeString;
-
+    let fullDateTime = _getFullDateTime(content);
     let trTag = "<tr data-id='" + content.session + "'>" +
         " <td>" + content.os + "</td> " +
         "<td>" + content.browser + "</td>" +
@@ -145,6 +152,27 @@ MyInfo.prototype._loginDeviceInnerHtml = function (contents) {
     $loginDeviceTbody.innerHTML += trTag;
   }
   this._deviceLogoutBtnClickAddEvent();
+}
+
+MyInfo.prototype._pagingViewBtnClickAddEvent = function () {
+  let pagingViews = document.getElementsByClassName("pagingView");
+  for (const pagingView of pagingViews) {
+    pagingView.addEventListener("click", function () {
+      let offset = this.parentElement.dataset.id;
+      if (offset == null || _myInfo.modalType == null) {
+        return;
+      }
+      // paging 처리를 위해 초기화
+      _myInfo._paging = null;
+      if (_myInfo.modalType === "loginDevice") {
+        _myInfo._getPatchLoginDeviceList(offset);
+      } else if (_myInfo.modalType === "userLoginLog") {
+
+      } else {
+
+      }
+    })
+  }
 }
 
 /**
@@ -164,6 +192,7 @@ MyInfo.prototype._deviceLogoutBtnClickAddEvent = function () {
       _fetch("PATCH", "/user/myInfo/api/login/status", {session: data})
       .then(() => {
         _success(messages["device.logout.success"]);
+        _myInfo._getPatchLoginDeviceList(_myInfo._paging.pageNumber);
         // 해당 태그 삭제
         trTag.remove();
       }).catch((error) => {
@@ -178,36 +207,60 @@ MyInfo.prototype._deviceLogoutBtnClickAddEvent = function () {
  * 로그인 기기 페이지 이동 클릭 이벤트
  */
 MyInfo.prototype._pagingNumberClickAddEvent = function () {
-  let pageItemList = document.getElementsByClassName("page-list");
+  let pageItemList = document.getElementsByClassName("notSelected");
   for (const btn of pageItemList) {
     btn.onclick = function () {
       // 부모의 data id값
       let offset = this.dataset.id;
 
+      if (offset == null || _myInfo.modalType == null) {
+        return;
+      }
+
+      // 현재 페이지넘버에 selected가 있으면 return
+      if (this.classList.contains("selected")) {
+        return;
+      }
       // 페이지 넘버 color class 지우고
       this.parentElement.querySelector(".bg-gray-300").classList.remove(
           "bg-gray-300");
 
+      // 현재페이지는 클릭이 안되게 selected Class추가
+      let selected = this.parentElement.querySelector(".selected");
+      selected.classList.remove("selected");
+      selected.classList.add("notSelected");
+
       // 현재 페이지 넘버에 colorClass 추가
       this.querySelector(".page-link").classList.add("bg-gray-300");
-      _myInfo._getPatchLoginDeviceList(offset);
+      this.classList.remove("notSelected");
+      this.classList.add("selected")
+
+      if (_myInfo.modalType === "loginDevice") {
+        _myInfo._getPatchLoginDeviceList(offset);
+      } else if (_myInfo.modalType === "loginLog") {
+
+      } else {
+
+      }
+
     }
   }
 }
 /**
  * 로그인 기기 관리 모달창 close
- * @param $loginDeviceModal
+ * @param $userManageModal
  * @param body
  * @private
  */
-MyInfo.prototype._loginDeviceModalCancelBtnClickAddEvent = function ($loginDeviceModal,
+MyInfo.prototype._loginDeviceModalCancelBtnClickAddEvent = function ($userManageModal,
     body) {
-  const closeBtnList = $loginDeviceModal.querySelectorAll(".model-cancel")
+  const closeBtnList = $userManageModal.querySelectorAll(".model-cancel")
   for (const closeBtnListElement of closeBtnList) {
     closeBtnListElement.addEventListener("click", e => {
-      _myInfo._loginDeviceEmpty($loginDeviceModal);
+      _myInfo._loginDeviceEmpty($userManageModal);
       _myInfo._paging = null;
-      _myInfo.modal._close($loginDeviceModal, body);
+      _myInfo.modalType = null;
+      _myInfo.modal._close($userManageModal, body);
     })
   }
 }
@@ -299,7 +352,6 @@ MyInfo.prototype._modalSaveBtnClickAddEvent = function ($userNameModal, body) {
       $userName.value = changeName;
       $userName.text = changeName;
       $ogUserName.value = changeName;
-      let elementsByClassName = document.getElementsByClassName("userNameInfo");
 
       _success(messages["userName.change.success"], null, 1000);
       _innerTextByClass("userNameInfo", data.data.userName)

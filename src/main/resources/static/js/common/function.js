@@ -181,12 +181,16 @@ async function _fetch(method,path, body, headers = {}) { //post fetch
   if (res.ok) {
     return data;
   } else {
-    if (res.status == HttpStatusCode.FORBIDDEN) {
-      alert(errorsMsg["error.unAuth"]);
-      const href = location.href;
-      location.href = "/login?url=" + href;
-    }
+    forbiddenTryCatch(res);
     throw Error(JSON.stringify(data.errorDetails[0]));
+  }
+}
+
+function forbiddenTryCatch(res) {
+  if (res.status == HttpStatusCode.FORBIDDEN) {
+    alert(errorsMsg["error.unAuth"]);
+    let href = location.href;
+    location.href = "/login?url=" + href;
   }
 }
 
@@ -202,15 +206,7 @@ async function _filePost(path, body) { //post fetch
   if (res.ok) {
     return data;
   } else {
-    if (res.status == HttpStatusCode.FORBIDDEN) {
-      toastr.options.onHidden = function() {
-        location.href = "/login?url=" + href;
-      }
-      toastr.error(errorsMsg["error.unAuth"]);
-      let href = location.href;
-
-
-    }
+    forbiddenTryCatch(res);
     throw Error(JSON.stringify(data.errorDetails[0]));
   }
 }
@@ -224,6 +220,7 @@ async function _get(path) { //post fetch
   if (res.ok) {
     return data;
   } else {
+    forbiddenTryCatch(res);
     throw Error(JSON.stringify(data.errorDetails[0]));
   }
 }
@@ -266,6 +263,27 @@ function fileImageTypeCheck(type) {
     }
   }
   return false;
+}
+
+/**
+ * 2023:9:13 수 오후 1:34:20 형식으로 반환
+ * @param content
+ * @returns {string}
+ * @private
+ */
+function _getFullDateTime(content) {
+  let language = navigator.language;
+  let timeString = new Date(content.createdDateTime).toLocaleTimeString(
+      language);
+  let dateString = new Date(
+      content.createdDateTime).toLocaleDateString().split(".").join(
+      ":").split(" ").join("");
+  dateString = dateString.slice(0, dateString.length - 1);
+  let localeString = new Date(content.createdDateTime).toLocaleString(
+      language, {weekday: 'short'});
+
+  let fullDateTime = dateString + " " + localeString + " " + timeString;
+  return fullDateTime;
 }
 
 /**
