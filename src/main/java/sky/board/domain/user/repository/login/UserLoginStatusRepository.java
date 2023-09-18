@@ -9,10 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import sky.board.domain.user.entity.User;
 import sky.board.domain.user.entity.login.UserLoginStatus;
-import sky.board.domain.user.model.Status;
 
 public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus, Long> {
 
@@ -27,15 +25,22 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
 
     @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.session = :session")
-    List<UserLoginStatus> findSessionList(@Param("uid") User user, @Param("userId") String userId,
+    List<UserLoginStatus> findList(@Param("uid") User user, @Param("userId") String userId,
         @Param("session") String session);
 
 
     @Query(value =
         "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.session = :session"
             + " and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus =:isStatus")
-    List<UserLoginStatus> findSessionListAndStatus(@Param("uid") User user, @Param("userId") String userId,
+    List<UserLoginStatus> findList(@Param("uid") User user, @Param("userId") String userId,
         @Param("session") String session, @Param("loginStatus") Boolean loginStatus,
+        @Param("isStatus") Boolean isStatus);
+
+    @Query(value =
+        "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.session = :session"
+            + " and u.remember =:remember  and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus =:isStatus")
+    List<UserLoginStatus> findList(@Param("uid") User user, @Param("userId") String userId,
+        @Param("session") String session, @Param("remember") String remember, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus);
 
 
@@ -61,5 +66,27 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
             + "u.uid = :uid and u.session = :session")
     Integer update(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus, @Param("session") String session);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value =
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where "
+            + "u.uid = :uid and u.session = :session and u.remember = :remember")
+    Integer update(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
+        @Param("isStatus") Boolean isStatus, @Param("session") String session, @Param("remember") String remember);
+
+
+    @Modifying(clearAutomatically = true)
+    @Query(value =
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where u.session = :session")
+    Integer updateSession(@Param("loginStatus") Boolean loginStatus,
+        @Param("isStatus") Boolean isStatus, @Param("session") String session);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value =
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where "
+            + " u.remember = :remember")
+    Integer updateRemember(@Param("loginStatus") Boolean loginStatus,
+        @Param("isStatus") Boolean isStatus, @Param("remember") String remember);
+
 
 }

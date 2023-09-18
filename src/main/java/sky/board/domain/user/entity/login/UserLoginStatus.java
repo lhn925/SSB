@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.UserInfoDto;
@@ -28,7 +29,7 @@ import sky.board.global.base.BaseTimeEntity;
 import sky.board.global.base.login.DefaultLoginLog;
 import sky.board.global.locationfinder.dto.UserLocationDto;
 import sky.board.global.locationfinder.service.LocationFinderService;
-
+@Slf4j
 @Entity
 @Getter
 @Setter(value = AccessLevel.PRIVATE)

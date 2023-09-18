@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.model.RememberCookie;
+import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.UserTokenUtil;
 import sky.board.global.redis.dto.RedisKeyDto;
 import sky.board.global.redis.service.RedisService;
@@ -29,14 +30,16 @@ import sky.board.global.redis.service.RedisService;
 public class RedisRememberService extends AbstractRememberMeServices {
 
     private final RedisService redisService;
+    private final UserLoginStatusService userLoginStatusService;
 
     private String token;
 
-    public RedisRememberService(String key, UserDetailsService userDetailsService, RedisService redisService) {
+    public RedisRememberService(String key, UserDetailsService userDetailsService, RedisService redisService,UserLoginStatusService userLoginStatusService) {
         super(key, userDetailsService);
         super.setParameter(key);
         super.setCookieName(key);
         this.redisService = redisService;
+        this.userLoginStatusService = userLoginStatusService;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
         // 쿠키 생성
         setCookie(null, tokenLifetime, request, response);
         // 레디스 생성
-        setRedis(userId, password, session, expiryTime, token);
+        setRedis(userId, session, expiryTime, token);
     }
 
     public long getExpiryTime(int tokenLifetime) {
@@ -79,15 +82,20 @@ public class RedisRememberService extends AbstractRememberMeServices {
     @Override
     protected void setCookie(String[] tokens, int maxAge, HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
-        Cookie cookie = new Cookie(super.getCookieName(), session.getId() + ":" + this.getToken());
+
+        // 기존에 있던 rememberCookie삭제
+        Cookie rmCookie = CustomCookie.getCookie(request.getCookies(), RememberCookie.KEY.getValue());
+        CustomCookie.delete(rmCookie, response);
+
+        String value = session.getId() + ":" + this.getToken();
+        Cookie cookie = new Cookie(super.getCookieName(), value);
         cookie.setPath(request.getContextPath());
         cookie.setMaxAge(maxAge);
         cookie.setDomain(request.getContextPath());
         cookie.setHttpOnly(true);
-        /**
-         * userLoginStatus 에 저장을 위해 세션에 임시 저장
-         */
-        session.setAttribute(RememberCookie.KEY.getValue(), session.getId() + ":" + this.getToken());
+
+        // LoginStatus rememberMe key 저장
+        request.setAttribute(RememberCookie.KEY.getValue(), hashing(value));
         response.addCookie(cookie);
     }
 
@@ -98,11 +106,10 @@ public class RedisRememberService extends AbstractRememberMeServices {
         this.setCookie(null, maxAge, request, response);
     }
 
-    public void setRedis(String userId, String password, HttpSession session, long expiryTime, String token) {
+    public void setRedis(String userId, HttpSession session, long expiryTime, String token) {
         String redisKey = UserTokenUtil.hashing(session.getId().getBytes(), token);
         JSONArray userArray = new JSONArray();
         userArray.add("userId:" + userId);
-        userArray.add("password:" + password);
         userArray.add("expireTime:" + expiryTime);
         redisService.setRememberData(redisKey, userArray.toString(), expiryTime);
     }
@@ -239,13 +246,15 @@ public class RedisRememberService extends AbstractRememberMeServices {
      */
     private boolean isInstanceOfUserDetails(Authentication authentication) {
 
-        log.info("authentication.getPrincipal() instanceof  UserDetails = {}",
-            authentication.getPrincipal() instanceof UserDetails);
         return authentication.getPrincipal() instanceof CustomUserDetails;
     }
 
 
     public RedisService getRedisService() {
         return redisService;
+    }
+
+    public UserLoginStatusService getUserLoginStatusService() {
+        return userLoginStatusService;
     }
 }

@@ -48,7 +48,9 @@ public class CustomCookie {
     }
 
     public static void delete(Cookie cookie,  HttpServletResponse response) {
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        if (cookie != null) {
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
     }
 }

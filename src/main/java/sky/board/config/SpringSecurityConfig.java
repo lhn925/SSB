@@ -63,8 +63,6 @@ public class SpringSecurityConfig {
     private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
-    @Value("${ssb.http.auth-token-header.name}")
-    private String principalRequestHeader;
 
 /*       "/js/**",
            "/login/**",
@@ -149,10 +147,8 @@ public class SpringSecurityConfig {
             RememberMeAuthenticationFilter.class);
 
         http.addFilterBefore(apiKeyAuthFilter, BasicAuthenticationFilter.class);
-//        http.addFilterBefore(apikeyAuthExceptionHandlerFilter, ApiKeyAuthFilter.class);
 
 // 허용 파일 및 허용 url
-//                        requestMatchers(ADMIN_URL).hasRole(UserGrade.ADMIN.getDescription()).
         http.csrf().disable().cors().disable().
             authorizeHttpRequests(request ->
                     request.
@@ -169,11 +165,6 @@ public class SpringSecurityConfig {
                 .permitAll()
             );
 
-/*        addFilterBefore(apikeyAuthExceptionHandlerFilter, ApiKeyAuthFilter.class).authorizeHttpRequests(
-                request -> {
-                    request.requestMatchers("/user/myInfo/**").permitAll();
-                }
-            )*/
         // logout 구현 부분
         http.logout()
             .logoutUrl("/logout")
@@ -183,23 +174,6 @@ public class SpringSecurityConfig {
         return http.build();
     }
 
-
-    /*    @Bean
-        public FilterRegistrationBean apiKeyAuthFilter () {
-            FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
-            registrationBean.setFilter(new ApiKeyAuthFilter());
-            registrationBean.addUrlPatterns("/user/myInfo/api/**");
-            registrationBean.setOrder(0);
-            return registrationBean;
-        }
-        @Bean
-        public FilterRegistrationBean apiKeyAuthExceptionFilter (MessageSource ms) {
-            FilterRegistrationBean<Filter> registrationBean = new FilterRegistrationBean<>();
-            registrationBean.setFilter(new ApikeyAuthExceptionHandlerFilter(ms));
-            registrationBean.addUrlPatterns("/user/myInfo/api/**");
-            registrationBean.setOrder(1);
-            return registrationBean;
-        }*/
     @Bean
     public HttpSessionSecurityContextRepository httpSessionSecurityContextRepository() {
         return new HttpSessionSecurityContextRepository();
@@ -211,8 +185,8 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public RememberMeServices rememberMeServices(UserDetailsService userDetailsService) {
-        return new RedisRememberService(RememberCookie.KEY.getValue(), userDetailsService, redisService);
+    public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,UserLoginStatusService userLoginStatusService) {
+        return new RedisRememberService(RememberCookie.KEY.getValue(), userDetailsService, redisService, userLoginStatusService);
     }
 
     @Bean

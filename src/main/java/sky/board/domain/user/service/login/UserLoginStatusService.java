@@ -3,7 +3,6 @@ package sky.board.domain.user.service.login;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +68,7 @@ public class UserLoginStatusService {
          * 겹치는 문제 제거
          */
         List<UserLoginStatus> findStatus = userLoginStatusRepository.
-            findSessionListAndStatus(user, userId, session.getId(), Status.ON.getValue(), Status.ON.getValue());
+            findList(user, userId, session.getId(), Status.ON.getValue(), Status.ON.getValue());
         if (findStatus.size() > 0) { // 기존에 있던 현재 세션아이디를 가진 Status 다 로그아웃
             userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), session.getId());
         }
@@ -85,13 +84,13 @@ public class UserLoginStatusService {
      * @param request
      * @param loginStatus
      */
-    public Page getUserLoginStatusList(HttpServletRequest request, Status loginStatus,  PageRequest pageRequest) {
+    public Page getUserLoginStatusList(HttpServletRequest request, Status loginStatus, PageRequest pageRequest) {
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
         User user = userQueryService.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
 
         Page pagingLoginStatus = userLoginStatusRepository.findByUidAndLoginStatus(user,
-            loginStatus.getValue(), pageRequest).map(u -> new UserLoginListDto(request.getSession().getId(),u));
+            loginStatus.getValue(), pageRequest).map(u -> new UserLoginListDto(request.getSession().getId(), u));
 
         return pagingLoginStatus;
     }
@@ -100,13 +99,17 @@ public class UserLoginStatusService {
     @Transactional
     public void updateLoginStatus(HttpServletRequest request, String userId, Status loginStatus, Status isStatus) {
         HttpSession session = request.getSession(false);
+        updateStatus(session, userId, loginStatus, isStatus);
+    }
+
+    private void updateStatus(HttpSession session, String userId, Status loginStatus, Status isStatus) {
         String sessionId = session.getId();// 세션 아이디
 //        해당 세션 정보 가져옴
         User user = userQueryService.findOne(userId);
 
         userId = user.getUserId();
 
-        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findSessionList(user, userId, sessionId);
+        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findList(user, userId, sessionId);
         if (findStatusList.size() > 0) {
             userLoginStatusRepository.update(user, loginStatus.getValue(), isStatus.getValue(), sessionId);
         }
@@ -128,7 +131,7 @@ public class UserLoginStatusService {
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
         String userId = userInfoDto.getUserId();
         User user = userQueryService.findOne(userId, userInfoDto.getToken());
-        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findSessionListAndStatus(user,
+        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findList(user,
             userInfoDto.getUserId(),
             sessionId, loginStatus.getValue(), isStatus.getValue());
         if (findStatusList.size() > 0) {
@@ -136,6 +139,52 @@ public class UserLoginStatusService {
             removeRedisSession(findStatusList);
         }
     }
+
+
+    /**
+     *  이전에 사용했던 remember 세션 로그아웃
+     * @param userId
+     * @param sessionId
+     * @param rememberId
+     * @param loginStatus
+     * @param isStatus
+     */
+    @Transactional
+    public void logoutRememberLoginStatus(String userId, String sessionId, String rememberId, Status loginStatus,
+        Status isStatus) {
+
+        User user = userQueryService.findOne(userId);
+
+        List<UserLoginStatus> findStatusList = userLoginStatusRepository.findList(user,
+            user.getUserId(),
+            sessionId, rememberId, loginStatus.getValue(), isStatus.getValue());
+        if (findStatusList.size() > 0) {
+            userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), sessionId, rememberId);
+            removeRedisSession(findStatusList);
+        }
+    }
+
+    /**
+     *  redis에서 expire된 remember off
+     * @param loginStatus
+     * @param isStatus
+     */
+    @Transactional
+    public void expireRedisRememberKeyOff(String rememberId,Status loginStatus,
+        Status isStatus) {
+        userLoginStatusRepository.updateRemember(loginStatus.getValue(), isStatus.getValue(), rememberId);
+    }
+    /**
+     *  redis에서 expire된 session off
+     * @param loginStatus
+     * @param isStatus
+     */
+    @Transactional
+    public void expireRedisSessionKeyOff(String sessionId,Status loginStatus,
+        Status isStatus) {
+        userLoginStatusRepository.updateSession(loginStatus.getValue(), isStatus.getValue(), sessionId);
+    }
+
 
     /**
      * 현재 접속하고 있는 세션제외 전부다 로그아웃 및 레디스 삭제
@@ -194,8 +243,8 @@ public class UserLoginStatusService {
             }
             // 해당 기기의 rememberMe redis 값 삭제
             if (StringUtils.hasText(userLoginStatus.getRemember()) &&
-                redisService.hasRedis(RedisKeyDto.REMEMBER_KEY + hashing(userLoginStatus.getRemember()))) {
-                redisService.deleteRemember(hashing(userLoginStatus.getRemember()));
+                redisService.hasRedis(RedisKeyDto.REMEMBER_KEY + userLoginStatus.getRemember())) {
+                redisService.deleteRemember(userLoginStatus.getRemember());
             }
         }
     }

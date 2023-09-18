@@ -3,11 +3,12 @@ package sky.board.global.redis.service;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
-@Service
+@Component
 public class RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;

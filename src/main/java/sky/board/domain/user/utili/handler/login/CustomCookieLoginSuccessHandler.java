@@ -35,7 +35,7 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
         Authentication authentication) throws IOException {
         request.getRequestURL();
         setSession(request, authentication);
-        log.info("request.getRequestURI() = {}", request.getRequestURI());
+        saveLoginStatus(request,response,authentication);
         sendRedirect(response, request.getRequestURL().toString(), request.getContextPath());
     }
 
@@ -67,6 +67,5 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
             throw new RuntimeException("saveLoginStatus:" + e);
         }
     }
-
 
 }

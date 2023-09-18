@@ -227,6 +227,7 @@ public class MyInfoApiController {
     public ResponseEntity getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
         @RequestParam(name = "size", defaultValue = "10", required = false) Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
+
         Page<UserLoginListDto> pagingStatusList = userLoginStatusService.getUserLoginStatusList(request, Status.ON,
             pageRequest);
         return ResponseEntity.ok(new Result<>(pagingStatusList));

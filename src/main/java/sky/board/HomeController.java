@@ -1,6 +1,7 @@
 package sky.board;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,12 +11,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import sky.board.domain.user.dto.login.CustomUserDetails;
+import sky.board.global.redis.service.RedisService;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class HomeController {
 
 
+    private final RedisService redisService;
 
     @GetMapping("/")
     public String home() {
@@ -23,6 +27,8 @@ public class HomeController {
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+
 
 
         log.info("authentication  = {}", authentication);
