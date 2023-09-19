@@ -1,11 +1,13 @@
 package sky.board.domain.user.dto.myInfo;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.context.MessageSource;
 import sky.board.domain.user.entity.UserActivityLog;
 
 @Getter
@@ -13,7 +15,7 @@ import sky.board.domain.user.entity.UserActivityLog;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserActivityLogListDto implements Serializable {
 
-    private LocalDateTime createDateTime;
+    private LocalDateTime createdDateTime;
 
     //변경내용
     private String chaContent;
@@ -22,10 +24,10 @@ public class UserActivityLogListDto implements Serializable {
     private String chaMethod;
     private String ip;
 
-    public UserActivityLogListDto(UserActivityLog userActivityLog) {
-        this.createDateTime = userActivityLog.getCreatedDateTime();
-        this.chaContent = userActivityLog.getChaContent();
-        this.chaMethod = userActivityLog.getChaMethod();
+    public UserActivityLogListDto(MessageSource ms, HttpServletRequest request, UserActivityLog userActivityLog) {
+        this.createdDateTime = userActivityLog.getCreatedDateTime();
+        this.chaContent = ms.getMessage(userActivityLog.getChaContent(), null, request.getLocale());
+        this.chaMethod = ms.getMessage(userActivityLog.getChaMethod(), null, request.getLocale());
         this.ip = userActivityLog.getIp();
     }
 }

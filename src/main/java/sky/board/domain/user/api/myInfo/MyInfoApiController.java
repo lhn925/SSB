@@ -1,6 +1,8 @@
 package sky.board.domain.user.api.myInfo;
 
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
@@ -10,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -225,7 +230,7 @@ public class MyInfoApiController {
 
     @GetMapping("/loginDevice")
     public ResponseEntity getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
-        @RequestParam(name = "size", defaultValue = "10", required = false) Integer size, HttpServletRequest request) {
+        @RequestParam(name = "size", defaultValue = "2", required = false) Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
 
         Page<UserLoginListDto> pagingStatusList = userLoginStatusService.getUserLoginStatusList(request, Status.ON,
@@ -234,37 +239,94 @@ public class MyInfoApiController {
     }
 
 
-    @GetMapping("/userLoginLog")
+    @GetMapping("/userLog")
     public ResponseEntity getLoginLogList(
-        @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-        @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+        @RequestParam(value = "type", required = false) String type,
+        @RequestParam(value = "startDate", required = false) String startDate,
+        @RequestParam(value = "endDate", required = false) String endDate,
         @RequestParam(name = "offset", defaultValue = "0") Integer offset,
-        @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
+        @RequestParam(name = "size", defaultValue = "2") Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
-        if (endDate == null || startDate == null) { // 조회할려는 날짜가 없을 경우
-            startDate = LocalDate.now().minusDays(7);
-            endDate = LocalDate.now();
+        LocalDate start = null;
+        LocalDate end = null;
+
+        if (type == null || !StringUtils.hasText("type")) {
+            type = "userLoginLog";
         }
-        Page pagingLoginLoginList = userLoginLogService.getUserLoginLogList(request, startDate, endDate, pageRequest);
-        return ResponseEntity.ok(new Result<>(pagingLoginLoginList));
+
+        // 조회 최대 날짜는 현재 날짜까지만 가능
+        LocalDate maxDate = LocalDate.now();
+
+        // userLoginLog는 3개월 전까지만 조회 가능
+        // userActivityLog는 6개월 전까지만 조회가능
+        LocalDate minDate = null;
+        int minNumber = 6;
+        if (type.equals("userLoginLog")) {
+            minNumber = 3;
+        }
+
+        minDate = LocalDate.now().minusMonths(minNumber);
+
+        // 기본 값 설정
+        start = LocalDate.parse(LocalDate.now().minusDays(7).format(ISO_DATE));
+        end = LocalDate.parse(LocalDate.now().format(ISO_DATE));
+
+        try {
+            if (startDate != null || !startDate.equals("")) { // 조회할려는 날짜가 없을 경우
+                start = LocalDate.parse(startDate, ISO_DATE);
+            }
+            if (endDate != null || !endDate.equals("")) { // 조회할려는 날짜가 없을 경우
+                end = LocalDate.parse(endDate,ISO_DATE);
+            }
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("error.date.range");
+        }
+        // maxDate가 endDate 보다 이전 날짜냐? true
+        // 조회할려는 날짜가 최대 날짜 보다 크다면
+        // 조회 할수 있는 최소 날짜 보다
+        // 작다면 minDate가 startDate 보다 앞에 날짜냐
+        if (maxDate.isBefore(end) || minDate.isAfter(start)) {
+            start = LocalDate.parse(LocalDate.now().minusDays(7).format(ISO_DATE));
+            end = LocalDate.parse(LocalDate.now().format(ISO_DATE));
+        }
+
+        Page pagingLoginList;
+        if (type.equals("userLoginLog")) {
+            pagingLoginList = userLoginLogService.getUserLoginLogList(request, start, end, pageRequest);
+        } else {
+            pagingLoginList = userActivityLogService.getUserActivityLogList(request, ChangeSuccess.SUCCESS,
+                Status.ON, start, end, pageRequest);
+        }
+        return ResponseEntity.ok(new Result<>(pagingLoginList));
+
     }
 
-    @GetMapping("/userActivityLog")
+/*    @GetMapping("/userActivityLog")
     public ResponseEntity getActivityLogList(
-        @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-        @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+        @RequestParam(value = "startDate", required = false)  String startDate,
+        @RequestParam(value = "endDate", required = false)  String endDate,
         @RequestParam(name = "offset", defaultValue = "0") Integer offset,
-        @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
+        @RequestParam(name = "size", defaultValue = "2") Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
-        if (endDate == null || startDate == null) { // 조회할려는 날짜가 없을 경우
-            startDate = LocalDate.now().minusDays(7);
-            endDate = LocalDate.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate start = null;
+        LocalDate end = null;
+
+        if (startDate == null || StringUtils.hasText(startDate)) { // 조회할려는 날짜가 없을 경우
+            start = LocalDate.parse(LocalDate.now().minusDays(7).format(dateTimeFormatter));
+        } else {
+            start = LocalDate.parse(startDate, dateTimeFormatter);
+        }
+        if (endDate == null || StringUtils.hasText(endDate)) { // 조회할려는 날짜가 없을 경우
+            end = LocalDate.parse(LocalDate.now().format(dateTimeFormatter));
+        } else {
+            end = LocalDate.parse(endDate, dateTimeFormatter);
         }
 
         Page pagingLoginLoginList = userActivityLogService.getUserActivityLogList(request, ChangeSuccess.SUCCESS,
-            Status.ON, startDate, endDate, pageRequest);
+            Status.ON, start, end, pageRequest);
         return ResponseEntity.ok(new Result<>(pagingLoginLoginList));
-    }
+    }*/
 
     private static void valueCheck(UserPwUpdateFormDto userPwUpdateFormDto, boolean isCaptcha, PwSecLevel pwSecLevel) {
         if (!isCaptcha) {

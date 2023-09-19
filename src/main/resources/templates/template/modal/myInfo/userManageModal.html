@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="modal">
+
+
+  <div id="userManageModal" class="modal modal-overlay">
+    <div class="modal-window modal-logout">
+      <div class="title text-center">
+        <h4>
+          <strong id="userManageTitle">로그인 관리<br></strong>
+        </h4>
+      </div>
+      <div class="close-area model-cancel"><span class="blind">X</span></div>
+      <div class="content" id="content">
+
+      </div>
+
+
+
+
+      <nav aria-label="Page navigation example" class="text-center">
+        <ul class="pagination justify-content-center" id="userManagePaging">
+          <li class="page-item"><a class="page-link" id="pagingPrev" href="#" th:text="#{sky.prevBtn}">Previous</a></li>
+          <li class="page-item"><a class="page-link text-dark bg-gray-300" href="#">1</a></li>
+          <li class="page-item"><a class="page-link text-dark" href="#">2</a></li>
+          <li class="page-item"><a class="page-link text-dark" href="#">3</a></li>
+          <li class="page-item"><a class="page-link text-dark" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#" id="pagingNext" th:text="#{sky.nextBtn}">Next</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+
+
+
+</th:block>
+</html>

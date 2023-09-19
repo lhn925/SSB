@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ public class UserActivityLogService {
     private final UserQueryRepository userQueryRepository;
     private final UserQueryService userQueryService;
 
+    private final MessageSource ms;
     private final AuditorAware<String> auditorAware;
 
     /**
@@ -77,10 +79,9 @@ public class UserActivityLogService {
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
         User findUser = userQueryService.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-
         Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(findUser.getId(), changeSuccess,
             isStatus.getValue(), startDate,
-            endDate, pageRequest).map(u -> new UserActivityLogListDto(u));
+            endDate, pageRequest).map(u -> new UserActivityLogListDto(ms,request,u));
         return userActivityLogListDtoPage;
     }
 }

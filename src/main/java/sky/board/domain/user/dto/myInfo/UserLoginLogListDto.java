@@ -14,13 +14,13 @@ import sky.board.domain.user.model.UserAgent;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserLoginLogListDto implements Serializable {
 
-    private LocalDateTime createDateTime;
+    private LocalDateTime createdDateTime;
     private String ip;
     private String countryCode;
     private UserAgent userAgent;
 
     public UserLoginLogListDto(UserLoginLog userLoginLog) {
-        this.createDateTime = userLoginLog.getCreatedDateTime();
+        this.createdDateTime = userLoginLog.getCreatedDateTime();
         this.ip = userLoginLog.getDefaultLoginLog().getIp();
         this.countryCode = userLoginLog.getDefaultLoginLog().getCountryName();
         this.userAgent = userLoginLog.getDefaultLoginLog().getUserAgent();
