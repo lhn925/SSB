@@ -8,16 +8,23 @@
   <div id="userManageModal" class="modal modal-overlay">
     <div class="modal-window modal-logout">
       <div class="title text-center">
-        <h4>
-          <strong id="userManageTitle">로그인 관리<br></strong>
-        </h4>
+        <div class="title-content">
+          <h4>
+            <strong id="userManageTitle">로그인 관리</strong><br/>
+          </h4>
+          <small id="additionalInfo" class="form-text display-none"></small>
+          <div id="rangeDate" class="display-none input-group mt-2">
+            <br/>
+            <input type="date" id="startDate" class="form-control"><h3>~</h3><input type="date" id="endDate" class="form-control">
+            <button class="btn btn-primary" id="searchDateBtn">조회</button>
+          </div>
+        </div>
+
       </div>
       <div class="close-area model-cancel"><span class="blind">X</span></div>
       <div class="content" id="content">
 
       </div>
-
-
 
 
       <nav aria-label="Page navigation example" class="text-center">
@@ -32,8 +39,6 @@
       </nav>
     </div>
   </div>
-
-
 
 
 </th:block>

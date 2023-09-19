@@ -104,29 +104,50 @@
               <a class=" text-decoration-none mainLogo"><h2 class="list-group-title-text"
                                                             th:text="#{sky.log.manage}">이력관리</h2></a>
             </li>
-            <li class="list-group-item d-flex  align-items-center flex-wrap userManageBtn" data-id="loginDevice">
-              <h6 class="mb-0">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="feather feather-globe mr-2 icon-inline">
-                </svg>
-              </h6>
-              <span class="ms-4" th:text="#{sky.login.list}">로그인 목록</span>
+            <li class="list-group-item d-flex manaImg  align-items-center flex-wrap">
+              <div class="d-flex align-items-center">
+                <h6 class="mb-0">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       class="feather feather-globe mr-2 icon-inline">
+                  </svg>
+                </h6>
+                <span class="ms-4" th:text="#{sky.login.list}">로그인 목록</span>
+              </div>
+              <div class="btn-div ms-auto">
+                <button class="btn userManageBtn" data-id="loginDevice">
+                  <img th:src="@{/css/image/blue-right-arrow.png}">
+                </button>
+              </div>
             </li>
-            <li class="list-group-item d-flex  align-items-center flex-wrap userManageBtn" data-id="userLoginLog">
-              <h6 class="mb-0">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="feather feather-globe mr-2 icon-inline">
-                </svg>
-              </h6>
-              <span class="ms-4" th:text="#{sky.login.log}">로그인 기록</span>
+            <li class="list-group-item d-flex manaImg align-items-center flex-wrap" >
+              <div class="d-flex align-items-center">
+                <h6 class="mb-0">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       class="feather feather-globe mr-2 icon-inline">
+                  </svg>
+                </h6>
+                <span class="ms-4" th:text="#{sky.login.log}">로그인 기록</span>
+              </div>
+              <div class="btn-div ms-auto">
+                <button class="btn userManageBtn" data-id="userLoginLog">
+                  <img th:src="@{/css/image/blue-right-arrow.png}">
+                </button>
+              </div>
             </li>
-            <li class="list-group-item d-flex  align-items-center flex-wrap" data-id="userActivityLog">
-              <h6 class="mb-0">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     class="feather feather-globe mr-2 icon-inline">
-                </svg>
-              </h6>
-              <span class="ms-4" th:text="#{sky.activityLog}">정보 수정 이력</span>
+            <li class="list-group-item d-flex manaImg align-items-center flex-wrap ">
+              <div class="d-flex align-items-center">
+                <h6 class="mb-0">
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       class="feather feather-globe mr-2 icon-inline">
+                  </svg>
+                </h6>
+                <span class="ms-4" th:text="#{sky.activityLog}">정보 수정 이력</span>
+              </div>
+              <div class="btn-div ms-auto" >
+                <button class="btn userManageBtn" data-id="userActivityLog">
+                  <img th:src="@{/css/image/blue-right-arrow.png}">
+                </button>
+              </div>
             </li>
           </ul>
         </div>

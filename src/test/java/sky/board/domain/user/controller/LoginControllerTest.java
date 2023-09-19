@@ -40,14 +40,16 @@ class LoginControllerTest {
 
 
 
-        mockMvc.perform(
+        for (int i=0; i< 50; i++) {
+            mockMvc.perform(
+                post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .param("userId", "lim222")
+                    .param("password", "dlagksmf2")
+                    .param("rememberMe", String.valueOf(true))
+                    .header("User-Agent", "pc")
+            );
+        }
 
-            post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("userId", "lim222")
-                .param("password", "dlagksmf2")
-                .param("rememberMe", String.valueOf(true))
-                .header("User-Agent", "pc")
-        );
 
 
     }

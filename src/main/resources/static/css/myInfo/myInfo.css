@@ -88,6 +88,10 @@
 .pwImg svg{
   background-image: url("../image/free-icon-padlock-4503885.png");
 }
+
+.manaImg svg{
+  background-image: url("../image/edit.png");
+}
 .earthImg svg {
   height: 25.5px;
   background-image: url("../image/globe.png");
@@ -102,6 +106,10 @@
 
 .btn-div img{
   width: 30px;
+}
+
+.userManageBtn > img{
+  width: 18px;
 }
 
 .list-group-title .pageTitleBtn {

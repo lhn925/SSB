@@ -45,9 +45,9 @@
 
 .modal .modal-logout {
   width: 600px;
-  height: 400px;
+  height: 700px;
   position: relative;
-  top: -100px;
+  top: 0px;
   padding: 10px;
 }
 @media (max-width: 730px) { /* 모바일 화면 크기 기준으로 설정할 수 있는 임의의 값 사용 */
@@ -69,17 +69,23 @@
 
 }
 
-.modal .title {
+.modal .title{
   padding-left: 10px;
   display: inline;
 /*  text-shadow: 1px 1px 2px gray;
   color: white;*/
 }
 
-.modal .title h4 {
-  margin-bottom: 20px;
-  padding: 30px 0 14px;
+.modal .title .title-content {
+  /*  text-shadow: 1px 1px 2px gray;
+    color: white;*/
   border-bottom: 1px solid #303038;
+  padding: 30px 0 14px;
+  margin-bottom: 20px;
+}
+
+.modal .title h4 {
+
   font-size: 20px;
   font-weight: 300;
   line-height: 28px;

@@ -166,7 +166,7 @@ async function _getFetch(url) {
   }
 }
 
-async function _fetch(method,path, body, headers = {}) { //post fetch
+async function _fetch(method, path, body, headers = {}) { //post fetch
   let url = path;
   const options = {
     method: method,
@@ -284,6 +284,26 @@ function _getFullDateTime(content) {
 
   let fullDateTime = dateString + " " + localeString + " " + timeString;
   return fullDateTime;
+}
+
+function _getMonth(date) {
+  let month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1)
+      : date.getMonth() + 1;
+  return month;
+}
+
+function _getDateFormat(date) {
+
+  let getMonth = _getMonth(date);
+  let getDay = _getDay(date);
+  let value = date.getFullYear() + "-" + getMonth + "-" + getDay;
+
+  return value;
+}
+
+function _getDay(date) {
+  let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+  return day;
 }
 
 /**

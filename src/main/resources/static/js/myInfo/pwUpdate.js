@@ -8,13 +8,14 @@ function PwUpdate() {
   this.$imageName = null;
   this.$resetSubBtn = null;
   this.$modalLogoutBtn = null;
+  this.$pwUpdateModal = null;
   this.modal = new Modal();
   this._init();
 }
 
 PwUpdate.prototype._init = function () {
 
-  this.$modal = document.getElementById("modal");
+  this.$pwUpdateModal = document.getElementById("pwUpdateModal");
   this.body = document.querySelector("body")
   this.$password = document.getElementById("password");
   this.$isChkPw = document.getElementById("_isChkPw");
@@ -111,7 +112,7 @@ PwUpdate.prototype._subBtnClickAddEvent = function ($subBtn, ...$elements) {
 
       // 비밀번호 변경
       _fetch("POST","/user/myInfo/api/pw", body).then((data) => {
-        _pwUpdate.modal._open(_pwUpdate.$modal, _pwUpdate.body);
+        _pwUpdate.modal._open(_pwUpdate.$pwUpdateModal, _pwUpdate.body);
       }).catch((error) => {
         error = JSON.parse(error.message);
         alert(error.message);
