@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.board.domain.user.entity.UserActivityLog;
@@ -21,4 +22,14 @@ public interface UserActivityLogRepository extends JpaRepository<UserActivityLog
         @Param("endDate") LocalDate endDate,
         Pageable pageable);
 
+
+    @Query(value = "select count (u.id) from UserActivityLog u where "
+        + "u.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ")
+    Integer expireActivityCount(@Param("isStatus") Boolean isStatus, @Param("expireDate") LocalDate expireDate);
+
+    @Modifying(clearAutomatically = true)
+    @Query(
+        "update UserActivityLog u set u.isStatus = :offStatus where  u.isStatus = :onStatus"
+            + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate")
+    Integer expireActivityOff(@Param("offStatus") Boolean offStatus, @Param("onStatus") Boolean onStatus,@Param("expireDate") LocalDate expireDate);
 }

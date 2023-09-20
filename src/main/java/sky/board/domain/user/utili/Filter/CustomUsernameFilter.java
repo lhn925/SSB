@@ -24,6 +24,7 @@ import sky.board.domain.user.dto.login.CustomUserDetails;
 import sky.board.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.board.domain.user.exception.LoginBlockException;
 import sky.board.domain.user.exception.LoginFailCountException;
+import sky.board.domain.user.exception.UserInfoNotFoundException;
 import sky.board.domain.user.model.LoginSuccess;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.log.UserLoginLogService;
@@ -68,7 +69,7 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
 
-        final int Limit =5;
+        final int Limit = 5;
         /**
          * 유저가 로그인 버튼을 입력한 URL 저장
          */
@@ -76,13 +77,14 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         String password = obtainPassword(request);
 
         try {
-            userLoginLogService.isLoginBlockChecked(request,userId);
+            userLoginLogService.isLoginBlockChecked(request, userId);
         } catch (LoginBlockException e) {
             throw new LoginBlockException(e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException | GeoIp2Exception e) {
             throw new RuntimeException("error");
-        }
+        } catch (UserInfoNotFoundException e) {
 
+        }
 
         // failCount 전달  success 핸들러에 전달
         Long failCount = userLoginLogService.getCount(userId, LoginSuccess.FAIL, Status.ON);
@@ -126,7 +128,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
             request.setAttribute("imageName", image);
             throw new LoginFailCountException("login.error");
         }
-
 
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(userId,
             password);

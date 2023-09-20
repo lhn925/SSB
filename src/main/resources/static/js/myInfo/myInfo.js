@@ -8,7 +8,6 @@ function MyInfo() {
   this.$userManageModal = null;
 
   //
-
   this.modalType = null;
   this._paging = null;
 

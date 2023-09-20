@@ -96,6 +96,13 @@ public class MyInfoApiController {
         return new ResponseEntity(new Result<>(userNameUpdateDto), HttpStatus.OK);
     }
 
+    /**
+     * 파일을 업로드할때 RequestBody를 사용하면 Exception 발생
+     * @param file
+     * @param bindingResult
+     * @param request
+     * @return
+     */
     @PostMapping("/picture")
     public ResponseEntity updateUserProfilePicture(@Validated @ModelAttribute UserPictureUpdateDto file,
         BindingResult bindingResult, HttpServletRequest request) {

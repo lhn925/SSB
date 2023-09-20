@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Slf4j
 @EnableJpaAuditing
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * DEFERRED : 기본적으로 LAZY와 동일하지만 비동기적으로 작업하고, ContextRefreshedEvent에 의해 Repository가 초기화 되어 검증되도록 진행합니다.
  */
 @SpringBootApplication
+@EnableScheduling
 public class BoardApplication {
 
     public static void main(String[] args) {

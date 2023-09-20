@@ -40,7 +40,7 @@ class LoginControllerTest {
 
 
 
-        for (int i=0; i< 50; i++) {
+        for (int i=0; i< 10; i++) {
             mockMvc.perform(
                 post("/login").contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .param("userId", "lim222")

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Locale.IsoCountryCode;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,15 +72,16 @@ public class UserLoginLogService {
 
 
     /**
-     *
      * 로그인 로그 출력
+     *
      * @param request
      * @param startDate
      * @param endDate
      * @param pageRequest
      * @return
      */
-    public Page<UserLoginLogListDto> getUserLoginLogList(HttpServletRequest request, LocalDate startDate, LocalDate endDate,
+    public Page<UserLoginLogListDto> getUserLoginLogList(HttpServletRequest request, LocalDate startDate,
+        LocalDate endDate,
         PageRequest pageRequest) {
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
@@ -96,6 +99,27 @@ public class UserLoginLogService {
             isStatus.getValue(),
             pageRequest);
         return loginLogPage.getTotalElements();
+    }
+
+    /**
+     * 3개월 지난 로그인 기록 전부다 off
+     * 3개월이 지난 id count를 구하고 리스트없이 update
+     * 데이터 십만개를 테스트 했을때 걸리는 시간 : 683ms
+     * @param month
+     */
+    @Transactional
+    public Integer expireLoginLogOff(Integer month) {
+        LocalDate expireDate = LocalDate.now().minusMonths(month);
+
+        Integer count = loginLogRepository.expireLoginLogCount(Status.ON.getValue(), expireDate);
+
+        log.info("count = {}", count);
+
+        Integer result = 0;
+        if (count > 0) {
+           result = loginLogRepository.expireLoginLogOff(Status.OFF.getValue(), Status.ON.getValue(), expireDate);
+        }
+        return result;
     }
 
     @Transactional
@@ -134,5 +158,6 @@ public class UserLoginLogService {
             }
         }
     }
+
 
 }

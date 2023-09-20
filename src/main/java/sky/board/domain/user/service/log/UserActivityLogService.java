@@ -84,4 +84,26 @@ public class UserActivityLogService {
             endDate, pageRequest).map(u -> new UserActivityLogListDto(ms,request,u));
         return userActivityLogListDtoPage;
     }
+
+    /**
+     * 3개월 지난 로그인 기록 전부다 off
+     * 3개월이 지난 id count를 구하고 리스트없이 update
+     * 데이터 십만개를 테스트 했을때 걸리는 시간 : 683ms
+     * @param month
+     */
+    @Transactional
+    public Integer expireActivityOff(Integer month) {
+        LocalDate expireDate = LocalDate.now().minusMonths(month);
+
+        Integer count = userActivityLogRepository.expireActivityCount(Status.ON.getValue(), expireDate);
+
+        log.info("count = {}", count);
+
+        Integer result = 0;
+        if (count > 0) {
+            result = userActivityLogRepository.expireActivityOff(Status.OFF.getValue(), Status.ON.getValue(), expireDate);
+        }
+        return result;
+    }
+
 }

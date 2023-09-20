@@ -2,12 +2,14 @@ package sky.board.domain.user.repository.log;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import sky.board.domain.user.entity.login.UserLoginLog;
 import sky.board.domain.user.model.LoginSuccess;
 
@@ -39,4 +41,23 @@ public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
         @Param("startDate") LocalDate startDate,
         @Param("endDate")  LocalDate endDate,
         Pageable pageable);
+
+
+
+
+
+    @Query(value = "select count (u.id) from UserLoginLog u where "
+        + "u.defaultLoginLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ")
+    Integer expireLoginLogCount(@Param("isStatus") Boolean status, @Param("expireDate") LocalDate expireDate);
+
+
+    @Modifying(clearAutomatically = true)
+    @Query("update UserLoginLog u set u.defaultLoginLog.isStatus = :offStatus where  u.defaultLoginLog.isStatus = :onStatus"
+        + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate")
+    Integer expireLoginLogOff (@Param("offStatus") Boolean offStatus,@Param("onStatus")
+    Boolean onStatus ,@Param("expireDate") LocalDate expireDate);
+
+
+
+
 }

@@ -82,7 +82,7 @@ public class SpringSecurityConfig {
     private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**",
         "/example/city", "/email/**", "/user/help/**", "/user/join/**", "/login", "/login/**"};
     private final String[] USER_URL = {"/user/myInfo/**"};
-    private final String[] ADMIN_URL = {"/board"};
+    private final String[] ADMIN_URL = {"/cron/**"};
 
 
     /**
@@ -108,8 +108,6 @@ public class SpringSecurityConfig {
         MessageSource messageSource,
         HttpSecurity http) throws Exception {
         ApiKeyAuthFilter apiKeyAuthFilter = new ApiKeyAuthFilter("/user/myInfo/api/**", messageSource);
-        ApikeyAuthExceptionHandlerFilter apikeyAuthExceptionHandlerFilter = new ApikeyAuthExceptionHandlerFilter(
-            messageSource);
         /**
          * cors
          * Cross-Origin Resource Sharing
@@ -155,6 +153,7 @@ public class SpringSecurityConfig {
                         dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll().
                         requestMatchers(ALL_URL).permitAll().
                         requestMatchers(USER_URL).hasRole(UserGrade.USER.getDescription()).
+                        requestMatchers(ADMIN_URL).hasRole(UserGrade.ADMIN.getDescription()).
                         anyRequest()
                         .authenticated()
                 // 어떠한 요청이라도 인증필요

@@ -50,10 +50,6 @@ public class UserLoginLog extends BaseTimeEntity {
     @Enumerated(STRING)
     private LoginSuccess isSuccess;
 
-    @CreatedDate
-    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private LocalDateTime loginDateTime;
-
     @Embedded
     private DefaultLoginLog defaultLoginLog;
 
