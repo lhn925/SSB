@@ -2,17 +2,14 @@ package sky.board.domain.user.controller.advice;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sky.board.domain.user.api.myInfo.MyInfoApiController;
 import sky.board.domain.user.exception.ChangeUserNameIsNotAfterException;
@@ -25,7 +22,7 @@ import sky.board.global.error.dto.Result;
 @Slf4j
 @RestControllerAdvice(assignableTypes = {MyInfoApiController.class})
 @RequiredArgsConstructor
-public class ApiExController {
+public class MyInfoApiExController {
 
     private final MessageSource ms;
 

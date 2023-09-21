@@ -1,7 +1,5 @@
 package sky.board.domain.email.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;

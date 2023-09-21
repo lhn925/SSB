@@ -186,10 +186,7 @@ public class EmailApiController {
             return sendEmail(EmailSendType.ID, helpEmailSendDto, request);
         } catch (UsernameNotFoundException e) {
             // 없으면 찾을수 없다고 경고 뜸
-            bindingResult.reject(e.getMessage(), null, null);
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
-
         // 없으면 찾을수 없다고 경고 뜸
         bindingResult.reject("sky.email.notFind", null, null);
         return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
