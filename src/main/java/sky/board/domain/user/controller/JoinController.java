@@ -39,12 +39,6 @@ public class JoinController {
      * id:join_1
      * 회원가입 페이지 이동 api
      *
-     * @param model
-     *
-     * @return
-     */
-
-    /**
      * @param userJoinAgreeDto
      * @param bindingResult
      * @param model
