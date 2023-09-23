@@ -50,14 +50,8 @@ public class JoinApiController {
         try {
             userJoinService.checkId(userId.getUserId());
         } catch (DuplicateCheckException e) {
-            bindingResult.addError(
-                new FieldErrorCustom(
-                    "JoinDuplicateDto",
-                    e.getFieldName(), e.getRejectValue(),
-                    "duplication",
-                    new String[]{e.getMessage()}));
-
-            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+            request.setAttribute("bindingResult",bindingResult);
+            throw new DuplicateCheckException(e.getMessage(),e.getFieldName(),e.getRejectValue());
         }
         return new ResponseEntity(new Result<>(userId), HttpStatus.OK);
     }
@@ -81,13 +75,8 @@ public class JoinApiController {
         try {
             userJoinService.checkUserName(userName.getUserName());
         } catch (DuplicateCheckException e) {
-            bindingResult.addError(
-                new FieldErrorCustom(
-                    "JoinDuplicateDto",
-                    e.getFieldName(), e.getRejectValue(),
-                    "duplication",
-                    new String[]{e.getMessage()}));
-            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+                request.setAttribute("bindingResult",bindingResult);
+            throw new DuplicateCheckException(e.getMessage(),e.getFieldName(),e.getRejectValue());
         }
         return new ResponseEntity(new Result<>(userName), HttpStatus.OK);
     }
@@ -109,13 +98,8 @@ public class JoinApiController {
         try {
             userJoinService.checkEmail(email.getEmail());
         } catch (DuplicateCheckException e) {
-            bindingResult.addError(
-                new FieldErrorCustom(
-                    "JoinDuplicateDto",
-                    e.getFieldName(), e.getRejectValue(),
-                    "duplication",
-                    new String[]{e.getMessage()}));
-            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
+            request.setAttribute("bindingResult",bindingResult);
+            throw new DuplicateCheckException(e.getMessage(),e.getFieldName(),e.getRejectValue());
         }
         return new ResponseEntity(new Result<>(email), HttpStatus.OK);
     }
