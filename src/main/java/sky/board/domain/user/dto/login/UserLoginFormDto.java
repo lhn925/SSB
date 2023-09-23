@@ -12,7 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserLoginFormDto implements Serializable {
     private String url;
-    private String mode;
     private String userId;
     private String password;
     private Boolean rememberMe;

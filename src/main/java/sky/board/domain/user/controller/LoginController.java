@@ -25,13 +25,23 @@ import sky.board.global.redis.dto.RedisKeyDto;
 public class LoginController {
 
     private final MessageSource ms;
-    private final RedisTemplate redisTemplate;
 
     /**
      * @param request
      * @return
      */
 
+    /**
+     *
+     * id:login_1
+     *
+     * 로그인페이지 이동
+     * @param userLoginFormDto
+     * @param userLoginFailErrorDto
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping
     public String loginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
         @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
@@ -44,7 +54,7 @@ public class LoginController {
 
         // 이전페이지 url 저장
         String referer = request.getHeader("referer");
-        if (StringUtils.hasText(referer) && !StringUtils.hasText(userLoginFormDto.getUrl()) ) {
+        if (StringUtils.hasText(referer) && !StringUtils.hasText(userLoginFormDto.getUrl()) && !referer.contains("/login") ) {
             String url = referer.equals(request.getRequestURL()) ? null : referer;
             userLoginFormDto.setUrl(url);
         }
@@ -55,35 +65,20 @@ public class LoginController {
 
     /**
      * 주소값에 파라미터가 노출되지 않게끔
+     * id:login_2
+     * @param userLoginFormDto
+     * @param userLoginFailErrorDto
+     * @param redirectAttributes
+     * @return
      */
     @GetMapping("/fail")
     public String failLoginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
         @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
         RedirectAttributes redirectAttributes) {
 
-        log.info("userLoginFormDto.getUserId() = {}", userLoginFormDto.getUserId());
         redirectAttributes.addFlashAttribute("userLoginFormDto", userLoginFormDto);
         redirectAttributes.addFlashAttribute("userLoginFailErrorDto", userLoginFailErrorDto);
-        log.info("userLoginFormDto.getUserId()2 = {}", userLoginFormDto.getUserId());
         return "redirect:/login";
     }
 
-/*    *//**
-     * 로그인 성공 후 호출되는 API
-     * 0dksmf071
-     * 0dlagksmf2
-     *//*
-    @GetMapping("/logout")
-    public String logout(HttpSession httpSession) {
-        Object user_id = httpSession.getAttribute(RedisKeyDto.USER_KEY);
-        if (user_id != null) {
-            httpSession.removeAttribute(RedisKeyDto.USER_KEY);
-        }
-        log.info("RedisKeyDto.SESSION_KEY = {}", RedisKeyDto.SESSION_KEY);
-        String id = httpSession.getId();
-        if (StringUtils.hasText(id)) {
-            redisTemplate.delete(RedisKeyDto.SESSION_KEY + httpSession.getId());
-        }
-        return "redirect:/";
-    }*/
 }

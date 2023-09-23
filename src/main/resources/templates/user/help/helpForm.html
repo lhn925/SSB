@@ -14,9 +14,9 @@
     <div class="card-body">
       <form id="form" th:method="get" th:action="@{/user/help/find}" th:object="${userHelpDto}">
         <input type="checkbox" hidden="true" id="_isChkEmail"/>
-        <input type="text" hidden="true" th:field="*{helpToken}"/>
         <input type="checkbox" hidden="true" id="_isChkAuth"/>
         <input type="text" hidden="true" th:field="*{helpType}"/>
+        <input type="text" hidden="true" th:field="*{helpToken}"/>
         <input type="text" hidden="true" th:field="*{userId}"/>
 
         <div th:if="${userHelpDto.helpType.name() == 'PW'}">

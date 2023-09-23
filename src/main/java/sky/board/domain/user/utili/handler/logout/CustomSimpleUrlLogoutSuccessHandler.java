@@ -30,7 +30,6 @@ public class CustomSimpleUrlLogoutSuccessHandler extends SimpleUrlLogoutSuccessH
 
 
     private final RememberMeServices rememberMeServices;
-    private final UserLoginStatusService userLoginStatusService;
     private final RedisService redisService;
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)

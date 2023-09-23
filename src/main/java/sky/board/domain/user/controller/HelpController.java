@@ -30,12 +30,10 @@ import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.Enabled;
 import sky.board.domain.user.model.HelpType;
 import sky.board.domain.user.model.PwSecLevel;
-import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.help.UserHelpService;
 import sky.board.domain.user.service.log.UserActivityLogService;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
-import sky.board.domain.user.service.myInfo.UserMyInfoService;
 import sky.board.domain.user.utili.CustomCookie;
 import sky.board.domain.user.utili.PwChecker;
 import sky.board.global.error.dto.FieldErrorCustom;
@@ -53,8 +51,6 @@ public class HelpController {
     private final UserLoginStatusService userLoginStatusService;
     private final UserActivityLogService userActivityLogService;
 
-
-    private final UserMyInfoService userMyInfoService;
     private final UserHelpService userHelpService;
     private final MessageSource ms;
 
@@ -62,6 +58,10 @@ public class HelpController {
 
 
     /**
+     * id:help_1
+     * <p>
+     * id 찾기 페이지로 이동
+     *
      * @param model
      * @param request
      * @param response
@@ -70,66 +70,36 @@ public class HelpController {
     @GetMapping("/id")
     public String idHelpForm(Model model, HttpServletRequest request, HttpServletResponse response) {
 
-        UserHelpDto userHelpDto = UserHelpDto.createUserHelpIdDto();
-        return getString(userHelpDto, model, HelpType.ID, "id", "helpForm", request, response);
-    }
-
-    @GetMapping("/idquery/check")
-    public String idQuery(@ModelAttribute UserIdHelpQueryDto userIdHelpQueryDto, Model model,
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws IOException {
-        if (!StringUtils.hasText(userIdHelpQueryDto.getUserId())) {
-            Alert.waringAlert(ms.getMessage("NotBlank", null, request.getLocale()), "/user/help/idquery", response);
-        }
-
-        try {
-            CustomUserDetails userDetails = userQueryService.findStatusUserId(userIdHelpQueryDto.getUserId(),
-                Enabled.ENABLED);
-
-            UserHelpDto userHelpDto = UserHelpDto.createUserHelpIdDto();
-            userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
-
-            StringBuffer email = new StringBuffer(userDetails.getEmail());
-
-            // 2221325@naver.com -> 22*****@n****.com
-            anonymousEmail(email);
-            userHelpDto.setEnEmail(email.toString());
-            userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
-
-            HttpSession session = request.getSession();
-            model.addAttribute("userHelpDto", userHelpDto);
-            session.setAttribute("userHelpDto", userHelpDto);
-            return getString(userHelpDto, model
-                , HelpType.PW, "idquery", "helpForm", request, response);
-        } catch (UsernameNotFoundException e) {
-            Alert.waringAlert(ms.getMessage("userId.notfound", null, request.getLocale()), "/user/help/idquery",
-                response);
-
-            return "redirect:/user/help/idquery";
-        }
-    }
-
-    @GetMapping("/idquery")
-    public String idQueryForm(Model model, HttpServletRequest request, HttpServletResponse response) {
-
-        HttpSession session = request.getSession();
-
-        EmailAuthCodeDto emailAuthCode = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
-
-        Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
-        if (helpToken != null) {
-            CustomCookie.delete(helpToken, response);
-        }
-        if (emailAuthCode != null) {
-            session.removeAttribute("emailAuthCodeDto");
-        }
-
-        model.addAttribute("userIdHelpQueryDto", new UserIdHelpQueryDto());
-        return "user/help/idQueryForm";
+        UserHelpDto userHelpDto = UserHelpDto.getInstance();
+        return getForwardView(userHelpDto, model, HelpType.ID, "id", "helpForm", request, response
+        );
     }
 
 
+/*    @GetMapping("/helpForm")
+    public String helpForm(@ModelAttribute UserHelpDto userHelpDto, Model model) {
+
+        if (userHelpDto.getHelpType() == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("userHelpDto", userHelpDto);
+        return "user/help/helpForm";
+    }*/
+
+    /**
+     * id:help_2
+     * 이메일 인증 후
+     * helpType 에 따라
+     * PW : 비밀번호 재설정 페이지 호출 컨트롤러 이동
+     * ID : 아이디 공개 페이지 호출 컨트롤러 이동
+     *
+     * @param userHelpDto
+     * @param bindingResult
+     * @param request
+     * @param response
+     * @param redirectAttributes
+     * @return
+     */
     @GetMapping("/find")
     public String findJoinEmailById(@Validated @ModelAttribute UserHelpDto userHelpDto, BindingResult bindingResult,
         HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttributes) {
@@ -139,8 +109,10 @@ public class HelpController {
 
         String helpToken = CustomCookie.readCookie(request.getCookies(), "helpToken");
         HttpSession session = request.getSession();
-        // helpToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
-        if (!StringUtils.hasText(helpToken) || (!helpToken.equals(userHelpDto.getHelpToken()))) {
+
+        UserHelpDto saveHelpDto = (UserHelpDto) session.getAttribute("userHelpDto");
+        // helpToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 세션에 저장된 토큰이 안 맞을 경우
+        if (!StringUtils.hasText(helpToken) || (!helpToken.equals(saveHelpDto.getHelpToken()))) {
             bindingResult.reject("code.error");
             return "redirect:/user/help/id";
         }
@@ -162,11 +134,11 @@ public class HelpController {
         }
 
         try {
-            CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(),Enabled.ENABLED);
+            CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(), Enabled.ENABLED);
             if (!findOne.isEnabled()) {
                 throw new UsernameNotFoundException("email.notfound");
             }
-            // 회원가입 날짜 전달
+
             userHelpDto.setUserId(findOne.getUserId());
 
             String url;
@@ -176,7 +148,10 @@ public class HelpController {
                 redirectAttributes.addFlashAttribute("userHelpDto", userHelpDto);
                 // 비밀번호 재설정 페이지 이동
                 url = "redirect:/user/help/reset";
-            } else {// 아이디 찾기 일시
+            } else {
+                // 아이디 찾기 일시
+
+                // 회원가입 날짜 전달
                 userHelpDto.setCreatedDateTime(findOne.getCreatedDateTime());
                 redirectAttributes.addFlashAttribute("userHelpDto", userHelpDto);
                 //helpToken 쿠키 삭제
@@ -187,9 +162,7 @@ public class HelpController {
                 // 아이디 페이지 이동
                 url = "redirect:/user/help/show";
             }
-
             return url;
-
         } catch (UsernameNotFoundException e) {
             bindingResult.addError(
                 new FieldErrorCustom("userHelpDto",
@@ -200,6 +173,17 @@ public class HelpController {
         }
     }
 
+
+    /**
+     * id:help_3
+     *
+     * @param userHelpDto
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     * @throws IOException
+     */
     @GetMapping("/show")
     public String showId(@ModelAttribute UserHelpDto userHelpDto, HttpServletRequest request,
         HttpServletResponse response, Model model)
@@ -211,18 +195,114 @@ public class HelpController {
         return "user/help/showId";
     }
 
+    /**
+     * id:help_4
+     * <p>
+     * 유저가 찾을려는 아이디의 존재 유무를 확인 후
+     * 확인 시 이메일 인증 페이지로 이동
+     *
+     * @param model
+     * @param request
+     * @param response
+     * @return
+     */
+    @GetMapping("/idquery")
+    public String idQueryForm(Model model, HttpServletRequest request, HttpServletResponse response) {
+
+        HttpSession session = request.getSession();
+
+        EmailAuthCodeDto emailAuthCode = (EmailAuthCodeDto) session.getAttribute("emailAuthCodeDto");
+
+        Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
+        if (helpToken != null) {
+            CustomCookie.delete(helpToken, response);
+        }
+        if (emailAuthCode != null) {
+            session.removeAttribute("helpToken");
+            session.removeAttribute("emailAuthCodeDto");
+        }
+
+        model.addAttribute("userIdHelpQueryDto", new UserIdHelpQueryDto());
+        return "user/help/idQueryForm";
+    }
+
+
+    /**
+     * id:help_5
+     * <p>
+     * 비밀번호 찾기 시 아이디가 있는지 체크 후 email 인증 페이지로 이동
+     *
+     * @param userIdHelpQueryDto
+     * @param model
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    @GetMapping("/idquery/check")
+    public String idQuery(@ModelAttribute UserIdHelpQueryDto userIdHelpQueryDto, Model model,
+        HttpServletRequest request,
+        HttpServletResponse response)
+        throws IOException {
+        if (!StringUtils.hasText(userIdHelpQueryDto.getUserId())) {
+            Alert.waringAlert(ms.getMessage("NotBlank", null, request.getLocale()), "/user/help/idquery", response);
+        }
+
+        try {
+            CustomUserDetails userDetails = userQueryService.findStatusUserId(userIdHelpQueryDto.getUserId(),
+                Enabled.ENABLED);
+
+
+            // HelpToken 생성 및 세션 저장
+            UserHelpDto userHelpDto = UserHelpDto.getInstance();
+            userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
+
+            StringBuffer email = new StringBuffer(userDetails.getEmail());
+
+            // 2221325@naver.com -> 22*****@n****.com
+            anonymousEmail(email);
+            userHelpDto.setEnEmail(email.toString());
+            userHelpDto.setUserId(userIdHelpQueryDto.getUserId());
+
+            return getForwardView(userHelpDto, model
+                , HelpType.PW, "idquery", "helpForm", request, response);
+        } catch (UsernameNotFoundException e) {
+            Alert.waringAlert(ms.getMessage("userId.notfound", null, request.getLocale()), "/user/help/idquery",
+                response);
+
+            return "redirect:/user/help/idquery";
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return "redirect:/user/help/idquery";
+        }
+    }
+
+
+    /**
+     * id:help_6
+     *  이메일 인증 후 비밀번호 재설정 페이지로 이동
+     *
+     * @param userHelpDto
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     * @throws IOException
+     */
     @GetMapping("/reset")
     public String pwResetForm(@ModelAttribute UserHelpDto userHelpDto,
         HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
         Cookie helpToken = CustomCookie.getCookie(request.getCookies(), "helpToken");
         // helpToken 쿠키가 만료됐거나 , 쿠키에 저장된 토큰과 요청한 토큰이 안 맞을 경우
-        if (!StringUtils.hasText(helpToken.getValue()) || (!helpToken.getValue().equals(userHelpDto.getHelpToken()))) {
+
+        UserHelpDto saveHelpDto = (UserHelpDto) request.getSession().getAttribute("userHelpDto");
+
+        if (!StringUtils.hasText(helpToken.getValue()) || (!helpToken.getValue().equals(saveHelpDto.getHelpToken()))) {
             Alert.waringAlert(ms.getMessage("code.error", null, request.getLocale()), "/user/help/idquery", response);
         }
         if (userIdCheck(userHelpDto.getUserId(), request, response)) {
             return null;
         }
-        log.info("helpToken = {}", helpToken);
 
         //시간 900초 다시
         helpToken.setMaxAge(900);
@@ -233,8 +313,8 @@ public class HelpController {
         String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
         UserPwResetFormDto userPwResetFormDto = UserPwResetFormDto.builder()
             .userId(userHelpDto.getUserId())
-            .helpToken(userHelpDto.getHelpToken())
             .captchaKey(key)
+            .helpToken(userHelpDto.getHelpToken())
             .imageName(apiExamCaptchaImage).build();
 
         model.addAttribute("userPwResetFormDto", userPwResetFormDto);
@@ -242,6 +322,17 @@ public class HelpController {
         return "user/help/pwResetForm";
     }
 
+    /**
+     *  id:help_7
+     *  비밀번호 재설정 후 성공 시 logout 페이지로 이동
+     * @param userPwResetFormDto
+     * @param bindingResult
+     * @param request
+     * @param model
+     * @param response
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/reset")
     public String pwReset(@Validated @ModelAttribute UserPwResetFormDto userPwResetFormDto, BindingResult bindingResult,
         HttpServletRequest request, Model model, HttpServletResponse response)
@@ -309,7 +400,7 @@ public class HelpController {
             HttpSession session = request.getSession();
             // 로그인된 기기 로그아웃
 
-            userLoginStatusService.removeAllLoginStatus(userDetails.getUserId(),session.getId());
+            userLoginStatusService.removeAllLoginStatus(userDetails.getUserId(), session.getId());
 
             //인증 이미지 삭제
             apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
@@ -350,7 +441,7 @@ public class HelpController {
         userPwResetFormDto.setImageName(apiExamCaptchaImage);
     }
 
-    private String getString(UserHelpDto userHelpDto, Model model, HelpType helpType, String url, String view,
+    private String getForwardView(UserHelpDto userHelpDto, Model model, HelpType helpType, String url, String view,
         HttpServletRequest request,
         HttpServletResponse response) {
 
@@ -362,6 +453,7 @@ public class HelpController {
 
         if (result != null) {
             CustomCookie.delete(result, response);
+            session.removeAttribute("userHelpDto");
             return "redirect:/user/help/" + url;
         }
 
@@ -372,12 +464,16 @@ public class HelpController {
             session.removeAttribute("emailAuthCodeDto");
             return "redirect:/user/help/" + url;
         }
+
         // 쿠키 생성
         CustomCookie.addCookie("/user/help", "helpToken", 900, response, userHelpDto.getHelpToken());
-
         userHelpDto.setHelpType(helpType);
+
+        // 세션 저장
+        session.setAttribute("userHelpDto", userHelpDto);
         model.addAttribute("userHelpDto", userHelpDto);
         return "/user/help/" + view;
+
     }
 
 

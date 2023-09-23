@@ -22,6 +22,9 @@ public class UserHelpDto implements Serializable {
     @JoinValid(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
     private String email;
 
+    /**
+     * 암호화 되어 있는 이메일
+     */
     private String enEmail;
 
     @NotBlank
@@ -34,11 +37,11 @@ public class UserHelpDto implements Serializable {
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime createdDateTime;
 
-    public static UserHelpDto createUserHelpIdDto() {
-        UserHelpDto userJoinAgreeResponseDto = new UserHelpDto();
+    public static UserHelpDto getInstance() {
+        UserHelpDto userHelpDto = new UserHelpDto();
         String token = UserTokenUtil.getToken();
-        userJoinAgreeResponseDto.setHelpToken(token);
-        return userJoinAgreeResponseDto;
+        userHelpDto.setHelpToken(token);
+        return userHelpDto;
     }
 
 }
