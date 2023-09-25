@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +38,15 @@ public class MyInfoController {
 
 
     private final UserQueryService userQueryService;
-    private final UserLoginStatusService userLoginStatusService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
+    /**
+     * id:myInfo_1
+     * 유저 마이 페이지로 이동
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping
     public String myPageForm(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);
@@ -53,6 +60,12 @@ public class MyInfoController {
     }
 
 
+    /**
+     * id:myInfo_2
+     * @param request
+     * @param model
+     * @return
+     */
     @GetMapping("/pw")
     public String pwUpdateForm(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);

@@ -14,6 +14,6 @@ public class UserPictureUpdateDto {
 
 
     @MultipartPictureValid
-    @MultipartFileSizeValid
+//    @MultipartFileSizeValid
     private MultipartFile file;
 }

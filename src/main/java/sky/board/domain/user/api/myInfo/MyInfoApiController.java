@@ -8,28 +8,18 @@ import jakarta.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -38,7 +28,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,8 +41,6 @@ import sky.board.domain.user.dto.myInfo.UserLoginStatusUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPictureUpdateDto;
 import sky.board.domain.user.dto.myInfo.UserPwUpdateFormDto;
-import sky.board.domain.user.entity.UserActivityLog;
-import sky.board.domain.user.entity.login.UserLoginStatus;
 import sky.board.domain.user.model.ChangeSuccess;
 import sky.board.domain.user.model.PwSecLevel;
 import sky.board.domain.user.model.Status;
@@ -65,8 +52,7 @@ import sky.board.domain.user.service.myInfo.UserMyInfoService;
 import sky.board.domain.user.utili.PwChecker;
 import sky.board.global.error.dto.ErrorResultDto;
 import sky.board.global.error.dto.Result;
-import sky.board.global.file.dto.UploadFile;
-import sky.board.global.file.utili.FileStore;
+import sky.board.global.file.dto.UploadFileDto;
 import sky.board.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.board.global.redis.dto.RedisKeyDto;
 
@@ -84,6 +70,15 @@ public class MyInfoApiController {
     private final UserLoginStatusService userLoginStatusService;
     private final UserLoginLogService userLoginLogService;
 
+    /**
+     * id:myInfo_Api_1
+     * 유저 닉네임 업데이트
+     *
+     * @param userNameUpdateDto
+     * @param bindingResult
+     * @param request
+     * @return
+     */
     @PostMapping("/userName")
     public ResponseEntity updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
         BindingResult bindingResult,
@@ -97,11 +92,14 @@ public class MyInfoApiController {
     }
 
     /**
-     * 파일을 업로드할때 RequestBody를 사용하면 Exception 발생
+     * id:myInfo_Api_2
+     * <p>
+     * 유저 프로필 사진 업데이트
+     *
      * @param file
      * @param bindingResult
      * @param request
-     * @return
+     * @return 파일을 업로드할때 RequestBody를 사용하면 Exception 발생
      */
     @PostMapping("/picture")
     public ResponseEntity updateUserProfilePicture(@Validated @ModelAttribute UserPictureUpdateDto file,
@@ -109,30 +107,43 @@ public class MyInfoApiController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-        UploadFile uploadFile = null;
-        uploadFile = userMyInfoService.updatePicture(request, file.getFile());
-        return new ResponseEntity(new Result<>(uploadFile), HttpStatus.OK);
+        UploadFileDto uploadFileDto = null;
+        uploadFileDto = userMyInfoService.updatePicture(request, file.getFile());
+        return new ResponseEntity(new Result<>(uploadFileDto), HttpStatus.OK);
     }
 
 
+  /*  /**
+     * id:myInfo_Api_3
+     * <p>
+     * 서버에서 프로필 이미지 가져오기
+     *
+     * @param fileName
+     * @param request
+     * @return
+     * @throws IOException
+     *//*
     @GetMapping("/picture/{fileName}")
-    public ResponseEntity<Resource> getUserProfilePicture(@PathVariable String fileName, HttpServletRequest request)
+    public ResponseEntity getUserProfilePicture(@PathVariable String fileName, HttpServletRequest request)
         throws IOException {
 
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
-        MediaType mediaType = MediaType.parseMediaType(Files.probeContentType(Paths.get(fileName)));
-
-        UrlResource pictureImage = userMyInfoService.getPictureImage(
+        // file MediaType 확인 후 header 에 저장
+        MediaType mediaType = null;
+        UrlResource pictureImage = null;
+        mediaType = MediaType.parseMediaType(Files.probeContentType(Paths.get(fileName)));
+        log.info("mediaType = {}", mediaType);
+        pictureImage = userMyInfoService.getPictureImage(
             FileStore.USER_PICTURE_DIR + userInfoDto.getToken() + "/" + fileName);
-
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, mediaType.toString())
             .body(pictureImage);
-    }
 
-    @GetMapping("/picture/default")
+    }*/
+
+/*    @GetMapping("/picture/default")
     public ResponseEntity<Resource> getUserProfilePictureDefault() throws IOException {
         MediaType mediaType = MediaType.parseMediaType(
             Files.probeContentType(Paths.get(FileStore.USER_DEFAULT_IMAGE_URL)));
@@ -141,8 +152,15 @@ public class MyInfoApiController {
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_TYPE, mediaType.toString())
             .body(pictureImage);
-    }
+    }*/
 
+    /**
+     * id:myInfo_Api_3
+     * 프로필 이미지 삭제
+     * @param request
+     * @return
+     * @throws FileNotFoundException
+     */
     @DeleteMapping("/picture")
     public ResponseEntity deleteUserProfilePicture(HttpServletRequest request) throws FileNotFoundException {
         userMyInfoService.deletePicture(request);
@@ -150,6 +168,16 @@ public class MyInfoApiController {
     }
 
 
+    /**
+     *
+     * 비밀번호 수정
+     * id:myInfo_Api_4
+     * @param userPwUpdateFormDto
+     * @param bindingResult
+     * @param request
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/pw")
     public ResponseEntity updateUserPassWord(@Validated @RequestBody UserPwUpdateFormDto userPwUpdateFormDto,
         BindingResult bindingResult, HttpServletRequest request) throws IOException {
@@ -201,6 +229,13 @@ public class MyInfoApiController {
         }
     }
 
+    /**
+     * id:myInfo_api_5
+     * 비밀번호 변경 후
+     * 해당아이디에 접속되어 있는 기기 전부 다 로그아웃
+     * @param request
+     * @return
+     */
     @PostMapping("/login/status")
     public ResponseEntity updateLoginStatus(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -210,6 +245,14 @@ public class MyInfoApiController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    /**
+     * id:myInfo_api_6
+     * 해당 기기 원격 로그아웃
+     * @param userLoginStatusUpdateDto
+     * @param bindingResult
+     * @param request
+     * @return
+     */
     @PatchMapping("/login/status")
     public ResponseEntity logoutStatus(@Validated @RequestBody UserLoginStatusUpdateDto userLoginStatusUpdateDto,
         BindingResult bindingResult, HttpServletRequest request) {
@@ -223,6 +266,14 @@ public class MyInfoApiController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    /**
+     * id:myInfo_api_7
+     * 해외 로그인 차단 설정 변경
+     * @param userLoginBlockDto
+     * @param bindingResult
+     * @param request
+     * @return
+     */
     @PostMapping("/block")
     public ResponseEntity loginBlockedUpdate(@Validated @RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
         BindingResult bindingResult,
@@ -235,6 +286,14 @@ public class MyInfoApiController {
     }
 
 
+    /**
+     * id:myInfo_api_8
+     * 로그인 되어 있는 기기 목록 검색 후 전달
+     * @param offset
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/loginDevice")
     public ResponseEntity getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
         @RequestParam(name = "size", defaultValue = "2", required = false) Integer size, HttpServletRequest request) {
@@ -246,6 +305,20 @@ public class MyInfoApiController {
     }
 
 
+    /**
+     * id:myInfo_api_9
+     *
+     * type 과 날짜 에 따라 유저정보 변경 및 유저 로그인 로그 목록 검색 후 목록 전달
+     *
+     *
+     * @param type
+     * @param startDate
+     * @param endDate
+     * @param offset
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/userLog")
     public ResponseEntity getLoginLogList(
         @RequestParam(value = "type", required = false) String type,
@@ -283,7 +356,7 @@ public class MyInfoApiController {
                 start = LocalDate.parse(startDate, ISO_DATE);
             }
             if (endDate != null || !endDate.equals("")) { // 조회할려는 날짜가 없을 경우
-                end = LocalDate.parse(endDate,ISO_DATE);
+                end = LocalDate.parse(endDate, ISO_DATE);
             }
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("error.date.range");
