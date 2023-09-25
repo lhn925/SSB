@@ -22,8 +22,7 @@ public class HomeController {
     private final RedisService redisService;
 
     @GetMapping("/")
-    public String home() {
-
+    public String home(HttpServletRequest request) {
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
