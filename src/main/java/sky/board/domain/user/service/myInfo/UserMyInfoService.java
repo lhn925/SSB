@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
@@ -26,7 +25,7 @@ import sky.board.domain.user.repository.UserQueryRepository;
 import sky.board.domain.user.service.UserQueryService;
 import sky.board.domain.user.service.join.UserJoinService;
 import sky.board.global.file.utili.FileStore;
-import sky.board.global.file.dto.UploadFile;
+import sky.board.global.file.dto.UploadFileDto;
 import sky.board.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -36,11 +35,9 @@ import sky.board.global.redis.dto.RedisKeyDto;
 public class UserMyInfoService {
 
     private final Long MONTHS = 1L;
-    private final UserQueryRepository userQueryRepository;
     private final UserJoinService userJoinService;
     private final FileStore fileStore;
     private final UserQueryService userQueryService;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void updateUserName(HttpServletRequest request, UserNameUpdateDto userNameUpdateDto) {
@@ -67,8 +64,8 @@ public class UserMyInfoService {
             throw new ChangeUserNameIsNotAfterException(userNameModifiedDate.format(dateTimeFormatter));
         }
 
-        isChange = true;
-        if (isChange) {
+
+        if (!isChange) {
             user.updateUserName(userNameUpdateDto.getUserName(), plusMonthsDate);
             UserInfoDto.sessionUserInfoUpdate(session, user);
         }
@@ -76,21 +73,22 @@ public class UserMyInfoService {
     }
 
     @Transactional
-    public UploadFile updatePicture(HttpServletRequest request, MultipartFile file) {
+    public UploadFileDto updatePicture(HttpServletRequest request, MultipartFile file) {
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
 
-        UploadFile uploadFile = null;
+        UploadFileDto uploadFileDto = null;
         if (!file.isEmpty()) {
             try {
-                uploadFile = fileStore.storeFile(file, fileStore.getUserPictureDir(), userInfoDto.getToken());
-                if (uploadFile != null) {
+                uploadFileDto = fileStore.storeImageSave(file, fileStore.getUserPictureDir(), userInfoDto.getToken());
+                uploadFileDto.setUserId(userInfoDto.getUserId());
+                if (uploadFileDto != null) {
                     User user = userQueryService.findOne(session);
                     //기존에 있던 이미지 삭제 없으면 삭제 x
                     user.deletePicture(fileStore);
 
                     // 서버에 저장되는 파일이름 저장
-                    user.updatePicture(uploadFile.getStoreFileName());
+                    user.updatePicture(uploadFileDto.getStoreFileName());
 
                     UserInfoDto.sessionUserInfoUpdate(session, user);
                 }
@@ -102,7 +100,7 @@ public class UserMyInfoService {
             throw new RuntimeException("error.file.NotBlank");
         }
 
-        return uploadFile;
+        return uploadFileDto;
     }
 
 
@@ -123,7 +121,7 @@ public class UserMyInfoService {
                 UserInfoDto.sessionUserInfoUpdate(session, user);
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("error");
             }
         } else {
             throw new FileNotFoundException("error.file.delete");
@@ -146,7 +144,7 @@ public class UserMyInfoService {
         try {
             return fileStore.getPictureUrlResource(imageName);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("error.file.notFind");
         }
     }
 

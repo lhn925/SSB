@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Enumeration;
 import lombok.extern.slf4j.Slf4j;
@@ -40,24 +41,28 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         log.info("ApiKeyAuthFilter");
-        UserInfoDto userInfoDto = (UserInfoDto) request.getSession().getAttribute(RedisKeyDto.USER_KEY);
+        HttpSession session = request.getSession(false);
+
 
         try {
+            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
             if (userInfoDto == null) {
-                throw new UserInfoNotFoundException("error.unAuth");
+                throw new UserInfoNotFoundException();
             }
             filterChain.doFilter(request, response);
-        } catch (UserInfoNotFoundException e) {
+        } catch (NullPointerException | UserInfoNotFoundException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             ResponseEntity<ErrorResult> errorResult = Result.getErrorResult(
-                new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale()), HttpStatus.FORBIDDEN);
+                new ErrorGlobalResultDto("error.unAuth", ms, request.getLocale()), HttpStatus.FORBIDDEN);
             String json = new ObjectMapper().writeValueAsString(errorResult);
             log.info("json = {}", json);
             response.getWriter().write(json);
         }
 
+        ///user/myInfo/api/picture/4a2122bd-772e-4edd-bba9-10d4f53ceabd.jpg
+        ///user/myInfo/api/picture/003a0a7c-c4a1-43ad-9ef6-e5d79692a88d.jpg
     }
 
     @Override

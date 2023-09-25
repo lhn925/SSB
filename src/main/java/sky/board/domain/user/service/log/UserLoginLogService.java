@@ -142,13 +142,12 @@ public class UserLoginLogService {
     /**
      * 해외 로그인 여부 확인
      *
-     * @param request
      * @param userId
      * @throws UsernameNotFoundException
      * @throws IOException
      * @throws GeoIp2Exception
      */
-    public void isLoginBlockChecked(HttpServletRequest request, String userId)
+    public void isLoginBlockChecked(String userId)
         throws UsernameNotFoundException, IOException, GeoIp2Exception {
         User findByUser = userQueryService.findOne(userId);
         if (findByUser.getIsLoginBlocked()) {

@@ -15,11 +15,13 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.model.RememberCookie;
 import sky.board.domain.user.model.Status;
 import sky.board.domain.user.service.login.RedisRememberService;
 import sky.board.domain.user.service.login.UserLoginStatusService;
 import sky.board.domain.user.utili.CustomCookie;
+import sky.board.global.redis.dto.RedisKeyDto;
 import sky.board.global.redis.service.RedisService;
 
 
@@ -28,7 +30,7 @@ import sky.board.global.redis.service.RedisService;
 @RequiredArgsConstructor
 public class CustomSimpleUrlLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
-
+    private final UserLoginStatusService userLoginStatusService;
     private final RememberMeServices rememberMeServices;
     private final RedisService redisService;
     @Override
@@ -36,6 +38,18 @@ public class CustomSimpleUrlLogoutSuccessHandler extends SimpleUrlLogoutSuccessH
         throws IOException, ServletException {
         Cookie[] cookies = request.getCookies();
         String hashKey = CustomCookie.readCookie(cookies, RememberCookie.KEY.getValue());
+
+        log.info("onLogoutSuccess ");
+        HttpSession session = request.getSession(false);
+        // 로그인 상태 변경
+        if (session != null &&
+            session.getAttribute(RedisKeyDto.USER_KEY) != null) {
+            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+            userLoginStatusService.updateLoginStatus(request, userInfoDto.getUserId(),
+                Status.OFF,
+                Status.OFF);
+            session.invalidate();
+        }
 
         // Redis에 저장되어 있는 rememberMe 데이터 삭제
         if (hashKey != null && StringUtils.hasText(hashKey)) {
@@ -45,6 +59,7 @@ public class CustomSimpleUrlLogoutSuccessHandler extends SimpleUrlLogoutSuccessH
             redisService.deleteRemember(redisKey);
         }
         setUrl(request);
+        // 세션 삭제
         super.onLogoutSuccess(request, response, authentication);
     }
 

@@ -10,6 +10,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 import sky.board.domain.user.dto.UserInfoDto;
 import sky.board.domain.user.dto.login.CustomUserDetails;
@@ -23,6 +24,7 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
 
 
     private final UserLoginStatusService userLoginStatusService;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
@@ -56,6 +58,7 @@ public class CustomCookieLoginSuccessHandler implements CustomLoginSuccessHandle
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
+
     }
 
     @Override

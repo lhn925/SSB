@@ -77,7 +77,8 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
         String password = obtainPassword(request);
 
         try {
-            userLoginLogService.isLoginBlockChecked(request, userId);
+            userLoginLogService.isLoginBlockChecked(userId);
+
         } catch (LoginBlockException e) {
             throw new LoginBlockException(e.getMessage());
         } catch (IOException | GeoIp2Exception e) {

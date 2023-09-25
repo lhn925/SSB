@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sky.board.domain.user.dto.login.CustomUserDetails;
@@ -38,6 +40,7 @@ public class CustomAuthenticationSuccessHandler implements
     private final SecurityContextImpl securityContext;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final UserLoginStatusService userLoginStatusService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
         Authentication authentication) throws IOException, ServletException {
@@ -116,7 +119,7 @@ public class CustomAuthenticationSuccessHandler implements
             }
             userLoginStatusService.save(request);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("saveLoginStatus: "+e.getMessage());
+            throw new RuntimeException("saveLoginStatus: " + e.getMessage());
         }
     }
 }

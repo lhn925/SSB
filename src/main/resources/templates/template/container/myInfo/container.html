@@ -8,7 +8,7 @@
           <div class="card-body">
             <div class="picture-div d-flex flex-column align-items-center text-center">
               <button type="button" class="btn pictureBtn" id="pictureBtn">
-                <img th:src="@{|/user/myInfo/api/picture/${userMyInfo.getPictureUrl()}|}"
+                <img th:src="@{|/user/file/api/picture/${userMyInfo.userId}|}"
                      class="userPicture picture-img rounded-circle p-1">
                 <input id="pictureFile" type="file" class="display-none">
                 <span class="photo-edit">
@@ -47,4 +47,6 @@
     </div>
   </div>
 </div>
+
+
 </html>

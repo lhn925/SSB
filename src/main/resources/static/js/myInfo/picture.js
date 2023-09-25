@@ -40,7 +40,7 @@ Picture.prototype._pictureFileBtnChangeEvent = function () {
         (data) => {
           _success(messages["picture.success"]);
           _addAttributeByClass("src",
-              "/user/myInfo/api/picture/" + data.data.storeFileName,
+              "/user/file/api/picture/" + data.data.userId,
               "userPicture");
         }
     ).catch((error) => {
