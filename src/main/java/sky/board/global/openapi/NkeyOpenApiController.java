@@ -71,20 +71,15 @@ public class NkeyOpenApiController {
         BindingResult bindingResult
         , HttpServletRequest request) throws IOException {
 
-        log.info("captchaNkeyDto.getCaptchaKey() = {}", captchaNkeyDto.getCaptchaKey());
-        log.info("captchaNkeyDto.getImageName() = {}", captchaNkeyDto.getImageName());
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         String fileName = captchaNkeyDto.getImageName();
-        log.info("fileName = {}", fileName);
         //받은 이미지 삭제
         apiExamCaptchaNkeyService.deleteImage(fileName);
 
         String key = (String) apiExamCaptchaNkeyService.getApiExamCaptchaNkey().get("key");
         String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
-
-        log.info("image = {}", image);
 
         CaptchaNkeyDto captcha = CaptchaNkeyDto.builder()
             .captchaKey(key)

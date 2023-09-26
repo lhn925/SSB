@@ -14,7 +14,7 @@ import sky.board.global.file.utili.MultipartPictureValidator;
 @Constraint(validatedBy = MultipartPictureValidator.class)
 public @interface MultipartPictureValid {
 
-    String message() default "{error.picture}";
+    String message() default "{picture.error}";
 
     Class<?>[] groups() default {};
 

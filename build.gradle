@@ -18,13 +18,19 @@ repositories {
     mavenCentral()
 }
 
+// The Class-Path manifest attribute in 오류
+//no main manifest attribute in 에러는 spring 애플리케이션을 빌드한 결과물로 나온 jar파일에서 처음 호출할 Main 메소드를 찾지 못했다는 에러
+
 dependencies {
+    implementation 'org.springframework:spring-test'
+
+
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.mysql:mysql-connector-j:8.0.32'
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'// 쿼리로그 남기기
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
 
 
 
@@ -40,16 +46,14 @@ dependencies {
     //image resizing 을 위한 라이브러리
     implementation 'com.github.downgoon:marvin:1.5.5'
     implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
-    implementation 'org.springframework:spring-test'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    compileOnly('org.springframework.boot:spring-boot-devtools')
 
     //email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     //Querydsl 추가
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -75,9 +79,12 @@ dependencies {
 
 
 
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 
 
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

@@ -359,7 +359,7 @@ public class MyInfoApiController {
                 end = LocalDate.parse(endDate, ISO_DATE);
             }
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("error.date.range");
+            throw new IllegalArgumentException("date.error.range");
         }
         // maxDate가 endDate 보다 이전 날짜냐? true
         // 조회할려는 날짜가 최대 날짜 보다 크다면

@@ -22,6 +22,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import sky.board.global.file.CustomMultipartFile;
 import sky.board.global.file.dto.UploadFileDto;
 
 /**
@@ -81,14 +82,12 @@ public class FileStore {
         String originalFilename = multipartFile.getOriginalFilename(); // 원본 파일명
         String storeFileName = createStoreFileName(originalFilename); // 서버 업로드 파일명
         String fileFormatName = multipartFile.getContentType()
-            .substring(multipartFile.getContentType().lastIndexOf("/") + 1);
+            .substring(multipartFile.getContentType().lastIndexOf("/") + 1); // 확장자 추출
 
         String dirPath = createDir(type + token);
 
         MultipartFile resizingFile = resizeImage(multipartFile, fileFormatName, originalFilename);
-        log.info("dirPath = {}", dirPath);
-        log.info("originalFilename = {} ", originalFilename);
-        log.info("storeFileName = {} ", storeFileName);
+
         resizingFile.transferTo(new File(getFullPath(dirPath, storeFileName)));
 
         return new UploadFileDto(originalFilename, storeFileName, null);

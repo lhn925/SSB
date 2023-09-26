@@ -14,7 +14,7 @@ import sky.board.global.file.utili.MultipartFileSizeValidator;
 @Constraint(validatedBy = MultipartFileSizeValidator.class)
 public @interface MultipartFileSizeValid {
 
-    String message() default "{error.fileSize.Limit}";
+    String message() default "{filesize.error.Limit}";
 
     Class<?>[] groups() default {};
 

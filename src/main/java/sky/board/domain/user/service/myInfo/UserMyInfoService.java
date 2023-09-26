@@ -97,7 +97,7 @@ public class UserMyInfoService {
                 throw new RuntimeException("error");
             }
         } else {
-            throw new RuntimeException("error.file.NotBlank");
+            throw new RuntimeException("file.error.NotBlank");
         }
 
         return uploadFileDto;
@@ -124,7 +124,7 @@ public class UserMyInfoService {
                 throw new RuntimeException("error");
             }
         } else {
-            throw new FileNotFoundException("error.file.delete");
+            throw new FileNotFoundException("file.error.delete");
         }
     }
 
@@ -144,7 +144,7 @@ public class UserMyInfoService {
         try {
             return fileStore.getPictureUrlResource(imageName);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("error.file.notFind");
+            throw new RuntimeException("file.error.notFind");
         }
     }
 

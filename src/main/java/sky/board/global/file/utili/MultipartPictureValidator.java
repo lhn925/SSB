@@ -20,7 +20,7 @@ public class MultipartPictureValidator implements ConstraintValidator<MultipartP
             // 기본메세지 제거
             context.disableDefaultConstraintViolation();
 
-            context.buildConstraintViolationWithTemplate("{error.file.NotBlank}")
+            context.buildConstraintViolationWithTemplate("{file.error.NotBlank}")
                 .addConstraintViolation();
             return false;
         }
