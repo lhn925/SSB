@@ -1,0 +1,97 @@
+package sky.Sss.domain.user.service.help;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.user.dto.UserInfoDto;
+import sky.Sss.domain.user.dto.help.UserPwResetFormDto;
+import sky.Sss.domain.user.dto.login.CustomUserDetails;
+import sky.Sss.domain.user.dto.myInfo.UserPwUpdateFormDto;
+import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.repository.UserQueryRepository;
+
+@Slf4j
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class UserHelpService {
+
+    private final UserQueryRepository userQueryRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    /**
+     * 비밀번호 업데이트
+     *
+     * @param userPwResetFormDto
+     * @return
+     */
+    @Transactional
+    public UserDetails passwordUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException {
+
+        User findByUser = User.getOptionalUser(
+            userQueryRepository.findByUserId(userPwResetFormDto.getUserId()));
+        //현재 비밀번호 와 대조
+        isPasswordSameAsNew(userPwResetFormDto, findByUser);
+        User.updatePw(findByUser, userPwResetFormDto.getNewPw(), userPwResetFormDto.getPwSecLevel(), passwordEncoder);
+        return getCustomUserDetails(findByUser);
+    }
+
+    /**
+     * passwordUpdate
+     *
+     * @param userPwUpdateFormDto
+     * @return
+     */
+    @Transactional
+    public CustomUserDetails passwordUpdate(UserPwUpdateFormDto userPwUpdateFormDto, UserInfoDto userInfoDto) {
+
+        User findByUser = User.getOptionalUser(
+            userQueryRepository.findByUserId(userInfoDto.getUserId()));
+
+        isPasswordSameAsNew(userPwUpdateFormDto, findByUser);
+        User.updatePw(findByUser, userPwUpdateFormDto.getNewPw(), userPwUpdateFormDto.getPwSecLevel(),
+            passwordEncoder);
+        return getCustomUserDetails(findByUser);
+    }
+
+
+    private static CustomUserDetails getCustomUserDetails(User findByUser) {
+        return (CustomUserDetails) User.UserBuilder(findByUser);
+    }
+
+
+    private void isPasswordSameAsNew(UserPwResetFormDto userPwResetFormDto, User findByUser)
+        throws IllegalArgumentException {
+        //현재 비밀번호 와 대조
+        boolean matches = passwordEncoder.matches(userPwResetFormDto.getNewPw(), findByUser.getPassword());
+
+        // 현재 비밀번호와 바꾸려는 비밀번호가 같으면 error
+        if (matches) {
+            throw new IllegalArgumentException("pw.isPasswordSameAsNew");
+        }
+    }
+
+    private void isPasswordSameAsNew(UserPwUpdateFormDto userPwUpdateFormDto, User findByUser)
+        throws IllegalArgumentException {
+        //현재 비밀번호 와 대조
+
+        // 입력한 비밀번호가 지금 비밀번호랑 맞아야하고
+        boolean authMatches = passwordEncoder.matches(userPwUpdateFormDto.getPassword(), findByUser.getPassword());
+        // 현재비밀번호랑 같으면 안되고
+        boolean matches = passwordEncoder.matches(userPwUpdateFormDto.getNewPw(), findByUser.getPassword());
+        String code = null;
+
+        if (!authMatches) {
+            code = "pw.authMatches.mismatch";
+        } else if (matches) {
+            code = "pw.isPasswordSameAsNew";
+        }
+        if (code != null) {
+            throw new IllegalArgumentException(code);
+        }
+    }
+
+}
