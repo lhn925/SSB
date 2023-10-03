@@ -79,7 +79,6 @@ public class User extends BaseTimeEntity {
     // 비활성화(회원 탈퇴) 여부 true:탈퇴x ,false:탈퇴
     private Boolean isEnabled;
 
-
     @Builder
     private User(String token, String userId, String password, String userName, String email, String pictureUrl,
         LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled,Boolean isLoginBlocked) {
