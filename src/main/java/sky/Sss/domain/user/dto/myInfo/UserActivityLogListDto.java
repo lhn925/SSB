@@ -28,6 +28,6 @@ public class UserActivityLogListDto implements Serializable {
         this.createdDateTime = userActivityLog.getCreatedDateTime();
         this.chaContent = ms.getMessage(userActivityLog.getChaContent(), null, request.getLocale());
         this.chaMethod = ms.getMessage(userActivityLog.getChaMethod(), null, request.getLocale());
-        this.ip = userActivityLog.getIp();
+        this.ip = userActivityLog.getDefaultLog().getIp();
     }
 }

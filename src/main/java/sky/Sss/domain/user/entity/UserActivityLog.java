@@ -1,22 +1,31 @@
 package sky.Sss.domain.user.entity;
 
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
 
 import com.maxmind.geoip2.exception.GeoIp2Exception;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.model.UserAgent;
 import sky.Sss.domain.user.model.ChangeSuccess;
 import sky.Sss.global.base.BaseEntity;
+import sky.Sss.global.base.BaseTimeEntity;
+import sky.Sss.global.base.login.DefaultLoginLog;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 
@@ -26,8 +35,9 @@ import sky.Sss.global.locationfinder.service.LocationFinderService;
  */
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserActivityLog extends BaseEntity {
+public class UserActivityLog  extends BaseTimeEntity {
 //    비밀번호 변경(최근 6개월 내) 및 연락처 수정 이력을 제공합니다.
     /**
      * 일시
@@ -39,10 +49,10 @@ public class UserActivityLog extends BaseEntity {
     @GeneratedValue
     private Long id;
 
-    //변경 아이피
-    private String ip;
     //사용자 고유번호
-    private Long uId;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "uid")
+    private User uId;
 
     // 변경 내용
     private String chaContent;
@@ -50,45 +60,26 @@ public class UserActivityLog extends BaseEntity {
     //변경 방법
     private String chaMethod;
 
-    // 변경 시도 국가
-    private String countryName;
-
     // 변경 성공 여부
     @Enumerated(STRING)
     private ChangeSuccess changeSuccess;
+    @Embedded
+    private DefaultLoginLog defaultLog;
 
-
-    // 변경에 사용된 기기
-    @Enumerated(STRING)
-    private UserAgent userAgent;
-
-    //위도
-    private String latitude;
-
-    // 경도
-    private String longitude;
-
-    // 상태 값
-    private Boolean isStatus;
+    @LastModifiedBy
+    private String modifiedByUserId;
 
     @Builder
-    public UserActivityLog(String ip,
-        Long uId, String countryName, ChangeSuccess changeSuccess,
-        UserAgent userAgent, String latitude, String longitude, Status isStatus, String chaContent, String chaMethod) {
-        this.ip = ip;
-        this.uId = uId;
-        this.countryName = countryName;
+    public UserActivityLog(
+        User user,ChangeSuccess changeSuccess, String chaContent, String chaMethod,DefaultLoginLog defaultLoginLog) {
+        this.uId = user;
         this.changeSuccess = changeSuccess;
-        this.userAgent = userAgent;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.isStatus = isStatus.getValue();
         this.chaContent = chaContent;
         this.chaMethod = chaMethod;
-
+        this.defaultLog = defaultLoginLog;
     }
 
-    public static UserActivityLog getActivityLog(Long uId,LocationFinderService locationFinderService, String chaContent,
+    public static UserActivityLog createActivityLog(User user,LocationFinderService locationFinderService, String chaContent,
         String chaMethod, HttpServletRequest request, ChangeSuccess changeSuccess, Status isStatus) {
         UserLocationDto userLocationDto = null;
         try {
@@ -98,17 +89,14 @@ public class UserActivityLog extends BaseEntity {
         } catch (GeoIp2Exception e) {
             throw new RuntimeException(e);
         }
+
+        DefaultLoginLog defaultLog = DefaultLoginLog.createDefaultLoginLog(isStatus, userLocationDto, request);
         return UserActivityLog.builder()
-            .uId(uId)
-            .ip(userLocationDto.getIpAddress()) //ip 저장
-            .countryName(userLocationDto.getCountryName()) // iso Code 저장
-            .latitude(userLocationDto.getLatitude()) // 위도
-            .longitude(userLocationDto.getLongitude()) // 경도
+            .user(user)
             .changeSuccess(changeSuccess) // 실패 여부 확인
-            .userAgent(UserLocationDto.isDevice(request)) // 기기 저장
-            .isStatus(isStatus)
             .chaContent(chaContent)
             .chaMethod(chaMethod)
+            .defaultLoginLog(defaultLog)
             .build();
     }
 

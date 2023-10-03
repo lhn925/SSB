@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,7 +45,7 @@ import sky.Sss.global.redis.service.RedisService;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 @Slf4j
-public class SpringSecurityConfig {
+public class SpringSecurityConfig  {
 
 
     private final RedisService redisService;
@@ -73,6 +75,8 @@ public class SpringSecurityConfig {
         "/example/city", "/email/**", "/user/help/**", "/user/join/**", "/login", "/login/**","/user/file/**"};
     private final String[] USER_URL = {"/user/logout", "/user/myInfo/**"};
     private final String[] ADMIN_URL = {"/cron/**"};
+
+
 
 
     /**
@@ -163,6 +167,10 @@ public class SpringSecurityConfig {
 
         return http.build();
     }
+
+
+
+
 
     @Bean
     public HttpSessionSecurityContextRepository httpSessionSecurityContextRepository() {

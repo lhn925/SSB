@@ -47,13 +47,13 @@ public class UserActivityLogService {
     public void save(Long uId, String userId, String chaContent, String chaMethod,
         HttpServletRequest request, ChangeSuccess changeSuccess) {
         Optional<User> byUserId = userQueryRepository.findByUserId(userId);
-        if (uId == null && !byUserId.isEmpty()) {
+        /*if (uId == null && !byUserId.isEmpty()) {
             uId = byUserId.orElse(null).getId();
         }
-
+*/
         //비 로그인으로 접근시 저장할 userId
         AuditorAwareImpl.changeUserId(auditorAware, userId);
-        UserActivityLog userActivityLog = getUserActivityLog(uId, chaContent, chaMethod, request, changeSuccess,
+        UserActivityLog userActivityLog = getUserActivityLog(byUserId.orElse(null), chaContent, chaMethod, request, changeSuccess,
             Status.ON);
         Optional<UserActivityLog> save = Optional.ofNullable(userActivityLogRepository.save(userActivityLog));
         save.orElseThrow(() -> new RuntimeException());
@@ -65,9 +65,9 @@ public class UserActivityLogService {
      *
      * @return
      */
-    public UserActivityLog getUserActivityLog(Long uId, String chaContent, String chaMethod, HttpServletRequest request,
+    public UserActivityLog getUserActivityLog(User user, String chaContent, String chaMethod, HttpServletRequest request,
         ChangeSuccess changeSuccess, Status isStatus) {
-        return UserActivityLog.getActivityLog(uId, locationFinderService, chaContent, chaMethod, request,
+        return UserActivityLog.createActivityLog(user, locationFinderService, chaContent, chaMethod, request,
             changeSuccess, isStatus);
 
     }
@@ -79,9 +79,10 @@ public class UserActivityLogService {
         HttpSession session = request.getSession(false);
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
         User findUser = userQueryService.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-        Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(findUser.getId(), changeSuccess,
+        Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(findUser, changeSuccess,
             isStatus.getValue(), startDate,
             endDate, pageRequest).map(u -> new UserActivityLogListDto(ms,request,u));
+
         return userActivityLogListDtoPage;
     }
 
