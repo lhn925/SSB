@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <th:block th:replace="~{template/header/common/header :: commonHead}">
+  <th:block th:replace="~{template/css/common/css :: commonCss}">
   </th:block>
   <th:block th:replace="~{template/css/myInfo/css :: css ('myInfoForm')}">
   </th:block>
@@ -11,7 +11,7 @@
 <body>
 <!-- Breadcrumb -->
 
-<th:block th:replace="~{template/header/myInfo/header :: header}">
+<th:block th:replace="~{template/header/common/header :: header}">
 </th:block>
 <!-- /Breadcrumb -->
 <div class="container" th:replace="~{template/container/myInfo/container ::container (~{:: .myInfoBody})}">
