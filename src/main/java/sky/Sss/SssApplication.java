@@ -3,9 +3,11 @@ package sky.Sss;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import sky.Sss.config.EnvConfig;
 
 @Slf4j
 @EnableJpaAuditing
@@ -17,6 +19,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @EnableScheduling
+//spring boot 애플리케이션 파일에서 @PropertySource를 사용해 properties 파일의 위치를 추가해 준다.
+@PropertySource(value = {
+    "classpath:env/env.yml"
+    }, factory = EnvConfig.class)
 public class SssApplication {
 
     public static void main(String[] args) {

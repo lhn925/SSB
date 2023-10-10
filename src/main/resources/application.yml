@@ -21,8 +21,6 @@ spring:
       namespace: spring:session
     store-type: redis
     timeout: 100
-  profiles:
-    active: local
   data:
     redis:
       repositories:
@@ -32,8 +30,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${mail.username}
-    password: ${mail.password}
+#    username: ${mail.username}
+#    password: ${mail.password}
     properties:
       mail:
         smtp:
@@ -68,10 +66,10 @@ spring:
         restart:
           enabled: true
 
-openapi:
-  relaxed-binding:
-    clientId: ${openapi.clientId}
-    clientSecret: ${openapi.clientSecret}
+#openapi:
+#  relaxed-binding:
+#    clientId: ${openapi.clientId}
+#    clientSecret: ${openapi.clientSecret}
 
 
 logging.level: #띄어쓰기 없음
@@ -79,13 +77,10 @@ logging.level: #띄어쓰기 없음
 
 file:
   dir: /Users/imhaneul/skyLife/toy/image/
+#sms:
+#  relaxed-binding:
+#    accessKey: ${cloud.accessKey}
+#    secretKey: ${cloud.secretKey}
+#    serviceId: ${cloud.serviceId}
+#    phone: ${cloud.phone}
 
-
-##email.getProps().put("mail.smtp.host", "smtp.gmail.com"); // use Gmail
-##email.getProps().put("mail.smtp.port", "587"); // set port
-##email.getProps().put("mail.smtp.auth", "true");
-##email.getProps().put("mail.smtp.starttls.enable", "true"); // use TLS
-#spring.mail.host=smtp.gmail.com
-#spring.mail.port=587
-#spring.mail.username=lim642666@gmail.com
-#spring.mail.password=mtcnsojqjuoguobs
