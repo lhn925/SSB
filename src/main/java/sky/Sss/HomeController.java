@@ -3,6 +3,8 @@ package sky.Sss;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import sky.Sss.global.redis.service.RedisService;
 
 @Controller
@@ -21,7 +24,7 @@ public class HomeController {
     private final RedisService redisService;
 
     @GetMapping("/")
-    public String home() {
+    public String home(HttpServletRequest request) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -41,6 +44,18 @@ public class HomeController {
 
 
         return "index";
+    }
+
+
+    @ResponseBody
+    @GetMapping("/home")
+    public ResponseEntity homeApi() {
+        log.info("home api 접근");
+//        Optional<String> ss_id = CustomCookie.readCookie(cookies, "SS_ID");
+
+//        log.info("ss_id = {}", ss_id);
+
+        return new ResponseEntity("연결완료?", HttpStatus.OK);
     }
 
 
