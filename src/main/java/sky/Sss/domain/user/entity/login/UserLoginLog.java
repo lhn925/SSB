@@ -62,13 +62,7 @@ public class UserLoginLog extends BaseTimeEntity {
         HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
 
         UserLocationDto userLocationDto = null;
-        try {
             userLocationDto = locationFinderService.findLocation();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (GeoIp2Exception e) {
-            throw new RuntimeException(e);
-        }
         UserLoginLog userLoginLog = UserLoginLog.builder()
             .uId(uId)
             .isSuccess(isSuccess)

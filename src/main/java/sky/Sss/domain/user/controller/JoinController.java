@@ -51,7 +51,6 @@ public class JoinController {
         if (bindingResult.hasErrors()) {
             return "redirect:/user/join/agree";
         }
-        log.info("접근");
         HttpSession session = request.getSession();
 
         if (session.getAttribute("emailAuthCodeDto") != null) {// 인증번호 삭제 (뒤로가기 버그 방지)
@@ -90,7 +89,6 @@ public class JoinController {
         }
         // 비밀번호 보안 레벨 확인
         PwSecLevel pwSecLevel = PwChecker.checkPw(userJoinPostDto.getPassword());
-        log.info("pwSecLevel.name() = {}", pwSecLevel.name());
 
         // 비밀번호 값이 유효하지 않은 경우
         if (pwSecLevel.equals(PwSecLevel.NOT)) {

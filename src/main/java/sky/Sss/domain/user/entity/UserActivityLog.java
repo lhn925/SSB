@@ -30,14 +30,13 @@ import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 
 /**
- *
  * 유저정보 수정내역
  */
 @Entity
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserActivityLog  extends BaseTimeEntity {
+public class UserActivityLog extends BaseTimeEntity {
 //    비밀번호 변경(최근 6개월 내) 및 연락처 수정 이력을 제공합니다.
     /**
      * 일시
@@ -71,7 +70,7 @@ public class UserActivityLog  extends BaseTimeEntity {
 
     @Builder
     public UserActivityLog(
-        User user,ChangeSuccess changeSuccess, String chaContent, String chaMethod,DefaultLoginLog defaultLoginLog) {
+        User user, ChangeSuccess changeSuccess, String chaContent, String chaMethod, DefaultLoginLog defaultLoginLog) {
         this.uId = user;
         this.changeSuccess = changeSuccess;
         this.chaContent = chaContent;
@@ -79,16 +78,11 @@ public class UserActivityLog  extends BaseTimeEntity {
         this.defaultLog = defaultLoginLog;
     }
 
-    public static UserActivityLog createActivityLog(User user,LocationFinderService locationFinderService, String chaContent,
+    public static UserActivityLog createActivityLog(User user, LocationFinderService locationFinderService,
+        String chaContent,
         String chaMethod, HttpServletRequest request, ChangeSuccess changeSuccess, Status isStatus) {
         UserLocationDto userLocationDto = null;
-        try {
-            userLocationDto = locationFinderService.findLocation();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (GeoIp2Exception e) {
-            throw new RuntimeException(e);
-        }
+        userLocationDto = locationFinderService.findLocation();
 
         DefaultLoginLog defaultLog = DefaultLoginLog.createDefaultLoginLog(isStatus, userLocationDto, request);
         return UserActivityLog.builder()

@@ -78,10 +78,6 @@ public class CustomUsernameFilter extends UsernamePasswordAuthenticationFilter {
 
         } catch (LoginBlockException e) {
             throw new LoginBlockException(e.getMessage());
-        } catch (IOException | GeoIp2Exception e) {
-            throw new RuntimeException("error");
-        } catch (UserInfoNotFoundException e) {
-
         }
 
         // failCount 전달  success 핸들러에 전달

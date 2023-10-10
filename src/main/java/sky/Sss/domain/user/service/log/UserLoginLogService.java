@@ -25,7 +25,7 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.repository.log.LoginLogRepository;
 import sky.Sss.domain.user.repository.UserQueryRepository;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.global.auditor.AuditorAwareImpl;
+import sky.Sss.global.utili.auditor.AuditorAwareImpl;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
@@ -139,11 +139,9 @@ public class UserLoginLogService {
      *
      * @param userId
      * @throws UsernameNotFoundException
-     * @throws IOException
-     * @throws GeoIp2Exception
      */
     public void isLoginBlockChecked(String userId)
-        throws UsernameNotFoundException, IOException, GeoIp2Exception {
+        throws UsernameNotFoundException {
         User findByUser = userQueryService.findOne(userId);
         if (findByUser.getIsLoginBlocked()) {
             UserLocationDto userLocationDto = locationFinderService.findLocation();

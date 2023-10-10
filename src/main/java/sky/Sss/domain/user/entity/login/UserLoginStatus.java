@@ -26,6 +26,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.base.login.DefaultLoginLog;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
+
 @Slf4j
 @Entity
 @Getter
@@ -64,7 +65,7 @@ public class UserLoginStatus extends BaseTimeEntity {
 
 
     @Builder
-    private UserLoginStatus(String remember,String session, User uid, String os,
+    private UserLoginStatus(String remember, String session, User uid, String os,
         String browser, DefaultLoginLog defaultLoginLog,
         Boolean loginStatus) {
         this.remember = remember;
@@ -78,8 +79,8 @@ public class UserLoginStatus extends BaseTimeEntity {
 
 
     /**
-     *
      * 객체 생성
+     *
      * @param locationFinderService
      * @param request
      * @param user
@@ -89,13 +90,7 @@ public class UserLoginStatus extends BaseTimeEntity {
         LocationFinderService locationFinderService,
         HttpServletRequest request, User user) {
         UserLocationDto userLocationDto;
-        try {
-            userLocationDto = locationFinderService.findLocation();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (GeoIp2Exception e) {
-            throw new RuntimeException(e);
-        }
+        userLocationDto = locationFinderService.findLocation();
 
         UserLoginStatusBuilder builder = UserLoginStatus.builder()
             .uid(user)
@@ -120,9 +115,10 @@ public class UserLoginStatus extends BaseTimeEntity {
     /**
      * 로그아웃 상태 및
      * isStatus 상태 변경
+     *
      * @param userLoginStatus
      */
-    public static void loginStatusUpdate(UserLoginStatus userLoginStatus,Status loginStatus,Status isStatus) {
+    public static void loginStatusUpdate(UserLoginStatus userLoginStatus, Status loginStatus, Status isStatus) {
         userLoginStatus.setLoginStatus(loginStatus.getValue());
         userLoginStatus.getDefaultLoginLog().changeIsStatus(loginStatus.getValue());
     }

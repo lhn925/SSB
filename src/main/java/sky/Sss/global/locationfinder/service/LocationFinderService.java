@@ -6,6 +6,7 @@ import com.maxmind.geoip2.DatabaseReader.Builder;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +20,17 @@ import sky.Sss.global.locationfinder.model.DataPath;
 @Service
 public class LocationFinderService {
 
+    public UserLocationDto findLocation() {
 
-
-
-    public UserLocationDto findLocation() throws IOException, GeoIp2Exception {
         DatabaseReader databaseReader = getClassPathResource(DataPath.CITY_DB.getValue());
-        InetAddress ipAddress = getInetAddress();
-        CityResponse response = databaseReader.city(ipAddress);
+        InetAddress ipAddress = null;
+        CityResponse response = null;
+        try {
+            ipAddress = getInetAddress();
+            response = databaseReader.city(ipAddress);
+        } catch (GeoIp2Exception | IOException e) {
+            throw new RuntimeException(e);
+        }
         return UserLocationDto.createUserLocationDto(response);
     }
 
@@ -40,9 +45,24 @@ public class LocationFinderService {
         return ipAddress;
     }
 
-    private DatabaseReader getClassPathResource(String mmdbPath) throws IOException {
-        ClassPathResource resource = new ClassPathResource(mmdbPath);
-        DatabaseReader databaseReader = new Builder(resource.getFile()).build();
+    private DatabaseReader getClassPathResource(String mmdbPath) {
+        InputStream resource = null;
+        DatabaseReader databaseReader = null;
+        try {
+
+            resource = new ClassPathResource(mmdbPath).getInputStream();
+            databaseReader = new Builder(resource).build();
+        } catch (IOException e) {
+            throw new RuntimeException("error");
+        } finally {
+            try {
+                if (resource != null) {
+                    resource.close();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("error");
+            }
+        }
 
         return databaseReader;
     }

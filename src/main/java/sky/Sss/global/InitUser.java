@@ -12,7 +12,6 @@ import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.service.join.UserJoinService;
 
 @Component
-@Profile("local")
 @RequiredArgsConstructor
 public class InitUser {
 

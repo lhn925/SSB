@@ -22,7 +22,7 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.repository.log.UserActivityLogRepository;
 import sky.Sss.domain.user.repository.UserQueryRepository;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.global.auditor.AuditorAwareImpl;
+import sky.Sss.global.utili.auditor.AuditorAwareImpl;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
