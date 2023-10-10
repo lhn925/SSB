@@ -269,7 +269,6 @@ public class HelpController {
         } catch (UsernameNotFoundException e) {
             Alert.waringAlert(ms.getMessage("userId.notfound", null, request.getLocale()), "/user/help/idquery",
                 response);
-
             return "redirect:/user/help/idquery";
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -472,7 +471,7 @@ public class HelpController {
         // 세션 저장
         session.setAttribute("userHelpDto", userHelpDto);
         model.addAttribute("userHelpDto", userHelpDto);
-        return "/user/help/" + view;
+        return "user/help/" + view;
 
     }
 

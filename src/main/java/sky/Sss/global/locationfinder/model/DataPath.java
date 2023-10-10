@@ -1,8 +1,8 @@
 package sky.Sss.global.locationfinder.model;
 
 public enum DataPath {
-    CITY_DB("data/GeoLite2-city.mmdb"),
-    COUNTRY_DB("data/GeoLite2-country.mmdb");
+    CITY_DB("data/GeoLite2-City.mmdb"),
+    COUNTRY_DB("data/GeoLite2-Country.mmdb");
 
 
     private final String value;
@@ -11,7 +11,8 @@ public enum DataPath {
         this.value = value;
     }
     public String getValue() {
+
+
         return value;
     }
-
 }

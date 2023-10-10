@@ -3,7 +3,7 @@ package sky.Sss.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
-import sky.Sss.global.auditor.AuditorAwareImpl;
+import sky.Sss.global.utili.auditor.AuditorAwareImpl;
 
 @Configuration
 public class AuditConfig {

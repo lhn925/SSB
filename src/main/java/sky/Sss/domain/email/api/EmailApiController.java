@@ -25,7 +25,7 @@ import sky.Sss.domain.email.dto.EmailSendDto;
 import sky.Sss.domain.email.dto.CodeCheckRequestDto;
 import sky.Sss.domain.email.dto.HelpEmailSendDto;
 import sky.Sss.domain.email.entity.Email;
-import sky.Sss.domain.email.model.EmailSendType;
+import sky.Sss.domain.email.model.SendType;
 import sky.Sss.domain.email.service.EmailService;
 import sky.Sss.domain.user.dto.help.UserHelpDto;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
@@ -82,7 +82,7 @@ public class EmailApiController {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 
-        return sendEmail(EmailSendType.JOIN, emailSendDto, request);
+        return sendEmail(SendType.JOIN, emailSendDto, request);
     }
 
 
@@ -182,7 +182,7 @@ public class EmailApiController {
             userJoinService.checkEmail(helpEmailSendDto.getEmail());
         } catch (DuplicateCheckException e) {
             // 등록한 이메일이 있을경우에 이메일 발송
-            return sendEmail(EmailSendType.ID, helpEmailSendDto, request);
+            return sendEmail(SendType.ID, helpEmailSendDto, request);
         } catch (UsernameNotFoundException e) {
             // 없으면 찾을수 없다고 경고 뜸
         }
@@ -192,7 +192,7 @@ public class EmailApiController {
     }
 
 
-    private ResponseEntity sendEmail(EmailSendType sendType, EmailSendDto emailSendDto,
+    private ResponseEntity sendEmail(SendType sendType, EmailSendDto emailSendDto,
         HttpServletRequest request) {
 
         String subject = "sky.email.subject";
@@ -207,7 +207,7 @@ public class EmailApiController {
         msObject.put("subContent1", ms.getMessage("sky.email.subContent1", null, request.getLocale()));
         msObject.put("subContent2", ms.getMessage("sky.email.subContent2", null, request.getLocale()));
 
-        Optional<String> optCode = emailService.sendMail(msObject, email, "/email/sendEmail");
+        Optional<String> optCode = emailService.sendMail(msObject, email, "email/sendEmail");
         LocalDateTime issueTime = LocalDateTime.now(); // 인증발급시간
         LocalDateTime authTime = issueTime.plusSeconds(300); // 5분 인증 시간
 
@@ -226,7 +226,7 @@ public class EmailApiController {
             HttpStatus.OK);
     }
 
-    private String setArgs(EmailSendType sendType, HttpServletRequest request) {
+    private String setArgs(SendType sendType, HttpServletRequest request) {
         String subArgs = "";
         switch (sendType) {
             case JOIN:

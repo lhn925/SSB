@@ -3,7 +3,7 @@ package sky.Sss.global.file.utili;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.web.multipart.MultipartFile;
-import sky.Sss.global.annotation.MultipartFileSizeValid;
+import sky.Sss.global.utili.annotation.MultipartFileSizeValid;
 
 public class MultipartFileSizeValidator implements ConstraintValidator<MultipartFileSizeValid, MultipartFile> {
 
