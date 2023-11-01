@@ -50,10 +50,9 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
 
         Boolean isCaptcha = (Boolean) Optional.ofNullable(request.getAttribute("isCaptcha")).orElse(false);
 
-
-
         // 인증번호는 맞는데 비밀번호가 틀렸을 경우
-        if (exception instanceof LoginFailCountException || exception instanceof CaptchaMisMatchFactorException || isCaptcha) {
+        if (exception instanceof LoginFailCountException || !(exception instanceof AuthenticationException)
+            || isCaptcha) {
             retryTwoFactor = true;
             errMsg = exception.getMessage();
             sbPath.append("imageName=" + request.getAttribute("imageName"));
@@ -62,7 +61,8 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
             errMsg = exception.getMessage();
         }
 
-        userLoginLogService.save(request, LoginSuccess.FAIL, Status.ON);
+        userLoginLogService.save(request.getHeader("User-Agent"), request.getParameter("userId"), LoginSuccess.FAIL,
+            Status.ON);
         sendRedirect(request, response, errMsg, sbPath, retryTwoFactor);
     }
 

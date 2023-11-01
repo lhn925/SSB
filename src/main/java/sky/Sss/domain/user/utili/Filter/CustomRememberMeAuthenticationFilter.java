@@ -70,10 +70,9 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         rememberMeServices.getRedisService().deleteSession(rmSessionKey);
 
         // DB LoginStatus 컬럼값 변경
-        rememberMeServices.getUserLoginStatusService()
-            .logoutRememberLoginStatus(((CustomUserDetails) authResult.getPrincipal()).getUserId(), rmSessionKey,
-                rmRedisToken,
-                Status.ON, Status.ON);
+//        rememberMeServices.getUserLoginStatusService()
+//            .logoutRememberLoginStatus(((CustomUserDetails) authResult.getPrincipal()).getUserId(), rmSessionKey,
+//                Status.ON, Status.ON);
     }
 
     @Override

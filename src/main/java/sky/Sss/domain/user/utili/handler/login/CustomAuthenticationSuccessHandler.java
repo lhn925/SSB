@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -21,8 +22,12 @@ import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
+import sky.Sss.domain.user.utili.jwt.JwtFilter;
+import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
+import sky.Sss.domain.user.utili.jwt.TokenProvider;
 import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
+import sky.Sss.global.redis.service.RedisService;
 
 /**
  * 로그인 성공 시 로직을 실행하는 핸들러
@@ -30,7 +35,7 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationSuccessHandler implements
+public class CustomAuthenticationSuccessHandler extends
     CustomLoginSuccessHandler {
 
     private final UserLoginLogService userLoginLogService;
@@ -38,11 +43,12 @@ public class CustomAuthenticationSuccessHandler implements
     private final SecurityContextImpl securityContext;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final UserLoginStatusService userLoginStatusService;
+    private final RedisService redisService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
         Authentication authentication) throws IOException, ServletException {
-        CustomLoginSuccessHandler.super.onAuthenticationSuccess(request, response, chain, authentication);
+        super.onAuthenticationSuccess(request, response, chain, authentication);
     }
 
 
@@ -68,6 +74,14 @@ public class CustomAuthenticationSuccessHandler implements
             c -> userLoginLogService.delete(request, LoginSuccess.FAIL, Status.OFF)
         );
 
+        // 해당 객체를 SecurityContextHolder에 저장하고
+        // authentication 객체를 createToken 메소드를 통해서 JWT Token을 생성
+//        String jwt = tokenProvider.createToken(authentication);
+
+        // response header에 jwt token에 넣어줌
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+//        log.info("jwt = {}", jwt);
         saveLoginStatus(request, response, authentication);
         String url = request.getParameter("url");
         String redirectUrl = request.getContextPath() + "/";
@@ -88,7 +102,8 @@ public class CustomAuthenticationSuccessHandler implements
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
         //로그인 성공 기록 저장
-        userLoginLogService.save(request, LoginSuccess.SUCCESS, Status.ON);
+        userLoginLogService.save(request.getHeader("User-Agent"), request.getParameter("userId"), LoginSuccess.SUCCESS,
+            Status.ON);
     }
 
     /**
@@ -102,8 +117,12 @@ public class CustomAuthenticationSuccessHandler implements
         HttpSession session = request.getSession();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
+
+        // 리액트단에서 접근할 유저정보 저장
+        setLoginToken(redisService, request, userInfo);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
     }
+
 
     @Override
     public void saveLoginStatus(HttpServletRequest request, HttpServletResponse response,
@@ -115,7 +134,8 @@ public class CustomAuthenticationSuccessHandler implements
                 request.setAttribute(RememberCookie.KEY.getValue(), remember);
                 request.getSession().removeAttribute(RememberCookie.KEY.getValue());
             }
-            userLoginStatusService.save(request);
+
+//            userLoginStatusService.save(request.getHeader("User-Agent"),new JwtTokenDto(),null);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus: " + e.getMessage());
         }

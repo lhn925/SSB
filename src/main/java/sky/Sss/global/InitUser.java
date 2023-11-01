@@ -41,7 +41,9 @@ public class InitUser {
                 userJoinDto.setUserName(i + "유입니다2");
                 userJoinDto.setUserId(i + "221325");
                 userJoinDto.setPassword(i + "221325");
-                userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
+                userJoinDto.setInfoAgreement(true);
+                userJoinDto.setSbbAgreement(true);
+                userJoinService.join(userJoinDto);
             }
 
             UserJoinPostDto userJoinDto = new UserJoinPostDto();
@@ -49,7 +51,9 @@ public class InitUser {
             userJoinDto.setUserName("임하늘");
             userJoinDto.setUserId("lim222");
             userJoinDto.setPassword("dlagksmf2");
-            userJoinService.join(userJoinDto, UserJoinAgreeDto.createUserJoinAgree());
+            userJoinDto.setInfoAgreement(true);
+            userJoinDto.setSbbAgreement(true);
+            userJoinService.join(userJoinDto);
         }
     }
 }

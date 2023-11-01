@@ -1,11 +1,9 @@
 package sky.Sss.domain.user.utili.Filter;
 
 
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +20,6 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.Sss.domain.user.exception.LoginBlockException;
 import sky.Sss.domain.user.exception.LoginFailCountException;
-import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.LoginSuccess;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.log.UserLoginLogService;

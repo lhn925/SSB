@@ -48,6 +48,11 @@ public class HttpReqRespUtils {
                 local = InetAddress.getLocalHost();
                 log.info("local.getAddress() = {}", local.getAddress());
                 log.info("local.getHostAddress() = {}", local.getHostAddress());
+                log.info("local.getCanonicalHostName() = {}", local.getCanonicalHostName());
+
+                if (local.getHostAddress().equals("127.0.0.1") || local.getHostAddress().equals("192.168.0.100")) {
+                    return ip = "218.239.21.150";
+                }
                 ip = local.getHostAddress();
             } catch (UnknownHostException e) {
                 throw new RuntimeException(e);
