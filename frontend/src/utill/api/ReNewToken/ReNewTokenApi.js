@@ -1,7 +1,18 @@
 import axios from "axios";
 
-function ReNewTokenApi (headers) {
-  return axios.post("/login/refresh",{headers});
+async function ReNewTokenApi (headers) {
+  try {
+    const response = await axios.post("./login/refresh", {}, {headers: headers});
+    return {
+      code:response.status,
+      data:response.data
+    };
+  }catch (error) {
+    return {
+      code:error.response.status,
+      data:error.response.data
+    };
+  }
 }
 
 export default ReNewTokenApi;

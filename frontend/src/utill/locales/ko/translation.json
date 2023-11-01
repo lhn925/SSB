@@ -1,0 +1,179 @@
+{
+  "msg": {
+    "join": {
+      "sky.signup": "회원가입",
+      "sky.checkBtn": "인증번호 확인",
+      "sky.authBtn": "인증번호 전송"
+    },
+    "joinAgree": {
+      "sky.agree.all": "전체 동의하기",
+      "sky.agree.all.text": "실명 인증된 아이디로 가입, 위치기반서비스 이용약관(선택), 이벤트・혜택 정보 수신(선택) 동의를 포함합니다.",
+      "sky.required": "[필수]",
+      "sky.agree1": "이용약관 동의 (클릭 시 내용 확인 가능)",
+      "sky.agree2": "개인정보 이용약관 동의 (클릭 시 내용 확인 가능)"
+    },
+    "loginForm": {
+      "sky.login": "로그인",
+      "sky.remember": "로그인 상태 유지",
+      "sky.captcha": "위 사진에 쓰여져 있는 보안 코드를 입력해주세요.",
+      "sky.findPw": "비밀번호 찾기",
+      "sky.findId": "아이디 찾기"
+    },
+    "common": {
+      "sky.id": "아이디",
+      "sky.pw": "비밀번호",
+      "sky.auth": "인증번호",
+      "sky.logout": "로그아웃",
+      "sky.myInfo": "마이페이지",
+      "sky.alarm.none": "알림없음",
+      "sky.userName": "닉네임",
+      "sky.email": "이메일",
+      "sky.logo": "SSB",
+      "sky.logo.fullName": "Sky Smart Store",
+      "sky.nextBtn": "다음",
+      "sky.prevBtn": "이전",
+      "sky.cancel": "취소",
+      "sky.check": "확인",
+      "sky.home": "home",
+      "sky.feed": "feed",
+      "sky.upload": "Upload",
+      "sky.library": "Library",
+      "sky.changeBtn": "변경",
+      "sky.loginBtn": "로그인",
+      "sky.pwReset": "비밀번호 재설정",
+      "sky.newPw": "새 비밀번호",
+      "sky.newPwChk": "새 비밀번호 확인",
+      "sky.newPw.success": "비밀번호 변경이 완료 되었습니다. 로그인 중이던 기기에서는 로그아웃이 됩니다."
+    },
+    "help": {
+      "sky.idHelp": "아이디찾기",
+      "sky.regid": "가입한 아이디",
+      "sky.join.date": "가입일",
+      "sky.emailVerification.subject": "[SKYBOARD] 요청하신 인증 번호를 알려드립니다.",
+      "sky.emailVerification.body1": "본인확인 이메일로 인증",
+      "sky.emailVerification.body2": "본인확인 이메일 주소와 입력한 이메일 주소가 같아야, 인증번호를 받을 수 있습니다.",
+      "sky.idqueryForm": "비밀번호를 찾고자 하는 아이디를 입력해주세요.",
+      "sky.idqueryForm2": "아이디가 기억나지 않는다면?",
+      "sky.modal.pwUpdateForm.title": "비밀번호가 변경되었습니다.",
+      "sky.modal.pwUpdateForm.logout": "모든 기기 및 브라우저에서 로그아웃",
+      "sky.modal.pwUpdateForm.logout.content": "다른 사람이 회원님의 비밀번호를 알고 있다고 생각된다면 모든 기기에서 로그아웃 하시는 것이 안전합니다.",
+      "sky.modal.pwUpdateForm.logoutnone": "로그인 상태 유지",
+      "sky.modal.pwUpdateForm.logoutnone.content": "회원님의 아이디로 로그인 한 목록은 보안 설정의 로그인 관리 > 로그인 목록에서 확인 가능합니다.",
+      "sky.pw.change": "비밀번호 변경"
+    },
+    "email": {
+      "sky.email.subject": "[SKYBOARD] 요청하신 인증 번호를 알려드립니다.",
+      "sky.email.content": "안녕하세요 즐거운 소통이 존재하는 SKY BOARD 입니다.",
+      "sky.email.subContent1": "아래의 인증번호를 인증번호 입력창에 입력해주세요.",
+      "sky.email.subContent2": "인증번호"
+    },
+    "log": {
+      "sky.log.pw.chaContent": "비밀번호 찾기 > 등록된 이메일로 인증",
+      "sky.log.pw.update": "마이페이지 > 비밀번호 변경"
+    },
+    "myPage": {
+      "sky.myProfile": "내프로필",
+      "sky.security.set": "보안설정",
+      "sky.overseas.login.block": "해외 로그인 차단",
+      "sky.log.manage": "이력관리",
+      "sky.login.list": "로그인 관리",
+      "sky.login.log": "로그인 기록",
+      "sky.activityLog": "정보 수정 이력",
+      "sky.userName.change": "닉네임 변경",
+      "sky.userName.change.role": "(닉네임은 한달에 한번 바꿀 수 있습니다.)"
+    },
+    "loginDeviceModal": {
+      "sky.os": "운영체제",
+      "sky.browser": "브라우저/앱",
+      "sky.login.ip": "로그인 IP",
+      "sky.first.login": "최초 로그인 일시",
+      "sky.inSession": "현재 접속중",
+      "sky.manage": "관리"
+    },
+    "auth": {
+      "success": "이메일 인증이 완료 되었습니다.",
+      "timeOut": "인증시간이 만료 되었습니다."
+    },
+    "userName": {
+      "change": {
+        "success": "닉네임이 성공적으로 변경되었습니다."
+      }
+    },
+    "userJoinForm": {
+      "userId": "5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
+      "userName": "닉네임은 특수문자를 제외한 2~8자리여야 합니다.",
+      "password": "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.",
+      "email": "올바른 이메일 형식이 아닙니다.",
+      "authCode": {
+        "NotBlank": "인증번호를 입력해주세요."
+      },
+      "email2": "이메일 인증은 필수입니다."
+    },
+    "사용불가": "사용불가",
+    "안전": "안전",
+    "보통": "보통",
+    "위험": "위험",
+    "userId": {
+      "NotBlank": "아이디를 입력해주세요"
+    },
+    "password": {
+      "NotBlank": "비밀번호를 입력해주세요"
+    },
+    "captcha": {
+      "NotBlank": "인증코드를 입력해주세요"
+    },
+    "newPw": {
+      "NotBlank": "새 비밀번호를 입력해주세요"
+    },
+    "newPwChk": {
+      "NotBlank": "비밀번호 확인을 위해 한번 더 입력해주세요"
+    },
+    "change": {
+      "picture": "프로필 사진을 변경하시겠습니까?",
+      "success": "프로필 사진이 변경 되었습니다."
+    },
+    "loginUnblock": "해외 로그인 차단을 해제 하였습니다.",
+    "loginBlock": "해외 로그인 차단을 설정하였습니다.",
+    "device": {
+      "logout": "해당 기기를 로그아웃 하시겠습니까?",
+      "logoutSuccess": "해당 기기가 로그아웃 되었습니다."
+    },
+    "page": {
+      "nextBtn": "다음",
+      "prevBtn": "이전"
+    },
+    "sky": {
+      "os": "운영체제",
+      "browser": "브라우저/앱",
+      "login": {
+        "ip": "로그인 IP",
+        "first": "최근 로그인"
+      },
+      "chaContent": "변경 내용",
+      "chaMethod": "변경 방법",
+      "chaIp": "변경 IP",
+      "createdDate": "날짜",
+      "manage": "관리",
+      "logout": "로그아웃",
+      "inSession": "현재접속중",
+      "device": "기기",
+      "countryName": "국가"
+    },
+    "loginDevice": "로그인 관리",
+    "userLoginLog": "로그인 기록",
+    "userActivityLog": "정보 수정 이력",
+    "userActivityLogInfo": "비밀번호 변경(최근 6개월 내) 이력을 제공합니다",
+    "userLoginLogInfo": "로그인 기록은 최근 90일까지의 기록을 최대 1,000 건 까지 제공합니다."
+  },
+  "errorMsg": {
+    "NotBlank": "필수 정보입니다.",
+    "server": "잘못된 요청이거나 서버 오류 입니다 잠시후 다시 시도해주세요",
+    "error.picture": "jpg(jpeg),png 이미지 확장자 만 가능합니다.",
+    "error.unAuth": "로그인 후 다시 이용해주세요",
+    "error.dateError": "종료 날짜가 시작 날짜보다 미래일 수 없습니다.",
+    "error.authToken" : "인증코드가 발급되지 않았습니다.발급 받아주세요",
+    "error.agree" : "이용약관에 동의해주세요." ,
+    "error.sbbAgreement" : "SSB 이용약관에 동의해주세요.",
+    "error.infoAgreement" : "개인정보 이용약관에 동의해주세요."
+  }
+}

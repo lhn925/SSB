@@ -1,11 +1,38 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
-import { useTranslation } from "react-i18next";
-let messages = createSlice({
-  t:useTranslation
-});
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
+import authReducer from "store/auth/authReducers"
+import userReducer from "store/userInfo/userReducers"
+import storage from "redux-persist/lib/storage"
+import {persistReducer, persistStore} from "redux-persist";
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  PURGE, REGISTER,
+  REHYDRATE
+} from "redux-persist/es/constants";
+import modalType from "store/modalType/modalType";
+const persistConfig = {
+  key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
+  version: 1,
+  storage,
+  whitelist:["authReducer","userReducer"]
+};
 
+const rootReducer = combineReducers({
+  authReducer,
+  userReducer,
+  modalType
+})
 
-
-export default messages;
-
-
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+})
+export const persistor = persistStore(store);
+export default store;

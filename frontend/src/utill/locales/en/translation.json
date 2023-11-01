@@ -1,0 +1,162 @@
+{
+  "msg": {
+    "join": {
+      "sky.signup": "Sign Up",
+      "sky.checkBtn": "Verify Code",
+      "sky.authBtn": "Send Code",
+      "sky.signupBtn": "Sign Up"
+    },
+    "joinAgree": {
+      "sky.agree.all": "Agree All",
+      "sky.agree.all.text": "Includes agreement to sign up with a verified ID, optional Location-based Service Terms, and optional agreement to receive event/benefit information.",
+      "sky.required": "[Required]",
+      "sky.agree1": "Terms of Service Agreement",
+      "sky.agree2": "Privacy Policy Agreement"
+    },
+    "loginForm": {
+      "sky.login": "Login",
+      "sky.remember": "Remember Me",
+      "sky.captcha": "Enter the security code in the image.",
+      "sky.findPw": "Find Password",
+      "sky.findId": "Find ID"
+    },
+    "common": {
+      "sky.id": "ID",
+      "sky.pw": "Password",
+      "sky.logout": "Logout",
+      "sky.myInfo": "My Page",
+      "sky.alarm.none": "No Notifications",
+      "sky.userName": "Nickname",
+      "sky.email": "Email",
+      "sky.logo": "SSS",
+      "sky.logo.fullName": "Sky Smart Store",
+      "sky.nextBtn": "Next",
+      "sky.prevBtn": "Previous",
+      "sky.cancel": "Cancel",
+      "sky.check": "Check",
+      "sky.changeBtn": "Change",
+      "sky.loginBtn": "Login",
+      "sky.pwReset": "Reset Password",
+      "sky.newPw": "New Password",
+      "sky.newPwChk": "Confirm New Password",
+      "sky.newPw.success": "Password change completed. You will be logged out from other devices."
+    },
+    "help": {
+      "sky.idHelp": "Find ID",
+      "sky.regid": "Registered ID",
+      "sky.join.date": "Join Date",
+      "sky.emailVerification.subject": "[SKYBOARD] Here is your verification code request.",
+      "sky.emailVerification.body1": "Verify with your email",
+      "sky.emailVerification.body2": "Make sure your verification email address matches the one you entered to receive the verification code."
+    },
+    "email": {
+      "sky.email.subject": "[SKYBOARD] Here is your verification code request.",
+      "sky.email.content": "Hello! This is Sky BOARD, where enjoyable communication exists.",
+      "sky.email.subContent1": "Please enter the following verification code in the verification code input field.",
+      "sky.email.subContent2": "Verification Code"
+    },
+    "log": {
+      "sky.log.pw.chaContent": "Find Password > Verify with Registered Email",
+      "sky.log.pw.update": "My Page > Change Password"
+    },
+    "myPage": {
+      "sky.myProfile": "My Profile",
+      "sky.security.set": "Security Settings",
+      "sky.overseas.login.block": "Block Overseas Login",
+      "sky.log.manage": "History Management",
+      "sky.login.list": "Login Management",
+      "sky.login.log": "Login Log",
+      "sky.activityLog": "Information Modification History",
+      "sky.userName.change": "Change Nickname",
+      "sky.userName.change.role": "(Nickname can be changed once a month.)"
+    },
+    "loginDeviceModal": {
+      "sky.os": "Operating System",
+      "sky.browser": "Browser/App",
+      "sky.login.ip": "Login IP",
+      "sky.first.login": "First Login Time",
+      "sky.inSession": "Currently in Session",
+      "sky.manage": "Management"
+    },
+    "auth": {
+      "success": "Email verification completed."
+    },
+    "userName": {
+      "change": {
+        "success": "Nickname successfully changed."
+      }
+    },
+    "userJoinForm": {
+      "userId": "Only 5~20 characters of lowercase letters, numbers, and special characters (_, -) are allowed.",
+      "userName": "Nickname must be 2~8 characters excluding special characters.",
+      "password": "Please use 8~16 characters of uppercase/lowercase letters, numbers, and special characters.",
+      "email": "Invalid email format.",
+      "authCode": {
+        "NotBlank": "Please enter the verification code."
+      },
+      "email2": "Email verification is mandatory."
+    },
+    "사용불가": "Not Available",
+    "안전": "Safe",
+    "보통": "Normal",
+    "위험": "Danger",
+    "userId": {
+      "NotBlank": "Please enter the ID."
+    },
+    "password": {
+      "NotBlank": "Please enter the password."
+    },
+    "captcha": {
+      "NotBlank": "Please enter the security code."
+    },
+    "newPw": {
+      "NotBlank": "Please enter the new password."
+    },
+    "newPwChk": {
+      "NotBlank": "Please enter the new password again for confirmation."
+    },
+    "change": {
+      "picture": "Do you want to change your profile picture?",
+      "success": "Profile picture successfully changed."
+    },
+    "loginUnblock": "Overseas login restriction has been lifted.",
+    "loginBlock": "Overseas login restriction has been set.",
+    "device": {
+      "logout": "Do you want to log out from this device?",
+      "logoutSuccess": "This device has been logged out."
+    },
+    "page": {
+      "nextBtn": "Next",
+      "prevBtn": "Previous"
+    },
+    "sky": {
+      "os": "Operating System",
+      "browser": "Browser/App",
+      "login": {
+        "ip": "Login IP",
+        "first": "Recent Login"
+      },
+      "chaContent": "Modified Content",
+      "chaMethod": "Modification Method",
+      "chaIp": "Modified IP",
+      "createdDate": "Date",
+      "manage": "Management",
+      "logout": "Logout",
+      "inSession": "Currently in Session",
+      "device": "Device",
+      "countryName": "Country"
+    },
+    "loginDevice": "Login Management",
+    "userLoginLog": "Login Record",
+    "userActivityLog": "Information Modification History",
+    "userActivityLogInfo": "Provides password change history within the last 6 months.",
+    "userLoginLogInfo": "Login record provides up to 90 days of history with a maximum of 1,000 entries."
+  },
+  "errorMsg":{
+    "NotBlank": "필수 정보입니다.",
+    "server": "잘못된 요청이거나 서버 오류 입니다 잠시후. 시도해주세요",
+    "error.picture": "jpg(jpeg),png 이미지 확장자 만 가능합니다.",
+    "error.unAuth": "로그인 후 다시 이용해주세요",
+    "error.dateError": "종료 날짜가 시작 날짜보다 미래일 수 없습니다."
+  }
+}

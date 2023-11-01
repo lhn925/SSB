@@ -1,0 +1,75 @@
+.btn-primary {
+  background-color: #1aafec;
+  border-color: #1aafec;
+}
+
+.btn-primary:hover {
+  background-color: #439cb9;
+  border-color: #439cb9;
+}
+
+.mainLogo,.mainColor {
+  color: #1aafec;
+}
+
+.btn-blue-outline {
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.btn-outline:hover {
+  color: #1aafec;
+  background-color: #fff;
+  border: 1px solid #439cb9;
+}
+
+.btn-outline {
+  position: relative;
+  padding: 15px 30px;
+  border-radius: 15px;
+  font-family: "paybooc-Light", sans-serif;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.25s;
+}
+
+.btn-login-open,.btn-ssb {
+  background-color: #1aafec;
+  padding: 5px 15px;
+  border-radius: 7px;
+}
+.error-msg {
+  color: #dc3545;
+}
+
+.success-msg {
+  color: #1aafec
+}
+
+.logo-text {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.display-none {
+  display: none;
+}
+#progress-container {
+  width: 100%;
+  background-color: #DDDDDD;
+}
+
+#progress-bar {
+  width: 0;
+  height: 30px;
+  line-height: 30px;
+  background-color: #8C9CEC;
+  text-align: center;
+}
+
+.navbar-picture {
+  width: 40px;
+  height: 40px;
+}
+

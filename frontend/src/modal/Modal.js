@@ -1,8 +1,8 @@
-import "./../../css/base.css"
 import PropTypes from 'prop-types';
 import styled from 'styled-components'
-import Portal from "../../Portal";
-import {useEffect} from "react";
+import Portal from "Portal";
+import {useEffect, useState} from "react";
+
 function Modal({
   className,
   onClose,
@@ -11,6 +11,7 @@ function Modal({
   visible,
   children,
 }) {
+
   const onMaskClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose(e)
@@ -33,12 +34,14 @@ function Modal({
   }, [])
 
   return (
-      <Portal elementId="modal-root">
-        <ModalOverlay visible={visible} />
-        <ModalWrapper className={className} onClick={maskClosable ? onMaskClick : null}
-            tabIndex={-1}
-            visible={visible}>
-          <ModalInner tabIndex={0} className="modal-inner"> {closable && <ModalClose onClick={close}>X</ModalClose>}
+      <Portal elementId="modal-root" className="overflow-auto">
+        <ModalOverlay $visible={visible}/>
+        <ModalWrapper className={className}
+                      onClick={maskClosable ? onMaskClick : null}
+                      tabIndex={-1}
+                      $visible={visible}>
+          <ModalInner tabIndex={0} className="modal-inner"> {closable &&
+              <ModalClose onClick={close}>X</ModalClose>}
             {children}
           </ModalInner>
         </ModalWrapper>
@@ -58,8 +61,9 @@ Modal.propTypes = {
 
 const ModalWrapper = styled.div`
   box-sizing: border-box;
-  display: ${(props) => (props.visible ? 'block' : 'none')};
+  display: ${(props) => (props.$visible ? 'block' : 'none')};
   position: fixed;
+  // width: 360px;
   top: 0;
   right: 0;
   bottom: 0;
@@ -71,7 +75,7 @@ const ModalWrapper = styled.div`
 
 const ModalOverlay = styled.div`
   box-sizing: border-box;
-  display: ${(props) => (props.visible ? 'block' : 'none')};
+  display: ${(props) => (props.$visible ? 'block' : 'none')};
   position: fixed;
   top: 0;
   left: 0;
@@ -87,18 +91,20 @@ const ModalInner = styled.div`
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.5);
   background-color: #fff;
   border-radius: 10px;
-  width: 360px;
-  height: 70%;
+  // width: 360px;
+  // height: 100%;
   max-width: 480px;
   top: 50%;
   transform: translateY(-50%);
   margin: 0 auto;
   padding: 40px 20px;
+      max-height: calc(100vh - 100px);
+    overflow-y: auto;
 `
 
 const ModalClose = styled.div`
     position: absolute;
     top: 15px;
-    left: 330px;
+    left: 440px;
 `
 export default Modal
