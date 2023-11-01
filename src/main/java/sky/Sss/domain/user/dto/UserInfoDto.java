@@ -1,6 +1,5 @@
 package sky.Sss.domain.user.dto;
 
-import jakarta.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +14,6 @@ import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Blocked;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.global.file.utili.FileStore;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -64,11 +62,11 @@ public class UserInfoDto implements Serializable {
             .build();
     }
 
-    public static void sessionUserInfoUpdate(HttpSession session, User user) {
+    public static UserInfoDto createUserInfo(User user) {
         UserDetails userDetails = User.UserBuilder(user);
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
-        session.removeAttribute(RedisKeyDto.USER_KEY);
-        session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
+
+        return userInfo;
     }
 
 }

@@ -30,13 +30,13 @@ public class UserLoginListDto {
 
     public UserLoginListDto(String inSession, UserLoginStatus userLoginStatus) {
         // session 값이 같으면 null 아니면 sessionId값 그대로
-        this.session = userLoginStatus.getSession().equals(inSession) ? null : userLoginStatus.getSession();
+        this.session = userLoginStatus.getSessionId().equals(inSession) ? null : userLoginStatus.getSessionId();
         this.os = userLoginStatus.getOs();
         this.browser = userLoginStatus.getBrowser();
         this.ip = userLoginStatus.getDefaultLoginLog().getIp();
         this.countryName = userLoginStatus.getDefaultLoginLog().getCountryName();
         this.createdDateTime = userLoginStatus.getCreatedDateTime();
         this.loginStatus = userLoginStatus.getLoginStatus();
-        this.inSession = inSession.equals(userLoginStatus.getSession());
+        this.inSession = inSession.equals(userLoginStatus.getSessionId());
     }
 }

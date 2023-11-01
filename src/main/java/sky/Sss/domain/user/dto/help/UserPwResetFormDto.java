@@ -17,8 +17,6 @@ public class UserPwResetFormDto implements Serializable {
 
     @NotBlank
     private String userId;
-    @NotBlank
-    private String helpToken;
 
     private String newPw;
 
@@ -37,10 +35,9 @@ public class UserPwResetFormDto implements Serializable {
     private String imageName;
 
     @Builder
-    public UserPwResetFormDto(String userId, String helpToken, String newPw, String newPwChk, String captcha,
+    public UserPwResetFormDto(String userId, String newPw, String newPwChk, String captcha,
         String captchaKey, String imageName) {
         this.userId = userId;
-        this.helpToken = helpToken;
         this.newPw = newPw;
         this.newPwChk = newPwChk;
         this.captcha = captcha;

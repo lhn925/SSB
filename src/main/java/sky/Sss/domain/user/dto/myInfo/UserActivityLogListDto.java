@@ -3,6 +3,7 @@ package sky.Sss.domain.user.dto.myInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,10 +25,10 @@ public class UserActivityLogListDto implements Serializable {
     private String chaMethod;
     private String ip;
 
-    public UserActivityLogListDto(MessageSource ms, HttpServletRequest request, UserActivityLog userActivityLog) {
+    public UserActivityLogListDto(MessageSource ms, Locale locale,UserActivityLog userActivityLog) {
         this.createdDateTime = userActivityLog.getCreatedDateTime();
-        this.chaContent = ms.getMessage(userActivityLog.getChaContent(), null, request.getLocale());
-        this.chaMethod = ms.getMessage(userActivityLog.getChaMethod(), null, request.getLocale());
+        this.chaContent = ms.getMessage(userActivityLog.getChaContent(), null, locale);
+        this.chaMethod = ms.getMessage(userActivityLog.getChaMethod(), null,locale);
         this.ip = userActivityLog.getDefaultLog().getIp();
     }
 }

@@ -1,6 +1,7 @@
 package sky.Sss.domain.user.dto.join;
 
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import lombok.Getter;
@@ -35,6 +36,12 @@ public class UserJoinPostDto implements Serializable {
     private String email;
 
     private String authCode;
+
+    @AssertTrue(message = "{userJoinAgree.AssertTrue}")
+    private boolean sbbAgreement;
+
+    @AssertTrue(message = "{userJoinAgree.AssertTrue}")
+    private boolean infoAgreement;
 
     // 보안 레벨
     private PwSecLevel pwSecLevel;

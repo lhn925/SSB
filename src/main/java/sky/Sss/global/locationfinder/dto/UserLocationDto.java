@@ -5,9 +5,11 @@ import com.maxmind.geoip2.model.CityResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import sky.Sss.domain.user.model.UserAgent;
 
 @Getter
+@Slf4j
 public class UserLocationDto {
 
     private String ipAddress;
@@ -43,8 +45,8 @@ public class UserLocationDto {
             .latitude(latitude)
             .longitude(longitude).build();
     }
-    public static UserAgent isDevice(HttpServletRequest request) {
-        String userAgent = request.getHeader("User-Agent").toUpperCase();
+    public static UserAgent isDevice(String userAgent) {
+        userAgent = userAgent.toUpperCase();
         if (userAgent.indexOf(UserAgent.MOBI.name()) > -1) {
             return UserAgent.MOBI;
         } else {
@@ -52,9 +54,9 @@ public class UserLocationDto {
         }
     }
 
-    public static String getClientOS(HttpServletRequest request) {
-        String userAgent = getUserAgent(request);
+    public static String getClientOS(String userAgent) {
         String os = "";
+        log.info("userAgent = {}", userAgent);
         userAgent = userAgent.toLowerCase();
         if (userAgent.indexOf("windows nt 10.0") > -1) {
             os = "Windows10";
@@ -91,8 +93,7 @@ public class UserLocationDto {
     }
 
 
-    public static String getClientBrowser(HttpServletRequest request) {
-        String userAgent = getUserAgent(request);
+    public static String getClientBrowser(String userAgent) {
         String browser = "";
         if (userAgent.indexOf("Trident/7.0") > -1) {
             browser = "ie11";
@@ -121,10 +122,7 @@ public class UserLocationDto {
         return browser;
     }
 
-    private static String getUserAgent(HttpServletRequest request) {
-        String userAgent = request.getHeader("USER-AGENT");
-        return userAgent;
-    }
+
 
 
 }

@@ -30,4 +30,7 @@ public class ErrorGlobalResultDto implements ErrorResult {
         this.errorDetails = new ArrayList<>();
         errorDetails.add(new ErrorGlobalDetailDto(code, messageSource, locale, args));
     }
+
+
+
 }
