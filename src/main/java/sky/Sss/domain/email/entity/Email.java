@@ -15,6 +15,7 @@ public class Email {
 
     private String subject; // 제목
     private String toMail; // 유저
+    public static final Integer TIME_LIMIT = 300;
 
 
     public static Email createJoinEmail(String subject, EmailSendDto emailSendDto) {

@@ -12,4 +12,7 @@ public class CodeCheckRequestDto implements Serializable  {
     @NotBlank(message = "NotBlank.authCode")
     private String authCode;
 
+    @NotBlank(message = "NotBlank.authToken")
+    private String authToken;
+
 }

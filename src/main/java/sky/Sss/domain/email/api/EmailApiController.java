@@ -34,6 +34,7 @@ import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.HelpType;
 import sky.Sss.domain.user.service.join.UserJoinService;
 import sky.Sss.domain.user.service.UserQueryService;
+import sky.Sss.domain.user.utili.UserTokenUtil;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.ErrorResultDto;
@@ -76,7 +77,7 @@ public class EmailApiController {
 
         try {
             // 이메일 중복 체크
-            userJoinService.checkEmail(emailSendDto.getEmail());
+            userJoinService.checkEmail(emailSendDto.getEmail(), bindingResult);
         } catch (DuplicateCheckException e) {
             bindingResult.reject("duplication", new Object[]{e.getMessage()}, null);
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
@@ -120,7 +121,8 @@ public class EmailApiController {
             return getErrorResultResponseEntity(bindingResult, "join.code.timeOut", request);
         }
 
-        if (!(authCode.getAuthCode().equals(emailAuthCodeDto.getCode()))) { // 인증 코드 체크
+        if ( !(emailAuthCodeDto.getAuthToken().equals(authCode.getAuthToken()))
+            ||!(authCode.getAuthCode().equals(emailAuthCodeDto.getCode()))) { // 인증 코드 체크
             return getErrorResultResponseEntity(bindingResult, "join.code.mismatch", request);
         }
 
@@ -128,7 +130,7 @@ public class EmailApiController {
         emailAuthCodeDto.changeSuccess(true);
         session.setAttribute("emailAuthCodeDto", emailAuthCodeDto);
 
-        return new ResponseEntity(new Result<>(emailAuthCodeDto), HttpStatus.OK);
+        return new ResponseEntity(emailAuthCodeDto, HttpStatus.OK);
     }
 
     private ResponseEntity<ErrorResult> getErrorResultResponseEntity(BindingResult bindingResult, String errorCode,
@@ -166,7 +168,8 @@ public class EmailApiController {
                     || !userHelpDto.getUserId().equals(helpEmailSendDto.getUserId())) {
                     throw new UsernameNotFoundException("code.error");
                 }
-                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(), Enabled.ENABLED);
+                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(),
+                    Enabled.ENABLED);
                 /**
                  * 비밀 번호 찾기시
                  *
@@ -179,7 +182,7 @@ public class EmailApiController {
                 }
             }
             // 등록 이메일 체크
-            userJoinService.checkEmail(helpEmailSendDto.getEmail());
+            userJoinService.checkEmail(helpEmailSendDto.getEmail(), bindingResult);
         } catch (DuplicateCheckException e) {
             // 등록한 이메일이 있을경우에 이메일 발송
             return sendEmail(SendType.ID, helpEmailSendDto, request);
@@ -187,7 +190,7 @@ public class EmailApiController {
             // 없으면 찾을수 없다고 경고 뜸
         }
         // 없으면 찾을수 없다고 경고 뜸
-        bindingResult.reject("sky.email.notFind", null, null);
+        bindingResult.reject("sky.email.notFind");
         return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
     }
 
@@ -209,12 +212,14 @@ public class EmailApiController {
 
         Optional<String> optCode = emailService.sendMail(msObject, email, "email/sendEmail");
         LocalDateTime issueTime = LocalDateTime.now(); // 인증발급시간
-        LocalDateTime authTime = issueTime.plusSeconds(300); // 5분 인증 시간
+        LocalDateTime authTime = issueTime.plusSeconds(Email.TIME_LIMIT); // 5분 인증 시간
 
         String code = optCode.orElse(null);
 
+        String authToken = UserTokenUtil.getToken();
         EmailAuthCodeDto emailResponseDto = EmailAuthCodeDto.builder()
             .code(code)
+            .authToken(authToken)
             .authTimeLimit(authTime)
             .isSuccess(false)
             .email(emailSendDto.getEmail()).build();
@@ -222,7 +227,7 @@ public class EmailApiController {
         HttpSession session = request.getSession();
 
         session.setAttribute("emailAuthCodeDto", emailResponseDto);
-        return new ResponseEntity(new Result(new AuthTimeResponseDto(authTime, issueTime)),
+        return new ResponseEntity(new AuthTimeResponseDto(authTime, issueTime, authToken),
             HttpStatus.OK);
     }
 

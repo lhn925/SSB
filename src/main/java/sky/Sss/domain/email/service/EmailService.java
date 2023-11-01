@@ -26,7 +26,6 @@ public class EmailService {
     private final MessageSource ms;
 
 
-
     public Optional<String> sendMail(JSONObject msObject,Email email,String type) {
         String authNum = createCode();
 
