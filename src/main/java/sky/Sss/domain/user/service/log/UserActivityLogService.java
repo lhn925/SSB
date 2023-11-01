@@ -4,6 +4,7 @@ package sky.Sss.domain.user.service.log;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,8 @@ public class UserActivityLogService {
      * 유저 정보 수정 기록 저장
      */
     @Transactional
-    public void save(Long uId, String userId, String chaContent, String chaMethod,
-        HttpServletRequest request, ChangeSuccess changeSuccess) {
+    public void save(String userId, String chaContent, String chaMethod,
+        String userAgent, ChangeSuccess changeSuccess) {
         Optional<User> byUserId = userQueryRepository.findByUserId(userId);
         /*if (uId == null && !byUserId.isEmpty()) {
             uId = byUserId.orElse(null).getId();
@@ -53,7 +54,8 @@ public class UserActivityLogService {
 */
         //비 로그인으로 접근시 저장할 userId
         AuditorAwareImpl.changeUserId(auditorAware, userId);
-        UserActivityLog userActivityLog = getUserActivityLog(byUserId.orElse(null), chaContent, chaMethod, request, changeSuccess,
+        UserActivityLog userActivityLog = getUserActivityLog(byUserId.orElse(null), chaContent, chaMethod, userAgent,
+            changeSuccess,
             Status.ON);
         Optional<UserActivityLog> save = Optional.ofNullable(userActivityLogRepository.save(userActivityLog));
         save.orElseThrow(() -> new RuntimeException());
@@ -65,23 +67,22 @@ public class UserActivityLogService {
      *
      * @return
      */
-    public UserActivityLog getUserActivityLog(User user, String chaContent, String chaMethod, HttpServletRequest request,
+    public UserActivityLog getUserActivityLog(User user, String chaContent, String chaMethod, String userAgent,
         ChangeSuccess changeSuccess, Status isStatus) {
-        return UserActivityLog.createActivityLog(user, locationFinderService, chaContent, chaMethod, request,
+        return UserActivityLog.createActivityLog(user, locationFinderService, chaContent, chaMethod, userAgent,
             changeSuccess, isStatus);
 
     }
 
-    public Page<UserActivityLogListDto> getUserActivityLogList(HttpServletRequest request, ChangeSuccess changeSuccess,
+    public Page<UserActivityLogListDto> getUserActivityLogList(ChangeSuccess changeSuccess,
         Status isStatus,
         LocalDate startDate, LocalDate endDate,
-        PageRequest pageRequest) {
-        HttpSession session = request.getSession(false);
-        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-        User findUser = userQueryService.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-        Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(findUser, changeSuccess,
+        PageRequest pageRequest, Locale locale) {
+        User user = userQueryService.findOne();
+        Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(user,
+            changeSuccess,
             isStatus.getValue(), startDate,
-            endDate, pageRequest).map(u -> new UserActivityLogListDto(ms,request,u));
+            endDate, pageRequest).map(u -> new UserActivityLogListDto(ms, locale, u));
 
         return userActivityLogListDtoPage;
     }
@@ -90,6 +91,7 @@ public class UserActivityLogService {
      * 3개월 지난 로그인 기록 전부다 off
      * 3개월이 지난 id count를 구하고 리스트없이 update
      * 데이터 십만개를 테스트 했을때 걸리는 시간 : 683ms
+     *
      * @param month
      */
     @Transactional
@@ -102,7 +104,8 @@ public class UserActivityLogService {
 
         Integer result = 0;
         if (count > 0) {
-            result = userActivityLogRepository.expireActivityOff(Status.OFF.getValue(), Status.ON.getValue(), expireDate);
+            result = userActivityLogRepository.expireActivityOff(Status.OFF.getValue(), Status.ON.getValue(),
+                expireDate);
         }
         return result;
     }

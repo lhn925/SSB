@@ -12,6 +12,7 @@ import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.dto.myInfo.UserPwUpdateFormDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.repository.UserQueryRepository;
+import sky.Sss.domain.user.service.UserQueryService;
 
 @Slf4j
 @Service
@@ -19,8 +20,8 @@ import sky.Sss.domain.user.repository.UserQueryRepository;
 @RequiredArgsConstructor
 public class UserHelpService {
 
-    private final UserQueryRepository userQueryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserQueryService userQueryService;
 
     /**
      * 비밀번호 업데이트
@@ -31,12 +32,11 @@ public class UserHelpService {
     @Transactional
     public UserDetails passwordUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException {
 
-        User findByUser = User.getOptionalUser(
-            userQueryRepository.findByUserId(userPwResetFormDto.getUserId()));
+        User findUser = userQueryService.findOne(userPwResetFormDto.getUserId());
         //현재 비밀번호 와 대조
-        isPasswordSameAsNew(userPwResetFormDto, findByUser);
-        User.updatePw(findByUser, userPwResetFormDto.getNewPw(), userPwResetFormDto.getPwSecLevel(), passwordEncoder);
-        return getCustomUserDetails(findByUser);
+        isPasswordSameAsNew(userPwResetFormDto, findUser);
+        User.updatePw(findUser, userPwResetFormDto.getNewPw(), userPwResetFormDto.getPwSecLevel(), passwordEncoder);
+        return getCustomUserDetails(findUser);
     }
 
     /**
@@ -46,15 +46,13 @@ public class UserHelpService {
      * @return
      */
     @Transactional
-    public CustomUserDetails passwordUpdate(UserPwUpdateFormDto userPwUpdateFormDto, UserInfoDto userInfoDto) {
+    public CustomUserDetails myPagePwUpdate(UserPwUpdateFormDto userPwUpdateFormDto) {
+        User findUser = userQueryService.findOne();
 
-        User findByUser = User.getOptionalUser(
-            userQueryRepository.findByUserId(userInfoDto.getUserId()));
-
-        isPasswordSameAsNew(userPwUpdateFormDto, findByUser);
-        User.updatePw(findByUser, userPwUpdateFormDto.getNewPw(), userPwUpdateFormDto.getPwSecLevel(),
+        isPasswordSameAsNew(userPwUpdateFormDto, findUser);
+        User.updatePw(findUser, userPwUpdateFormDto.getNewPw(), userPwUpdateFormDto.getPwSecLevel(),
             passwordEncoder);
-        return getCustomUserDetails(findByUser);
+        return getCustomUserDetails(findUser);
     }
 
 

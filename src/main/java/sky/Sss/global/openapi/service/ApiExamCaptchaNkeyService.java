@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -123,12 +124,17 @@ public class ApiExamCaptchaNkeyService {
         }
     }
 
-    public void deleteImage(String filename) throws IOException {
+    public void deleteImage(String filename) throws NoSuchFileException {
         int i = filename.lastIndexOf("/");
         String substring = filename.substring(i + 1);
 
         Path filePath = Paths.get(fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), substring, "jpg"));
-        Files.delete(filePath);
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            log.info("filename = {}", filename);
+            e.printStackTrace();
+        }
     }
 
     private String getReadImage(InputStream is) {

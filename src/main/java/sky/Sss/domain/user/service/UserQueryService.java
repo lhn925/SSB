@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -51,13 +53,21 @@ public class UserQueryService {
         return UserInfoDto.createUserInfo(userDetails);
     }
 
-    public User findOne(HttpSession session) {
-        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-
-        Optional<User> optionalUser = userQueryRepository.findOne(userInfoDto.getUserId(), userInfoDto.getToken());
-
+    public User findOne() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Optional<User> optionalUser = userQueryRepository.findByUserId(userDetails.getUsername());
         User user = User.getOptionalUser(optionalUser);
         return user;
+    }
+
+    public UserInfoDto getUserInfoDto() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        User user = findOne(userDetails.getUsername());
+        UserInfoDto userInfoDto = UserInfoDto.createUserInfo(user);
+        return userInfoDto;
     }
 
     public User findOne(String userId) {
@@ -70,6 +80,10 @@ public class UserQueryService {
         Optional<User> optionalUser = userQueryRepository.findOne(userId,token);
         User user = User.getOptionalUser(optionalUser);
         return user;
+    }
+    public Optional<User> findOptionalUser(String userId) {
+        Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
+        return optionalUser;
     }
 
 

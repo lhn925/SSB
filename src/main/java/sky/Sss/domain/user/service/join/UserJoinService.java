@@ -5,6 +5,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import sky.Sss.domain.user.dto.join.UserJoinAgreeDto;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.entity.User;
@@ -30,7 +31,7 @@ public class UserJoinService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long join(UserJoinPostDto userJoinDto, UserJoinAgreeDto userJoinAgreeDto) {
+    public Long join(UserJoinPostDto userJoinDto) {
 
         // 유저토큰 생성 할 객체 생성
         PwEncryptor pwEncryptor = new PwEncryptor();
@@ -38,7 +39,7 @@ public class UserJoinService {
 
 
         // 중복검사
-        joinDuplicate(userJoinDto, salt);
+        checkSalt(salt);
 
         // db 저장
         User user = User.createJoinUser(userJoinDto, salt, passwordEncoder);
@@ -47,18 +48,11 @@ public class UserJoinService {
             throw new UserJoinServerErrorException(ms.getMessage("join.error", null, null));
         }
         // 이용약관 저장
-        UserJoinAgreement userJoinAgreement = UserJoinAgreement.createUserJoinAgreement(user, userJoinAgreeDto);
+        UserJoinAgreement userJoinAgreement = UserJoinAgreement.createUserJoinAgreement(user, userJoinDto);
 
         UserAgreeRepository.save(userJoinAgreement);
 
         return user.getId();
-    }
-
-    private void joinDuplicate(UserJoinPostDto userJoinDto, String salt) {
-        checkId(userJoinDto.getUserId());
-        checkUserName(userJoinDto.getUserName());
-        checkEmail(userJoinDto.getEmail());
-        checkSalt(salt);
     }
 
     public void checkSalt(String salt) {
@@ -67,22 +61,28 @@ public class UserJoinService {
         }
     }
 
-    public void checkId(String userId) {
+    public void duplicateCheckJoin(UserJoinPostDto userJoinPostDto,BindingResult bindingResult)
+        throws DuplicateCheckException {
+        checkId(userJoinPostDto.getUserId(),bindingResult);
+        checkEmail(userJoinPostDto.getEmail(),bindingResult);
+        checkUserName(userJoinPostDto.getUserName(),bindingResult);
+    }
+
+    public void checkId(String userId, BindingResult bindingResult) throws DuplicateCheckException {
         if (userQueryRepository.existsByUserId(userId)) {
-            throw new DuplicateCheckException("아이디", "userId", userId);
+            throw new DuplicateCheckException(bindingResult,"아이디", "userId", userId);
         }
     }
 
-    public void checkUserName(String userName) {
+    public void checkUserName(String userName, BindingResult bindingResult) throws DuplicateCheckException {
         if (userQueryRepository.existsByUserName(userName)) {
-            throw new DuplicateCheckException("닉네임", "userName", userName);
+            throw new DuplicateCheckException(bindingResult,"닉네임", "userName", userName);
         }
-
     }
 
-    public void checkEmail(String email) {
+    public void checkEmail(String email, BindingResult bindingResult) throws DuplicateCheckException {
         if (userQueryRepository.existsByEmail(email)) {
-            throw new DuplicateCheckException("email", "email", email);
+            throw new DuplicateCheckException(bindingResult,"email", "email", email);
         }
     }
 
