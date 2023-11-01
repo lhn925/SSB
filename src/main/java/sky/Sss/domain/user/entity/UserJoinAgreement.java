@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 import sky.Sss.domain.user.dto.join.UserJoinAgreeDto;
+import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.global.base.BaseTimeEntity;
 
 @Entity
@@ -40,11 +41,11 @@ public class UserJoinAgreement extends BaseTimeEntity {
         this.user = user;
     }
 
-    public static UserJoinAgreement createUserJoinAgreement(User user, UserJoinAgreeDto userJoinAgreeDto) {
+    public static UserJoinAgreement createUserJoinAgreement(User user, UserJoinPostDto userJoinPostDto) {
         UserJoinAgreement userJoinAgreement = new UserJoinAgreement();
         userJoinAgreement.setUser(user);
-        userJoinAgreement.setSddAgreement(userJoinAgreeDto.isSbbAgreement());
-        userJoinAgreement.setInfoAgreement(userJoinAgreeDto.isInfoAgreement());
+        userJoinAgreement.setSddAgreement(userJoinPostDto.isSbbAgreement());
+        userJoinAgreement.setInfoAgreement(userJoinPostDto.isInfoAgreement());
         return userJoinAgreement;
     }
 

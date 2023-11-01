@@ -80,11 +80,11 @@ public class UserActivityLog extends BaseTimeEntity {
 
     public static UserActivityLog createActivityLog(User user, LocationFinderService locationFinderService,
         String chaContent,
-        String chaMethod, HttpServletRequest request, ChangeSuccess changeSuccess, Status isStatus) {
+        String chaMethod, String userAgent, ChangeSuccess changeSuccess, Status isStatus) {
         UserLocationDto userLocationDto = null;
         userLocationDto = locationFinderService.findLocation();
 
-        DefaultLoginLog defaultLog = DefaultLoginLog.createDefaultLoginLog(isStatus, userLocationDto, request);
+        DefaultLoginLog defaultLog = DefaultLoginLog.createDefaultLoginLog(isStatus, userLocationDto,userAgent);
         return UserActivityLog.builder()
             .user(user)
             .changeSuccess(changeSuccess) // 실패 여부 확인

@@ -62,7 +62,6 @@ public class User extends BaseTimeEntity {
     // 유저네임 마지막 수정일 한번 바꾼후 3개월 동안 바꾸질 못함
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime userNameModifiedDate;
-
     // 회원 등급
     @Enumerated(STRING)
     private UserGrade grade;
