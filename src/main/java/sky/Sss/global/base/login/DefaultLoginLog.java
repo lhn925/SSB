@@ -58,14 +58,14 @@ public class DefaultLoginLog {
 
     public static DefaultLoginLog createDefaultLoginLog(Status isStatus,
         UserLocationDto userLocationDto,
-        HttpServletRequest request) {
+        String userAgent) {
 
         return DefaultLoginLog.builder()
             .ip(userLocationDto.getIpAddress()) //ip 저장
             .countryName(userLocationDto.getCountryName()) // iso Code 저장
             .latitude(userLocationDto.getLatitude()) // 위도
             .longitude(userLocationDto.getLongitude()) // 경도
-            .userAgent(UserLocationDto.isDevice(request)) // 기기 저장
+            .userAgent(UserLocationDto.isDevice(userAgent)) // 기기 저장
             .isStatus(isStatus.getValue()).build();
     }
 

@@ -2,7 +2,6 @@ package sky.Sss.domain.user.entity.login;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -11,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,10 +20,12 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.model.Status;
+import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.base.login.DefaultLoginLog;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
+import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Entity
@@ -38,12 +38,19 @@ public class UserLoginStatus extends BaseTimeEntity {
     @GeneratedValue
     private Long id;
 
-    //사용자의 remember key 값
-    private String remember;
-    //사용자가 접속한 세션에 키 값
-
+    //사용자에게 부여한 Jwt redisToken 값
     @Column(nullable = false)
-    private String session;
+    private String redisToken;
+
+
+    //사용자에게 부여한 Jwt redisToken 값
+    @Column(nullable = false)
+    private String refreshToken;
+
+    //사용자에게 부여한 Jwt redisToken 값
+    @Column(nullable = false)
+    private String sessionId;
+
 
     //사용자 고유 번호
     @ManyToOne(fetch = LAZY)
@@ -65,14 +72,16 @@ public class UserLoginStatus extends BaseTimeEntity {
 
 
     @Builder
-    private UserLoginStatus(String remember, String session, User uid, String os,
-        String browser, DefaultLoginLog defaultLoginLog,
-        Boolean loginStatus) {
-        this.remember = remember;
-        this.session = session;
+    private UserLoginStatus(String redisToken, User uid, String os,
+        String browser, DefaultLoginLog defaultLoginLog, String refreshToken,
+        Boolean loginStatus, String sessionId) {
+
+        this.refreshToken = refreshToken;
+        this.redisToken = redisToken;
         this.uid = uid;
         this.os = os;
         this.browser = browser;
+        this.sessionId = sessionId;
         this.loginStatus = loginStatus;
         this.defaultLoginLog = defaultLoginLog;
     }
@@ -82,32 +91,26 @@ public class UserLoginStatus extends BaseTimeEntity {
      * 객체 생성
      *
      * @param locationFinderService
-     * @param request
      * @param user
      * @return
      */
     public static UserLoginStatus getLoginStatus(
         LocationFinderService locationFinderService,
-        HttpServletRequest request, User user) {
+        String userAgent, User user, JwtTokenDto jwtTokenDto, String sessionId) {
         UserLocationDto userLocationDto;
         userLocationDto = locationFinderService.findLocation();
 
         UserLoginStatusBuilder builder = UserLoginStatus.builder()
             .uid(user)
             .loginStatus(Status.ON.getValue())
+            .refreshToken(jwtTokenDto.getRefreshToken())
             .defaultLoginLog(
-                DefaultLoginLog.createDefaultLoginLog(Status.ON, userLocationDto, request)
-            ).session(request.getSession(false).getId())
-            .browser(UserLocationDto.getClientBrowser(request))
-            .os(UserLocationDto.getClientOS(request));
-        String rememberMe = (String) request.getAttribute(RememberCookie.KEY.getValue());
+                DefaultLoginLog.createDefaultLoginLog(Status.ON, userLocationDto, userAgent)
+            ).redisToken(jwtTokenDto.getRedisToken())
+            .sessionId(sessionId)
+            .browser(UserLocationDto.getClientBrowser(userAgent))
+            .os(UserLocationDto.getClientOS(userAgent));
 
-        /**
-         * rememberMe가 있을 경우
-         */
-        if (rememberMe != null && StringUtils.hasText(rememberMe)) {
-            builder.remember(rememberMe);
-        }
         return builder.build();
     }
 

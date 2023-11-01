@@ -58,8 +58,7 @@ public class UserLoginLog extends BaseTimeEntity {
     }
 
 
-    public static UserLoginLog getLoginLog(Long uId, LocationFinderService locationFinderService,
-        HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
+    public static UserLoginLog getLoginLog(Long uId, LocationFinderService locationFinderService,String userAgent, LoginSuccess isSuccess, Status isStatus) {
 
         UserLocationDto userLocationDto = null;
             userLocationDto = locationFinderService.findLocation();
@@ -67,7 +66,7 @@ public class UserLoginLog extends BaseTimeEntity {
             .uId(uId)
             .isSuccess(isSuccess)
             .defaultLoginLog(DefaultLoginLog.createDefaultLoginLog(
-                    isStatus, userLocationDto, request
+                    isStatus, userLocationDto, userAgent
                 )
             )
             .build();
