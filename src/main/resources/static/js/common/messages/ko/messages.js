@@ -42,5 +42,4 @@ const messages = {
   "userActivityLog": "정보 수정 이력",
   "userActivityLog.info": "비밀번호 변경(최근 6개월 내) 이력을 제공합니다",
   "userLoginLog.info": "로그인 기록은 최근 90일까지의 기록을 최대 1,000 건 까지 제공합니다."
-
 }

@@ -28,6 +28,7 @@ Join.prototype._init = function () {
 
 }
 
+
 // 회원가입 버튼 클릭시 전체가 유효한값이 입력되었는지 확인하는 함수
 Join.prototype._SubmitBtnClickAddEvent = function () {
 

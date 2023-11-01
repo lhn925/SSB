@@ -7,10 +7,20 @@
   line-height: 1.6;
 }*/
 body {
-  line-height: 1.6;
-  height: 100%;
   margin: 0 auto;
 }
+input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+  font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;
+  font-size: 14px;
+  font-weight: 100;
+  line-height: 20px;
+  padding: 2px 7px;
+  transition: border-color .1s;
+}
+
 /*
 :root[color-theme='light'] {
   --background: #fff;
