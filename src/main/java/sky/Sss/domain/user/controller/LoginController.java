@@ -2,80 +2,144 @@ package sky.Sss.domain.user.controller;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import java.nio.file.NoSuchFileException;
+import java.util.Enumeration;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.user.dto.login.UserLoginFailErrorDto;
 import sky.Sss.domain.user.dto.login.UserLoginFormDto;
+import sky.Sss.domain.user.exception.CaptchaMisMatchFactorException;
+import sky.Sss.domain.user.exception.LoginBlockException;
+import sky.Sss.domain.user.exception.LoginFailException;
+import sky.Sss.domain.user.exception.RefreshTokenNotFoundException;
+import sky.Sss.domain.user.exception.UserInfoNotFoundException;
+import sky.Sss.domain.user.model.LoginSuccess;
+import sky.Sss.domain.user.model.Status;
+import sky.Sss.domain.user.service.log.UserLoginLogService;
+import sky.Sss.domain.user.service.login.LoginService;
+import sky.Sss.domain.user.utili.jwt.AccessTokenDto;
+import sky.Sss.domain.user.utili.jwt.JwtDto;
+import sky.Sss.domain.user.utili.jwt.JwtFilter;
+import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
+import sky.Sss.domain.user.utili.jwt.TokenProvider;
+import sky.Sss.global.error.dto.ErrorResultDto;
+import sky.Sss.global.error.dto.Result;
+import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 
 @Slf4j
-@Controller
 @RequiredArgsConstructor
 @RequestMapping("/login")
+@RestController
 public class LoginController {
 
     private final MessageSource ms;
+    private final LoginService loginService;
+    private final UserLoginLogService userLoginLogService;
+    private final TokenProvider tokenProvider;
+    private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
 
     /**
      * @param request
      * @return
      */
 
+    @PostMapping
+    public ResponseEntity login(@Validated @RequestBody UserLoginFormDto userLoginFormDto,
+        BindingResult bindingResult,
+        HttpServletRequest request) throws UsernameNotFoundException, NoSuchFileException {
+        if (bindingResult.hasErrors()) {
+            log.info("로그인 실패");
+            throw new LoginFailException("login.error");
+        }
+        String userAgent = request.getHeader("User-Agent");
+        String captchaKey = userLoginFormDto.getCaptchaKey();
+        HttpSession session = request.getSession();
+        LoginSuccess loginSuccess = LoginSuccess.FAIL;
+        Long limit = 4L; //
+        Long failCount = 0L;
+
+        try {
+
+            // 해외 로그인 차단 여부 확인
+            userLoginLogService.isLoginBlockChecked(userLoginFormDto.getUserId());
+
+            // 로그인 실패 횟수 조회
+            failCount = userLoginLogService.getCount(userLoginFormDto.getUserId(), LoginSuccess.FAIL, Status.ON);
+
+            // 2차 인증 코드 확인
+            loginService.verifyCaptchKey(userLoginFormDto, failCount, captchaKey, limit);
+
+            JwtDto tokenDto = loginService.login(userLoginFormDto, request.getHeader("User-Agent"),
+                session.getId(), failCount);
+            loginSuccess = LoginSuccess.SUCCESS;
+            return new ResponseEntity(tokenDto, HttpStatus.OK);
+        } catch (BadCredentialsException | CaptchaMisMatchFactorException e) {
+            failCount++;// 실패횟수 +
+            if (failCount > limit || StringUtils.hasText(captchaKey)) {
+                if (StringUtils.hasText(userLoginFormDto.getImageName())) {
+                    apiExamCaptchaNkeyService.deleteImage(userLoginFormDto.getImageName());
+                }
+                Map mapKey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();
+                String key = (String) mapKey.get("key");
+
+                String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
+
+                userLoginFormDto.setCaptchaKey(key);
+                userLoginFormDto.setImageName(image);
+                String message = "login.error.captcha";
+                userLoginFormDto.setMessage(ms.getMessage(message, null, request.getLocale()));
+                return new ResponseEntity(userLoginFormDto, HttpStatus.UNAUTHORIZED);
+            } else {
+                throw new BadCredentialsException("login.error");
+            }
+        } finally {
+            loginService.saveLoginLog(userAgent, userLoginFormDto.getUserId(), loginSuccess);
+        }
+    }
+
     /**
-     *
-     * id:login_1
-     *
-     * 로그인페이지 이동
-     * @param userLoginFormDto
-     * @param userLoginFailErrorDto
      * @param request
-     * @param model
      * @return
      */
-    @GetMapping
-    public String loginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
-        @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
-        HttpServletRequest request, Model model) {
-        // error 또는 retryTwoFactor가 true 일 경우
-        if (userLoginFailErrorDto.isError() || userLoginFailErrorDto.isRetryTwoFactor()) {
-            model.addAttribute("errMsg", ms.getMessage(userLoginFailErrorDto.getErrMsg(),
-                null, request.getLocale()));
+    @PostMapping("/refresh")
+    public ResponseEntity refresh(HttpServletRequest request) {
+        String refreshToken = request.getHeader(JwtFilter.REFRESH_AUTHORIZATION_HEADER);
+        String accessToken = tokenProvider.validateRefreshToken(refreshToken);
+        if (accessToken == null) {
+            throw new RefreshTokenNotFoundException("refresh.error");
         }
-
-        // 이전페이지 url 저장
-        String referer = request.getHeader("referer");
-        if (StringUtils.hasText(referer) && !StringUtils.hasText(userLoginFormDto.getUrl()) && !referer.contains("/login") ) {
-            String url = referer.equals(request.getRequestURL()) ? null : referer;
-            userLoginFormDto.setUrl(url);
-        }
-
-        model.addAttribute("userLoginFormDto", userLoginFormDto);
-        return "user/login/loginForm";
+        AccessTokenDto accessTokenDto = new AccessTokenDto();
+        accessTokenDto.setAccessToken("Bearer " +accessToken);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, accessToken);
+        return new ResponseEntity<>(accessTokenDto, HttpStatus.OK);
     }
 
     /**
-     * 주소값에 파라미터가 노출되지 않게끔
-     * id:login_2
-     * @param userLoginFormDto
-     * @param userLoginFailErrorDto
-     * @param redirectAttributes
-     * @return
+     *
      */
-    @GetMapping("/fail")
-    public String failLoginForm(@ModelAttribute UserLoginFormDto userLoginFormDto,
-        @ModelAttribute UserLoginFailErrorDto userLoginFailErrorDto,
-        RedirectAttributes redirectAttributes) {
-
-        redirectAttributes.addFlashAttribute("userLoginFormDto", userLoginFormDto);
-        redirectAttributes.addFlashAttribute("userLoginFailErrorDto", userLoginFailErrorDto);
-        return "redirect:/login";
+    @GetMapping("/check")
+    public ResponseEntity loginCheck(HttpServletRequest request) {
+        log.info("request.getSession().getId() = {}", request.getSession().getId());
+        return new ResponseEntity("안녕", HttpStatus.OK);
     }
-
 }

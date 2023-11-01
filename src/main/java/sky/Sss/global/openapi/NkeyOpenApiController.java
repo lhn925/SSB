@@ -3,6 +3,7 @@ package sky.Sss.global.openapi;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,15 +69,18 @@ public class NkeyOpenApiController {
     @GetMapping("/again")
     public ResponseEntity captchaKEyAgain(@Validated @ModelAttribute CaptchaNkeyDto captchaNkeyDto,
         BindingResult bindingResult
-        , HttpServletRequest request) throws IOException {
+        , HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         String fileName = captchaNkeyDto.getImageName();
         //받은 이미지 삭제
-        apiExamCaptchaNkeyService.deleteImage(fileName);
-
+        try {
+            apiExamCaptchaNkeyService.deleteImage(fileName);
+        } catch (NoSuchFileException e) {
+            log.error("delete image error ", captchaNkeyDto.getImageName());
+        }
         String key = (String) apiExamCaptchaNkeyService.getApiExamCaptchaNkey().get("key");
         String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
 
@@ -84,7 +88,7 @@ public class NkeyOpenApiController {
             .captchaKey(key)
             .imageName(image).build();
 
-        return new ResponseEntity(new Result<>(captcha), HttpStatus.OK);
+        return new ResponseEntity(captcha, HttpStatus.OK);
     }
 
 }

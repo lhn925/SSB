@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -41,9 +42,7 @@ public class FileApiController {
      * @throws IOException
      */
     @GetMapping("/picture/{userId}")
-    public ResponseEntity getUserProfilePicture(@PathVariable String userId, HttpServletResponse response)
-        throws IOException {
-
+    public ResponseEntity getUserProfilePicture(@PathVariable String userId) {
 
         // file MediaType 확인 후 header 에 저장
 
@@ -62,7 +61,7 @@ public class FileApiController {
                 pictureImage = userMyInfoService.getPictureImage(FileStore.USER_DEFAULT_IMAGE_URL);
             }
         } catch (Exception e) {
-            response.sendRedirect("/error/404");
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()
