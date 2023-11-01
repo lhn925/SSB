@@ -5,7 +5,7 @@ import org.springframework.security.core.AuthenticationException;
 /**
  * MissingCapthcahFactorException : 2차 인증 번호를 입력하지 않음
  */
-public class CaptchaMisMatchFactorException extends AuthenticationException {
+public class CaptchaMisMatchFactorException extends IllegalArgumentException {
 
 
     public CaptchaMisMatchFactorException(String msg, Throwable cause) {
