@@ -15,18 +15,18 @@ function Header() {
   const {t} = useTranslation();
   const [content, setContent] = useState();
   const type = useSelector(state => state.modalType.type);
+  const helpType = useSelector(state => state.helpType.helpType);
   const openModal = () => {
-    dispatch(modalActions.changeType({type:"Login"}));
+    dispatch(modalActions.changeType({type:"LOGIN"}));
     setModalVisible(true)
   }
   const closeModal = () => {
     setModalVisible(false)
   }
+
   useEffect(() => { // modal 내용 변경
-    setContent(Content({type,closeModal,setModalVisible}))
-  },[type]);
-
-
+    setContent(Content({type,closeModal,helpType}))
+  },[type,helpType]);
 
   return (
       <header role="banner"

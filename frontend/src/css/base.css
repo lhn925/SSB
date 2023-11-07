@@ -2,10 +2,15 @@
   background-color: #1aafec;
   border-color: #1aafec;
 }
-
 .btn-primary:hover {
   background-color: #439cb9;
   border-color: #439cb9;
+  color: #ffffff;
+}
+.btn-outline-info:hover {
+  color: #706d6d;
+  background-color: #dcdcdc;
+  border-color: #e7e1e1;
 }
 
 .mainLogo,.mainColor {

@@ -11,6 +11,7 @@ import {
   REHYDRATE
 } from "redux-persist/es/constants";
 import modalType from "store/modalType/modalType";
+import helpType from "store/helpType/helpType";
 const persistConfig = {
   key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
   version: 1,
@@ -21,7 +22,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   authReducer,
   userReducer,
-  modalType
+  modalType,
+  helpType
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

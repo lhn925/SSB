@@ -1,5 +1,7 @@
 //패스워드 안전도 체크 함수
 import {useState} from "react";
+import {EmailApi} from "./api/email/EmailApi";
+import {CodeCheckApi} from "./api/email/CodeCheckApi";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -59,9 +61,6 @@ export function PwSecureLevel(password) {// 패스워드 안전 강도
 
   let regex8 = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
   // 이모지 확인
-
-
-
   /**
    * 0점 사용불가
    * 1점 위험
@@ -74,8 +73,6 @@ export function PwSecureLevel(password) {// 패스워드 안전 강도
    * 소문자로 이루어졌는데 같은문자만 도배일경우 - 사용불가
    * 그리고 8문자이하면 사용불가 한글 사용불가
    */
-
-
 
   if (password.length < 8 || password.length >= 17) {
     secLevel = 0;
@@ -105,14 +102,12 @@ export function PwSecureLevel(password) {// 패스워드 안전 강도
   if (regex3.test(password)) { // 특수표현 검색
     ++secLevel;
   }
-  console.log(secLevel);
   if (secLevel < 1) {
     if (regex5.test(password)) {
       secLevel = 0;
       return secLevel;
     }
   }
-
   return secLevel;
 }
 
@@ -132,7 +127,7 @@ export function GetCountDownTime(minutes, seconds, remainingTime, setTimer,
 
 }
 
-export function GetInterval(timer, setTimer ,authTimeLimit, setCountDownTime,
+export function GetInterval(timer, setTimer, authTimeLimit, setCountDownTime,
     errorMsg) {
   return setInterval(() => {
     const emailInterValObject = EmailInterValEvent(timer, authTimeLimit);
@@ -141,6 +136,7 @@ export function GetInterval(timer, setTimer ,authTimeLimit, setCountDownTime,
     const seconds = emailInterValObject.seconds;
     const getCountDownTime = GetCountDownTime(minutes, seconds, remainingTime,
         setTimer, errorMsg);
+
     setCountDownTime(
         {message: getCountDownTime.message, error: getCountDownTime.error});
   }, 1000);
@@ -189,4 +185,64 @@ export function EmailInterValEvent(timer, authTimeLimit) {
     seconds: seconds
   }
 
+}
+
+export function ChangeError(setErrors, name, message, error) {
+  setErrors((errors) => {
+    return {
+      ...errors,
+      [name]: {message: message, error: error}
+    }
+  });
+}
+
+export async function SendCode(url, body, setErrors, setAuth, setTimer,
+    setAuthTimeLimit, messages) {
+  const response = await EmailApi(url, body);
+  if (response.code !== 200) {
+    if (response.data.errorDetails !== undefined) {
+      response.data.errorDetails.map((data) => {
+        ChangeError(setErrors, "email", data.message, true);
+      });
+    } else {
+      ChangeError(setErrors, "email", messages, true);
+    }
+  } else {
+    ChangeError(setErrors, "email", '', false);
+    ChangeError(setErrors, "authCode", '', false);
+    setAuth({authToken: response.data.authToken, success: false})
+    setTimer(await StartCountdown(response.data.authTimeLimit,
+        response.data.authIssueTime));
+    setAuthTimeLimit(await response.data.authTimeLimit);
+  }
+}
+
+export async function AuthCodeCheck(setInputs,authCode, auth, setErrors, setCountDownTime,
+    t, setTimer, setAuthTimeLimit, setAuth, emailRef , sendType) {
+  const response = await CodeCheckApi(
+      {authCode: authCode, authToken: auth.authToken, sendType:sendType});
+  if (response.code !== 200) {
+    if (response.data.errorDetails) {
+      response.data.errorDetails.map((data) => {
+        ChangeError(setErrors, "authCode", data.message, true);
+      });
+      setCountDownTime({message: '', error: false});
+      return;
+    }
+    ChangeError(setErrors, "authCode", t(`errorMsg.server`), true);
+  } else {
+    ChangeError(setErrors, "authCode", t(`msg.auth.success`), false);
+    ChangeError(setErrors, "email", '', false);
+    setTimer(0);
+    setAuthTimeLimit(null);
+    setCountDownTime({message: '', error: false});
+    setAuth({...auth, success: true})
+    emailRef.current.value = response.data.email;
+    setInputs((inputs) => {
+      return{
+        ...inputs,
+        email:response.data.email
+      }
+    })
+  }
 }

@@ -4,19 +4,22 @@ import {Collapse} from "react-bootstrap";
 import {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {
+  ChangeError,
   GetInterval,
   PwSecureCheckFn,
   PwSecureLevel,
-  Regex,
-  StartCountdown
 } from "utill/function";
 import {
   DuplicateCheckApi
 } from "utill/api/duplicateCheck/DuplicateCheckApi";
-import {EmailApi} from "utill/api/email/EmailApi";
-import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
 import {JoinApi} from "utill/api/join/JoinApi";
 import {toast} from "react-toastify";
+import {EmailInput} from "components/input/EmailInput";
+import {AuthInput} from "components/input/AuthInput";
+import {Input} from "components/input/Input";
+import {PwInput} from "../../../components/input/PwInput";
+import {modalActions} from "../../../store/modalType/modalType";
+import {useDispatch} from "react-redux";
 
 function Join(props) {
   const {t} = useTranslation();
@@ -45,19 +48,19 @@ function Join(props) {
   })
 
   const [allAgreeCheck, setAllAgreeCheck] = useState(false)
+  const dispatch = useDispatch();
+  // authToken
   const [auth, setAuth] = useState({authToken: '', success: false})
   // 비밀번호 표시 변경 버튼 체크
   const [isShowPwChecked, setShowChecked] = useState(false);
-
   // Email Timer
   const [countDownTime, setCountDownTime] = useState(
       {message: '', error: false});
   const [authTimeLimit, setAuthTimeLimit] = useState(null);
   const [timer, setTimer] = useState(0);
-
+  const emailRef = useRef(null);
 
   const passwordRef = useRef(null);
-  const emailRef = useRef(null);
 
   useEffect(() => {
     let countDownInterVal = null;
@@ -71,83 +74,24 @@ function Join(props) {
   }, [timer, authTimeLimit])
 
   const clickBtnSendCode = async () => {
-    const email = inputs.email;
-    if (email === "") {
-      changeError("email", t(`errorMsg.NotBlank`), true);
-      return;
-    }
-    if (!Regex("email", email)) {
-      return;
-    }
-    if (variable.current.isDoubleClick) {
-      return;
-    }
-    variable.current.isDoubleClick = true;
-    const response = await EmailApi("./email/join", {email: email});
-    variable.current.isDoubleClick = false;
-    if (response.code !== 200) {
-      if (response.data.errorDetails !== undefined) {
-        response.data.errorDetails.map((data) => {
-          changeError("email", data.message, true);
-        });
-        return;
-      }
-      changeError("email", t(`errorMsg.server`), true);
-    } else {
-      changeError("email", '', false);
-      changeError("authCode", '', false);
-      setAuth({authToken: response.data.authToken, success: false})
-      setTimer(await StartCountdown(response.data.authTimeLimit,
-          response.data.authIssueTime));
-      setAuthTimeLimit(await response.data.authTimeLimit);
-    }
-
+    const body = {email: inputs.email, sendType: props.type};
+    const url = "./email/join";
+    await props.ClickBtnSendCode(
+      url,
+      inputs, t, setErrors, variable, body, setAuth, setTimer,
+      setAuthTimeLimit)
   }
-
   const authCodeCheckBtn = async () => {
-    const authCode = inputs.authCode;
-    console.log(authCode)
-    if (authCode === "" || auth.authToken === "") {
-      const message = authCode === "" ? t(`msg.userJoinForm.authCode.NotBlank`)
-          : t(`errorMsg.error.authToken`);
-      changeError("authCode", message, true);
-      return;
-    }
-    if (variable.current.isDoubleClick) {
-      return;
-    }
-    variable.current.isDoubleClick = true;
-
-    const response = await CodeCheckApi(
-        {authCode: authCode, authToken: auth.authToken});
-    variable.current.isDoubleClick = false;
-    if (response.code !== 200) {
-      if (response.data.errorDetails) {
-        response.data.errorDetails.map((data) => {
-          changeError("authCode", data.message, true);
-        });
-        setCountDownTime({message: '', error: false});
-        return;
-      }
-      changeError("authCode", t(`errorMsg.server`), true);
-    } else {
-      changeError("authCode", t(`msg.auth.success`), false);
-      changeError("email", '', false);
-      setTimer(0);
-      setAuthTimeLimit(null);
-      setCountDownTime({message: '', error: false});
-      setAuth({...auth, success: true})
-      emailRef.current.value = response.data.email;
-    }
+    props.ClickBtnAuthCodeCheck(setInputs, inputs, auth, t, setErrors, variable,
+        setCountDownTime,
+        setTimer, setAuthTimeLimit, setAuth, emailRef, props.type);
   }
-
   const handleShowPwChecked = async () => {
     const password = await passwordRef.current;
 
     await setShowChecked(!isShowPwChecked);
     password.type = !isShowPwChecked ? 'text' : 'password';
   }
-
   const clickShowAgreement = async (name) => {
     let copy = await name === "infoAgreement" ? agree.infoAgreement
         : agree.sbbAgreement;
@@ -158,7 +102,6 @@ function Join(props) {
       }
     })
   }
-
   const clickAgreeChecked = async (e) => {
     e.stopPropagation();
     const {name} = e.target;
@@ -166,7 +109,7 @@ function Join(props) {
     let copy = await name === "infoAgreement" ? agree.infoAgreement
         : agree.sbbAgreement;
     let copyCheck = !copy.check;
-    changeError(name, '', !copyCheck)
+    ChangeError(setErrors, name, '', !copyCheck)
     setAgree((agree) => {
       return {
         ...agree,
@@ -179,8 +122,8 @@ function Join(props) {
     let copySbbAgree = agree.sbbAgreement;
     let copyAllAgreeCheck = !allAgreeCheck;
     await setAllAgreeCheck(copyAllAgreeCheck);
-    changeError("sbbAgreement", '', !copyAllAgreeCheck);
-    changeError("infoAgreement", '', !copyAllAgreeCheck);
+    ChangeError(setErrors, "sbbAgreement", '', !copyAllAgreeCheck);
+    ChangeError(setErrors, "infoAgreement", '', !copyAllAgreeCheck);
     setAgree(() => {
       return {
         sbbAgreement: {check: copyAllAgreeCheck, open: copySbbAgree.open},
@@ -188,72 +131,50 @@ function Join(props) {
       }
     })
   }
-
   const duplicateCheck = async (name, value) => {
     const response = await DuplicateCheckApi(name, value);
-    if (response !== undefined) {
-
-      const isSuccess = response.code !== 200;
-      if (isSuccess) {
+    const isSuccess = response.code !== 200;
+    if (isSuccess) {
+      if (response.data.errorDetails !== undefined) {
         response.data.errorDetails.map((data) => {
-          changeError(name, data.message, isSuccess);
+          ChangeError(setErrors, name, data.message, isSuccess);
         });
-      } else {
-        changeError(name, '', isSuccess);
+        return;
       }
-
-      return isSuccess;
+      ChangeError(setErrors, name, t(`errorMsg.server`), isSuccess);
+    } else {
+      ChangeError(setErrors, name, '', isSuccess);
     }
 
-  }
+    return isSuccess;
 
-  const RegexCheck = (name, input_value) => {
-
-    let isRegex = !Regex(name, input_value);
-
-    let message = Regex ? t(`msg.userJoinForm.` + name) : '';
-    changeError(name, message, isRegex);
-    return isRegex;
-  }
-
-  function changeError(name, message, error) {
-    setErrors((errors) => {
-      return {
-        ...errors,
-        [name]: {message: message, error: error}
-      }
-    });
   }
 
   const [secureLevel, setSecureLevel] = useState(
       {secLevelClass: '', secLevelStr: ''});
   const isStringBlank = (name) => {
-    changeError(name, name === "authCode" ? t(
+    ChangeError(setErrors, name, name === "authCode" ? t(
         `msg.userJoinForm.authCode.NotBlank`) : t(`errorMsg.NotBlank`), true);
     setSecureLevel(name === "password" ? {secLevelClass: '', secLevelStr: ''}
         : secureLevel);
     return true;
   }
-
   const onKeyUp = async (e) => {
-
     const {value, name} = e.target;
-
     const input_value = value.split(" ").join("");
+    console.log("name:"+name)
     // 공백 체크
-
     setInputs((inputs) => {
       return {
         ...inputs,
         [name]: input_value
       }
     });
-
     if (input_value === "") {
       return isStringBlank(name);
     }
     if (name === "userId" || name === "email" || name === "userName") {
-      const isRegex = RegexCheck(name, input_value);
+      const isRegex = props.RegexCheck(name, input_value, setErrors, t);
       // 정규표현식이 맞고 빈칸이 아닌 경우
       if (!isRegex && name !== "email") { // 중복 체크
         await duplicateCheck(name, input_value);
@@ -266,16 +187,18 @@ function Join(props) {
       setSecureLevel(PwSecureCheckFn(number));
       let error = number === 0;
       let message = error ? t(`msg.userJoinForm.password`) : '';
-      changeError(name, message, error);
+      ChangeError(setErrors, name, message, error);
     }
   }
+
+  // 회원가입
   const submitHandler = async (e) => {
     e.stopPropagation();
 
     // 이용 약관 동의 확인
-    for (const [key,value] of Object.entries(agree)) {
+    for (const [key, value] of Object.entries(agree)) {
       if (!value.check) {
-        changeError(key, t(`errorMsg.error.`+key) , !value.check);
+        ChangeError(setErrors, key, t(`errorMsg.error.` + key), !value.check);
       }
     }
 
@@ -297,7 +220,8 @@ function Join(props) {
     }
     // 이메일 인증 여부 확인
     if (!auth.success) {
-      changeError("authCode", t(`msg.userJoinForm.email2`), !auth.success);
+      ChangeError(setErrors, "authCode", t(`msg.userJoinForm.email2`),
+          !auth.success);
       return;
     }
 
@@ -308,13 +232,14 @@ function Join(props) {
 
     let loading = toast.loading("회원가입 진행중...");
     const body = {
-      userId:inputs.userId,
-      password:inputs.password,
-      userName:inputs.userName,
-      email:inputs.email,
-      authCode:inputs.authCode,
-      sbbAgreement:agree.sbbAgreement.check,
-      infoAgreement:agree.infoAgreement.check}
+      userId: inputs.userId,
+      password: inputs.password,
+      userName: inputs.userName,
+      email: inputs.email,
+      authCode: inputs.authCode,
+      sbbAgreement: agree.sbbAgreement.check,
+      infoAgreement: agree.infoAgreement.check
+    }
     const response = await JoinApi(body);
     const result = response.code !== 200;
     if (result) {
@@ -322,17 +247,17 @@ function Join(props) {
         const hasField = data.field === "email" || data.field === "authCode";
         if (hasField) {
           setAuth({...auth, success: false});
-          changeError("email", data.message, true);
-          changeError("authCode", data.message, true);
+          ChangeError(setErrors, "email", data.message, true);
+          ChangeError(setErrors, "authCode", data.message, true);
         } else {
-          changeError(data.field, data.message, true);
+          ChangeError(setErrors, data.field, data.message, true);
         }
       });
       toast.dismiss(loading);
     } else {
       toast.dismiss(loading);
       toast.success("회원가입이 완료되었습니다.");
-      props.setModalVisible(false);
+      props.closeModal();
     }
 
     variable.current.isDoubleClick = false;
@@ -345,103 +270,33 @@ function Join(props) {
               `msg.join.sky.signup`)}</h5>
           <form>
             <div className="form-group">
-              <div className={"input-group form-join form-id "
-                  + (errors.userId.error ? 'error' : 'on')}>
-                <input name="userId" id="userId" type="text" placeholder={t(`msg.common.sky.id`)}
-                       className={"form-control " + (errors.userId.error
-                           ? 'border-danger' : '')} onKeyUp={onKeyUp}/>
-              </div>
-              <div className="form-text text-danger">
-                <small id="id-NotThyme-msg">{errors.userId.error
-                    ? errors.userId.message : ''}</small>
-              </div>
+              <Input name="userId" placeholder={t(`msg.common.sky.id`)} type="text"
+                     error={errors.userId.error} message={errors.userId.message}
+                     iconClass="form-id" onKeyUp={onKeyUp} t={t}/>
             </div>
             <div className="form-group">
-              <div className={"input-group form-join form-pw "
-                  + (errors.password.error ? 'error' : 'on')}>
-                <input type="password" name="password" id="password"
+              <PwInput handleShowPwChecked={handleShowPwChecked} name="password"
+                       error={errors.password.error}
+                       message={errors.password.message}
+                       isShowPwChecked={isShowPwChecked} onKeyUp={onKeyUp}
+                       passwordRef={passwordRef}
                        placeholder={t(`msg.common.sky.pw`)}
-                       className={"form-control " + (errors.password.error
-                           ? 'border-danger' : '')}
-                       onKeyUp={onKeyUp} ref={passwordRef}/>
-                <div className="password-info">
-                  <em className={"how-secure " + secureLevel.secLevelClass}
-                      name="secureLevel"
-                      id="secureLevel">{secureLevel.secLevelStr}</em>
-                  <button type="button" id="btn-show"
-                          className={"btn-show hide " + (isShowPwChecked ? 'on'
-                              : '')} onClick={handleShowPwChecked}>
-                    <span className="blind"></span>
-                  </button>
-                </div>
-              </div>
-              <div className="form-text text-danger">
-                <small id="password-NotThyme-msg"> {errors.password.error
-                    ? errors.password.message : ''}</small>
-              </div>
+                       secLevelStr={secureLevel.secLevelStr}
+                       secLevelClass={secureLevel.secLevelClass}/>
             </div>
             <div className="form-group">
-              <div className={"input-group form-join form-name "
-                  + (errors.userName.error ? 'error' : 'on')}>
-                <input className={"form-control " + (errors.userName.error
-                    ? 'border-danger' : '')}
-                       name="userName" id="userName"
-                       placeholder={t(`msg.common.sky.userName`)}
-                       onKeyUp={onKeyUp}/>
-              </div>
-              <div className="form-text text-danger">
-                <small id="userName-NotThyme-msg"> {errors.userName.error
-                    ? errors.userName.message : ''}</small>
-              </div>
+              <Input name="userName" placeholder={t(`msg.common.sky.userName`)} type="text"
+                     error={errors.userName.error}
+                     message={errors.userName.message} iconClass="form-name"
+                     onKeyUp={onKeyUp} t={t}/>
             </div>
             <div className="form-group">
-              <div className={"input-group form-join form-email "
-                  + (errors.email.error ? 'error' : 'on')}>
-                <input className={"form-control " + (errors.email.error
-                    ? 'border-danger' : '')}
-                       name="email" id="email"
-                       disabled={auth.success}
-                       placeholder={t(`msg.common.sky.email`)}
-                       onKeyUp={onKeyUp} ref={emailRef}/>
-                <div className="input-group-append">
-                  <button type="button" onClick={clickBtnSendCode}
-                          className="btn btn-primary authCode"
-                          disabled={auth.success}
-                          id="sendCodeButton">인증번호 전송
-                  </button>
-                </div>
-              </div>
-              <div className="form-text text-danger">
-                <small id="email-NotThyme-msg">{errors.email.error
-                    ? errors.email.message : ''}</small>
-              </div>
+              {EmailInput(errors, auth, t, onKeyUp, emailRef, clickBtnSendCode)}
             </div>
             <div className="form-group">
-              <div className={"input-group form-join form-auth "
-                  + (errors.authCode.error ? 'error' : auth.success ? ''
-                      : 'on')}>
-                <input type="text" className={"form-control authCode "
-                    + (errors.authCode.error ? 'border-danger' : '')}
-                       name="authCode" id="authCode"
-                       placeholder={t(`msg.common.sky.auth`)}
-                       disabled={auth.success}
-                       onKeyUp={onKeyUp}/>
-                <div className="input-group-append">
-                  <button type="button" onClick={authCodeCheckBtn}
-                          className="btn btn-primary authCode"
-                          disabled={auth.success}
-                          id="verifyCodeButton">인증번호 확인
-                  </button>
-                </div>
-              </div>
-              <small id="verification-msg"
-                     className={errors.authCode.error ? 'text-danger'
-                         : ''}>{errors.authCode.message}</small>
-              <small id="verification-time"
-                     className={countDownTime.error ? 'text-danger'
-                         : ''}>{countDownTime.message}</small>
+              {AuthInput(errors, auth, t, onKeyUp, authCodeCheckBtn,
+                  countDownTime)}
             </div>
-
             <div className="form-group"
                  aria-controls="example-collapse-text"
                  onClick={() => clickShowAgreement("sbbAgreement")}
@@ -453,9 +308,11 @@ function Join(props) {
               <label className="mb-2">
                 <small className="mainColor me-1">{t(
                     `msg.joinAgree.sky.required`)}</small>
-                <span className="form-text ">{t(`msg.common.sky.logo`)+ " " + t(`msg.joinAgree.sky.agree1`)}</span>
+                <span className="form-text ">{t(`msg.common.sky.logo`) + " "
+                    + t(`msg.joinAgree.sky.agree1`)}</span>
                 <div className="form-text text-danger">
-                  <small id="infoAgree-NotThyme-msg">{errors.sbbAgreement.message}</small>
+                  <small
+                      id="infoAgree-NotThyme-msg">{errors.sbbAgreement.message}</small>
                 </div>
               </label>
               <Collapse in={agree.sbbAgreement.open}>
@@ -483,9 +340,10 @@ function Join(props) {
                     `msg.joinAgree.sky.required`)}</small>
                 <span className="form-text">{t(
                     `msg.joinAgree.sky.agree2`)}</span>
-              <div className="form-text text-danger">
-                <small id="infoAgree-NotThyme-msg">{errors.infoAgreement.message}</small>
-              </div>
+                <div className="form-text text-danger">
+                  <small
+                      id="infoAgree-NotThyme-msg">{errors.infoAgreement.message}</small>
+                </div>
               </label>
               <Collapse in={agree.infoAgreement.open}>
                 <div id="example-collapse-text2"
@@ -499,7 +357,6 @@ function Join(props) {
                   해지 신청 이전에 삭제하신 후 탈퇴하시기 바랍니다.
                 </div>
               </Collapse>
-
             </div>
 
             <div className="form-group">
@@ -514,8 +371,12 @@ function Join(props) {
             </div>
             <div className="d-grid gap-2 col-6 mx-auto">
               <button type="button" id="subBtn" onClick={submitHandler}
-                      className="btn btn-primary btn-block btn-dark mt-5">가입하기
+                      className="btn btn-primary btn-block btn-dark mt-3">가입하기
               </button>
+              <button type="button" onClick={() =>{
+                dispatch(modalActions.changeType({type: "LOGIN"}));}
+              } id="cancelBtn" className="btn btn-outline-info mt-1">{t(
+                  `msg.common.sky.cancel`)}</button>
             </div>
           </form>
         </div>

@@ -58,7 +58,7 @@ Reset.prototype._subBtnClickAddEvent = function ($subBtn, ...$elements) {
 
     if (isClicking) {
       $subBtn.type = "submit";
-      $subBtn.click();
+      $subBtn.click();3
       $subBtn.setAttribute("disabled", "disabled");
     }
 
