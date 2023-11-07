@@ -1,5 +1,7 @@
 package sky.Sss.domain.user.dto.help;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -7,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import sky.Sss.domain.email.model.SendType;
 import sky.Sss.domain.user.annotation.JoinValid;
 
 @Getter
@@ -26,12 +29,10 @@ public class UserHelpDto implements Serializable {
 
     private String authCode;
 
+    @NotBlank(message = "{NotBlank.authToken}")
+    private String authToken;
+
     private String helpType;
-
-
-
-    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private LocalDateTime createdDateTime;
 
     public static UserHelpDto createUserHelpDto() {
         UserHelpDto userHelpDto = new UserHelpDto();

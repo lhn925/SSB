@@ -12,19 +12,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserIdHelpRepDto implements Serializable {
-    private String userId;
-    /**
-     * 암호화 되어 있는 이메일
-     */
-    @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
-    private LocalDateTime createdDateTime;
+public class UserIdHelpReqDto implements Serializable {
+    private String email;
+    private String authToken;
 
     @Builder
-    public UserIdHelpRepDto(String userId, LocalDateTime createdDateTime) {
-        this.userId = userId;
-        this.createdDateTime = createdDateTime;
+    public UserIdHelpReqDto(String email, String authToken) {
+        this.email = email;
+        this.authToken = authToken;
     }
-
-
 }
