@@ -16,6 +16,9 @@ public class Email {
     private String subject; // 제목
     private String toMail; // 유저
     public static final Integer TIME_LIMIT = 300;
+    public static final String JOIN_TOKEN_KEY = "703771fa8aac9d498186";
+    public static final String PW_TOKEN_KEY = "ccec46f8f67b1a32e334";
+    public static final String ID_TOKEN_KEY = "635794abd5fa77a0b233";
 
 
     public static Email createJoinEmail(String subject, EmailSendDto emailSendDto) {

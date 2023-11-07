@@ -50,6 +50,7 @@ public class CustomCookie {
     public static void delete(Cookie cookie,  HttpServletResponse response) {
         if (cookie != null) {
             cookie.setMaxAge(0);
+            cookie.setPath("/");
             response.addCookie(cookie);
         }
     }
