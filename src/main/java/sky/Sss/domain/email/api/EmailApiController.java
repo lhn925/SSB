@@ -83,14 +83,14 @@ public class EmailApiController {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
 
-        return sendEmail(SendType.JOIN, emailSendDto, request);
+        return sendAuthEmail(SendType.JOIN, emailSendDto, request);
     }
 
 
     /**
      * id:emailApi_2
      * <p>
-     * 회원가입 이메일 인증 번호 유효 체크
+     * 이메일 인증 번호 유효 체크
      *
      * @param authCode
      * @param bindingResult
@@ -121,8 +121,10 @@ public class EmailApiController {
             return getErrorResultResponseEntity(bindingResult, "join.code.timeOut", request);
         }
 
-        if ( !(emailAuthCodeDto.getAuthToken().equals(authCode.getAuthToken()))
-            ||!(authCode.getAuthCode().equals(emailAuthCodeDto.getCode()))) { // 인증 코드 체크
+        String hashingToken = getHashing(authCode);
+
+        if (!(emailAuthCodeDto.getAuthToken().equals(hashingToken))
+            || !(authCode.getAuthCode().equals(emailAuthCodeDto.getCode()))) { // 인증 코드 체크
             return getErrorResultResponseEntity(bindingResult, "join.code.mismatch", request);
         }
 
@@ -133,12 +135,6 @@ public class EmailApiController {
         return new ResponseEntity(emailAuthCodeDto, HttpStatus.OK);
     }
 
-    private ResponseEntity<ErrorResult> getErrorResultResponseEntity(BindingResult bindingResult, String errorCode,
-        HttpServletRequest request) {
-        bindingResult.reject(errorCode);
-        return Result.getErrorResult(
-            new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
-    }
 
     /**
      * id:emailApi_3
@@ -157,15 +153,16 @@ public class EmailApiController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         try {
+            HttpSession session = request.getSession(false);
             /**
              * 비밀번호 찾기 시
              */
             if (helpEmailSendDto.getHelpType().equals(HelpType.PW)) {
-
-                HttpSession session = request.getSession();
                 UserHelpDto userHelpDto = (UserHelpDto) session.getAttribute("userHelpDto");
-                if (!userHelpDto.getHelpType().equals(HelpType.PW)
-                    || !userHelpDto.getUserId().equals(helpEmailSendDto.getUserId())) {
+                /**
+                 * 잘못된 접근일 경우 아이디가 다르거나 helpType이 다를 경우
+                 */
+                if (userHelpDto == null || !userHelpDto.getUserId().equals(helpEmailSendDto.getUserId())) {
                     throw new UsernameNotFoundException("code.error");
                 }
                 CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(),
@@ -185,9 +182,10 @@ public class EmailApiController {
             userJoinService.checkEmail(helpEmailSendDto.getEmail(), bindingResult);
         } catch (DuplicateCheckException e) {
             // 등록한 이메일이 있을경우에 이메일 발송
-            return sendEmail(SendType.ID, helpEmailSendDto, request);
+            return sendAuthEmail(helpEmailSendDto.getSendType(), helpEmailSendDto, request);
         } catch (UsernameNotFoundException e) {
-            // 없으면 찾을수 없다고 경고 뜸
+            bindingResult.reject(e.getMessage());
+            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
         // 없으면 찾을수 없다고 경고 뜸
         bindingResult.reject("sky.email.notFind");
@@ -195,13 +193,11 @@ public class EmailApiController {
     }
 
 
-    private ResponseEntity sendEmail(SendType sendType, EmailSendDto emailSendDto,
+    private ResponseEntity sendAuthEmail(SendType sendType, EmailSendDto emailSendDto,
         HttpServletRequest request) {
 
         String subject = "sky.email.subject";
-        String subArgs = setArgs(sendType, request);
-        Email email = Email.createJoinEmail(
-            ms.getMessage(subject, new Object[]{subArgs}, request.getLocale()),
+        Email email = Email.createJoinEmail(ms.getMessage(subject, null, request.getLocale()),
             emailSendDto);
 
         JSONObject msObject = new JSONObject();
@@ -216,10 +212,13 @@ public class EmailApiController {
 
         String code = optCode.orElse(null);
 
-        String authToken = UserTokenUtil.getToken();
+        // authToken 요청 구분을 위해 pw,id,join 각각 키를 만들어 구분
+        String authToken = UserTokenUtil.getToken(); // 유저에게 줄 token
+        String salt = getTokeKey(sendType); // salt
+        String hashingToken = UserTokenUtil.hashing(authToken.getBytes(), salt); // 서버가 가지고 있을 해싱 토큰
         EmailAuthCodeDto emailResponseDto = EmailAuthCodeDto.builder()
             .code(code)
-            .authToken(authToken)
+            .authToken(hashingToken)
             .authTimeLimit(authTime)
             .isSuccess(false)
             .email(emailSendDto.getEmail()).build();
@@ -231,25 +230,41 @@ public class EmailApiController {
             HttpStatus.OK);
     }
 
-    private String setArgs(SendType sendType, HttpServletRequest request) {
-        String subArgs = "";
+    private String getTokeKey(SendType sendType) {
+        String key = "";
         switch (sendType) {
             case JOIN:
-                subArgs = ms.getMessage("sky.signup", null, request.getLocale());
+                key = Email.JOIN_TOKEN_KEY;
                 break;
             case ID:
-                subArgs = ms.getMessage("sky.findId", null, request.getLocale());
+                key = Email.ID_TOKEN_KEY;
                 break;
             case PW:
-                subArgs = ms.getMessage("sky.findPw", null, request.getLocale());
+                key = Email.PW_TOKEN_KEY;
                 break;
-            case EMAIL:
-                subArgs = ms.getMessage("sky.email", null, request.getLocale());
-                break;
-            default:
         }
+        return key;
+    }
 
-        return subArgs;
+    /**
+     * token 구분을 위해 요청한 sendType key와 token결합 후 비교
+     *
+     * @param authCode
+     * @return
+     */
+    private String getHashing(CodeCheckRequestDto authCode) {
+        log.info("authCode.getSendType() = {}", authCode.getSendType());
+        String salt = getTokeKey(authCode.getSendType());
+        String authToken = authCode.getAuthToken();
+        String hashingToken = UserTokenUtil.hashing(authToken.getBytes(), salt);
+        return hashingToken;
+    }
+
+    private ResponseEntity<ErrorResult> getErrorResultResponseEntity(BindingResult bindingResult, String errorCode,
+        HttpServletRequest request) {
+        bindingResult.reject(errorCode);
+        return Result.getErrorResult(
+            new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
     }
 
 }

@@ -118,7 +118,6 @@ public class JoinController {
         userJoinPostDto.setEmail(emailAuthCodeDto.getEmail());
         userJoinService.duplicateCheckJoin(userJoinPostDto, bindingResult);
         userJoinService.join(userJoinPostDto);
-        session.invalidate();
         // 회원가입 성공
         return new ResponseEntity(HttpStatus.OK);
     }

@@ -83,9 +83,11 @@ public class MyInfoController {
     private final UserHelpService userHelpService;
     private final UserLoginStatusService userLoginStatusService;
     private final UserLoginLogService userLoginLogService;
+
     /**
      * id:myInfo_1
      * 유저 마이 페이지로 이동
+     *
      * @return
      */
     @GetMapping
@@ -95,11 +97,12 @@ public class MyInfoController {
 
         // 유저 정보 반환
         UserMyInfoDto userMyInfo = UserMyInfoDto.createUserMyInfo(userInfoDto);
-        return new ResponseEntity(userMyInfo,HttpStatus.OK);
+        return new ResponseEntity(userMyInfo, HttpStatus.OK);
     }
 
     /**
      * id:myInfo_2
+     *
      * @return
      */
     @GetMapping("/pw")
@@ -114,7 +117,7 @@ public class MyInfoController {
         UserPwUpdateFormDto userPwUpdateFormDto = UserPwUpdateFormDto.builder()
             .captchaKey(key)
             .imageName(apiExamCaptchaImage).build();
-        return new ResponseEntity(new Result<>(userPwUpdateFormDto),HttpStatus.OK);
+        return new ResponseEntity(new Result<>(userPwUpdateFormDto), HttpStatus.OK);
     }
 
     /**
@@ -134,7 +137,7 @@ public class MyInfoController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         // 중복체크
-        userMyInfoService.updateUserName(userNameUpdateDto,bindingResult);
+        userMyInfoService.updateUserName(userNameUpdateDto, bindingResult);
         return new ResponseEntity(new Result<>(userNameUpdateDto), HttpStatus.OK);
     }
 
@@ -162,6 +165,7 @@ public class MyInfoController {
     /**
      * id:myInfo_Api_3
      * 프로필 이미지 삭제
+     *
      * @param request
      * @return
      * @throws FileNotFoundException
@@ -174,9 +178,9 @@ public class MyInfoController {
 
 
     /**
-     *
      * 비밀번호 수정
      * id:myInfo_Api_4
+     *
      * @param userPwUpdateFormDto
      * @param bindingResult
      * @param request
@@ -228,7 +232,7 @@ public class MyInfoController {
             deleteImage(userPwUpdateFormDto);
             return ResponseEntity.ok(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            userActivityLogService.save( userDetails.getUsername(), "sky.pw", "sky.log.pw.update",
+            userActivityLogService.save(userDetails.getUsername(), "sky.pw", "sky.log.pw.update",
                 request.getHeader("User-Agent"), ChangeSuccess.FAIL);
             deleteImage(userPwUpdateFormDto);
             throw new IllegalArgumentException(e.getMessage());
@@ -239,21 +243,23 @@ public class MyInfoController {
      * id:myInfo_api_5
      * 비밀번호 변경 후
      * 해당아이디에 접속되어 있는 기기 전부 다 로그아웃
+     *
      * @param request
      * @return
      */
     @PostMapping("/login/status")
     public ResponseEntity updateLoginStatus(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
 
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
-        userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId());
+        userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(), session.getId());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     /**
      * id:myInfo_api_6
      * 해당 기기 원격 로그아웃
+     *
      * @param userLoginStatusUpdateDto
      * @param bindingResult
      * @param request
@@ -265,8 +271,9 @@ public class MyInfoController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
+        String sessionId = request.getSession().getId();
         // 로그인 되어 있는 디바이스 기기 로그아웃
-        userLoginStatusService.logoutDevice(userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON);
+        userLoginStatusService.logoutDevice(userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON, sessionId);
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -274,6 +281,7 @@ public class MyInfoController {
     /**
      * id:myInfo_api_7
      * 해외 로그인 차단 설정 변경
+     *
      * @param userLoginBlockDto
      * @param bindingResult
      * @param request
@@ -294,6 +302,7 @@ public class MyInfoController {
     /**
      * id:myInfo_api_8
      * 로그인 되어 있는 기기 목록 검색 후 전달
+     *
      * @param offset
      * @param size
      * @param request
@@ -304,7 +313,8 @@ public class MyInfoController {
         @RequestParam(name = "size", defaultValue = "2", required = false) Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
 
-        Page<UserLoginListDto> pagingStatusList = userLoginStatusService.getUserLoginStatusList(request.getSession().getId(), Status.ON,
+        Page<UserLoginListDto> pagingStatusList = userLoginStatusService.getUserLoginStatusList(
+            request.getSession().getId(), Status.ON,
             pageRequest);
         return ResponseEntity.ok(new Result<>(pagingStatusList));
     }
@@ -312,9 +322,8 @@ public class MyInfoController {
 
     /**
      * id:myInfo_api_9
-     *
+     * <p>
      * type 과 날짜 에 따라 유저정보 변경 및 유저 로그인 로그 목록 검색 후 목록 전달
-     *
      *
      * @param type
      * @param startDate
@@ -377,10 +386,10 @@ public class MyInfoController {
 
         Page pagingLoginList;
         if (type.equals("userLoginLog")) {
-            pagingLoginList = userLoginLogService.getUserLoginLogList( start, end, pageRequest);
+            pagingLoginList = userLoginLogService.getUserLoginLogList(start, end, pageRequest);
         } else {
             pagingLoginList = userActivityLogService.getUserActivityLogList(ChangeSuccess.SUCCESS,
-                Status.ON, start, end, pageRequest,request.getLocale());
+                Status.ON, start, end, pageRequest, request.getLocale());
         }
         return ResponseEntity.ok(new Result<>(pagingLoginList));
 
