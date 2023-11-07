@@ -1,0 +1,16 @@
+.form-text {
+  margin-top: 2px;
+  font-size: .875em;
+}
+.captcha-img {
+  width: 100%;
+}
+
+.captchaBtn{
+  background-image: url("../image/free-icon-repeating-4709823.png");
+  background-size: 25px 24px;
+  background-position: 6px 8px;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 39px;
+}
