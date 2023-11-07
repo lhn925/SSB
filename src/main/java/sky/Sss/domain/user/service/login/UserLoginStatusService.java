@@ -125,7 +125,7 @@ public class UserLoginStatusService {
      * @param isStatus
      */
     @Transactional
-    public void logoutDevice(String redisToken, Status loginStatus, Status isStatus) {
+    public void logoutDevice(String redisToken, Status loginStatus, Status isStatus,String sessionId) {
 //        해당 세션 정보 가져옴
         User user = userQueryService.findOne();
         List<UserLoginStatus> findStatusList = userLoginStatusRepository.findList(user,
@@ -133,7 +133,7 @@ public class UserLoginStatusService {
             loginStatus.getValue(), isStatus.getValue(), redisToken);
         if (findStatusList.size() > 0) {
             userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), redisToken);
-            removeLoginToken(findStatusList);
+            removeLoginToken(findStatusList,sessionId);
         }
     }
 
@@ -179,11 +179,9 @@ public class UserLoginStatusService {
 
         Optional<UserLoginStatus> findLoginStatus = userLoginStatusRepository.findOne(user, userId,
             refreshToken, Status.ON.getValue(), Status.ON.getValue());
-
         findLoginStatus.ifPresent(userLoginStatus ->
             UserLoginStatus.loginStatusUpdate(userLoginStatus, loginStatus, isStatus)
         );
-
         return findLoginStatus.orElse(null);
     }
 
@@ -208,8 +206,6 @@ public class UserLoginStatusService {
 
         return findLoginStatus.orElse(null);
     }
-
-
     /**
      * redis에서 expire된 session off
      *
@@ -221,15 +217,13 @@ public class UserLoginStatusService {
         Status isStatus) {
         userLoginStatusRepository.updateSession(loginStatus.getValue(), isStatus.getValue(), sessionId);
     }
-
-
     /**
      * 현재 접속하고 있는 세션제외 전부다 로그아웃 및 레디스 삭제
      *
      * @param userId
      */
     @Transactional
-    public void removeAllLoginStatus(String userId) {
+    public void removeAllLoginStatus(String userId,String sessionId) {
         User user = userQueryService.findOne(userId);
 
         // 로그인 되어 있는 기기 검색
@@ -240,34 +234,34 @@ public class UserLoginStatusService {
          * 로그인 기기 로그아웃
          */
         // 로그인 되어 있는기기가 있을 경우
-        logoutStatus(user, userLoginStatusList);
+        logoutStatus(user, userLoginStatusList,sessionId);
     }
-
-
-    private void logoutStatus(User user, List<UserLoginStatus> userLoginStatusList) {
+    private void logoutStatus(User user, List<UserLoginStatus> userLoginStatusList,String sessionId) {
         if (userLoginStatusList.size() != 0) {
-            removeLoginToken(userLoginStatusList);
+            removeLoginToken(userLoginStatusList,sessionId);
             Integer integer = userLoginStatusRepository.updateAll(user, Status.OFF.getValue(),
                 Status.OFF.getValue());
+
+            log.info("integer = {}", integer);
             if (integer <= 0) {
                 throw new IllegalStateException();
             }
         }
     }
-
     /**
      * 레디스 세션 삭제
      *
      * @param userLoginStatusList
      */
-    private void removeLoginToken(List<UserLoginStatus> userLoginStatusList) {
+    private void removeLoginToken(List<UserLoginStatus> userLoginStatusList,String sessionId) {
         for (UserLoginStatus userLoginStatus : userLoginStatusList) {
             // 레디스 토큰 값 삭제
-            if (redisService.hasRedis(RedisKeyDto.REDIS_LOGIN_KEY + userLoginStatus.getRedisToken())) {
-                redisService.delete(RedisKeyDto.REDIS_LOGIN_KEY + userLoginStatus.getRedisToken());
+            if (redisService.hasRedis(userLoginStatus.getRedisToken())) {
+                redisService.delete(userLoginStatus.getRedisToken());
             }
             // 세션 삭제
-            if (redisService.hasRedis(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId())) {
+            // 현재 접속하고 있는 세션 제외
+            if (!userLoginStatus.getSessionId().equals(sessionId) && redisService.hasRedis(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId())) {
                 redisService.delete(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId());
             }
 
