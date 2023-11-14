@@ -34,8 +34,8 @@
       "sky.prevBtn": "이전",
       "sky.cancel": "취소",
       "sky.check": "확인",
-      "sky.home": "home",
-      "sky.feed": "feed",
+      "sky.home": "Home",
+      "sky.feed": "Feed",
       "sky.upload": "Upload",
       "sky.library": "Library",
       "sky.changeBtn": "변경",
@@ -43,7 +43,11 @@
       "sky.pwReset": "비밀번호 재설정",
       "sky.newPw": "새 비밀번호",
       "sky.newPwChk": "새 비밀번호 확인",
-      "sky.captcha": "보안 코드"
+      "sky.captcha": "보안 코드",
+      "login.progress": "로그인 중...",
+      "logout.progress": "로그아웃 중...",
+      "login.success": "로그인 되었습니다.",
+      "logout.success": "로그아웃 되었습니다."
     },
     "help": {
       "sky.idHelp": "아이디 찾기",

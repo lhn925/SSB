@@ -9,12 +9,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.dto.myInfo.UserLoginListDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.login.UserLoginStatus;
+import sky.Sss.domain.user.exception.LoginFailException;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.repository.login.UserLoginStatusRepository;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -125,7 +127,7 @@ public class UserLoginStatusService {
      * @param isStatus
      */
     @Transactional
-    public void logoutDevice(String redisToken, Status loginStatus, Status isStatus,String sessionId) {
+    public void logoutDevice(String redisToken, Status loginStatus, Status isStatus, String sessionId) {
 //        해당 세션 정보 가져옴
         User user = userQueryService.findOne();
         List<UserLoginStatus> findStatusList = userLoginStatusRepository.findList(user,
@@ -133,7 +135,7 @@ public class UserLoginStatusService {
             loginStatus.getValue(), isStatus.getValue(), redisToken);
         if (findStatusList.size() > 0) {
             userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), redisToken);
-            removeLoginToken(findStatusList,sessionId);
+            removeLoginToken(findStatusList, sessionId);
         }
     }
 
@@ -206,6 +208,23 @@ public class UserLoginStatusService {
 
         return findLoginStatus.orElse(null);
     }
+
+    /**
+     * webSocket ID update
+     *
+     * @param userId
+     * @param redisToken
+     */
+    @Transactional
+    public void wsIdUpdate(String userId, String redisToken, String wsId) {
+        User user = userQueryService.findOne(userId);
+        Integer result = userLoginStatusRepository.wsUpdate(user, wsId,RedisKeyDto.REDIS_LOGIN_KEY + redisToken);
+        log.info("result = {}", result);
+        if (result == 0) {
+            throw new MessageDeliveryException("JWT");
+        }
+    }
+
     /**
      * redis에서 expire된 session off
      *
@@ -217,13 +236,14 @@ public class UserLoginStatusService {
         Status isStatus) {
         userLoginStatusRepository.updateSession(loginStatus.getValue(), isStatus.getValue(), sessionId);
     }
+
     /**
      * 현재 접속하고 있는 세션제외 전부다 로그아웃 및 레디스 삭제
      *
      * @param userId
      */
     @Transactional
-    public void removeAllLoginStatus(String userId,String sessionId) {
+    public void removeAllLoginStatus(String userId, String sessionId) {
         User user = userQueryService.findOne(userId);
 
         // 로그인 되어 있는 기기 검색
@@ -234,11 +254,12 @@ public class UserLoginStatusService {
          * 로그인 기기 로그아웃
          */
         // 로그인 되어 있는기기가 있을 경우
-        logoutStatus(user, userLoginStatusList,sessionId);
+        logoutStatus(user, userLoginStatusList, sessionId);
     }
-    private void logoutStatus(User user, List<UserLoginStatus> userLoginStatusList,String sessionId) {
+
+    private void logoutStatus(User user, List<UserLoginStatus> userLoginStatusList, String sessionId) {
         if (userLoginStatusList.size() != 0) {
-            removeLoginToken(userLoginStatusList,sessionId);
+            removeLoginToken(userLoginStatusList, sessionId);
             Integer integer = userLoginStatusRepository.updateAll(user, Status.OFF.getValue(),
                 Status.OFF.getValue());
 
@@ -248,12 +269,13 @@ public class UserLoginStatusService {
             }
         }
     }
+
     /**
      * 레디스 세션 삭제
      *
      * @param userLoginStatusList
      */
-    private void removeLoginToken(List<UserLoginStatus> userLoginStatusList,String sessionId) {
+    private void removeLoginToken(List<UserLoginStatus> userLoginStatusList, String sessionId) {
         for (UserLoginStatus userLoginStatus : userLoginStatusList) {
             // 레디스 토큰 값 삭제
             if (redisService.hasRedis(userLoginStatus.getRedisToken())) {
@@ -261,7 +283,8 @@ public class UserLoginStatusService {
             }
             // 세션 삭제
             // 현재 접속하고 있는 세션 제외
-            if (!userLoginStatus.getSessionId().equals(sessionId) && redisService.hasRedis(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId())) {
+            if (!userLoginStatus.getSessionId().equals(sessionId) && redisService.hasRedis(
+                RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId())) {
                 redisService.delete(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId());
             }
 

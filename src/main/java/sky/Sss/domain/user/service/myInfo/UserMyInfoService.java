@@ -29,7 +29,7 @@ import sky.Sss.global.file.dto.UploadFileDto;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserProfileService {
+public class UserMyInfoService {
 
     private final Long MONTHS = 1L;
     private final UserJoinService userJoinService;

@@ -20,7 +20,7 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
     @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus = :isStatus")
     Optional<UserLoginStatus> findOne(@Param("uid") User user, @Param("userId") String userId,
-        @Param("refreshToken") String redisToken,@Param("loginStatus") Boolean loginStatus,@Param("isStatus") Boolean isStatus);
+        @Param("refreshToken") String refreshToken,@Param("loginStatus") Boolean loginStatus,@Param("isStatus") Boolean isStatus);
 
     @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.redisToken = :redisToken and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus = :isStatus")
     Optional<UserLoginStatus> findOne(@Param("uid") User user, @Param("userId") String userId,
@@ -62,6 +62,12 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
             + "u.uid = :uid and u.sessionId = :sessionId")
     Integer update(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus, @Param("sessionId") String sessionId);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value =
+        "update UserLoginStatus u set u.wsId = :wsId where "
+            + " u.uid = :uid and u.redisToken = :redisToken")
+    Integer wsUpdate(@Param("uid") User user, @Param("wsId") String wsId, @Param("redisToken") String redisToke);
 
     @Modifying(clearAutomatically = true)
     @Query(value =

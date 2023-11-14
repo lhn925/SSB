@@ -44,8 +44,8 @@ public class TokenProvider implements InitializingBean {
 
 
     private final RedisService redisService;
-    private static final String AUTHORITIES_KEY = "auth";
-    private static final String REDIS_TOKEN_KEY = "redis";
+    public static final String AUTHORITIES_KEY = "auth";
+    public static final String REDIS_TOKEN_KEY = "redis";
     private final String accessSecret;
     private final String refreshSecret;
     private final UserLoginStatusService userLoginStatusService;
