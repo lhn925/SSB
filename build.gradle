@@ -47,6 +47,9 @@ dependencies {
     implementation 'com.github.downgoon:marvin:1.5.5'
     implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
 
+    // 웹소켓
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     compileOnly('org.springframework.boot:spring-boot-devtools')
 
     //email
@@ -76,6 +79,9 @@ dependencies {
     implementation 'org.springframework.session:spring-session-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    implementation 'org.webjars:webjars-locator-core'
+    implementation 'org.webjars:sockjs-client:1.5.1'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
 
 
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
@@ -83,9 +89,6 @@ dependencies {
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-
-
 }
 
 // Querydsl 설정부
