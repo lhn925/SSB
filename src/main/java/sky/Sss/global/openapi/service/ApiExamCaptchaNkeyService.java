@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sky.Sss.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.Sss.global.file.utili.FileStore;
-import sky.Sss.global.openapi.entity.OpenApi;
+import sky.Sss.global.openapi.entity.CaptchaOpenApi;
 
 /**
  * 네이버 API 로그인 2차 보안키 발급 및 인증 서비스
@@ -34,7 +34,7 @@ import sky.Sss.global.openapi.entity.OpenApi;
 @Slf4j
 public class ApiExamCaptchaNkeyService {
 
-    private final OpenApi openApi;
+    private final CaptchaOpenApi captchaOpenApi;
     private final FileStore fileStore;
 
     // 키 발급시 0,  캡차 이미지 비교시 1로 세팅
@@ -186,8 +186,8 @@ public class ApiExamCaptchaNkeyService {
 
     private Map<String, String> getRequestHeaders() {
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("X-Naver-Client-Id", openApi.getClientId());
-        requestHeaders.put("X-Naver-Client-Secret", openApi.getClientSecret());
+        requestHeaders.put("X-Naver-Client-Id", captchaOpenApi.getClientId());
+        requestHeaders.put("X-Naver-Client-Secret", captchaOpenApi.getClientSecret());
         return requestHeaders;
     }
 }

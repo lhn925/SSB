@@ -42,7 +42,6 @@ public class WebSocketEventListener {
         if(sessionId != null) {
             browserSessionMap.remove(headerAccessor.getSessionId());
         }
-        headerAccessor.setNativeHeader("authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW0yMjIiLCJpYXQiOjE2OTk5NDEzNzMsImF1dGgiOiJST0xFX1VTRVIiLCJyZWRpcyI6IjExNmFiMzI0MWI5ZTY1MTg3OTEyIiwiZXhwIjoxNjk5OTQ0OTczfQ.CgTcLKjxqDyCjQSwyeLHJKbtGd6L3z2q53k4-jJlO5vzOQ6l2riCuPVxFhAWE6eTiH9Vp_sBAaIwzqmycUckSA");
         log.info("Web socket session closed. Message : [{}]", event.getMessage());
     }
 

@@ -27,11 +27,6 @@ import sky.Sss.global.file.utili.FileStore;
 public class FileApiController {
     private final UserMyInfoService userMyInfoService;
     private final UserQueryService userQueryService;
-
-
-
-
-
     /**
      * id:user_file_Api_1
      * <p>
