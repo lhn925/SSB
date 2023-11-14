@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.model.Status;
+import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.base.login.DefaultLoginLog;
@@ -43,11 +44,11 @@ public class UserLoginStatus extends BaseTimeEntity {
     private String redisToken;
 
 
-    //사용자에게 부여한 Jwt redisToken 값
     @Column(nullable = false)
     private String refreshToken;
 
-    //사용자에게 부여한 Jwt redisToken 값
+    private String wsId;
+
     @Column(nullable = false)
     private String sessionId;
 
@@ -126,4 +127,7 @@ public class UserLoginStatus extends BaseTimeEntity {
         userLoginStatus.getDefaultLoginLog().changeIsStatus(loginStatus.getValue());
     }
 
+    public static void wsIdUpdate(UserLoginStatus userLoginStatus, String wsId) {
+        userLoginStatus.setWsId(wsId);
+    }
 }
