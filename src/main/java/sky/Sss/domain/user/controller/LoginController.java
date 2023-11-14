@@ -70,6 +70,7 @@ public class LoginController {
             log.info("로그인 실패");
             throw new LoginFailException("login.error");
         }
+
         String userAgent = request.getHeader("User-Agent");
         String captchaKey = userLoginFormDto.getCaptchaKey();
         HttpSession session = request.getSession();

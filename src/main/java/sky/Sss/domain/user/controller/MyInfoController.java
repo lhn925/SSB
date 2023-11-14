@@ -31,17 +31,18 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.WebSocketSession;
+import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginListDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginStatusUpdateDto;
-import sky.Sss.domain.user.dto.myInfo.UserProfileDto;
+import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserNameUpdateDto;
 import sky.Sss.domain.user.dto.myInfo.UserPictureUpdateDto;
 import sky.Sss.domain.user.dto.myInfo.UserPwUpdateFormDto;
@@ -54,7 +55,7 @@ import sky.Sss.domain.user.service.help.UserHelpService;
 import sky.Sss.domain.user.service.log.UserActivityLogService;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
-import sky.Sss.domain.user.service.myInfo.UserProfileService;
+import sky.Sss.domain.user.service.myInfo.UserMyInfoService;
 import sky.Sss.domain.user.utili.PwChecker;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.Result;
@@ -65,12 +66,13 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/profile")
-public class ProfileController {
+@RequestMapping("/user/myInfo")
+@UserAuthorize
+public class MyInfoController {
     private final UserQueryService userQueryService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final MessageSource ms;
-    private final UserProfileService userProfileService;
+    private final UserMyInfoService userMyInfoService;
     private final UserActivityLogService userActivityLogService;
     private final UserHelpService userHelpService;
     private final UserLoginStatusService userLoginStatusService;
@@ -82,14 +84,12 @@ public class ProfileController {
      *
      * @return
      */
-    @GetMapping("/{userId}")
-    public ResponseEntity userProfileForm(@PathVariable String userId) {
-
+    @GetMapping
+    public ResponseEntity userProfileForm() {
         // 유저 정보 조회
         UserInfoDto userInfoDto = userQueryService.getUserInfoDto();
-
         // 유저 정보 반환
-        UserProfileDto userMyInfo = UserProfileDto.createUseProfileDto(userInfoDto);
+        UserMyInfoDto userMyInfo = UserMyInfoDto.createUseProfileDto(userInfoDto);
         return new ResponseEntity(userMyInfo, HttpStatus.OK);
     }
 
@@ -130,7 +130,7 @@ public class ProfileController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         // 중복체크
-        userProfileService.updateUserName(userNameUpdateDto, bindingResult);
+        userMyInfoService.updateUserName(userNameUpdateDto, bindingResult);
         return new ResponseEntity(new Result<>(userNameUpdateDto), HttpStatus.OK);
     }
 
@@ -151,7 +151,7 @@ public class ProfileController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         UploadFileDto uploadFileDto = null;
-        uploadFileDto = userProfileService.updatePicture(file.getFile());
+        uploadFileDto = userMyInfoService.updatePicture(file.getFile());
         return new ResponseEntity(new Result<>(uploadFileDto), HttpStatus.OK);
     }
 
@@ -164,7 +164,7 @@ public class ProfileController {
      */
     @DeleteMapping("/picture")
     public ResponseEntity deleteUserProfilePicture() throws FileNotFoundException {
-        userProfileService.deletePicture();
+        userMyInfoService.deletePicture();
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -286,7 +286,7 @@ public class ProfileController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-        userProfileService.updateLoginBlocked(userLoginBlockDto);
+        userMyInfoService.updateLoginBlocked(userLoginBlockDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

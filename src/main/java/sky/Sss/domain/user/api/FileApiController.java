@@ -1,6 +1,5 @@
 package sky.Sss.domain.user.api;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,7 +23,7 @@ import sky.Sss.global.file.utili.FileStore;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user/file/api")
+@RequestMapping("/user/file")
 public class FileApiController {
     private final UserMyInfoService userMyInfoService;
     private final UserQueryService userQueryService;

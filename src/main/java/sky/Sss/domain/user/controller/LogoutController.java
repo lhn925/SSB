@@ -38,13 +38,15 @@ public class LogoutController {
             String refreshToken = tokenProvider.resolveToken(request.getHeader(JwtFilter.REFRESH_AUTHORIZATION_HEADER));
 
             logoutService.logout(accessToken, refreshToken);
+
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
         } catch (AuthenticationException e) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
+
         return new ResponseEntity(HttpStatus.OK);
     }
 
