@@ -1,5 +1,5 @@
 import axios from "axios";
-import {authActions} from "../../../store/auth/authReducers";
+import {authActions} from "store/auth/authReducers";
 import {toast} from "react-toastify";
 
 function LoginApi(body){

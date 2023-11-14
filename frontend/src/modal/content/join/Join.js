@@ -257,7 +257,7 @@ function Join(props) {
     } else {
       toast.dismiss(loading);
       toast.success("회원가입이 완료되었습니다.");
-      props.closeModal();
+      dispatch(modalActions.changeType({type: "LOGIN"}));
     }
 
     variable.current.isDoubleClick = false;

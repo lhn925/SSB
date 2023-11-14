@@ -1,12 +1,11 @@
-import "modal/css/Login/login.css"
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useDispatch} from "react-redux";
 import {toast} from "react-toastify";
+import "modal/css/Login/login.css"
 import {authActions} from "store/auth/authReducers";
 import {useNavigate} from "react-router";
 import LoginApi from "utill/api/LoginApi/LoginApi";
-import {Link} from "react-router-dom";
 import {modalActions} from "store/modalType/modalType";
 import {helpActions} from "store/helpType/helpType";
 import Captcha from "components/captcha/Captcha";
@@ -25,7 +24,6 @@ function Login(props) {
   const variable = useRef({
     isDoubleClick: false // 더블 클릭 방지
   })
-
   const navigate = useNavigate();
   const Submit = async () => {
     let rmUserId = userId.split(" ").join("");
@@ -68,10 +66,14 @@ function Login(props) {
       dispatch(authActions.setAccessHeader());
       toast.dismiss(loading);
       toast.success("로그인 성공 했습니다.");
+      props.bc.postMessage({type: "login"})
       props.closeModal();
       navigate("/");
+
     }).catch(error => {
       let message;
+      console.log(error)
+      toast.dismiss(loading);
       if (error.response.status == 401) {
         message = error.response.data.message;
         setCaptchaKey(error.response.data.captchaKey);
@@ -83,7 +85,6 @@ function Login(props) {
         message = t(`errorMsg.server`);
       }
       setCaptcha('');
-      toast.dismiss(loading);
       toast.error(message)
       setErrorMsg(message);
     }).finally(() => {

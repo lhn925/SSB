@@ -6,56 +6,98 @@ import "css/bootstrap/bootstrap.min.css"
 import "css/base.css"
 import {Route, Routes, useLocation, useNavigate} from "react-router";
 import {ToastContainer} from "react-toastify";
-import {useEffect} from "react";
+import {lazy, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import UserInfoApi from "utill/api/userInfo/UserInfoApi";
 import ReNewTokenApi from "utill/api/ReNewToken/ReNewTokenApi";
 import {userActions} from "store/userInfo/userReducers";
 import {authActions} from "store/auth/authReducers";
 import {persistor} from "store/store";
+import {Profile} from "content/profile/Profile";
+import Stomp from 'stompjs';
+import SockJS from 'sockjs-client';
+import * as StompJs from "@stomp/stompjs";
+
+// const Feed = lazy(() => import('./routes/Feed'));
+// const Home = lazy(() => import('./routes/home'));
+// const UserId = lazy(() => import('./routes/userId'));
 
 function App() {
-
-  const auth = useSelector((state) => state.authReducer);
+  const currentAuth = useSelector((state) => state?.authReducer);
   const dispatch = useDispatch();
+  const bc = new BroadcastChannel(`my_chanel`);
   const location = useLocation();
+  const client = useRef({client:null});
 
-  async function CheckUserInfo(accessToken, accessHeader) {
-    if (accessToken != null) { // accessToken 확인
-      const response = await UserInfoApi(accessHeader);
-      if (response.code == 200) {
-        dispatch(userActions.setUserId(response.data));
-        dispatch(userActions.setEmail(response.data));
-        dispatch(userActions.setPictureUrl(response.data));
-        dispatch(userActions.setUserName(response.data));
-      } else {
-        if (response.code == 401 && auth.refresh != null) {
-          const response = await ReNewTokenApi(auth.refreshHeader);
-          if (response.code == 200) {
-            const token = response.data.accessToken;
-            const header = {Authorization: token}
-            dispatch(authActions.setAccess(response.data));
+  function connect(accessToken) {
+    const clientData = new StompJs.Client({
+      brokerURL: "ws://localhost:8080/webSocket",
+      connectHeaders: {
+        Authorization: accessToken,
+      }, debug: function (message) {
+      },
+      // reconnectDelay: 5000, // 자동 재 연결
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    })
+    clientData.onConnect = function () {
+      clientData.subscribe("/user/queue/alarm", function (message) {
+        console.log(message.body);
+      });
+    };
+    clientData.activate();
+    client.current.client = clientData;
+  }
+  bc.onmessage = function (e) {
+    let data = e.data;
+    if (data.type === "logout") {
+      window.location.replace("/")
+    } else {
+      window.location.replace(location.pathname);
+    }
+  }
+  async function CheckUserInfo(aucessToken, refreshToken, accessHeader,
+      refreshHeader) {
+    try {
+      if (aucessToken) {
+        const response = await UserInfoApi(accessHeader);
+        if (response.code === 200) {
+          const userData = response.data;
+          dispatch(userActions.setUserId(userData));
+          dispatch(userActions.setEmail(userData));
+          dispatch(userActions.setPictureUrl(userData));
+          dispatch(userActions.setUserName(userData));
+          connect(aucessToken);
+          return;
+        } else if (response.code === 401 && refreshToken) {
+          const renewTokenResponse = await ReNewTokenApi(refreshHeader);
+          if (renewTokenResponse.code === 200) {
+            const newAccessToken = renewTokenResponse.data;
+            dispatch(authActions.setAccess(newAccessToken));
             dispatch(authActions.setAccessHeader());
-            CheckUserInfo(token, header);// 다시 한번 호출
-          } else {
-            persistor.purge();
+            // Recursive call to CheckUserInfo after token renewal
+            await CheckUserInfo(newAccessToken, refreshToken, accessHeader,
+                refreshHeader, dispatch);
+            return;
           }
-        } else {
-          persistor.purge();
         }
       }
+      throw new Error();
+    } catch (error) {
+      if (client.current.client) {
+        client.current.client.deactivate();
+      }
+      persistor.purge();
     }
-
   }
 
   useEffect(() => {
-    CheckUserInfo(auth.access, auth.accessHeader);
-  }, [location]) // 페이지 이동 시 유저정보 확인
-
+    CheckUserInfo(currentAuth.access, currentAuth.refresh,
+        currentAuth.accessHeader, currentAuth.refreshHeader);
+  }, [currentAuth]) // 페이지 이동 시 유저정보 확인
   return (
       <div className="App">
-        <Header/>
-
+        <Header bc={bc}/>
         <ToastContainer
             position="top-right"
             autoClose={3000}
@@ -68,14 +110,17 @@ function App() {
             pauseOnHover
             theme="light"
         />
-        <div className="container">
+        <div className="l-container">
           <Routes>
             <Route path="/">
             </Route>
             <Route path="/feed">
             </Route>
+            <Route path="/:userId" element={<Profile/>}>
+            </Route>
           </Routes>
         </div>
+
       </div>
   );
 }

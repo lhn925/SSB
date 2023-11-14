@@ -1,9 +1,35 @@
 * {
   box-sizing: border-box;
 }
-.container {
+.content {
   display: grid;
+  grid-template-columns: repeat(3,1fr);
+  grid-template-areas:
+      'a a a'
+      'b b b'
+      'd d c'
 }
+
+.profileHeader {
+  padding: 30px;
+  height: 260px;
+  grid-area: a;
+}
+.vertical-bar {
+  grid-area: b;
+}
+.userInfoBar {
+  position: relative;
+  padding-top: 15px;
+}
+.l-fluid-fixed {
+  grid-area: d;
+  position: relative;
+}
+.l-sidebar-right {
+  grid-area: c;
+}
+
 body {
   width: 100vw;
   height: 100vh;
@@ -34,7 +60,7 @@ body {
     padding: 0 20px
   }
 
-  .sc-classic .l-container.l-fullwidth {
+  .sc-classic  .l-container.l-fullwidth {
     width: 960px
   }
 
