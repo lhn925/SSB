@@ -9,7 +9,7 @@ import {
 } from "utill/function";
 import IdQuery from "modal/content/help/IdQuery";
 
-function Content(props) {
+function ModalContent(props) {
   const RegexCheck = (name, input_value, setErrors, t) => {
     let isRegex = !Regex(name, input_value);
     let message = Regex ? t(`msg.userJoinForm.` + name) : '';

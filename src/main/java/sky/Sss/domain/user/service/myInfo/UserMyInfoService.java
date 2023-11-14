@@ -1,11 +1,8 @@
 package sky.Sss.domain.user.service.myInfo;
 
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.BindException;
 import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
@@ -28,13 +24,12 @@ import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.join.UserJoinService;
 import sky.Sss.global.file.utili.FileStore;
 import sky.Sss.global.file.dto.UploadFileDto;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserMyInfoService {
+public class UserProfileService {
 
     private final Long MONTHS = 1L;
     private final UserJoinService userJoinService;
