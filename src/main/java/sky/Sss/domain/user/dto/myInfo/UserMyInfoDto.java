@@ -2,9 +2,7 @@ package sky.Sss.domain.user.dto.myInfo;
 
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,30 +22,29 @@ public class UserMyInfoDto implements Serializable {
     private String userName;
     private String pictureUrl;
     private Boolean isLoginBlocked;
-    private Boolean isMyProfile;
     private Boolean isAdmin;
 
 
     @Builder
-    public UserProfileDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
-        Boolean isMyProfile, Boolean isAdmin) {
+    public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked, Boolean isAdmin) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
         this.pictureUrl = pictureUrl;
         this.isLoginBlocked = isLoginBlocked;
-        this.isMyProfile = isMyProfile;
         this.isAdmin = isAdmin;
     }
 
-    public static UserProfileDto createUseProfileDto(UserInfoDto userInfoDto) {
-        return UserProfileDto.builder()
+    public static UserMyInfoDto createUseProfileDto(UserInfoDto userInfoDto) {
+        Optional<Boolean> isAdmin = userInfoDto.getGrantedAuthority().stream()
+            .map(auth -> auth.getAuthority().equals(UserGrade.ADMIN)).findFirst();
+        return UserMyInfoDto.builder()
             .userId(userInfoDto.getUserId())
             .email(userInfoDto.getEmail())
             .pictureUrl(userInfoDto.getPictureUrl())
             .isLoginBlocked(userInfoDto.getIsLoginBlocked().getValue())
             .userName(userInfoDto.getUserName())
-            .isMyProfile(userInfoDto.getIsMyProfile()).build();
+            .isAdmin(isAdmin.orElse(false)).build();
     }
 
 

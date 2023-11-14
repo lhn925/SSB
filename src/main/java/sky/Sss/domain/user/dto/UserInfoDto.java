@@ -28,7 +28,7 @@ public class UserInfoDto implements Serializable {
     private Enabled enabled;
     private Blocked isLoginBlocked;
     private LocalDateTime userNameModifiedDate;
-
+    private Boolean isMyProfile;
     private List<GrantedAuthority> grantedAuthority;
 
     @Builder
@@ -65,7 +65,6 @@ public class UserInfoDto implements Serializable {
     public static UserInfoDto createUserInfo(User user) {
         UserDetails userDetails = User.UserBuilder(user);
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
-
         return userInfo;
     }
 
