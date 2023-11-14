@@ -1,14 +1,16 @@
 package sky.Sss.domain.user.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class Greeting {
-    private String content;
-
-    public Greeting(String content) {
-        this.content = content;
-    }
+@Getter
+@Setter
+@AllArgsConstructor
+public class BrowserSession {
+    private String sessionId;
+    private String userId;
+    private String uuid;
 }

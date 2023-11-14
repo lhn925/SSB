@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class HelloMessage {
+public class LoginWebSocketDto {
     private String userId;
     private String sessionId;
     private String name;
