@@ -49,11 +49,16 @@ public class User extends BaseTimeEntity {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String token;
 
+    @Column(nullable = false)
     private String userId;
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
     private String userName;
+    @Column(nullable = false)
     private String email;
 
     // 프로필 사진
@@ -67,16 +72,21 @@ public class User extends BaseTimeEntity {
     private UserGrade grade;
 
     // 비밀번호 보안 등급
+//    @Column(nullable = false)
     @Enumerated(STRING)
     private PwSecLevel pwSecLevel;
 
+//    @Column(nullable = false)
     private String salt;
 
     // 차단: true , 차단 x : false
+//    @Column(nullable = false)
     private Boolean isLoginBlocked;
 
     // 비활성화(회원 탈퇴) 여부 true:탈퇴x ,false:탈퇴
+//    @Column(nullable = false)
     private Boolean isEnabled;
+
 
     @Builder
     private User(String token, String userId, String password, String userName, String email, String pictureUrl,
@@ -153,14 +163,14 @@ public class User extends BaseTimeEntity {
     }
 
 
-    public void updateUserName(String updateName, LocalDateTime plusMonthsDate) {
-        this.setUserName(updateName);
+    public static void updateUserName(User user,String updateName, LocalDateTime plusMonthsDate) {
+        user.setUserName(updateName);
         // 3개월 동안 변경 불가능
-        this.setUserNameModifiedDate(plusMonthsDate);
+        user.setUserNameModifiedDate(plusMonthsDate);
     }
 
-    public void updatePicture(String uploadFile) {
-        this.setPictureUrl(uploadFile);
+    public static void updatePicture(User user,String uploadFile) {
+        user.setPictureUrl(uploadFile);
     }
 
     /**
@@ -169,10 +179,10 @@ public class User extends BaseTimeEntity {
      * @param fileStore
      * @throws IOException
      */
-    public void deletePicture(FileStore fileStore) throws IOException {
-        if (StringUtils.hasText(this.getPictureUrl())) {
-            fileStore.deleteFile(User.getPictureFullUrl(fileStore, this.token),
-                this.getPictureUrl());
+    public static void deletePicture(User user,FileStore fileStore) throws IOException {
+        if (StringUtils.hasText(user.getPictureUrl())) {
+            fileStore.deleteFile(getPictureFullUrl(fileStore, user.token),
+                user.getPictureUrl());
         }
     }
 
