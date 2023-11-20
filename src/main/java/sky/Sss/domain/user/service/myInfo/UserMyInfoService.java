@@ -38,7 +38,7 @@ public class UserMyInfoService {
 
     @Transactional
     public void updateUserName(UserNameUpdateDto userNameUpdateDto, BindingResult bindingResult)
-        throws DuplicateCheckException  {
+        throws DuplicateCheckException {
         // 변경 가능 여부
         boolean isChange = false;
         User user = userQueryService.findOne();
@@ -51,7 +51,7 @@ public class UserMyInfoService {
         LocalDateTime plusMonthsDate = now.plusMonths(MONTHS);
 
         // 중복 확인
-        userJoinService.checkUserName(userNameUpdateDto.getUserName(),bindingResult);
+        userJoinService.checkUserName(userNameUpdateDto.getUserName(), bindingResult);
 
         // 유저 네임을 가입하고나서 처음 변경 할경우 바로 변경 가능
         if (userNameModifiedDate != null && !now.isAfter(userNameModifiedDate)) {
@@ -61,7 +61,7 @@ public class UserMyInfoService {
         }
 
         if (!isChange) {
-            user.updateUserName(userNameUpdateDto.getUserName(), plusMonthsDate);
+            User.updateUserName(user, userNameUpdateDto.getUserName(), plusMonthsDate);
             UserInfoDto.createUserInfo(user);
         }
         userNameUpdateDto.setUserNameModifiedDate(plusMonthsDate);
@@ -73,13 +73,13 @@ public class UserMyInfoService {
         UploadFileDto uploadFileDto = null;
         if (!file.isEmpty()) {
             try {
-                uploadFileDto = fileStore.storeImageSave(file, fileStore.getUserPictureDir(), user.getToken());
+                uploadFileDto = fileStore.storeFileSave(file, fileStore.getUserPictureDir(), user.getToken(), 300);
                 uploadFileDto.setUserId(user.getUserId());
                 if (uploadFileDto != null) {
                     //기존에 있던 이미지 삭제 없으면 삭제 x
-                    user.deletePicture(fileStore);
+                    User.deletePicture(user, fileStore);
                     // 서버에 저장되는 파일이름 저장
-                    user.updatePicture(uploadFileDto.getStoreFileName());
+                    User.updatePicture(user, uploadFileDto.getStoreFileName());
                     UserInfoDto.createUserInfo(user);
                 }
 
@@ -105,8 +105,8 @@ public class UserMyInfoService {
         if (StringUtils.hasText(pictureUrl)) {
             try {
                 //유저 이미지 삭제
-                user.deletePicture(fileStore);
-                user.updatePicture(null);
+                User.deletePicture(user, fileStore);
+                user.updatePicture(user,null);
                 UserInfoDto.createUserInfo(user);
 
             } catch (IOException e) {
@@ -122,7 +122,7 @@ public class UserMyInfoService {
         User user = userQueryService.findOne();
         // block 여부 업데이트
         log.info("userLoginBlockUpdateDto = {}", userLoginBlockUpdateDto.getIsLoginBlocked());
-        User.changeIsLoginBlocked(user,userLoginBlockUpdateDto);
+        User.changeIsLoginBlocked(user, userLoginBlockUpdateDto);
         // 세션 업데이트
         UserInfoDto.createUserInfo(user);
     }

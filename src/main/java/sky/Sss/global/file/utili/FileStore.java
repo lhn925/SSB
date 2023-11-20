@@ -16,6 +16,12 @@ import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import marvin.image.MarvinImage;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 import org.marvinproject.image.transform.scale.Scale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -23,6 +29,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.global.file.dto.UploadFileDto;
+import sky.Sss.global.file.dto.UploadTrackFileDto;
 
 /**
  * 각종 URL 정보
@@ -37,12 +44,19 @@ public class FileStore {
     // 2차 인증 사진 url
     public static final String CAPTCHA_IMAGE_DIR = "captcha/";
     public static final String USER_PICTURE_DIR = "picture/";
+    public static final String TRACK_DIR = "track/";
+    public static final String TRACK_COVER_DIR = "cover/";
     //default Image url및 사진
     public static final String USER_DEFAULT_IMAGE_URL = "default/defaultImage.png";
     public static final String USER_DEFAULT_DIR = "default";
+
+    public static final Long TRACK_UPLOAD_LIMIT = 10800L;
+
     private String userPictureDir = USER_PICTURE_DIR;
     private String captchaImageDir = CAPTCHA_IMAGE_DIR;
     private String userDefaultImageUrl = USER_DEFAULT_IMAGE_URL;
+    private String trackFileDir = TRACK_DIR;
+    private String trackCoverDir = TRACK_COVER_DIR;
 
     @Value("${file.dir}")
     public String fileDir;
@@ -66,33 +80,96 @@ public class FileStore {
     }
 
     /**
-     * 하나의 이미지 저장
+     * 파일 저장
      *
      * @param multipartFile
-     * @param token
      *     // 저장 위치
      * @return
      * @throws IOException
      */
-    public UploadFileDto storeImageSave(MultipartFile multipartFile, String type, String token) throws IOException {
+    public UploadFileDto storeFileSave(MultipartFile multipartFile, String fileDir, String fileToken)
+        throws IOException {
+        return this.storeFileSave(multipartFile, fileDir, fileToken, 0);
+    }
+
+    /**
+     * 파일 저장
+     *
+     * @param multipartFile
+     *     // 저장 위치
+     * @return
+     * @throws IOException
+     */
+    public UploadFileDto storeFileSave(MultipartFile multipartFile, String fileDir, String token, int targetWidth)
+        throws IOException {
         if (multipartFile.isEmpty()) {
             return null;
         }
-        String originalFilename = multipartFile.getOriginalFilename(); // 원본 파일명
-        String storeFileName = createStoreFileName(originalFilename); // 서버 업로드 파일명
-        String fileFormatName = multipartFile.getContentType()
-            .substring(multipartFile.getContentType().lastIndexOf("/") + 1); // 확장자 추출
+        String originalFilename = multipartFile.getOriginalFilename(); // 원본 파일명 (확장자포함)
+        String storeFileName = createStoreFileName(originalFilename); // 서버 업로드 파일명 (확장자 포함)
+        String fileFormatName = extractExt(originalFilename); // 확장자 추출
+        String dirPath = createDir(fileDir + token); // 유저 폴더 경로 생성
+        // 유저 프로필 사진
+        if (fileDir.equals(userPictureDir) || fileDir.equals(trackCoverDir)) {
+            MultipartFile resizingFile = resizeImage(targetWidth, multipartFile, fileFormatName, originalFilename);
+            resizingFile.transferTo(new File(getFullPath(dirPath, storeFileName)));
+            return new UploadFileDto(originalFilename, storeFileName, null);
+        } else if (fileDir.equals(trackFileDir)) { // 트랙 저장
+            return getUploadTrackFileDto(multipartFile, originalFilename, storeFileName, dirPath);
+        } else {
+            return null;
+        }
+    }
 
-        String dirPath = createDir(type + token);
+    /**
+     * tarck 재생시간 추출
+     *
+     * @param multipartFile
+     * @param originalFilename
+     * @param storeFileName
+     * @param dirPath
+     * @return
+     * @throws IOException
+     */
+    private UploadTrackFileDto getUploadTrackFileDto(MultipartFile multipartFile, String originalFilename,
+        String storeFileName, String dirPath) throws IOException {
 
-        MultipartFile resizingFile = resizeImage(300, multipartFile, fileFormatName, originalFilename);
-
-        resizingFile.transferTo(new File(getFullPath(dirPath, storeFileName)));
-
-        return new UploadFileDto(originalFilename, storeFileName, null);
+        AudioFile audioFile = null;
+        try {
+            File file = new File(getFullPath(dirPath, storeFileName));
+            multipartFile.transferTo(file);
+            audioFile = AudioFileIO.read(new File(file.getPath()));
+        } catch (CannotReadException e) {
+            throw new RuntimeException(e);
+        } catch (TagException e) {
+            throw new RuntimeException(e);
+        } catch (ReadOnlyFileException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidAudioFrameException e) {
+            throw new RuntimeException(e);
+        }
+        // 길이
+        Integer track_length = Math.round(audioFile.getAudioHeader().getTrackLength());
+        // 음질
+        String bitRate = audioFile.getAudioHeader().getBitRate();//음질
+        // 크기
+        Long size = multipartFile.getSize();
+        // 확장자
+        String ext = audioFile.getExt();
+        return new UploadTrackFileDto(originalFilename, storeFileName, null, track_length, bitRate, size, ext);
     }
 
 
+    /**
+     * 이미지 resize
+     *
+     * @param targetWidth
+     * @param originalFile
+     * @param fileFormatName
+     * @param storeFileName
+     * @return
+     * @throws IOException
+     */
     public MultipartFile resizeImage(int targetWidth, MultipartFile originalFile, String fileFormatName,
         String storeFileName) throws IOException {
 
@@ -136,17 +213,17 @@ public class FileStore {
      * @return
      * @throws IOException
      */
-    public List<UploadFileDto> storeImages(List<MultipartFile> multipartFile, String type, String token)
+    public List<UploadFileDto> storeFiles(List<MultipartFile> multipartFile, String type, String token)
         throws IOException {
         List<UploadFileDto> uploadFileDtos = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
             if (!file.isEmpty()) {
-                uploadFileDtos.add(storeImageSave(file, type, token));
-
+                uploadFileDtos.add(storeFileSave(file, type, token));
             }
         }
         return uploadFileDtos;
     }
+
 
     /**
      * 디렉터리 생성
@@ -194,9 +271,7 @@ public class FileStore {
         return new UrlResource("file:" + this.getFilePathAndExt(this.getCaptchaImageDir(), fileName, "jpg"));
     }
 
-
     public UrlResource getPictureUrlResource(String fileName) throws MalformedURLException {
-
         UrlResource resource = new UrlResource("file:" + fileDir + fileName);
         return resource;
     }
