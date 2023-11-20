@@ -76,7 +76,7 @@ logging.level: #띄어쓰기 없음
   org.hibernate.SQL: debug #띄어쓰기 2칸
 
 file:
-  dir: /Users/imhaneul/skyLife/toy/image/
+  dir: /Users/imhaneul/skyLife/toy/files/
 #sms:
 #  relaxed-binding:
 #    accessKey: ${cloud.accessKey}
