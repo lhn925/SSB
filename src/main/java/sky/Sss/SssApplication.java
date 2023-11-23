@@ -3,6 +3,7 @@ package sky.Sss;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -18,6 +19,7 @@ import sky.Sss.config.EnvConfig;
  * DEFERRED : 기본적으로 LAZY와 동일하지만 비동기적으로 작업하고, ContextRefreshedEvent에 의해 Repository가 초기화 되어 검증되도록 진행합니다.
  */
 @SpringBootApplication
+@EnableCaching
 @EnableScheduling
 //spring boot 애플리케이션 파일에서 @PropertySource를 사용해 properties 파일의 위치를 추가해 준다.
 @PropertySource(value = {

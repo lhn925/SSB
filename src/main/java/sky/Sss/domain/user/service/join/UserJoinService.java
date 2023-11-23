@@ -1,6 +1,9 @@
 package sky.Sss.domain.user.service.join;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,12 +34,16 @@ public class UserJoinService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = {"checkId"},key = "#userJoinDto.userId"),
+        @CacheEvict(value = {"checkUserName"},key = "#userJoinDto.userName"),
+        @CacheEvict(value = {"checkEmail"},key = "#userJoinDto.email"),
+    })
     public Long join(UserJoinPostDto userJoinDto) {
 
         // 유저토큰 생성 할 객체 생성
         PwEncryptor pwEncryptor = new PwEncryptor();
         String salt = pwEncryptor.getSALT();
-
 
         // 중복검사
         checkSalt(salt);
@@ -61,28 +68,31 @@ public class UserJoinService {
         }
     }
 
-    public void duplicateCheckJoin(UserJoinPostDto userJoinPostDto,BindingResult bindingResult)
+    public void duplicateCheckJoin(UserJoinPostDto userJoinPostDto, BindingResult bindingResult)
         throws DuplicateCheckException {
-        checkId(userJoinPostDto.getUserId(),bindingResult);
-        checkEmail(userJoinPostDto.getEmail(),bindingResult);
-        checkUserName(userJoinPostDto.getUserName(),bindingResult);
+        checkId(userJoinPostDto.getUserId(), bindingResult);
+        checkEmail(userJoinPostDto.getEmail(), bindingResult);
+        checkUserName(userJoinPostDto.getUserName(), bindingResult);
     }
 
+    @Cacheable(value = "checkId", key = "#userId", cacheManager = "contentCacheManager")
     public void checkId(String userId, BindingResult bindingResult) throws DuplicateCheckException {
         if (userQueryRepository.existsByUserId(userId)) {
-            throw new DuplicateCheckException(bindingResult,"아이디", "userId", userId);
+            throw new DuplicateCheckException(bindingResult, "아이디", "userId", userId);
         }
     }
 
+    @Cacheable(value = "checkUserName", key = "#userName", cacheManager = "contentCacheManager")
     public void checkUserName(String userName, BindingResult bindingResult) throws DuplicateCheckException {
         if (userQueryRepository.existsByUserName(userName)) {
-            throw new DuplicateCheckException(bindingResult,"닉네임", "userName", userName);
+            throw new DuplicateCheckException(bindingResult, "닉네임", "userName", userName);
         }
     }
 
+    @Cacheable(value = "checkEmail", key = "#email", cacheManager = "contentCacheManager")
     public void checkEmail(String email, BindingResult bindingResult) throws DuplicateCheckException {
         if (userQueryRepository.existsByEmail(email)) {
-            throw new DuplicateCheckException(bindingResult,"email", "email", email);
+            throw new DuplicateCheckException(bindingResult, "email", "email", email);
         }
     }
 
