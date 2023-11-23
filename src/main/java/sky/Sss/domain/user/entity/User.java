@@ -181,13 +181,8 @@ public class User extends BaseTimeEntity {
      */
     public static void deletePicture(User user,FileStore fileStore) throws IOException {
         if (StringUtils.hasText(user.getPictureUrl())) {
-            fileStore.deleteFile(getPictureFullUrl(fileStore, user.token),
-                user.getPictureUrl());
+            fileStore.deleteFile(FileStore.USER_PICTURE_DIR,user.getToken(),user.getPictureUrl());
         }
-    }
-
-    public static String getPictureFullUrl(FileStore fileStore, String token) {
-        return fileStore.getFileDir() + fileStore.getUserPictureDir() + token + "/";
     }
 
     public static User changeIsLoginBlocked(User user, UserLoginBlockUpdateDto userLoginBlockUpdateDto) {

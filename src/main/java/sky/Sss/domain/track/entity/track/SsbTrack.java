@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.track.dto.TrackMetaUploadDto;
+import sky.Sss.domain.track.dto.track.TrackMetaUploadDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.model.TrackGenre;
 import sky.Sss.domain.user.entity.User;
@@ -126,13 +126,13 @@ public class SsbTrack extends BaseTimeEntity {
 
     public static void deleteSsbTrack(SsbTrack ssbTrack, FileStore fileStore) throws IOException {
         if (StringUtils.hasText(ssbTrack.getStoreFileName())) {
-            fileStore.deleteFile(getSsbTrackPath(fileStore, ssbTrack.getToken()), ssbTrack.getStoreFileName());
+            fileStore.deleteFile(FileStore.TRACK_DIR,ssbTrack.getToken(),ssbTrack.getStoreFileName());
         }
     }
 
     public static void deleteSsbTrackCover(SsbTrack ssbTrack, FileStore fileStore) throws IOException {
         if (StringUtils.hasText(ssbTrack.getStoreFileName())) {
-            fileStore.deleteFile(getSsbTrackCoverPath(fileStore, ssbTrack.getToken()), ssbTrack.getStoreFileName());
+            fileStore.deleteFile(FileStore.TRACK_COVER_DIR, ssbTrack.getToken(), ssbTrack.getCoverUrl());
         }
     }
 
@@ -140,13 +140,8 @@ public class SsbTrack extends BaseTimeEntity {
         ssbTrack.setCoverUrl(coverUrl);
     }
 
-
-    public static String getSsbTrackPath(FileStore fileStore, String token) {
-        return fileStore.getFileDir() + fileStore.getTrackFileDir() + token + "/";
-    }
-
     public static String getSsbTrackCoverPath(FileStore fileStore, String token) {
-        return fileStore.getFileDir() + fileStore.getTrackCoverDir() + token + "/";
+        return fileStore.getTrackCoverDir() + token + "/";
     }
 
 }

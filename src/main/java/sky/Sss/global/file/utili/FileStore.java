@@ -66,8 +66,8 @@ public class FileStore {
         return path + fileName;
     }
 
-    public void deleteFile(String path, String filename) throws IOException {
-        Path filePath = Paths.get(this.getFullPath(path, filename));
+    public void deleteFile(String dirType, String token, String filename) throws IOException {
+        Path filePath = Paths.get(getFileDir() + dirType + token + "/" + filename);
         Files.delete(filePath);
     }
 

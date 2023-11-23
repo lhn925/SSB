@@ -10,13 +10,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
+import sky.Sss.domain.track.dto.temp.TempTrackDeleteDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.dto.UploadTrackFileDto;
+import sky.Sss.global.file.utili.FileStore;
 
 @Entity
 @Getter
@@ -63,9 +67,14 @@ public class TempTrackStorage extends BaseTimeEntity {
         tempTrackStorage.setIsPlayList(isPlayList);
         tempTrackStorage.setStoreFileName(uploadTrackFileDto.getStoreFileName());
         tempTrackStorage.setOriginalName(uploadTrackFileDto.getOriginalFileName());
-
-
         return tempTrackStorage;
+    }
+
+
+    public static void deleteTempFile (TempTrackStorage tempTrackStorage,FileStore fileStore) throws IOException {
+        if (StringUtils.hasText(tempTrackStorage.getStoreFileName())) {
+            fileStore.deleteFile(FileStore.TRACK_DIR, tempTrackStorage.getToken(), tempTrackStorage.getStoreFileName());
+        }
     }
 
 }
