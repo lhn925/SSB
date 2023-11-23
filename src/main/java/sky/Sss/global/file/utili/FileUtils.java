@@ -15,6 +15,16 @@ public class FileUtils {
     public static boolean validImgFile(MultipartFile multipartFile) {
         List<String> notValidTypeList = Arrays.asList("image/jpg", "image/jpeg", "image/pjpeg", "image/png",
             "image/bmp", "image/x-windows-bmp");
+        return valid(multipartFile, notValidTypeList);
+    }
+
+    public static boolean validTrackFile(MultipartFile multipartFile) {
+        List<String> notValidTypeList = Arrays.asList("audio/mpeg", "audio/flac", "audio/ogg", "video/mp4",
+            "audio/wav");
+        return valid(multipartFile, notValidTypeList);
+    }
+
+    private static boolean valid(MultipartFile multipartFile, List<String> notValidTypeList) {
         try {
             String mimeType = tika.detect(multipartFile.getInputStream());
             boolean isValid = notValidTypeList.stream()
@@ -24,4 +34,6 @@ public class FileUtils {
             throw new RuntimeException(e);
         }
     }
+
+
 }

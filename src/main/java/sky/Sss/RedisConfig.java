@@ -32,8 +32,6 @@ public class RedisConfig {
         redisConfiguration.setDatabase(0);
         return new LettuceConnectionFactory(redisConfiguration);
     }
-
-
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer() {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
