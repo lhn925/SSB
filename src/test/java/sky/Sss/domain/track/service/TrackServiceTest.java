@@ -99,40 +99,19 @@ class TrackServiceTest {
         String grantedAuth = "USER";
         List<SimpleGrantedAuthority> collect = Arrays.stream(grantedAuth.split(",")).map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
-        User user = new User("lim222", "",collect );
-
+        User user = new User("lim222", "", collect);
+        String sessionId = "a8702363-50ad-4de1-8e6b-928cf988e3a9";
         String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW0yMjIiLCJpYXQiOjE3MDA0NTI0MzEsImF1dGgiOiJST0xFX1VTRVIiLCJyZWRpcyI6ImQyZWQ0OTAzZjVkMGI3YzNlYjEzIiwiZXhwIjoxNzAwNDU2MDMxfQ.QPCH3I9_d2hW1lIMLIrqCiui1xUfhvePbXGoVltUDniX7hJtYKvcu-X8qtvtCYwIYkoHDE2TFJZ0eLMfrroXVA";
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
             user, token, collect);
 
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-        File file1 = new File("/Users/imhaneul/Downloads/sky.m4a");
-        File file2 = new File("/Users/imhaneul/Downloads/sky.m4a");
-        File file3 = new File("/Users/imhaneul/Downloads/sky.m4a");
-        File file4 = new File("/Users/imhaneul/Downloads/sky.m4a");
         File coverImage = new File("/Users/imhaneul/Downloads/IMG_7813.PNG");
 
-
-
-        InputStream fileInputStream1 = new FileInputStream(file1);
-        InputStream fileInputStream2 = new FileInputStream(file2);
-        InputStream fileInputStream3 = new FileInputStream(file3);
-        InputStream fileInputStream4 = new FileInputStream(file4);
         InputStream fileInputStream5 = new FileInputStream(coverImage);
-        MockMultipartFile multipartFile1 = new MockMultipartFile("sky1","sky.m4a", Mp4ContentTypeValue.MUSIC_VIDEO.name(), fileInputStream1);
-        MockMultipartFile multipartFile2 = new MockMultipartFile("sky2","sky.m4a", Mp4ContentTypeValue.MUSIC_VIDEO.name(), fileInputStream2);
-        MockMultipartFile multipartFile3 = new MockMultipartFile("sky3","sky.m4a", Mp4ContentTypeValue.MUSIC_VIDEO.name(), fileInputStream3);
-        MockMultipartFile multipartFile4 = new MockMultipartFile("sky3","sky.m4a", Mp4ContentTypeValue.MUSIC_VIDEO.name(), fileInputStream4);
-
-
-        MockMultipartFile multipartFile5 = new MockMultipartFile("cover","IMG_7813.PNG", "image/x-png", fileInputStream5);
-
-        List<MockMultipartFile> list = new ArrayList<>();
-        list.add(multipartFile1);
-        list.add(multipartFile2);
-        list.add(multipartFile3);
-        list.add(multipartFile4);
+        MockMultipartFile multipartFile5 = new MockMultipartFile("cover", "IMG_7813.PNG", "image/x-png",
+            fileInputStream5);
 
         TrackPlayListSettingDto trackPlayListSettingDto = new TrackPlayListSettingDto();
         trackPlayListSettingDto.setPlayListType(PlayListType.ALBUM);
@@ -141,22 +120,49 @@ class TrackServiceTest {
         trackPlayListSettingDto.setPlayListTitle("앨범타이틀!");
         trackPlayListSettingDto.setIsDownload(true);
         trackPlayListSettingDto.setIsPrivacy(false);
-        trackPlayListSettingDto.setCoverImgFile(multipartFile5);
-        List<TrackPlayListMetaDto> fileList = new ArrayList<>();
+        Set<TrackTagsDto> tagsDtoSet = new HashSet<>();
+        for (int i = 1; i<=10; i++) {
+            TrackTagsDto trackTagsDto = new TrackTagsDto();
+            trackTagsDto.setId(0L);
+            trackTagsDto.setTag("iu" + i);
+            tagsDtoSet.add(trackTagsDto);
+        }
+        trackPlayListSettingDto.setTagSet(tagsDtoSet);
+
+        List<TrackPlayListMetaDto> list = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            File file1 = new File("/Users/imhaneul/Downloads/sky.m4a");
+            InputStream fileInputStream1 = new FileInputStream(file1);
+            MockMultipartFile multipartFile1 = new MockMultipartFile("sky" + i, "sky.m4a",
+                Mp4ContentTypeValue.MUSIC_VIDEO.name(), fileInputStream1);
+
+            TrackTempFileUploadDto trackTempFileUploadDto = new TrackTempFileUploadDto();
+            trackTempFileUploadDto.setPlayList(true);
+            trackTempFileUploadDto.setTrackFile(multipartFile1);
+
+            TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(trackTempFileUploadDto,
+                sessionId);
 
 
-        Integer order = 1;
-        for (MockMultipartFile multipartFile : list) {
             TrackPlayListMetaDto trackPlayListMetaDto = new TrackPlayListMetaDto();
-            trackPlayListMetaDto.setOrder(order++);
-            trackPlayListMetaDto.setTitle("아이유"+order);
+            trackPlayListMetaDto.setOrder(i+1);
+            trackPlayListMetaDto.setTitle("아이유" + i);
             trackPlayListMetaDto.setDesc(trackPlayListSettingDto.getDesc());
             trackPlayListMetaDto.setGenre(MusicGenre.COUNTRY.name());
             trackPlayListMetaDto.setDownload(true);
             trackPlayListMetaDto.setPrivacy(false);
+            trackPlayListMetaDto.setToken(tempTrackInfoDto.getToken());
+            trackPlayListMetaDto.setId(tempTrackInfoDto.getId());
             trackPlayListMetaDto.setGenreType(TrackGenre.MUSIC);
-            fileList.add(trackPlayListMetaDto);
+            list.add(trackPlayListMetaDto);
         }
 
+        trackPlayListSettingDto.setTrackPlayListMetaDto(list);
+
+        trackService.saveTrackFiles(trackPlayListSettingDto, "a8702363-50ad-4de1-8e6b-928cf988e3a9");
+
     }
+
+
+
 }
