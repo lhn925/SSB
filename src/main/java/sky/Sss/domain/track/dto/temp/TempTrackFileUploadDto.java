@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto;
+package sky.Sss.domain.track.dto.temp;
 
 
 import lombok.Getter;
@@ -8,7 +8,7 @@ import sky.Sss.global.utili.annotation.MultipartTrackFileValid;
 
 @Getter
 @Setter
-public class TrackTempFileUploadDto {
+public class TempTrackFileUploadDto {
 
     @MultipartTrackFileValid
     private MultipartFile trackFile;

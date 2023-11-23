@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto;
+package sky.Sss.domain.track.dto.track;
 
 
 import java.util.List;
@@ -16,7 +16,6 @@ public class TrackPlayListInfoDto {
     private String coverUrl;
     private Boolean isDownload;
     private String userName;
-    private List<TrackInfoDto> trackInfoDtoList;
 
     public TrackPlayListInfoDto(SsbPlayListSettings ssbPlayListSettings) {
         this.id = ssbPlayListSettings.getId();

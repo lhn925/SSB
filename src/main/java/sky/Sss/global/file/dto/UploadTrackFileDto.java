@@ -12,10 +12,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor(access = PROTECTED)
 public class UploadTrackFileDto extends UploadFileDto{
-
-
-    private String token;
-    private Long id;
     // 재생길이
     private Integer trackLength;
     // 파일크기

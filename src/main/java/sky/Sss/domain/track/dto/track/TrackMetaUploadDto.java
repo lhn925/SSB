@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto;
+package sky.Sss.domain.track.dto.track;
 
 
 import jakarta.validation.constraints.NotBlank;
@@ -18,8 +18,10 @@ public class TrackMetaUploadDto {
     @NotBlank
     private TrackGenre genreType;
 
+    @NotBlank
     private Long id;
 
+    @NotBlank
     private String token;
 
     private Long trackLength;
