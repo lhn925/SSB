@@ -42,19 +42,17 @@ public class SsbPlayListTracks extends BaseTimeEntity {
     private Integer orders;
 
 
-    public static List<SsbPlayListTracks> createSsbPlayListTrackList(Map<Integer, SsbTrack> playListMap,SsbPlayListSettings ssbPlayListSettings) {
-
-        List<SsbPlayListTracks> ssbPlayListTracksList = new ArrayList<>();
+    public static void createSsbPlayListTrackList(Map<Integer, SsbTrack> playListMap,
+        SsbPlayListSettings ssbPlayListSettings) {
         for (Integer key : playListMap.keySet()) {
             SsbPlayListTracks ssbPlayListTracks = new SsbPlayListTracks();
             SsbTrack ssbTrack = playListMap.get(key);
             ssbPlayListTracks.setSsbTrack(ssbTrack);
             ssbPlayListTracks.setSsbPlayListSettings(ssbPlayListSettings);
             ssbPlayListTracks.setOrders(key);
-            ssbPlayListTracksList.add(ssbPlayListTracks);
+            SsbPlayListSettings.addPlayListTracks(ssbPlayListTracks, ssbPlayListSettings);
         }
 
-        return ssbPlayListTracksList;
     }
 
 }
