@@ -19,7 +19,7 @@ public class FileUtils {
     }
 
     public static boolean validTrackFile(MultipartFile multipartFile) {
-        List<String> notValidTypeList = Arrays.asList("audio/mpeg", "audio/flac", "audio/ogg", "video/mp4",
+        List<String> notValidTypeList = Arrays.asList("audio/mpeg"," audio/mp3", "audio/flac", "audio/ogg", "audio/mp4",
             "audio/wav");
         return valid(multipartFile, notValidTypeList);
     }
