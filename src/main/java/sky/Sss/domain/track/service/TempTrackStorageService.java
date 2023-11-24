@@ -2,17 +2,15 @@ package sky.Sss.domain.track.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.TempTrackInfoDto;
-import sky.Sss.domain.track.dto.TrackInfoDto;
-import sky.Sss.domain.track.dto.TrackTempFileUploadDto;
+import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
+import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
+import sky.Sss.domain.track.exception.TrackFileNotFoundException;
 import sky.Sss.domain.track.repository.TempTrackStorageRepository;
-import sky.Sss.domain.track.repository.TrackRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.UserTokenUtil;
@@ -35,7 +33,7 @@ public class TempTrackStorageService {
      * @throws IOException
      */
     @Transactional
-    public TempTrackInfoDto saveTempTrackFile(TrackTempFileUploadDto trackTempFileUploadDto, String sessionId)
+    public TempTrackInfoDto saveTempTrackFile(TempTrackFileUploadDto tempTrackFileUploadDto, String sessionId)
         throws IOException {
         User user = userQueryService.findOne();
         // track/{fileToken}폴더/track 이름
@@ -43,25 +41,23 @@ public class TempTrackStorageService {
         String fileToken = UserTokenUtil.getToken();
 
         UploadTrackFileDto uploadTrackFileDto = (UploadTrackFileDto) fileStore.storeFileSave(
-            trackTempFileUploadDto.getTrackFile(),
+            tempTrackFileUploadDto.getTrackFile(),
             FileStore.TRACK_DIR,
             fileToken);
-
         TempTrackStorage tempTrackStorage = TempTrackStorage.createTempTrackStorage(uploadTrackFileDto, fileToken,
-            sessionId, user, trackTempFileUploadDto.isPlayList());
+            sessionId, user, tempTrackFileUploadDto.isPlayList());
 
         tempTrackStorageRepository.save(tempTrackStorage);
 
         // 구분값 추가
         TempTrackInfoDto tempTrackInfoDto = new TempTrackInfoDto(tempTrackStorage.getId(), tempTrackStorage.getToken(),
             uploadTrackFileDto);
-
         return tempTrackInfoDto;
     }
 
     public TempTrackStorage findOne(Long id, String sessionId, String token, User user) throws FileNotFoundException {
         TempTrackStorage findOne = tempTrackStorageRepository.findOne(id, token, sessionId, user).orElseThrow(
-            () -> new FileNotFoundException());
+            () -> new TrackFileNotFoundException());
 
         return findOne;
     }
@@ -69,6 +65,20 @@ public class TempTrackStorageService {
     @Transactional
     public void delete(TempTrackStorage tempTrackStorage) {
         tempTrackStorageRepository.delete(tempTrackStorage);
+    }
+
+    @Transactional
+    public void delete(Long id, String token, String sessionId) throws IOException {
+        User user = userQueryService.findOne();
+
+        TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, sessionId, user)
+            .orElseThrow(() -> new TrackFileNotFoundException());
+
+        // 임시파일 삭제
+        TempTrackStorage.deleteTempFile(tempTrackStorage,fileStore);
+
+        // DB에서 삭제
+        delete(tempTrackStorage);
     }
 
 }
