@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track;
+package sky.Sss.domain.track.dto.playlist;
 
 
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
+import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.model.PlayListType;
 import sky.Sss.global.utili.annotation.MultipartPictureValid;
 
