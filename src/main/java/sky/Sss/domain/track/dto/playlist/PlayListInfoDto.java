@@ -1,14 +1,13 @@
 package sky.Sss.domain.track.dto.track;
 
 
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 
 @Setter
 @Getter
-public class TrackPlayListInfoDto {
+public class PlayListInfoDto {
 
     private Long id;
     private String token;
@@ -17,7 +16,7 @@ public class TrackPlayListInfoDto {
     private Boolean isDownload;
     private String userName;
 
-    public TrackPlayListInfoDto(SsbPlayListSettings ssbPlayListSettings) {
+    public PlayListInfoDto(SsbPlayListSettings ssbPlayListSettings) {
         this.id = ssbPlayListSettings.getId();
         this.token = ssbPlayListSettings.getToken();
         this.title = ssbPlayListSettings.getTitle();

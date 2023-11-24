@@ -12,7 +12,7 @@ import sky.Sss.global.utili.annotation.MultipartPictureValid;
 
 @Getter
 @Setter
-public class TrackPlayListSettingDto {
+public class PlayListSettingDto {
     // 플레이리스트 제목
     @NotBlank
     private String playListTitle;
@@ -29,7 +29,7 @@ public class TrackPlayListSettingDto {
 
     private Set<TrackTagsDto> tagSet;
 
-    private List<TrackPlayListMetaDto> trackPlayListMetaDto;
+    private List<PlayListTrackInfoDto> playListTrackInfoDtoList;
 
     @MultipartPictureValid
     private MultipartFile coverImgFile;

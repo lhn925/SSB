@@ -11,7 +11,7 @@ import sky.Sss.global.utili.annotation.MultipartPictureValid;
 
 @Getter
 @Setter
-public class TrackMetaUploadDto {
+public class TrackInfoUploadDto {
 
     @NotBlank
     private String title;
