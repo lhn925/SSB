@@ -10,7 +10,6 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -20,13 +19,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.TrackPlayListSettingDto;
-import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
+import sky.Sss.domain.track.dto.playlist.PlayListSettingDto;
 import sky.Sss.domain.track.model.PlayListType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
@@ -88,16 +84,16 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         );
     }
 
-    public static SsbPlayListSettings createSsbPlayListSettings(TrackPlayListSettingDto trackPlayListSettingDto,
+    public static SsbPlayListSettings createSsbPlayListSettings(PlayListSettingDto playListSettingDto,
         User user) {
         SsbPlayListSettings ssbPlayListSettings = new SsbPlayListSettings();
-        ssbPlayListSettings.setDescription(trackPlayListSettingDto.getDesc());
-        ssbPlayListSettings.setPlayListType(trackPlayListSettingDto.getPlayListType());
-        ssbPlayListSettings.setIsDownload(trackPlayListSettingDto.getIsDownload());
-        ssbPlayListSettings.setIsPrivacy(trackPlayListSettingDto.getIsPrivacy());
+        ssbPlayListSettings.setDescription(playListSettingDto.getDesc());
+        ssbPlayListSettings.setPlayListType(playListSettingDto.getPlayListType());
+        ssbPlayListSettings.setIsDownload(playListSettingDto.getIsDownload());
+        ssbPlayListSettings.setIsPrivacy(playListSettingDto.getIsPrivacy());
         ssbPlayListSettings.setUser(user);
 
-        ssbPlayListSettings.setTitle(trackPlayListSettingDto.getPlayListTitle());
+        ssbPlayListSettings.setTitle(playListSettingDto.getPlayListTitle());
         return ssbPlayListSettings;
     }
 
