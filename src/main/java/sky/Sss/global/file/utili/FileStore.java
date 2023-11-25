@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import marvin.image.MarvinImage;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -26,8 +27,10 @@ import org.marvinproject.image.transform.scale.Scale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import sky.Sss.global.exception.FileExtConstraintException;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.dto.UploadTrackFileDto;
 
@@ -66,9 +69,13 @@ public class FileStore {
         return path + fileName;
     }
 
-    public void deleteFile(String dirType, String token, String filename) throws IOException {
+    public void deleteFile(String dirType, String token, String filename) {
         Path filePath = Paths.get(getFileDir() + dirType + token + "/" + filename);
-        Files.delete(filePath);
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -85,10 +92,8 @@ public class FileStore {
      * @param multipartFile
      *     // 저장 위치
      * @return
-     * @throws IOException
      */
-    public UploadFileDto storeFileSave(MultipartFile multipartFile, String fileDir, String fileToken)
-        throws IOException {
+    public UploadFileDto storeFileSave(MultipartFile multipartFile, String fileDir, String fileToken) {
         return this.storeFileSave(multipartFile, fileDir, fileToken, 0);
     }
 
@@ -101,25 +106,43 @@ public class FileStore {
      * @throws IOException
      */
     public UploadFileDto storeFileSave(MultipartFile multipartFile, String fileDir, String token, int targetWidth)
-        throws IOException {
+        {
         if (multipartFile.isEmpty()) {
             return null;
         }
+        fileExtConstraint(multipartFile, fileDir);
         String originalFilename = multipartFile.getOriginalFilename(); // 원본 파일명 (확장자포함)
         String storeFileName = createStoreFileName(originalFilename); // 서버 업로드 파일명 (확장자 포함)
         String fileFormatName = extractExt(originalFilename); // 확장자 추출
         String dirPath = createDir(fileDir + token); // 유저 폴더 경로 생성
         // 유저 프로필 사진
-        if (fileDir.equals(userPictureDir) || fileDir.equals(trackCoverDir)) {
-            MultipartFile resizingFile = resizeImage(targetWidth, multipartFile, fileFormatName, originalFilename);
-            resizingFile.transferTo(new File(getFullPath(dirPath, storeFileName)));
-            return new UploadFileDto(originalFilename, storeFileName, null);
-        } else if (fileDir.equals(trackFileDir)) { // 트랙 저장
-            return getUploadTrackFileDto(multipartFile, originalFilename, storeFileName, dirPath);
-        } else {
-            return null;
+        try {
+            if (fileDir.equals(userPictureDir) || fileDir.equals(trackCoverDir)) {
+                MultipartFile resizingFile = resizeImage(targetWidth, multipartFile, fileFormatName, originalFilename);
+                resizingFile.transferTo(new File(getFullPath(dirPath, storeFileName)));
+                return new UploadFileDto(originalFilename, storeFileName, null);
+            } else if (fileDir.equals(trackFileDir)) { // 트랙 저장
+                return getUploadTrackFileDto(multipartFile, originalFilename, storeFileName, dirPath);
+            } else {
+                return null;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException();
         }
     }
+
+    public void fileExtConstraint(MultipartFile multipartFile, String fileDir) {
+        boolean isValid = false;
+        if (fileDir.equals(userPictureDir) || fileDir.equals(trackCoverDir)) {
+            isValid = FileUtils.validImgFile(multipartFile);
+        } else if (fileDir.equals(trackFileDir)) {
+            isValid = FileUtils.validTrackFile(multipartFile);
+        }
+        if (!isValid) {
+            throw new FileExtConstraintException();
+        }
+    }
+
 
     /**
      * tarck 재생시간 추출
@@ -132,7 +155,7 @@ public class FileStore {
      * @throws IOException
      */
     private UploadTrackFileDto getUploadTrackFileDto(MultipartFile multipartFile, String originalFilename,
-        String storeFileName, String dirPath) throws IOException {
+        String storeFileName, String dirPath) {
 
         AudioFile audioFile = null;
         try {
@@ -147,6 +170,8 @@ public class FileStore {
             throw new RuntimeException(e);
         } catch (InvalidAudioFrameException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException();
         }
         // 길이
         Integer track_length = Math.round(audioFile.getAudioHeader().getTrackLength());
@@ -174,7 +199,12 @@ public class FileStore {
         String storeFileName) throws IOException {
 
         // MultipartFile -> BufferedImage Convert
-        BufferedImage image = ImageIO.read(originalFile.getInputStream());
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(originalFile.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         // newWidth : newHeight = originWidth : originHeight
         int originWidth = image.getWidth();
@@ -211,10 +241,8 @@ public class FileStore {
      * @param token
      *     // 저장 위치
      * @return
-     * @throws IOException
      */
-    public List<UploadFileDto> storeFiles(List<MultipartFile> multipartFile, String type, String token)
-        throws IOException {
+    public List<UploadFileDto> storeFiles(List<MultipartFile> multipartFile, String type, String token) {
         List<UploadFileDto> uploadFileDtos = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
             if (!file.isEmpty()) {
@@ -237,7 +265,7 @@ public class FileStore {
         try {
             Files.createDirectories(directoryPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return fileDir + path + "/";
     }
@@ -267,12 +295,21 @@ public class FileStore {
         return originalFilename.substring(pos + 1);// 추출
     }
 
-    public UrlResource getCaptchaUrlResource(String fileName) throws MalformedURLException {
-        return new UrlResource("file:" + this.getFilePathAndExt(this.getCaptchaImageDir(), fileName, "jpg"));
+    public UrlResource getCaptchaUrlResource(String fileName) {
+        try {
+            return new UrlResource("file:" + this.getFilePathAndExt(this.getCaptchaImageDir(), fileName, "jpg"));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("file.error.notFind");
+        }
     }
 
-    public UrlResource getPictureUrlResource(String fileName) throws MalformedURLException {
-        UrlResource resource = new UrlResource("file:" + fileDir + fileName);
+    public UrlResource getPictureUrlResource(String fileName) {
+        UrlResource resource = null;
+        try {
+            resource = new UrlResource("file:" + fileDir + fileName);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("file.error.notFind");
+        }
         return resource;
     }
 
