@@ -16,6 +16,6 @@ public class UploadFileDto {
     public UploadFileDto(String originalFileName, String storeFileName,String userId) {
         this.originalFileName = originalFileName;
         this.storeFileName = storeFileName;
-        this.userId = storeFileName;
+        this.userId = userId;
     }
 }

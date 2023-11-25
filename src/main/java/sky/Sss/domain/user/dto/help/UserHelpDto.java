@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import sky.Sss.domain.email.model.SendType;
 import sky.Sss.domain.user.annotation.JoinValid;
+import sky.Sss.global.utili.validation.regex.RegexPatterns;
 
 @Getter
 @Setter
@@ -19,7 +20,7 @@ public class UserHelpDto implements Serializable {
 
     private String userId;
 
-    @JoinValid(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
+    @JoinValid(regexp = RegexPatterns.EMAIL_REGEX, message = "{userJoinForm.email}")
     private String email;
 
     /**

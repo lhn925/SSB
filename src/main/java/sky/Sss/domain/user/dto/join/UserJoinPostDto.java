@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import sky.Sss.domain.user.annotation.JoinValid;
 import sky.Sss.domain.user.model.PwSecLevel;
+import sky.Sss.global.utili.validation.regex.RegexPatterns;
 
 @Getter
 @Setter
@@ -22,17 +23,17 @@ public class UserJoinPostDto implements Serializable {
      * 1달에 1번 닉네임 변경 가능합니다.
      */
 
-    @JoinValid(regexp = "^[a-z0-9_-]{5,20} *$", message = "{userJoinForm.userId}")
+    @JoinValid(regexp = RegexPatterns.USER_ID_REGEX, message = "{userJoinForm.userId}")
     private String userId;
 
 //    @JoinValid(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "{userJoinForm.password}")
     @NotBlank
     private String password;
 
-    @JoinValid(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
+    @JoinValid(regexp = RegexPatterns.USER_NAME_REGEX, message = "{userJoinForm.userName}")
     private String userName;
 
-    @JoinValid(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", message = "{userJoinForm.email}")
+    @JoinValid(regexp = RegexPatterns.EMAIL_REGEX, message = "{userJoinForm.email}")
     private String email;
 
     private String authCode;

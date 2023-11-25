@@ -1,37 +1,20 @@
 package sky.Sss.domain.track.dto.playlist;
 
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
+import sky.Sss.domain.track.dto.BaseTrackDto;
 import sky.Sss.domain.track.model.PlayListType;
-import sky.Sss.global.utili.annotation.MultipartPictureValid;
 
 @Getter
 @Setter
-public class PlayListSettingDto {
-    // 플레이리스트 제목
-    @NotBlank
-    private String playListTitle;
+public class PlayListSettingDto extends BaseTrackDto {
     // 플레이리스트 타입
-    @NotBlank
+    @NotNull
     private PlayListType playListType;
-
-    private String desc;
-
-    @NotBlank
-    private Boolean isDownload;
-    @NotBlank
-    private Boolean isPrivacy;
-
-    private Set<TrackTagsDto> tagSet;
 
     private List<PlayListTrackInfoDto> playListTrackInfoDtoList;
 
-    @MultipartPictureValid
-    private MultipartFile coverImgFile;
 }

@@ -8,12 +8,13 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import sky.Sss.domain.email.model.SendType;
+import sky.Sss.global.utili.validation.regex.RegexPatterns;
 
 @Getter
 @Setter
 public class EmailSendDto implements Serializable  {
     @NotBlank
-    @Pattern(regexp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$",message = "{userJoinForm.email}")
+    @Pattern(regexp = RegexPatterns.EMAIL_REGEX,message = "{userJoinForm.email}")
     private String email; // 유저
 
     @NotNull(message = "{NotBlank}")

@@ -6,12 +6,13 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import sky.Sss.domain.user.annotation.JoinValid;
+import sky.Sss.global.utili.validation.regex.RegexPatterns;
 
 @Getter
 @Setter
 public class UserNameUpdateDto implements Serializable {
 
-    @JoinValid(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
+    @JoinValid(regexp = RegexPatterns.USER_NAME_REGEX, message = "{userJoinForm.userName}")
     private String userName;
 
     private LocalDateTime userNameModifiedDate;

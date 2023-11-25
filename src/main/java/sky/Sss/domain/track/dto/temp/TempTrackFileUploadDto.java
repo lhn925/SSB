@@ -4,7 +4,7 @@ package sky.Sss.domain.track.dto.temp;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
-import sky.Sss.global.utili.annotation.MultipartTrackFileValid;
+import sky.Sss.global.utili.validation.annotation.MultipartTrackFileValid;
 
 @Getter
 @Setter

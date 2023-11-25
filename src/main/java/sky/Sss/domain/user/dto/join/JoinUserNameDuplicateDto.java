@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.Sss.domain.user.annotation.JoinValid;
+import sky.Sss.global.utili.validation.regex.RegexPatterns;
 
 
 /**
@@ -16,6 +17,6 @@ import sky.Sss.domain.user.annotation.JoinValid;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JoinUserNameDuplicateDto implements Serializable  {
 
-    @JoinValid(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$", message = "{userJoinForm.userName}")
+    @JoinValid(regexp = RegexPatterns.USER_NAME_REGEX, message = "{userJoinForm.userName}")
     private String userName;
 }
