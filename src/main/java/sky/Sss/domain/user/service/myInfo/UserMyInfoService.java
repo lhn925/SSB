@@ -106,7 +106,7 @@ public class UserMyInfoService {
             try {
                 //유저 이미지 삭제
                 User.deletePicture(user, fileStore);
-                user.updatePicture(user,null);
+                user.updatePicture(user, null);
                 UserInfoDto.createUserInfo(user);
 
             } catch (IOException e) {
@@ -129,11 +129,7 @@ public class UserMyInfoService {
 
 
     public UrlResource getPictureImage(String imageName) {
-        try {
-            return fileStore.getPictureUrlResource(imageName);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("file.error.notFind");
-        }
+        return fileStore.getPictureUrlResource(imageName);
     }
 
 

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,8 @@ import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
-import sky.Sss.domain.track.exception.TrackFileNotFoundException;
-import sky.Sss.domain.track.exception.TrackLengthLimitOverException;
+import sky.Sss.domain.track.exception.SsbFileFileNotFoundException;
+import sky.Sss.domain.track.exception.SsbFileLengthLimitOverException;
 import sky.Sss.domain.track.repository.PlayListSettingRepository;
 import sky.Sss.domain.track.repository.TrackRepository;
 import sky.Sss.domain.user.entity.User;
@@ -44,6 +43,7 @@ import sky.Sss.global.file.utili.FileStore;
 @Service
 @RequiredArgsConstructor
 public class TrackService {
+
     private final FileStore fileStore;
     private final TrackRepository trackRepository;
     private final UserQueryService userQueryService;
@@ -54,19 +54,19 @@ public class TrackService {
     /**
      * track 생성
      *
-     * @param trackMetaUploadDto
+     * @param trackInfoSaveDto
      * @throws IOException
      */
     @Transactional
-    public TrackInfoDto saveTrackFile(TrackInfoSaveDto trackMetaUploadDto, String sessionId) throws IOException {
+    public TrackInfoDto saveTrackFile(TrackInfoSaveDto trackInfoSaveDto, MultipartFile coverImgFile, String sessionId) {
         User user = userQueryService.findOne();
         // 시간제한 180분
         // 임시 디비에 있던걸
         // ssbTrack 에 옮기는 작업
-        TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackMetaUploadDto.getId(), sessionId,
-            trackMetaUploadDto.getToken(), user);
+        TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackInfoSaveDto.getId(), sessionId,
+            trackInfoSaveDto.getToken(), user);
 
-        Set<TrackTagsDto> tagSet = trackMetaUploadDto.getTagSet();
+        Set<TrackTagsDto> tagSet = trackInfoSaveDto.getTagSet();
 
         // 현재 ssbTrack 에 저장되어 있는 track
         Integer totalTrackLength = getTotalLength(user);
@@ -75,19 +75,18 @@ public class TrackService {
         Set<SsbTrackTags> ssbTrackTags = getSsbTrackTags(tagSet);
         Integer totalUploadTrackLength = 0;
         SsbTrack ssbTrack = saveTrack(user, tempTrackStorage, totalUploadTrackLength, totalTrackLength,
-            trackMetaUploadDto,
+            trackInfoSaveDto,
             ssbTrackTags);
 
-        UploadFileDto uploadFileDto = getUploadFileDto(trackMetaUploadDto.getCoverImgFile(),
-            tempTrackStorage.getToken());
-
-        SsbTrack.updateTrackCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
-
+        if (coverImgFile != null) {
+            UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile,
+                tempTrackStorage.getToken());
+            SsbTrack.updateTrackCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
+        }
         tempTrackStorageService.delete(tempTrackStorage);
         return new TrackInfoDto(ssbTrack, user.getUserName());
 
     }
-
 
     /**
      * 플레이리스트 생성
@@ -96,8 +95,8 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public PlayListInfoDto saveTrackFiles(PlayListSettingDto playListSettingDto, String sessionId)
-        throws IOException {
+    public PlayListInfoDto saveTrackFiles(PlayListSettingDto playListSettingDto, MultipartFile coverImgFile,
+        String sessionId) {
         User user = userQueryService.findOne();
         // playList 안에 있는 Track 정보
         List<PlayListTrackInfoDto> trackPlayListFileDtoList = playListSettingDto.getPlayListTrackInfoDtoList();
@@ -146,18 +145,17 @@ public class TrackService {
         }
 
         // 커버 이미지 업데이트
-        if (playListSettingDto.getCoverImgFile() != null) {
+        if (coverImgFile != null) {
             for (Integer key : trackFileMap.keySet()) {
                 trackFileMap.get(key);
-                UploadFileDto trackUploadFileDto = getUploadFileDto(playListSettingDto.getCoverImgFile(),
+                UploadFileDto trackUploadFileDto = getUploadFileDto(coverImgFile,
                     trackFileMap.get(key).getToken());
                 SsbTrack.updateTrackCoverImg(trackUploadFileDto.getStoreFileName(), trackFileMap.get(key));
             }
-            UploadFileDto playListUploadFileDto = getUploadFileDto(playListSettingDto.getCoverImgFile(),
+            UploadFileDto playListUploadFileDto = getUploadFileDto(coverImgFile,
                 playListToken);
             SsbPlayListSettings.updatePlayListCoverImg(playListUploadFileDto.getStoreFileName(), ssbPlayListSettings);
         }
-
         // 등록
         playListSettingRepository.save(ssbPlayListSettings);
 
@@ -165,14 +163,15 @@ public class TrackService {
     }
 
     @Transactional
-    public void updateTrackInfo(TrackInfoUpdateDto trackInfoUpdateDto) throws IOException {
+    public void updateTrackInfo(TrackInfoUpdateDto trackInfoUpdateDto, MultipartFile coverImgFile) {
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = findOne(trackInfoUpdateDto.getId(), trackInfoUpdateDto.getToken(),
             user);
-        if (trackInfoUpdateDto.getCoverImgFile() != null) {
-            UploadFileDto uploadFileDto = getUploadFileDto(trackInfoUpdateDto.getCoverImgFile(), ssbTrack.getToken());
+        if (coverImgFile != null) {
             // 기존 이미지 삭제
             SsbTrack.deleteSsbTrackCover(ssbTrack, fileStore);
+
+            UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile, ssbTrack.getToken());
             SsbTrack.updateTrackCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
         }
         // 태그 수정
@@ -181,13 +180,13 @@ public class TrackService {
         SsbTrack.addTagLink(ssbTrack, trackTagLinks);
         // 내용 수정
         SsbTrack.uploadTrackInfo(ssbTrack, trackInfoUpdateDto.getGenre(), trackInfoUpdateDto.getGenreType(),
-            trackInfoUpdateDto.isPrivacy(), trackInfoUpdateDto.isDownload(), ssbTrack.getTitle(),
-            ssbTrack.getDescription());
+            trackInfoUpdateDto.isPrivacy(), trackInfoUpdateDto.isDownload(), trackInfoUpdateDto.getTitle(),
+            trackInfoUpdateDto.getDesc());
     }
 
 
     @Transactional
-    public void deleteTrack(Long id, String token) throws IOException {
+    public void deleteTrack(Long id, String token) {
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = findOne(id, token, user);
 
@@ -195,11 +194,11 @@ public class TrackService {
             SsbTrack.deleteSsbTrackCover(ssbTrack, fileStore);
         }
         SsbTrack.deleteSsbTrack(ssbTrack, fileStore);
-        SsbTrack.changeEnabled(ssbTrack,true);
+        SsbTrack.changeEnabled(ssbTrack, true);
     }
 
     public SsbTrack findOne(Long id, String token, User user) {
-        return trackRepository.findOne(id, user, token, false).orElseThrow(() -> new TrackFileNotFoundException());
+        return trackRepository.findOne(id, user, token, false).orElseThrow(() -> new SsbFileFileNotFoundException());
     }
 
     /**
@@ -208,8 +207,7 @@ public class TrackService {
      * @return
      * @throws IOException
      */
-    private UploadFileDto getUploadFileDto(MultipartFile coverImgFile, String token)
-        throws IOException {
+    private UploadFileDto getUploadFileDto(MultipartFile coverImgFile, String token) {
         UploadFileDto uploadFileDto = fileStore.storeFileSave(coverImgFile,
             FileStore.TRACK_COVER_DIR, token, 800);
         return uploadFileDto;
@@ -217,7 +215,9 @@ public class TrackService {
 
     private SsbTrack saveTrack(User user, TempTrackStorage tempTrack,
         Integer totalUploadTrackLength, Integer totalTrackLength,
-        TrackInfoSaveDto metaDto, Set<SsbTrackTags> ssbTrackTags) throws IOException {
+        TrackInfoSaveDto metaDto, Set<SsbTrackTags> ssbTrackTags) {
+
+
 
         // ssbTrack 생성
         SsbTrack ssbTrack = SsbTrack.createSsbTrack(metaDto, tempTrack, user);
@@ -247,7 +247,7 @@ public class TrackService {
 
     // 태그 등록
     private List<SsbTrackTagLink> getTrackTagLinks(Set<SsbTrackTags> tags, SsbTrack ssbTrack) {
-        if (tags.size() > 0) {
+        if (tags != null && tags.size() > 0) {
             List<SsbTrackTagLink> ssbTrackTagLinks = tags.stream().map(tag -> SsbTrackTagLink.createSsbTrackTagLink(
                 ssbTrack, tag)).collect(Collectors.toList());
             return ssbTrackTagLinks;
@@ -281,11 +281,10 @@ public class TrackService {
         return null;
     }
 
-    private void checkLimit(Integer totalTrackLength, Integer trackLength)
-        throws IOException {
+    private void checkLimit(Integer totalTrackLength, Integer trackLength) {
         Boolean isLengthOver = (totalTrackLength + trackLength) > FileStore.TRACK_UPLOAD_LIMIT;
         if (isLengthOver) {
-            throw new TrackLengthLimitOverException();
+            throw new SsbFileLengthLimitOverException();
         }
     }
 

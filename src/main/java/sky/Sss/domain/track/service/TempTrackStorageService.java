@@ -1,15 +1,15 @@
 package sky.Sss.domain.track.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
-import sky.Sss.domain.track.exception.TrackFileNotFoundException;
+import sky.Sss.domain.track.exception.SsbFileFileNotFoundException;
 import sky.Sss.domain.track.repository.TempTrackStorageRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -33,8 +33,7 @@ public class TempTrackStorageService {
      * @throws IOException
      */
     @Transactional
-    public TempTrackInfoDto saveTempTrackFile(TempTrackFileUploadDto tempTrackFileUploadDto, String sessionId)
-        throws IOException {
+    public TempTrackInfoDto saveTempTrackFile(TempTrackFileUploadDto tempTrackFileUploadDto, String sessionId) {
         User user = userQueryService.findOne();
         // track/{fileToken}폴더/track 이름
         // cover/fileToken/cover
@@ -55,9 +54,10 @@ public class TempTrackStorageService {
         return tempTrackInfoDto;
     }
 
-    public TempTrackStorage findOne(Long id, String sessionId, String token, User user) throws FileNotFoundException {
+    public TempTrackStorage findOne(Long id, String sessionId, String token, User user)
+        throws SsbFileFileNotFoundException {
         TempTrackStorage findOne = tempTrackStorageRepository.findOne(id, token, sessionId, user).orElseThrow(
-            () -> new TrackFileNotFoundException());
+            () -> new SsbFileFileNotFoundException());
 
         return findOne;
     }
@@ -72,10 +72,10 @@ public class TempTrackStorageService {
         User user = userQueryService.findOne();
 
         TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, sessionId, user)
-            .orElseThrow(() -> new TrackFileNotFoundException());
+            .orElseThrow(() -> new SsbFileFileNotFoundException());
 
         // 임시파일 삭제
-        TempTrackStorage.deleteTempFile(tempTrackStorage,fileStore);
+        TempTrackStorage.deleteTempFile(tempTrackStorage, fileStore);
 
         // DB에서 삭제
         delete(tempTrackStorage);
