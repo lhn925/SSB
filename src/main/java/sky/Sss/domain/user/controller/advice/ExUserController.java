@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,9 +21,9 @@ import sky.Sss.global.error.dto.FieldErrorCustom;
 import sky.Sss.global.error.dto.Result;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = {"sky.Sss.domain.user"})
 @RequiredArgsConstructor
-public class ExRestController {
+public class ExUserController {
 
     private final MessageSource ms;
 
@@ -50,4 +52,12 @@ public class ExRestController {
         }
         return Result.getErrorResult(new ErrorGlobalResultDto(errorCode, ms, request.getLocale()));
     }
+
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity accessExHandler (AccessDeniedException e,HttpServletRequest request) {
+        return new ResponseEntity(new ErrorGlobalResultDto("access.error.forbidden", ms, request.getLocale()),
+            HttpStatus.FORBIDDEN);
+    }
+
 }
