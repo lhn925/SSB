@@ -1,0 +1,10 @@
+package sky.Sss.global.utili.validation.regex;
+
+public class RegexPatterns {
+    public static final String TRACK_TITLE_REGEX = "^[\\p{L}\\p{N}\\s.:]{1,45}";
+    public static final String EMAIL_REGEX = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+    public static final String USER_ID_REGEX = "^[a-z0-9_-]{5,20} *$";
+    public static final String USER_NAME_REGEX = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$";
+    public static final String TAG_REGEX = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_]{1,25}$";
+    public static final String GENRE_REGEX = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_]{1,20}$";
+}

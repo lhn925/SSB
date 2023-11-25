@@ -1,4 +1,4 @@
-package sky.Sss.global.utili.annotation;
+package sky.Sss.global.utili.validation.annotation;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -7,7 +7,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import sky.Sss.global.file.utili.MultipartTrackFileValidator;
+import sky.Sss.global.utili.validation.annotation.validator.MultipartTrackFileValidator;
 
 @Target({FIELD})
 @Retention(RUNTIME)

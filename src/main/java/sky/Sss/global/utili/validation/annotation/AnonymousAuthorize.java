@@ -1,4 +1,4 @@
-package sky.Sss.global.utili.annotation;
+package sky.Sss.global.utili.validation.annotation;
 
 
 import java.lang.annotation.ElementType;
