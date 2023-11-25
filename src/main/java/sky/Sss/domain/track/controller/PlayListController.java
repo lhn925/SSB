@@ -12,12 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.domain.track.dto.playlist.PlayListInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingDto;
-import sky.Sss.domain.track.exception.TrackLengthLimitOverException;
 import sky.Sss.domain.track.service.TrackService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
@@ -41,30 +41,24 @@ public class PlayListController {
 
     /**
      * 플레이리스트 생성
+     *
      * @param playListSettingDto
      * @param bindingResult
      * @param request
      * @return
      */
     @PostMapping
-    public ResponseEntity savePlayList(@Validated @RequestBody PlayListSettingDto playListSettingDto, BindingResult bindingResult,
+    public ResponseEntity savePlayList(@Validated @RequestPart PlayListSettingDto playListSettingDto,
+        BindingResult bindingResult, @RequestPart(name = "coverImgFile", required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
         HttpSession session = request.getSession();
-        try {
-            PlayListInfoDto trackPlayListInfoDto = trackService.saveTrackFiles(playListSettingDto,session.getId());
-            return new ResponseEntity(trackPlayListInfoDto, HttpStatus.OK);
-        } catch (TrackLengthLimitOverException e) {
-            bindingResult.reject("track.limit.error");
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
-        } catch (IOException e) {
-            bindingResult.reject("error");
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        PlayListInfoDto trackPlayListInfoDto = trackService.saveTrackFiles(playListSettingDto, coverImgFile,
+            session.getId());
+        return ResponseEntity.ok(trackPlayListInfoDto);
     }
-
 
 
 }

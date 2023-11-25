@@ -6,14 +6,12 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.temp.TempTrackDeleteDto;
@@ -57,16 +55,12 @@ public class TempTrackController {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
         HttpSession session = request.getSession();
-        try {
-            TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(tempTrackFileUploadDto,
-                session.getId());
-            return new ResponseEntity(tempTrackInfoDto, HttpStatus.OK);
-        } catch (IOException e) {
-            bindingResult.reject("error");
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(tempTrackFileUploadDto,
+            session.getId());
+        return ResponseEntity.ok(tempTrackInfoDto);
+
     }
+
     /**
      * 임시파일 삭제
      *
@@ -75,21 +69,16 @@ public class TempTrackController {
      */
     @DeleteMapping
     public ResponseEntity deleteTempFile(@Validated @ModelAttribute TempTrackDeleteDto tempTrackDeleteDto,
-        BindingResult bindingResult, HttpServletRequest request) {
+        BindingResult bindingResult, HttpServletRequest request) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
         HttpSession session = request.getSession();
 
         String sessionId = session.getId();
-        try {
-            tempTrackStorageService.delete(tempTrackDeleteDto.getId(), tempTrackDeleteDto.getToken(), sessionId);
-        } catch (IOException e) {
-            bindingResult.reject("error");
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()),
-                HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity(HttpStatus.OK);
+
+        tempTrackStorageService.delete(tempTrackDeleteDto.getId(), tempTrackDeleteDto.getToken(), sessionId);
+        return ResponseEntity.ok().build();
     }
 
 }
