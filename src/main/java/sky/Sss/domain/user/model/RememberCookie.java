@@ -4,7 +4,7 @@ public enum RememberCookie {
 
     KEY("rememberMe");
 
-    private String value;
+    private final String value;
 
     RememberCookie(String value) {
         this.value = value;

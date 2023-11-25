@@ -52,7 +52,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             ResponseEntity<ErrorResult> errorResult = Result.getErrorResult(
-                new ErrorGlobalResultDto("error.unAuth", ms, request.getLocale()), HttpStatus.FORBIDDEN);
+                new ErrorGlobalResultDto("login.error.unAuth", ms, request.getLocale()), HttpStatus.FORBIDDEN);
             String json = new ObjectMapper().writeValueAsString(errorResult);
             log.info("json = {}", json);
             response.getWriter().write(json);
