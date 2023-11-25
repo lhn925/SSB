@@ -38,40 +38,13 @@ public class SpringSecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-
-
-/*       "/js/**",
-           "/login/**",
-           "/email/**",
-           "/image/**",
-           "/example/city",
-           "/login",
-           "/user/join/api/**",
-           "/user/join/**",
-           "/user/help/**",
-           "/test/**",
-           "/open/**",
-           "/",
-           "/css/**"*/
-
-
     private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**", "/user/join",
         "/example/city", "/email/**", "/user/help", "/user/help/**", "/user/join/**", "/user/file/**", "/app/login",
-        "/login/**", "/user/profile/**","/webSocket/**","/user/track/**"};
+        "/login/**", "/user/profile/**","/webSocket/**"};
     private final String[] USER_URL = {"/user/logout"};
     private final String[] ADMIN_URL = {"/cron/**"};
 
 
-    /**
-     * ㅡㅛ
-     * 에외 처리하고 싶은 url
-     *
-     * @return
-     *//*
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/login/dashboard", "/email/**", "/join/**", "/");
-    }*/
     @Bean
     public SecurityFilterChain webSecurityFilterChain(
         HttpSecurity http) throws Exception {
