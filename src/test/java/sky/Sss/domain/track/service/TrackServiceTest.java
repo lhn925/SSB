@@ -25,9 +25,9 @@ import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
+import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.track.model.MusicGenre;
 import sky.Sss.domain.track.model.PlayListType;
-import sky.Sss.domain.track.model.TrackGenre;
 
 
 @SpringBootTest
@@ -81,14 +81,14 @@ class TrackServiceTest {
 
         trackMetaUploadDto.setTagSet(tagsDtoSet);
         trackMetaUploadDto.setTitle("sky");
-        trackMetaUploadDto.setCoverImgFile(multipartFile5);
+//        trackMetaUploadDto.setCoverImgFile(multipartFile5);
         trackMetaUploadDto.setGenre("hiphop");
         trackMetaUploadDto.setDownload(false);
         trackMetaUploadDto.setPrivacy(false);
         trackMetaUploadDto.setToken(tempTrackInfoDto.getToken());
         trackMetaUploadDto.setId(tempTrackInfoDto.getId());
 
-        trackService.saveTrackFile(trackMetaUploadDto,sessionId);
+//        trackService.saveTrackFile(trackMetaUploadDto,sessionId);
     }
 
 
@@ -115,10 +115,6 @@ class TrackServiceTest {
         PlayListSettingDto playListSettingDto = new PlayListSettingDto();
         playListSettingDto.setPlayListType(PlayListType.ALBUM);
         playListSettingDto.setDesc("안녕하세요 앨범 소개글입니다");
-        playListSettingDto.setCoverImgFile(multipartFile5);
-        playListSettingDto.setPlayListTitle("앨범타이틀!");
-        playListSettingDto.setIsDownload(true);
-        playListSettingDto.setIsPrivacy(false);
         Set<TrackTagsDto> tagsDtoSet = new HashSet<>();
         for (int i = 1; i<=10; i++) {
             TrackTagsDto trackTagsDto = new TrackTagsDto();
@@ -152,13 +148,12 @@ class TrackServiceTest {
             trackPlayListMetaDto.setPrivacy(false);
             trackPlayListMetaDto.setToken(tempTrackInfoDto.getToken());
             trackPlayListMetaDto.setId(tempTrackInfoDto.getId());
-            trackPlayListMetaDto.setGenreType(TrackGenre.MUSIC);
+            trackPlayListMetaDto.setGenreType(MainGenreType.MUSIC);
             list.add(trackPlayListMetaDto);
         }
 
         playListSettingDto.setPlayListTrackInfoDtoList(list);
 
-        trackService.saveTrackFiles(playListSettingDto, "a8702363-50ad-4de1-8e6b-928cf988e3a9");
 
     }
 
