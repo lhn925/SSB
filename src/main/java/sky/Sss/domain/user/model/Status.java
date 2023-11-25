@@ -6,7 +6,7 @@ package sky.Sss.domain.user.model;
 public enum Status {
     ON(true), OFF(false);
 
-    private Boolean isStatus;
+    private final Boolean isStatus;
 
     Status(Boolean isStatus) {
         this.isStatus = isStatus;

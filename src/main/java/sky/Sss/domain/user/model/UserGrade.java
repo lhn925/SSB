@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum UserGrade {
     ADMIN("ADMIN"), USER("USER"), ANONYMOUS("ANONYMOUS");
-    private String description;
+    private final String description;
 
     UserGrade(String description) {
         this.description = description;
