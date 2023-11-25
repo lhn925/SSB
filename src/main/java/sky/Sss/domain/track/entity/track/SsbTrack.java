@@ -13,8 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +23,11 @@ import lombok.Setter;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
-import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
-import sky.Sss.domain.track.model.TrackGenre;
+import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.utili.FileStore;
+import sky.Sss.global.utili.JSEscape;
 
 @Entity
 @Setter(AccessLevel.PRIVATE)
@@ -41,6 +39,7 @@ public class SsbTrack extends BaseTimeEntity {
     @GeneratedValue
     private Long id;
 
+    // 45 자 이하 이모티콘 x
     @Column(nullable = false)
     private String title;
 
@@ -49,14 +48,17 @@ public class SsbTrack extends BaseTimeEntity {
     private User user;
 
     @Enumerated(STRING)
-    private TrackGenre genreType;
+    private MainGenreType mainGenreType;
 
+
+    // 이모티콘 사용 불가능
     private String genre;
 
     // 다운로드 허용 여부 ture 허용, false 불가
     @Column(nullable = false)
     private Boolean isDownload;
 
+    // 1000자 이하
     private String description;
 
     // track 커버
@@ -91,7 +93,7 @@ public class SsbTrack extends BaseTimeEntity {
     private Boolean isEnabled;
 
     public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> list) {
-        if (list.size() > 0) {
+        if (list != null && list.size() > 0) {
             list.stream().forEach(ssbTrackTagLink ->
                 ssbTrack.tags.add(ssbTrackTagLink)
             );
@@ -117,15 +119,23 @@ public class SsbTrack extends BaseTimeEntity {
         return ssbTrack;
     }
 
-    public static void uploadTrackInfo(SsbTrack ssbTrack, String genre, TrackGenre trackGenre, Boolean isPrivacy,
+    public static void uploadTrackInfo(SsbTrack ssbTrack, String genre, MainGenreType mainGenreType, Boolean isPrivacy,
         Boolean isDownload, String title, String description) {
-        ssbTrack.setGenre(genre);
-        ssbTrack.setGenreType(trackGenre);
+
+        String subGenreType = mainGenreType.getSubGenreType(genre);
+        ssbTrack.setGenre(subGenreType);
+
+        ssbTrack.setTitle(JSEscape.escapeJS(title));
+        ssbTrack.setMainGenreType(mainGenreType);
         ssbTrack.setIsPrivacy(isPrivacy);
         ssbTrack.setIsDownload(isDownload);
-        ssbTrack.setTitle(title);
-        ssbTrack.setDescription(description);
+        if (description.trim().length() > 1000) {
+            throw new IllegalArgumentException("track.desc.error.length");
+        }
+
+        ssbTrack.setDescription(JSEscape.escapeJS(description));
     }
+
 
     public static void updateToken(String token, SsbTrack ssbTrack) {
         ssbTrack.setToken(token);
@@ -144,20 +154,23 @@ public class SsbTrack extends BaseTimeEntity {
     }
 
 
-    public static void deleteSsbTrack(SsbTrack ssbTrack, FileStore fileStore) throws IOException {
+    public static void deleteSsbTrack(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getStoreFileName())) {
             fileStore.deleteFile(FileStore.TRACK_DIR, ssbTrack.getToken(), ssbTrack.getStoreFileName());
         }
     }
 
-    public static void deleteSsbTrackCover(SsbTrack ssbTrack, FileStore fileStore) throws IOException {
+    public static void deleteSsbTrackCover(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getCoverUrl())) {
             fileStore.deleteFile(FileStore.TRACK_COVER_DIR, ssbTrack.getToken(), ssbTrack.getCoverUrl());
         }
     }
 
     public static void updateTrackCoverImg(String coverUrl, SsbTrack ssbTrack) {
-        ssbTrack.setCoverUrl(coverUrl);
+        if (StringUtils.hasText(coverUrl)) {
+            ssbTrack.setCoverUrl(coverUrl);
+        }
+
     }
 
     public static String getSsbTrackCoverPath(FileStore fileStore, String token) {

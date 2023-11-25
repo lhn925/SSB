@@ -10,13 +10,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.io.IOException;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.track.dto.temp.TempTrackDeleteDto;
+import sky.Sss.domain.track.exception.SsbFileFileNotFoundException;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.dto.UploadTrackFileDto;
@@ -56,7 +54,7 @@ public class TempTrackStorage extends BaseTimeEntity {
 
 
     public static TempTrackStorage createTempTrackStorage(UploadTrackFileDto uploadTrackFileDto, String token,
-        String sessionId, User user,Boolean isPlayList) {
+        String sessionId, User user, Boolean isPlayList) {
         TempTrackStorage tempTrackStorage = new TempTrackStorage();
         tempTrackStorage.setSize(uploadTrackFileDto.getSize());
         tempTrackStorage.setTrackLength(uploadTrackFileDto.getTrackLength());
@@ -71,7 +69,8 @@ public class TempTrackStorage extends BaseTimeEntity {
     }
 
 
-    public static void deleteTempFile (TempTrackStorage tempTrackStorage,FileStore fileStore) throws IOException {
+    public static void deleteTempFile(TempTrackStorage tempTrackStorage, FileStore fileStore)
+        throws SsbFileFileNotFoundException {
         if (StringUtils.hasText(tempTrackStorage.getStoreFileName())) {
             fileStore.deleteFile(FileStore.TRACK_DIR, tempTrackStorage.getToken(), tempTrackStorage.getStoreFileName());
         }

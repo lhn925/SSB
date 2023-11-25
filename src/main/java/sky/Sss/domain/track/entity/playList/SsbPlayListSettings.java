@@ -43,6 +43,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
     private User user;
 
     // title
+    // 45 자 이하 이모티콘 x
     @Column(nullable = false)
     private String title;
 
@@ -57,7 +58,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
 
     private String token;
 
-    // 설명
+    // 설명 1000 자 이하
     private String description;
 
     // 공개여부
@@ -89,11 +90,11 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         SsbPlayListSettings ssbPlayListSettings = new SsbPlayListSettings();
         ssbPlayListSettings.setDescription(playListSettingDto.getDesc());
         ssbPlayListSettings.setPlayListType(playListSettingDto.getPlayListType());
-        ssbPlayListSettings.setIsDownload(playListSettingDto.getIsDownload());
-        ssbPlayListSettings.setIsPrivacy(playListSettingDto.getIsPrivacy());
+        ssbPlayListSettings.setIsDownload(playListSettingDto.isDownload());
+        ssbPlayListSettings.setIsPrivacy(playListSettingDto.isDownload());
         ssbPlayListSettings.setUser(user);
 
-        ssbPlayListSettings.setTitle(playListSettingDto.getPlayListTitle());
+        ssbPlayListSettings.setTitle(playListSettingDto.getTitle());
         return ssbPlayListSettings;
     }
 
