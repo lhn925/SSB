@@ -14,9 +14,17 @@ import sky.Sss.domain.track.dto.track.TrackInfoDto;
 public class TrackQueryController {
 
 
+    // 트랙 정보 가져오기
+    // 트랙 파일 가져오기
+    // 트랙 리스트 가져오기
+    //
+
+
 
     @GetMapping("/{trackId}")
-    public ResponseEntity<TrackInfoDto> getTrack(@PathVariable String trackId) {
+    public ResponseEntity getTrack(@PathVariable String trackId) {
+
+
 
         return null;
     }

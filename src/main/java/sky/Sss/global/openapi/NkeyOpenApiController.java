@@ -79,7 +79,7 @@ public class NkeyOpenApiController {
         try {
             apiExamCaptchaNkeyService.deleteImage(fileName);
         } catch (NoSuchFileException e) {
-            log.error("delete image error ", captchaNkeyDto.getImageName());
+            log.error("deleteAllBatch image error ", captchaNkeyDto.getImageName());
         }
         String key = (String) apiExamCaptchaNkeyService.getApiExamCaptchaNkey().get("key");
         String image = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);

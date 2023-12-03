@@ -77,7 +77,7 @@ public class TempTrackController {
 
         String sessionId = session.getId();
 
-        tempTrackStorageService.delete(tempTrackDeleteDto.getId(), tempTrackDeleteDto.getToken(), sessionId);
+        tempTrackStorageService.deleteAllBatch(tempTrackDeleteDto.getId(), tempTrackDeleteDto.getToken(), sessionId);
         return ResponseEntity.ok().build();
     }
 
