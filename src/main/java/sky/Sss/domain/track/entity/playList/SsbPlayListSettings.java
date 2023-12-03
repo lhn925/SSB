@@ -16,18 +16,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.playlist.PlayListSettingDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.model.PlayListType;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Enabled;
+import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
+import sky.Sss.global.file.utili.FileStore;
+import sky.Sss.global.utili.JSEscape;
 
 
+@Slf4j
 @Getter
 @Setter(PRIVATE)
 @Entity
@@ -56,53 +61,91 @@ public class SsbPlayListSettings extends BaseTimeEntity {
     @Column(nullable = false)
     private PlayListType playListType;
 
+    @Column(nullable = false)
     private String token;
 
     // 설명 1000 자 이하
     private String description;
 
     // 공개여부
+    @Column(nullable = false)
     private Boolean isPrivacy;
 
+    @Column(nullable = false)
     private Boolean isDownload;
 
+    @Column(nullable = false)
+    private Boolean isStatus;
+
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
-    private Set<SsbPlayListLikes> likes = new HashSet<>();
+    private List<SsbPlayListLikes> likes = new ArrayList<>();
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
-    private Set<SsbPlayListTagLink> tags = new HashSet<>();
+    private List<SsbPlayListTagLink> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
     private List<SsbPlayListTracks> playListTracks = new ArrayList<>();
 
 
-    public static void addPlayListTracks(SsbPlayListTracks ssbPlayListTracks,SsbPlayListSettings ssbPlayListSettings) {
-        ssbPlayListSettings.playListTracks.add(ssbPlayListTracks);
+    public static void addAllTracks(List<SsbPlayListTracks> ssbPlayListTracks,
+        SsbPlayListSettings ssbPlayListSettings) {
+        ssbPlayListSettings.playListTracks.addAll(ssbPlayListTracks);
     }
 
-    public static void addPlayListTagLink(SsbPlayListSettings ssbPlayListSettings, List<SsbPlayListTagLink> list) {
-        list.stream().forEach(ssbTrackTagLink ->
-            ssbPlayListSettings.tags.add(ssbTrackTagLink)
-        );
+    public static void addTagLink(SsbPlayListSettings ssbPlayListSettings, List<SsbPlayListTagLink> list) {
+        if (list != null && !list.isEmpty()) {
+            ssbPlayListSettings.tags.addAll(list);
+        }
     }
 
-    public static SsbPlayListSettings createSsbPlayListSettings(PlayListSettingDto playListSettingDto,
+    public static SsbPlayListSettings create(PlayListSettingSaveDto playListSettingSaveDto,
         User user) {
         SsbPlayListSettings ssbPlayListSettings = new SsbPlayListSettings();
-        ssbPlayListSettings.setDescription(playListSettingDto.getDesc());
-        ssbPlayListSettings.setPlayListType(playListSettingDto.getPlayListType());
-        ssbPlayListSettings.setIsDownload(playListSettingDto.isDownload());
-        ssbPlayListSettings.setIsPrivacy(playListSettingDto.isDownload());
-        ssbPlayListSettings.setUser(user);
+        if (playListSettingSaveDto.getDesc().trim().length() > 1000) {
+            throw new IllegalArgumentException("track.desc.error.length");
+        }
+        ssbPlayListSettings.setTitle(JSEscape.escapeJS(playListSettingSaveDto.getTitle()));
 
-        ssbPlayListSettings.setTitle(playListSettingDto.getTitle());
+        ssbPlayListSettings.setDescription(JSEscape.escapeJS(playListSettingSaveDto.getDesc()));
+
+        PlayListType playListType = PlayListType.findByListType(playListSettingSaveDto.getPlayListType());
+        ssbPlayListSettings.setPlayListType(playListType);
+
+        ssbPlayListSettings.setIsDownload(playListSettingSaveDto.isDownload());
+        ssbPlayListSettings.setIsPrivacy(playListSettingSaveDto.isPrivacy());
+        ssbPlayListSettings.setUser(user);
+        changeStatus(ssbPlayListSettings, Status.ON);
         return ssbPlayListSettings;
     }
 
-    public static void updatePlayListCoverImg(String coverUrl, SsbPlayListSettings ssbPlayListSettings) {
+
+    public static void updateInfo(SsbPlayListSettings ssbPlayListSettings, String title, String desc,
+        String playListType, Boolean isDownload, Boolean isPrivacy) {
+        PlayListType type = PlayListType.findByListType(playListType);
+        ssbPlayListSettings.setIsPrivacy(isPrivacy);
+        ssbPlayListSettings.setIsDownload(isDownload);
+        ssbPlayListSettings.setPlayListType(type);
+        ssbPlayListSettings.setTitle(JSEscape.escapeJS(title));
+        if (desc.trim().length() > 1000) {
+            throw new IllegalArgumentException("track.desc.error.length");
+        }
+    }
+
+    public static void changeStatus(SsbPlayListSettings ssbPlayListSettings, Status isStatus) {
+        ssbPlayListSettings.setIsStatus(isStatus.getValue());
+    }
+
+    public static void updateCoverImg(String coverUrl, SsbPlayListSettings ssbPlayListSettings) {
         ssbPlayListSettings.setCoverUrl(coverUrl);
     }
 
-    public static void updatePlayListToken(String token, SsbPlayListSettings ssbPlayListSettings) {
+    public static void deleteCoverImg(FileStore fileStore, SsbPlayListSettings ssbPlayListSettings) {
+        if (StringUtils.hasText(ssbPlayListSettings.getCoverUrl())) {
+            fileStore.deleteFile(FileStore.TRACK_COVER_DIR, ssbPlayListSettings.getToken(),
+                ssbPlayListSettings.getCoverUrl());
+        }
+    }
+
+    public static void updateToken(String token, SsbPlayListSettings ssbPlayListSettings) {
         ssbPlayListSettings.setToken(token);
     }
 

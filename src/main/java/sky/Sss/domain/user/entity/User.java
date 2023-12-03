@@ -119,10 +119,6 @@ public class User extends BaseTimeEntity {
             .isEnabled(Enabled.ENABLED()).build();
     }
 
-
-
-
-
     //  User 클래스 (org.springframework.security.core.UserDetails.User)의 빌더를
     //  사용해서 username 에 아이디, password 에 비밀번호,
     //  roles 에 권한(역할)을 넣어주고 리턴

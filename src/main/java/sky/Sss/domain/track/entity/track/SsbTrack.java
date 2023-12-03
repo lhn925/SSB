@@ -2,6 +2,7 @@ package sky.Sss.domain.track.entity.track;
 
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.EnumType.ORDINAL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -9,26 +10,30 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Enabled;
+import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.utili.FileStore;
 import sky.Sss.global.utili.JSEscape;
 
+@Slf4j
 @Entity
 @Setter(AccessLevel.PRIVATE)
 @Getter
@@ -49,7 +54,6 @@ public class SsbTrack extends BaseTimeEntity {
 
     @Enumerated(STRING)
     private MainGenreType mainGenreType;
-
 
     // 이모티콘 사용 불가능
     private String genre;
@@ -81,52 +85,60 @@ public class SsbTrack extends BaseTimeEntity {
     @Column(nullable = false)
     private String storeFileName;
 
-    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
-    private Set<SsbTrackTagLink> tags = new HashSet<>();
-    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
-    private Set<SsbTrackLikes> likes = new HashSet<>();
-    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
-    private Set<SsbTrackViews> views = new HashSet<>();
-
-    // 비활성화 여부 true:삭제 ,false:삭제x
+    // 비활성화 여부 true:활성화 ,false:비활성화x
     @Column(nullable = false)
-    private Boolean isEnabled;
+    private Boolean isStatus;
 
-    public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> list) {
-        if (list != null && list.size() > 0) {
-            list.stream().forEach(ssbTrackTagLink ->
+    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
+    private List<SsbTrackTagLink> tags = new ArrayList<>();
+    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
+    private List<SsbTrackLikes> likes = new ArrayList<>();
+    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
+    private List<SsbTrackViews> views = new ArrayList<>();
+
+
+    public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
+        if (tagLinks != null && tagLinks.size() > 0) {
+            tagLinks.stream().forEach(ssbTrackTagLink ->
                 ssbTrack.tags.add(ssbTrackTagLink)
             );
         } else {
             // 아무것도 없으면 전부 삭제
-            removeTagLink(ssbTrack);
+            rmTagLink(ssbTrack);
         }
     }
 
-    public static void removeTagLink(SsbTrack ssbTrack) {
+    // 링크 삭제
+    public static void rmTagLink(SsbTrack ssbTrack, SsbTrackTagLink tagLinks) {
+        ssbTrack.getTags().remove(tagLinks);
+    }
+
+    public static void rmTagLink(SsbTrack ssbTrack) {
         ssbTrack.tags.clear();
     }
 
-    public static SsbTrack createSsbTrack(TrackInfoSaveDto trackInfoSaveDto, TempTrackStorage tempTrackStorage,
+    public static SsbTrack create(TrackInfoSaveDto trackInfoSaveDto, TempTrackStorage tempTrackStorage,
         User user) {
         SsbTrack ssbTrack = new SsbTrack();
         setUploadTrackFile(tempTrackStorage, ssbTrack);
-        uploadTrackInfo(ssbTrack, trackInfoSaveDto.getGenre(), trackInfoSaveDto.getGenreType(),
+        uploadInfo(ssbTrack, trackInfoSaveDto.getGenre(), trackInfoSaveDto.getGenreType(),
             trackInfoSaveDto.isPrivacy(), trackInfoSaveDto.isDownload(), trackInfoSaveDto.getTitle(),
             trackInfoSaveDto.getDesc());
         ssbTrack.setUser(user);
-        ssbTrack.setIsEnabled(false);
+        SsbTrack.changeStatus(ssbTrack, Status.ON);
         return ssbTrack;
     }
 
-    public static void uploadTrackInfo(SsbTrack ssbTrack, String genre, MainGenreType mainGenreType, Boolean isPrivacy,
+    public static void uploadInfo(SsbTrack ssbTrack, String genre, String mainGenreType, Boolean isPrivacy,
         Boolean isDownload, String title, String description) {
+        // enum Type 적용
+        MainGenreType type = MainGenreType.findByType(mainGenreType);
+        String subGenreType = type.getSubGenreValue(genre);
+        ssbTrack.setTitle(JSEscape.escapeJS(title));
 
-        String subGenreType = mainGenreType.getSubGenreType(genre);
         ssbTrack.setGenre(subGenreType);
 
-        ssbTrack.setTitle(JSEscape.escapeJS(title));
-        ssbTrack.setMainGenreType(mainGenreType);
+        ssbTrack.setMainGenreType(type);
         ssbTrack.setIsPrivacy(isPrivacy);
         ssbTrack.setIsDownload(isDownload);
         if (description.trim().length() > 1000) {
@@ -135,14 +147,12 @@ public class SsbTrack extends BaseTimeEntity {
 
         ssbTrack.setDescription(JSEscape.escapeJS(description));
     }
-
-
     public static void updateToken(String token, SsbTrack ssbTrack) {
         ssbTrack.setToken(token);
     }
 
-    public static void changeEnabled(SsbTrack ssbTrack, Boolean isEnabled) {
-        ssbTrack.setIsEnabled(isEnabled);
+    public static void changeStatus(SsbTrack ssbTrack, Status isStatus) {
+        ssbTrack.setIsStatus(isStatus.getValue());
     }
 
     //파일 정보 저장
@@ -154,19 +164,19 @@ public class SsbTrack extends BaseTimeEntity {
     }
 
 
-    public static void deleteSsbTrack(SsbTrack ssbTrack, FileStore fileStore) {
+    public static void deleteTrackFile(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getStoreFileName())) {
             fileStore.deleteFile(FileStore.TRACK_DIR, ssbTrack.getToken(), ssbTrack.getStoreFileName());
         }
     }
 
-    public static void deleteSsbTrackCover(SsbTrack ssbTrack, FileStore fileStore) {
+    public static void deleteCoverImg(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getCoverUrl())) {
             fileStore.deleteFile(FileStore.TRACK_COVER_DIR, ssbTrack.getToken(), ssbTrack.getCoverUrl());
         }
     }
 
-    public static void updateTrackCoverImg(String coverUrl, SsbTrack ssbTrack) {
+    public static void updateCoverImg(String coverUrl, SsbTrack ssbTrack) {
         if (StringUtils.hasText(coverUrl)) {
             ssbTrack.setCoverUrl(coverUrl);
         }

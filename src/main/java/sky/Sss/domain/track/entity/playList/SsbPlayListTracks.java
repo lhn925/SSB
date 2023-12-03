@@ -4,12 +4,10 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +39,22 @@ public class SsbPlayListTracks extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer orders;
 
-
     public static void createSsbPlayListTrackList(Map<Integer, SsbTrack> playListMap,
         SsbPlayListSettings ssbPlayListSettings) {
+        List<SsbPlayListTracks> ssbPlayListTracksList = new ArrayList<>();
         for (Integer key : playListMap.keySet()) {
             SsbPlayListTracks ssbPlayListTracks = new SsbPlayListTracks();
             SsbTrack ssbTrack = playListMap.get(key);
             ssbPlayListTracks.setSsbTrack(ssbTrack);
             ssbPlayListTracks.setSsbPlayListSettings(ssbPlayListSettings);
             ssbPlayListTracks.setOrders(key);
-            SsbPlayListSettings.addPlayListTracks(ssbPlayListTracks, ssbPlayListSettings);
+            ssbPlayListTracksList.add(ssbPlayListTracks);
         }
+        SsbPlayListSettings.addAllTracks(ssbPlayListTracksList, ssbPlayListSettings);
+    }
 
+    public static void changeOrders(SsbPlayListTracks ssbPlayListTracks, Integer orders) {
+        ssbPlayListTracks.setOrders(orders);
     }
 
 }

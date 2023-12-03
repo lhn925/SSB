@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.track.exception.SsbFileFileNotFoundException;
+import sky.Sss.domain.track.exception.SsbFileNotFoundException;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.dto.UploadTrackFileDto;
@@ -70,7 +70,7 @@ public class TempTrackStorage extends BaseTimeEntity {
 
 
     public static void deleteTempFile(TempTrackStorage tempTrackStorage, FileStore fileStore)
-        throws SsbFileFileNotFoundException {
+        throws SsbFileNotFoundException {
         if (StringUtils.hasText(tempTrackStorage.getStoreFileName())) {
             fileStore.deleteFile(FileStore.TRACK_DIR, tempTrackStorage.getToken(), tempTrackStorage.getStoreFileName());
         }

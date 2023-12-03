@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +25,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 @Setter(PRIVATE)
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"playlist_id", "tag_id"}))
 public class SsbPlayListTagLink extends BaseTimeEntity {
 
     @Id
@@ -30,11 +33,11 @@ public class SsbPlayListTagLink extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "playlist_id")
+    @JoinColumn(name = "playlist_id",nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name="tag_id")
+    @JoinColumn(name="tag_id",nullable = false)
     private SsbTrackTags ssbTrackTags;
 
     public static SsbPlayListTagLink createSsbTrackTagLink(SsbPlayListSettings ssbPlayListSettings, SsbTrackTags ssbTrackTags) {

@@ -24,14 +24,6 @@ public class SsbTrackTags extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String tag;
 
-//    @OneToMany(mappedBy = "ssbTrackTags",cascade = ALL)
-//    private Set<SsbTrackTagLink> tags = new HashSet<>();
-//
-//    public static void addTagLink(SsbTrackTags ssbTrackTags,SsbTrackTagLink ssbTrackTagLink) {
-//        ssbTrackTags.getTags().add(ssbTrackTagLink);
-//    }
-
-
     public static SsbTrackTags createSsbTrackTag(String tag) {
         SsbTrackTags ssbTrackTags = new SsbTrackTags();
         ssbTrackTags.setTag(tag);
