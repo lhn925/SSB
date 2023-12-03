@@ -1,11 +1,31 @@
 package sky.Sss.domain.track.model;
 
-public enum PlayListType {
-    PLAYLIST("PLAYLIST"), ALBUM("ALBUM"), EP("EP"), SINGLE("SINGLE"), COMPILATION("COMPILATION");
 
-    private String type;
-    PlayListType(String type) {
+public enum PlayListType {
+    PLAYLIST("PLAYLIST",1), ALBUM("ALBUM",2), EP("EP",3), SINGLE("SINGLE",4), COMPILATION("COMPILATION",5);
+
+    private final String type;
+    private final Integer index;
+    PlayListType(String type,Integer index) {
         this.type = type;
+        this.index = index;
     }
 
+    public static PlayListType findByListType(String type) {
+        PlayListType[] values = values();
+        for (PlayListType value : values) {
+            if (value.name().equals(type)) {
+                return value;
+            }
+        }
+        return PLAYLIST;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Integer getIndex() {
+        return index;
+    }
 }

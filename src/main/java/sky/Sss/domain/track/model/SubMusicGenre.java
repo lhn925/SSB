@@ -3,7 +3,7 @@ package sky.Sss.domain.track.model;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public enum MusicGenre {
+public enum SubMusicGenre {
     ALTERNATIVE_ROCK("alternative_rock",1),
     AMBIENT("ambient",2),
     CLASSICAL("classical",3),
@@ -38,14 +38,14 @@ public enum MusicGenre {
     private final String value;
     private final Integer index;
 
-    MusicGenre(String value, Integer index) {
+    SubMusicGenre(String value, Integer index) {
         this.value = value;
         this.index = index;
     }
 
-    public static MusicGenre findBySubGenre(String arg) {
-        MusicGenre[] values = values();
-        for (MusicGenre value : values) {
+    public static SubMusicGenre findBySubGenre(String arg) {
+        SubMusicGenre[] values = values();
+        for (SubMusicGenre value : values) {
             if (value.getValue().equals(arg)) {
                 return value;
             }

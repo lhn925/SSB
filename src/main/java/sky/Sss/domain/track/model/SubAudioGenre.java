@@ -1,6 +1,6 @@
 package sky.Sss.domain.track.model;
 
-public enum AudioGenre {
+public enum SubAudioGenre {
     AUDIOBOOKS("audiobooks",1),
     BUSINESS("business",2),
     COMEDY("comedy",3),
@@ -16,13 +16,13 @@ public enum AudioGenre {
     private final String value;
     private final Integer index;
 
-    AudioGenre(String value, Integer index) {
+    SubAudioGenre(String value, Integer index) {
         this.value = value;
         this.index = index;
     }
-    public static AudioGenre findBySubGenre(String genre) {
-        AudioGenre[] values = values();
-        for (AudioGenre value : values) {
+    public static SubAudioGenre findBySubGenre(String genre) {
+        SubAudioGenre[] values = values();
+        for (SubAudioGenre value : values) {
             if (value.name().equals(genre)) {
                 return value;
             }
