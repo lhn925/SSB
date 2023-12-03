@@ -11,14 +11,9 @@ import sky.Sss.domain.track.model.MainGenreType;
 @Getter
 @Setter
 public class TrackInfoUpdateDto extends BaseTrackDto {
-    @NotNull
-    private MainGenreType genreType;
-
-    @NotNull
-    private Long id;
 
     @NotBlank
-    private String token;
+    private String genreType;
     @NotBlank
     private String genre;
 
