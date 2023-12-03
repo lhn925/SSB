@@ -1,8 +1,6 @@
 package sky.Sss.domain.user.service.log;
 
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
@@ -14,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserActivityLogListDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserActivityLog;
@@ -25,7 +22,6 @@ import sky.Sss.domain.user.repository.UserQueryRepository;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.utili.auditor.AuditorAwareImpl;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Service
 @RequiredArgsConstructor

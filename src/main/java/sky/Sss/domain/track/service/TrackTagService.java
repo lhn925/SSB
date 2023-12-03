@@ -1,13 +1,19 @@
 package sky.Sss.domain.track.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.tag.TrackTagsDto;
+import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
+import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
+import sky.Sss.domain.track.repository.PlayListTagLinkRepository;
+import sky.Sss.domain.track.repository.TrackTagLinkRepository;
 import sky.Sss.domain.track.repository.TrackTagRepository;
 
 
@@ -18,16 +24,38 @@ import sky.Sss.domain.track.repository.TrackTagRepository;
 public class TrackTagService {
 
     private final TrackTagRepository trackTagRepository;
+    private final TrackTagLinkRepository trackTagLinkRepository;
+    private final PlayListTagLinkRepository playListTagLinkRepository;
 
+
+    //    Cache miss 로 인한 데이터 실시간성 보완을 위해 cachePut 사용
     @Transactional
-//    Cache miss 로 인한 데이터 실시간성 보완을 위해 cachePut 사용
     @CachePut(value = "tags", key = "#tag", cacheManager = "contentCacheManager")
-    public SsbTrackTags getTags(String tag) {
+    public SsbTrackTags getTagsByStr(String tag) {
         Optional<SsbTrackTags> byTag = trackTagRepository.findByTag(tag);
-        SsbTrackTags tags = null;
-        if (byTag.isEmpty()) {
-            tags = trackTagRepository.save(SsbTrackTags.createSsbTrackTag(tag));
-        }
-        return tags == null ? byTag.orElse(null) : tags;
+        return byTag.orElse(null);
     }
+
+    public List<SsbTrackTags> addTags(List<SsbTrackTags> tags) {
+        List<SsbTrackTags> ssbTrackTags = trackTagRepository.saveAll(tags);
+        return ssbTrackTags;
+    }
+
+    // 개별 trackLink Batch 삭제
+    @Transactional
+    public void deleteTagLinksInBatch(List<SsbTrackTagLink> tagLink) {
+        if (tagLink != null && !tagLink.isEmpty()) {
+            trackTagLinkRepository.deleteAllInBatch(tagLink);
+        }
+    }
+
+    // playList trackLink Batch 삭제
+    @Transactional
+    public void delPlyTagLinksInBatch(List<SsbPlayListTagLink> tagLink) {
+        if (tagLink != null && !tagLink.isEmpty()) {
+            playListTagLinkRepository.deleteAllInBatch(tagLink);
+        }
+    }
+
+
 }

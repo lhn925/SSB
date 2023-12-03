@@ -1,15 +1,15 @@
 package sky.Sss.domain.track.service;
 
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
-import sky.Sss.domain.track.exception.SsbFileFileNotFoundException;
+import sky.Sss.domain.track.exception.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.TempTrackStorageRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -55,11 +55,29 @@ public class TempTrackStorageService {
     }
 
     public TempTrackStorage findOne(Long id, String sessionId, String token, User user)
-        throws SsbFileFileNotFoundException {
+        throws SsbFileNotFoundException {
         TempTrackStorage findOne = tempTrackStorageRepository.findOne(id, token, sessionId, user).orElseThrow(
-            () -> new SsbFileFileNotFoundException());
+            () -> new SsbFileNotFoundException());
 
         return findOne;
+    }
+
+
+    public List<TempTrackStorage> findByList(String sessionId, User user, List<String> tokens, List<Long> ids)
+        throws SsbFileNotFoundException {
+        List<TempTrackStorage> tempTrackStorageList = tempTrackStorageRepository.findBySessionId(sessionId, user,
+            tokens, ids);
+        if (tempTrackStorageList.isEmpty()) {
+            new SsbFileNotFoundException();
+        }
+        return tempTrackStorageList;
+    }
+
+    @Transactional
+    public void deleteAllBatch(List<TempTrackStorage> tempList) {
+        if (!tempList.isEmpty()) {
+            tempTrackStorageRepository.deleteAllInBatch(tempList);
+        }
     }
 
     @Transactional
@@ -67,12 +85,13 @@ public class TempTrackStorageService {
         tempTrackStorageRepository.delete(tempTrackStorage);
     }
 
+
     @Transactional
-    public void delete(Long id, String token, String sessionId) throws IOException {
+    public void deleteAllBatch(Long id, String token, String sessionId) throws IOException {
         User user = userQueryService.findOne();
 
         TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, sessionId, user)
-            .orElseThrow(() -> new SsbFileFileNotFoundException());
+            .orElseThrow(() -> new SsbFileNotFoundException());
 
         // 임시파일 삭제
         TempTrackStorage.deleteTempFile(tempTrackStorage, fileStore);

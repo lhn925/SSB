@@ -1,19 +1,18 @@
 package sky.Sss.domain.track.dto.playlist;
 
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import sky.Sss.domain.track.dto.BaseTrackDto;
-import sky.Sss.domain.track.model.PlayListType;
 
 @Getter
 @Setter
-public class PlayListSettingDto extends BaseTrackDto {
+public class PlayListSettingSaveDto extends BaseTrackDto {
     // 플레이리스트 타입
-    @NotNull
-    private PlayListType playListType;
+    @NotBlank
+    private String playListType;
 
     private List<PlayListTrackInfoDto> playListTrackInfoDtoList;
 

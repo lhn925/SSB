@@ -22,12 +22,10 @@ import org.springframework.security.core.userdetails.User;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
-import sky.Sss.domain.track.dto.playlist.PlayListSettingDto;
+import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
-import sky.Sss.domain.track.model.MainGenreType;
-import sky.Sss.domain.track.model.MusicGenre;
-import sky.Sss.domain.track.model.PlayListType;
+import sky.Sss.domain.track.model.SubMusicGenre;
 
 
 @SpringBootTest
@@ -79,7 +77,7 @@ class TrackServiceTest {
             tagsDtoSet.add(trackTagsDto);
         }
 
-        trackMetaUploadDto.setTagSet(tagsDtoSet);
+//        trackMetaUploadDto.setTagSet(tagsDtoSet);
         trackMetaUploadDto.setTitle("sky");
 //        trackMetaUploadDto.setCoverImgFile(multipartFile5);
         trackMetaUploadDto.setGenre("hiphop");
@@ -112,9 +110,8 @@ class TrackServiceTest {
         MockMultipartFile multipartFile5 = new MockMultipartFile("cover", "IMG_7813.PNG", "image/x-png",
             fileInputStream5);
 
-        PlayListSettingDto playListSettingDto = new PlayListSettingDto();
-        playListSettingDto.setPlayListType(PlayListType.ALBUM);
-        playListSettingDto.setDesc("안녕하세요 앨범 소개글입니다");
+        PlayListSettingSaveDto playListSettingSaveDto = new PlayListSettingSaveDto();
+        playListSettingSaveDto.setDesc("안녕하세요 앨범 소개글입니다");
         Set<TrackTagsDto> tagsDtoSet = new HashSet<>();
         for (int i = 1; i<=10; i++) {
             TrackTagsDto trackTagsDto = new TrackTagsDto();
@@ -122,7 +119,7 @@ class TrackServiceTest {
             trackTagsDto.setTag("iu" + i);
             tagsDtoSet.add(trackTagsDto);
         }
-        playListSettingDto.setTagSet(tagsDtoSet);
+//        playListSettingSaveDto.setTagSet(tagsDtoSet);
 
         List<PlayListTrackInfoDto> list = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -142,17 +139,17 @@ class TrackServiceTest {
             PlayListTrackInfoDto trackPlayListMetaDto = new PlayListTrackInfoDto();
             trackPlayListMetaDto.setOrder(i+1);
             trackPlayListMetaDto.setTitle("아이유" + i);
-            trackPlayListMetaDto.setDesc(playListSettingDto.getDesc());
-            trackPlayListMetaDto.setGenre(MusicGenre.COUNTRY.name());
+            trackPlayListMetaDto.setDesc(playListSettingSaveDto.getDesc());
+            trackPlayListMetaDto.setGenre(SubMusicGenre.COUNTRY.name());
             trackPlayListMetaDto.setDownload(true);
             trackPlayListMetaDto.setPrivacy(false);
             trackPlayListMetaDto.setToken(tempTrackInfoDto.getToken());
             trackPlayListMetaDto.setId(tempTrackInfoDto.getId());
-            trackPlayListMetaDto.setGenreType(MainGenreType.MUSIC);
+//            trackPlayListMetaDto.setGenreType(MainGenreType.MUSIC);
             list.add(trackPlayListMetaDto);
         }
 
-        playListSettingDto.setPlayListTrackInfoDtoList(list);
+        playListSettingSaveDto.setPlayListTrackInfoDtoList(list);
 
 
     }
