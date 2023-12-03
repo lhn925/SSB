@@ -6,11 +6,16 @@ public class JSEscape {
         if (text == null || text.length() == 0) {
             return null;
         }
-        return text.replaceAll("<", "\\u003C")
-            .replaceAll(">", "\\u003E")
-            .replaceAll(":", "\\u003A")
-            .replaceAll("'", "\\u0027")
-            .replaceAll("\"", "\\u0022")
-            .replaceAll(".", "\\u002E");
+        return text.replace("<", "\\u003C")
+            .replace(">", "\\u003E")
+            .replace(":", "\\u003A")
+            .replace("'", "\\u0027")
+            .replace("\"", "\\u0022")
+            .replace(".", "\\u002E")
+            .replace("{", "\\u007B")
+            .replace("}", "\\u007D")
+            .replace(",", "\\u002C")
+            .replace("\n", "\\u000A")
+            .replace(" ", "\\u0020");
     }
 }
