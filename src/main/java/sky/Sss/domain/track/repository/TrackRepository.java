@@ -15,10 +15,15 @@ public interface TrackRepository extends JpaRepository<SsbTrack, Long> {
      * @param user
      * @return
      */
-    @Query("select COALESCE(sum(s.trackLength),0) from SsbTrack s where s.user = :user and s.isEnabled =:isEnabled")
-    Integer getTotalTrackLength(@Param("user") User user, @Param("isEnabled") Boolean isEnabled);
+    @Query("select COALESCE(sum(s.trackLength),0) from SsbTrack s where s.user = :user and s.isStatus =:isStatus")
+    Integer getTotalTrackLength(@Param("user") User user, @Param("isStatus") Boolean isStatus);
 
-    @Query("select s from SsbTrack s where s.id =:id and s.user =:user and s.token =:token and s.isEnabled =:isEnabled")
-    Optional<SsbTrack> findOne(@Param("id") Long id, @Param("user") User user, @Param("token") String token,@Param("isEnabled") Boolean isEnabled);
+    @Query("select s from SsbTrack s where s.id =:id and s.user =:user and s.token =:token and s.isStatus =:isStatus")
+    Optional<SsbTrack> findOne(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
+        @Param("isStatus") Boolean isStatus);
+
+    @Query("select s from SsbTrack s join fetch s.tags where s.id =:id and s.user =:user and s.token =:token and s.isStatus =:isStatus")
+    Optional<SsbTrack> findOneWithTags(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
+        @Param("isStatus") Boolean isStatus);
 
 }
