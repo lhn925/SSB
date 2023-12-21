@@ -2,7 +2,6 @@ package sky.Sss.domain.track.entity.track;
 
 
 import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.EnumType.ORDINAL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -10,7 +9,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -27,7 +25,6 @@ import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.utili.FileStore;
@@ -166,13 +163,13 @@ public class SsbTrack extends BaseTimeEntity {
 
     public static void deleteTrackFile(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getStoreFileName())) {
-            fileStore.deleteFile(FileStore.TRACK_DIR, ssbTrack.getToken(), ssbTrack.getStoreFileName());
+            fileStore.deleteFile(FileStore.TRACK_DIR, ssbTrack.getStoreFileName());
         }
     }
 
     public static void deleteCoverImg(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getCoverUrl())) {
-            fileStore.deleteFile(FileStore.TRACK_COVER_DIR, ssbTrack.getToken(), ssbTrack.getCoverUrl());
+            fileStore.deleteFile(FileStore.IMAGE_DIR, ssbTrack.getCoverUrl());
         }
     }
 
@@ -182,9 +179,8 @@ public class SsbTrack extends BaseTimeEntity {
         }
 
     }
-
     public static String getSsbTrackCoverPath(FileStore fileStore, String token) {
-        return fileStore.getTrackCoverDir() + token + "/";
+        return fileStore.getImageDir() + token + "/";
     }
 
 }

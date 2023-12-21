@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.model.PlayListType;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.utili.FileStore;
@@ -140,7 +139,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
 
     public static void deleteCoverImg(FileStore fileStore, SsbPlayListSettings ssbPlayListSettings) {
         if (StringUtils.hasText(ssbPlayListSettings.getCoverUrl())) {
-            fileStore.deleteFile(FileStore.TRACK_COVER_DIR, ssbPlayListSettings.getToken(),
+            fileStore.deleteFile(FileStore.IMAGE_DIR,
                 ssbPlayListSettings.getCoverUrl());
         }
     }

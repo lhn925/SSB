@@ -72,7 +72,7 @@ public class TempTrackStorage extends BaseTimeEntity {
     public static void deleteTempFile(TempTrackStorage tempTrackStorage, FileStore fileStore)
         throws SsbFileNotFoundException {
         if (StringUtils.hasText(tempTrackStorage.getStoreFileName())) {
-            fileStore.deleteFile(FileStore.TRACK_DIR, tempTrackStorage.getToken(), tempTrackStorage.getStoreFileName());
+            fileStore.deleteFile(FileStore.TRACK_DIR, tempTrackStorage.getStoreFileName());
         }
     }
 

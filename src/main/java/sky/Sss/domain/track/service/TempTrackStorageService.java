@@ -39,10 +39,9 @@ public class TempTrackStorageService {
         // cover/fileToken/cover
         String fileToken = UserTokenUtil.getToken();
 
-        UploadTrackFileDto uploadTrackFileDto = (UploadTrackFileDto) fileStore.storeFileSave(
+        UploadTrackFileDto uploadTrackFileDto = (UploadTrackFileDto) fileStore.storeTrackFileSave(
             tempTrackFileUploadDto.getTrackFile(),
-            FileStore.TRACK_DIR,
-            fileToken);
+            FileStore.TRACK_DIR, fileToken);
         TempTrackStorage tempTrackStorage = TempTrackStorage.createTempTrackStorage(uploadTrackFileDto, fileToken,
             sessionId, user, tempTrackFileUploadDto.isPlayList());
 

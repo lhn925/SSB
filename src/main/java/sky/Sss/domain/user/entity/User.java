@@ -177,7 +177,7 @@ public class User extends BaseTimeEntity {
      */
     public static void deletePicture(User user,FileStore fileStore) throws IOException {
         if (StringUtils.hasText(user.getPictureUrl())) {
-            fileStore.deleteFile(FileStore.USER_PICTURE_DIR,user.getToken(),user.getPictureUrl());
+            fileStore.deleteFile(FileStore.IMAGE_DIR, user.getPictureUrl());
         }
     }
 

@@ -3,7 +3,6 @@ package sky.Sss.domain.user.service.myInfo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +21,7 @@ import sky.Sss.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.join.UserJoinService;
+import sky.Sss.domain.user.utili.UserTokenUtil;
 import sky.Sss.global.file.utili.FileStore;
 import sky.Sss.global.file.dto.UploadFileDto;
 
@@ -73,7 +73,7 @@ public class UserMyInfoService {
         UploadFileDto uploadFileDto = null;
         if (!file.isEmpty()) {
             try {
-                uploadFileDto = fileStore.storeFileSave(file, fileStore.getUserPictureDir(), user.getToken(), 300);
+                uploadFileDto = fileStore.storeFileSave(file, FileStore.PICTURE_TYPE, 500);
                 uploadFileDto.setUserId(user.getUserId());
                 if (uploadFileDto != null) {
                     //기존에 있던 이미지 삭제 없으면 삭제 x
@@ -89,11 +89,8 @@ public class UserMyInfoService {
         } else {
             throw new RuntimeException("file.error.NotBlank");
         }
-
         return uploadFileDto;
     }
-
-
     @Transactional
     public void deletePicture() throws FileNotFoundException {
 
@@ -121,7 +118,6 @@ public class UserMyInfoService {
     public void updateLoginBlocked(UserLoginBlockUpdateDto userLoginBlockUpdateDto) {
         User user = userQueryService.findOne();
         // block 여부 업데이트
-        log.info("userLoginBlockUpdateDto = {}", userLoginBlockUpdateDto.getIsLoginBlocked());
         User.changeIsLoginBlocked(user, userLoginBlockUpdateDto);
         // 세션 업데이트
         UserInfoDto.createUserInfo(user);
@@ -129,7 +125,7 @@ public class UserMyInfoService {
 
 
     public UrlResource getPictureImage(String imageName) {
-        return fileStore.getPictureUrlResource(imageName);
+        return fileStore.getUrlResource(imageName);
     }
 
 

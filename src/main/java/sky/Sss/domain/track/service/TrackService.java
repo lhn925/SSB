@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,11 +80,12 @@ public class TrackService {
 
         // 트랙 저장
         trackRepository.save(ssbTrack);
-        if (coverImgFile != null) {
-            UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile,
-                tempTrackStorage.getToken());
-            SsbTrack.updateCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
+
+        String storeFileName = null;
+        if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드
+            storeFileName = getUploadFileDto(coverImgFile).getStoreFileName();
         }
+        SsbTrack.updateCoverImg(storeFileName, ssbTrack);
         tempTrackStorageService.delete(tempTrackStorage);
         return new TrackInfoDto(ssbTrack, user.getUserName());
 
@@ -157,17 +159,15 @@ public class TrackService {
         tempTrackStorageService.deleteAllBatch(tempList);
 
         // 커버 이미지 업데이트
+        String storeFileCoverName = null;
         if (coverImgFile != null) {
-            for (Integer key : trackFileMap.keySet()) {
-                trackFileMap.get(key);
-                UploadFileDto trackUploadFileDto = getUploadFileDto(coverImgFile,
-                    trackFileMap.get(key).getToken());
-                SsbTrack.updateCoverImg(trackUploadFileDto.getStoreFileName(), trackFileMap.get(key));
-            }
-            UploadFileDto playListUploadFileDto = getUploadFileDto(coverImgFile,
-                playListToken);
-            SsbPlayListSettings.updateCoverImg(playListUploadFileDto.getStoreFileName(), ssbPlayListSettings);
+            storeFileCoverName = getUploadFileDto(coverImgFile).getStoreFileName();
         }
+        for (Integer key : trackFileMap.keySet()) {
+            trackFileMap.get(key);
+            SsbTrack.updateCoverImg(storeFileCoverName, trackFileMap.get(key));
+        }
+        SsbPlayListSettings.updateCoverImg(storeFileCoverName, ssbPlayListSettings);
 
         trackRepository.saveAll(savaTracks);
         // 등록
@@ -208,9 +208,8 @@ public class TrackService {
 
         if (coverImgFile != null) {
             // 기존 이미지 삭제
-            SsbTrack.deleteCoverImg(ssbTrack, fileStore);
-
-            UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile, ssbTrack.getToken());
+//            SsbTrack.deleteCoverImg(ssbTrack, fileStore);
+            UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile);
             SsbTrack.updateCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
         }
     }
@@ -247,7 +246,7 @@ public class TrackService {
         SsbTrack ssbTrack = findOne(id, token, user, Status.ON);
 
         // 커버이미지 삭제
-        SsbTrack.deleteCoverImg(ssbTrack, fileStore);
+//        SsbTrack.deleteCoverImg(ssbTrack, fileStore);
 
         trackTagService.deleteTagLinksInBatch(ssbTrack.getTags());
 
@@ -260,15 +259,21 @@ public class TrackService {
             .orElseThrow(() -> new SsbFileNotFoundException());
     }
 
+    public SsbTrack findById(Long id, Status isStatus) {
+        return trackRepository.findByIdAndIsStatus(id, isStatus.getValue())
+            .orElseThrow(() -> new SsbFileNotFoundException());
+    }
+
+
     /**
      * cover Img upload
      *
      * @return
      * @throws IOException
      */
-    public UploadFileDto getUploadFileDto(MultipartFile coverImgFile, String token) {
+    public UploadFileDto getUploadFileDto(MultipartFile coverImgFile) {
         UploadFileDto uploadFileDto = fileStore.storeFileSave(coverImgFile,
-            FileStore.TRACK_COVER_DIR, token, 800);
+            FileStore.COVER_TYPE, 500);
         return uploadFileDto;
     }
 
@@ -351,6 +356,11 @@ public class TrackService {
         if (isLengthOver) {
             throw new SsbFileLengthLimitOverException();
         }
+    }
+
+    public UrlResource getSsbTrackFile(String fileName) {
+
+        return fileStore.getUrlResource(FileStore.TRACK_DIR + fileName);
     }
 
 }

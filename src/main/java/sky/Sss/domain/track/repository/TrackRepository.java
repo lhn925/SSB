@@ -22,6 +22,10 @@ public interface TrackRepository extends JpaRepository<SsbTrack, Long> {
     Optional<SsbTrack> findOne(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
         @Param("isStatus") Boolean isStatus);
 
+
+    Optional<SsbTrack> findByIdAndIsStatus(@Param("id") Long id, @Param("isStatus") Boolean isStatus);
+
+
     @Query("select s from SsbTrack s join fetch s.tags where s.id =:id and s.user =:user and s.token =:token and s.isStatus =:isStatus")
     Optional<SsbTrack> findOneWithTags(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
         @Param("isStatus") Boolean isStatus);

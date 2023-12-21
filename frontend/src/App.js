@@ -17,6 +17,7 @@ import {Profile} from "content/profile/Profile";
 import Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
 import * as StompJs from "@stomp/stompjs";
+import ReactPlayer from "react-player";
 
 // const Feed = lazy(() => import('./routes/Feed'));
 // const Home = lazy(() => import('./routes/home'));
@@ -110,6 +111,8 @@ function App() {
             pauseOnHover
             theme="light"
         />
+
+        <ReactPlayer url={process.env.PUBLIC_URL + "/user/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />
         <div className="l-container">
           <Routes>
             <Route path="/">

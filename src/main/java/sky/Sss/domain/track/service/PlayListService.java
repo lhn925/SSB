@@ -19,7 +19,6 @@ import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.PlayListSettingRepository;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.file.dto.UploadFileDto;
@@ -94,8 +93,8 @@ public class PlayListService {
 
         // 이미지 수정
         if (coverImgFile != null) {
-            SsbPlayListSettings.deleteCoverImg(fileStore, ssbPlayListSettings);
-            UploadFileDto uploadFileDto = trackService.getUploadFileDto(coverImgFile, ssbPlayListSettings.getToken());
+//            SsbPlayListSettings.deleteCoverImg(fileStore, ssbPlayListSettings);
+            UploadFileDto uploadFileDto = trackService.getUploadFileDto(coverImgFile);
             SsbPlayListSettings.updateCoverImg(uploadFileDto.getStoreFileName(), ssbPlayListSettings);
         }
     }
@@ -108,7 +107,7 @@ public class PlayListService {
         SsbPlayListSettings.changeStatus(ssbPlayListSettings, Status.OFF);
 
         // coverImg 삭제
-        SsbPlayListSettings.deleteCoverImg(fileStore, ssbPlayListSettings);
+//        SsbPlayListSettings.deleteCoverImg(fileStore, ssbPlayListSettings);
 //        // link 삭제
         trackTagService.delPlyTagLinksInBatch(ssbPlayListSettings.getTags());
 //        // tracks 삭제
