@@ -52,7 +52,7 @@ public class BoardJdbcRepository implements BoardRepository {
     }
 
     @Override
-    public Optional<Board> findById (Long findId) {
+    public Optional<Board> findOne (Long findId) {
         Board board = null;
         try {
             getConn();
