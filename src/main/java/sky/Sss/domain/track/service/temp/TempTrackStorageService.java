@@ -48,7 +48,7 @@ public class TempTrackStorageService {
         tempTrackStorageRepository.save(tempTrackStorage);
 
         // 구분값 추가
-        TempTrackInfoDto tempTrackInfoDto = new TempTrackInfoDto(tempTrackStorage.getId(), tempTrackStorage.getToken(),
+        TempTrackInfoDto tempTrackInfoDto =  TempTrackInfoDto.create(tempTrackStorage.getId(), tempTrackStorage.getToken(),
             uploadTrackFileDto);
         return tempTrackInfoDto;
     }

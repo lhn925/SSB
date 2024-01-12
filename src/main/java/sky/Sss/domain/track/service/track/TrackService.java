@@ -87,7 +87,7 @@ public class TrackService {
         }
         SsbTrack.updateCoverImg(storeFileName, ssbTrack);
         tempTrackStorageService.delete(tempTrackStorage);
-        return new TrackInfoDto(ssbTrack, user.getUserName());
+        return TrackInfoDto.create(ssbTrack, user.getUserName());
 
     }
 
@@ -173,7 +173,7 @@ public class TrackService {
         // 등록
         playListSettingRepository.save(ssbPlayListSettings);
 
-        return new PlayListInfoDto(ssbPlayListSettings);
+        return PlayListInfoDto.create(ssbPlayListSettings);
     }
 
     @Transactional

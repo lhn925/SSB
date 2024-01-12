@@ -5,12 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TotalLengthDto {
+public class TotalLengthRepDto {
 
     private Integer totalLength;
     private Long limit;
 
-    public TotalLengthDto(Integer totalLength,Long limit) {
+    public TotalLengthRepDto(Integer totalLength,Long limit) {
         this.totalLength = totalLength;
         this.limit = limit;
     }
