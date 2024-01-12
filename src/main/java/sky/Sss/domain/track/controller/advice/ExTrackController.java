@@ -2,6 +2,7 @@ package sky.Sss.domain.track.controller.advice;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sky.Sss.domain.track.exception.SsbFileException;
+import sky.Sss.domain.track.exception.SsbTrackAccessDeniedException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
+import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.Result;
 
 @Slf4j
@@ -23,11 +26,19 @@ public class ExTrackController {
 
 
     @ExceptionHandler({SsbFileException.class})
-    public ResponseEntity fileExHandler(SsbFileException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResult> fileExHandler(SsbFileException e, HttpServletRequest request) {
         return Result.getErrorResult(new ErrorGlobalResultDto(e.getCode(), ms, request.getLocale()), e.getHttpStatus());
     }
+
+    @ExceptionHandler({SsbTrackAccessDeniedException.class})
+    public ResponseEntity<ErrorResult> fileAccessExHandler(SsbTrackAccessDeniedException e,
+        HttpServletRequest request) {
+        return Result.getErrorResult(new ErrorGlobalResultDto(e.getCode(), ms, request.getLocale()), e.getHttpStatus());
+    }
+
     @ExceptionHandler({RuntimeException.class})
-    public ResponseEntity ioExHandler(RuntimeException e, HttpServletRequest request) {
-        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ErrorResult> ioExHandler(RuntimeException e, HttpServletRequest request) {
+        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),
+            HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
