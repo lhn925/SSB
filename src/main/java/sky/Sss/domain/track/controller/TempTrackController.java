@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.temp.TempTrackDeleteDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
-import sky.Sss.domain.track.service.TempTrackStorageService;
+import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.Result;
@@ -68,7 +68,7 @@ public class TempTrackController {
      * @return
      */
     @DeleteMapping
-    public ResponseEntity deleteTempFile(@Validated @ModelAttribute TempTrackDeleteDto tempTrackDeleteDto,
+    public ResponseEntity removeTempFile(@Validated @ModelAttribute TempTrackDeleteDto tempTrackDeleteDto,
         BindingResult bindingResult, HttpServletRequest request) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));

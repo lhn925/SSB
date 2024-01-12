@@ -21,7 +21,7 @@ import sky.Sss.domain.track.dto.playlist.PlayListInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingUpdateDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackDeleteDto;
-import sky.Sss.domain.track.service.PlayListService;
+import sky.Sss.domain.track.service.playList.PlayListService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.Result;

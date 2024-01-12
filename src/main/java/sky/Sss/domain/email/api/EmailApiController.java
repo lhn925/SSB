@@ -98,7 +98,7 @@ public class EmailApiController {
      * @return
      */
     @PostMapping("/codeCheck")
-    public ResponseEntity sendJoinMail(
+    public ResponseEntity verifyAuthCode(
         @Validated @RequestBody CodeCheckRequestDto authCode,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -132,7 +132,7 @@ public class EmailApiController {
         emailAuthCodeDto.changeSuccess(true);
         session.setAttribute("emailAuthCodeDto", emailAuthCodeDto);
 
-        return new ResponseEntity(emailAuthCodeDto, HttpStatus.OK);
+        return ResponseEntity.ok(emailAuthCodeDto);
     }
 
 

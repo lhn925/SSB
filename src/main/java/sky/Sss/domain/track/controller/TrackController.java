@@ -11,7 +11,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import sky.Sss.domain.track.dto.track.TotalLengthDto;
+import sky.Sss.domain.track.dto.track.TotalLengthRepDto;
 import sky.Sss.domain.track.dto.track.TrackDeleteDto;
-import sky.Sss.domain.track.dto.track.TrackInfoDto;
+import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.dto.track.TrackInfoUpdateDto;
-import sky.Sss.domain.track.service.TrackService;
+import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.error.dto.ErrorResultDto;
@@ -43,9 +42,10 @@ public class TrackController {
     private final MessageSource ms;
     private final UserQueryService userQueryService;
     /**
-     * 플레이 리스트 수정
-     * 플레이 리스트 삭제
-     * 플레이 리스트 개별 곡 삭제
+     * track 생성
+     * track 수정
+     * track 삭제
+     *
      *
      * @param trackMetaUploadDto
      * @param bindingResult
@@ -56,24 +56,26 @@ public class TrackController {
      * 개별곡 저장
      */
     @PostMapping
-    public ResponseEntity saveTrack(@Validated @RequestPart TrackInfoSaveDto trackInfoSaveDto,
+    public ResponseEntity<?> saveTrack(@Validated @RequestPart TrackInfoSaveDto trackInfoSaveDto,
         BindingResult bindingResult,
         @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
+
         HttpSession session = request.getSession();
-        TrackInfoDto trackInfoDto = trackService.saveTrackFile(trackInfoSaveDto, coverImgFile, session.getId());
-        return ResponseEntity.ok(trackInfoDto);
+        TrackInfoRepDto trackInfoRepDto = trackService.saveTrackFile(trackInfoSaveDto, coverImgFile, session.getId());
+        return ResponseEntity.ok(trackInfoRepDto);
     }
+
     /**
      * 트랙정보 업데이트
      *
      * @return
      */
     @PutMapping
-    public ResponseEntity updateTrack(@Validated @RequestPart TrackInfoUpdateDto trackInfoUpdateDto,
+    public ResponseEntity<?> modifyTrack(@Validated @RequestPart TrackInfoUpdateDto trackInfoUpdateDto,
         @RequestPart(required = false) MultipartFile coverImgFile,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -87,7 +89,7 @@ public class TrackController {
      * 트랙 파일 삭제
      */
     @DeleteMapping
-    public ResponseEntity deleteTrack(@Validated @RequestBody TrackDeleteDto trackDeleteDto,
+    public ResponseEntity<?> removeTrack(@Validated @RequestBody TrackDeleteDto trackDeleteDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -95,14 +97,16 @@ public class TrackController {
         trackService.deleteTrack(trackDeleteDto.getId(), trackDeleteDto.getToken());
         return ResponseEntity.ok().build();
     }
+
+
     /**
-     *
      * 업로드한 track 시간 총합
+     *
      * @return
      */
     @GetMapping("/total")
-    public ResponseEntity getTotalLength() {
+    public ResponseEntity<TotalLengthRepDto> getTotalLength() {
         Integer totalLength = trackService.getTotalLength(userQueryService.findOne());
-        return ResponseEntity.ok(new TotalLengthDto(totalLength, FileStore.TRACK_UPLOAD_LIMIT));
+        return ResponseEntity.ok(new TotalLengthRepDto(totalLength, FileStore.TRACK_UPLOAD_LIMIT));
     }
 }
