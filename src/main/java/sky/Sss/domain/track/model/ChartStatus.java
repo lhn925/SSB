@@ -1,17 +1,15 @@
 package sky.Sss.domain.track.model;
 
-public enum PlayBackStatus {
-    //재생중
-    PLAYING("PLAYING"),
-    //정지
-    PAUSED("PAUSED"),
-    //완료
-    COMPLETED("COMPLETED"),
-    //알수없음
-    INCOMPLETE("INCOMPLETE");
+public enum ChartStatus {
+    // 차트에 반영되지 않음
+    NOT_REFLECTED("NOT_REFLECTED"),
+
+    // 차트에 반영됨
+    REFLECTED("REFLECTED");
+
 
     private String status;
-    PlayBackStatus(String playBackStatus) {
+    ChartStatus(String playBackStatus) {
         this.status = playBackStatus;
     }
 }
