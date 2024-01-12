@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
+import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
@@ -65,12 +66,13 @@ public class SsbTrack extends BaseTimeEntity {
     // track 커버
     private String coverUrl;
 
-    // 공개 여부 True면 공개 false면 비공개
+    // 공개 여부 True 면 비공개 false 면 공개
     @Column(nullable = false)
     private Boolean isPrivacy;
 
     @Column(nullable = false)
     private Long size;
+
     @Column(nullable = false)
     private Integer trackLength;
 
@@ -91,7 +93,7 @@ public class SsbTrack extends BaseTimeEntity {
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackLikes> likes = new ArrayList<>();
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
-    private List<SsbTrackViews> views = new ArrayList<>();
+    private List<SsbChartIncludedPlays> views = new ArrayList<>();
 
 
     public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
@@ -103,6 +105,10 @@ public class SsbTrack extends BaseTimeEntity {
             // 아무것도 없으면 전부 삭제
             rmTagLink(ssbTrack);
         }
+    }
+
+    public static void addView(SsbTrack ssbTrack, SsbChartIncludedPlays ssbChartIncludedPlays) {
+        ssbTrack.getViews().add(ssbChartIncludedPlays);
     }
 
     // 링크 삭제
@@ -119,9 +125,10 @@ public class SsbTrack extends BaseTimeEntity {
         SsbTrack ssbTrack = new SsbTrack();
         setUploadTrackFile(tempTrackStorage, ssbTrack);
         uploadInfo(ssbTrack, trackInfoSaveDto.getGenre(), trackInfoSaveDto.getGenreType(),
-            trackInfoSaveDto.isPrivacy(), trackInfoSaveDto.isDownload(), trackInfoSaveDto.getTitle(),
+            trackInfoSaveDto.getIsPrivacy(), trackInfoSaveDto.getIsDownload(), trackInfoSaveDto.getTitle(),
             trackInfoSaveDto.getDesc());
         ssbTrack.setUser(user);
+
         SsbTrack.changeStatus(ssbTrack, Status.ON);
         return ssbTrack;
     }
@@ -144,6 +151,7 @@ public class SsbTrack extends BaseTimeEntity {
 
         ssbTrack.setDescription(JSEscape.escapeJS(description));
     }
+
     public static void updateToken(String token, SsbTrack ssbTrack) {
         ssbTrack.setToken(token);
     }
@@ -158,6 +166,8 @@ public class SsbTrack extends BaseTimeEntity {
         ssbTrack.setSize(tempTrackStorage.getSize());
         ssbTrack.setOriginalName(tempTrackStorage.getOriginalName());
         ssbTrack.setStoreFileName(tempTrackStorage.getStoreFileName());
+
+        tempTrackStorage.getCreatedDateTime();
     }
 
 
@@ -179,6 +189,7 @@ public class SsbTrack extends BaseTimeEntity {
         }
 
     }
+
     public static String getSsbTrackCoverPath(FileStore fileStore, String token) {
         return fileStore.getImageDir() + token + "/";
     }
