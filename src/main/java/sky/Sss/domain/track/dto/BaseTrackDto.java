@@ -23,8 +23,10 @@ public class BaseTrackDto {
     @NotNull
     protected String desc;
 
-    protected boolean isDownload;
-    protected boolean isPrivacy;
+    @NotNull
+    protected Boolean isDownload;
+    @NotNull
+    protected Boolean isPrivacy;
     protected List<TrackTagsDto> tagList;
 
 }
