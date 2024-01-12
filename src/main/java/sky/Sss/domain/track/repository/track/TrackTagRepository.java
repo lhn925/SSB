@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.repository;
+package sky.Sss.domain.track.repository.track;
 
 import java.util.List;
 import java.util.Optional;

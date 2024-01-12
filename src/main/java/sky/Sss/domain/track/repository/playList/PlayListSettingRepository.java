@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.repository;
+package sky.Sss.domain.track.repository.playList;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
