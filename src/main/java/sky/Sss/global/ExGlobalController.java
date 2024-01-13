@@ -10,18 +10,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import sky.Sss.domain.track.exception.SsbTrackAccessDeniedException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
+import sky.Sss.global.error.dto.ErrorResult;
+import sky.Sss.global.error.dto.Result;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = {"sky.Sss"})
 public class ExGlobalController {
 
     private final MessageSource ms;
     @ExceptionHandler({AccessDeniedException.class})
-    public ResponseEntity accessExHandler (AccessDeniedException e,HttpServletRequest request) {
+    public ResponseEntity<ErrorResult> accessExHandler (AccessDeniedException e,HttpServletRequest request) {
         return new ResponseEntity(new ErrorGlobalResultDto("access.error.forbidden", ms, request.getLocale()),
             HttpStatus.FORBIDDEN);
     }
-
+    @ExceptionHandler({SsbTrackAccessDeniedException.class})
+    public ResponseEntity<ErrorResult> trackAccessExHandler(SsbTrackAccessDeniedException e, HttpServletRequest request) {
+        log.info("e.getMessage() = {}", e.getMessage());
+        return Result.getErrorResult(new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale()),
+            HttpStatus.FORBIDDEN);
+    }
 }
