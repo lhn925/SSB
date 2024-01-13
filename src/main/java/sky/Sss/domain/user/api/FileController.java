@@ -1,5 +1,6 @@
 package sky.Sss.domain.user.api;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,14 +15,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.service.TrackService;
-import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.domain.user.service.myInfo.UserMyInfoService;
+import sky.Sss.domain.track.service.track.TrackPlayService;
 import sky.Sss.global.file.utili.FileStore;
 
 @Slf4j
@@ -30,10 +25,8 @@ import sky.Sss.global.file.utili.FileStore;
 @RequestMapping("/user/file")
 public class FileController {
 
-    private final UserMyInfoService userMyInfoService;
-    private final UserQueryService userQueryService;
-    private final TrackService trackService;
     private final FileStore fileStore;
+    private final TrackPlayService trackPlayService;
 
     // 굳이 파일을 들고 오는데
     // DB 조회를 해야할까?
@@ -46,7 +39,6 @@ public class FileController {
     //https://i1.sndcdn.com/avatars-CArjHPU2594ar3d8-zRJ9nw-t500x500.jpg
     //https://i1.sndcdn.com/artworks-ofaAuAuzQo8MEAsM-v2yUgg-t500x500.jpg
     //https://i1.sndcdn.com/artworks-zpso7w5yhucrU6FT-TQdzcg-t500x500.jpg
-
 
     /**
      * id:user_file_Api_1
@@ -74,20 +66,21 @@ public class FileController {
             .body(pictureImage);
     }
 
+    /**
+     * track 재생
+     *
+     * @return
+     */
+    // 한시간에 한번만 플레이 인정
+    // 70% 혹은 1분 이하의 곡은 전부다 들어야 조회수 인정
     // track file 출력
-    @GetMapping("/track")
-    public ResponseEntity getTrackFile(@RequestParam Long id) {
-        UrlResource trackFile = null;
-        try {
-            SsbTrack ssbTrack = trackService.findById(id, Status.ON);
-            trackFile = trackService.getSsbTrackFile(ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok().body(trackFile);
+    @GetMapping("/track/play/{id}/{token}")
+    public ResponseEntity<UrlResource> getTrackFile(@PathVariable Long id, @PathVariable String token) {
+
+        return ResponseEntity.ok(trackPlayService.getTrackPlayFile(id, token));
+
     }
 
-    // track file 출력
     @GetMapping("/image/default")
     public ResponseEntity getTrackCoverImg(@PathVariable Long trackId, @PathVariable String userId) {
         return null;
