@@ -31,33 +31,16 @@ public class HttpReqRespUtils {
 
     //    @Async
     public static String getClientIpAddressIfServletRequestExist() {
-
         if (Objects.isNull(RequestContextHolder.getRequestAttributes())) {
             return "0.0.0.0";
         }
-
         //RequestContextHolder는 Spring 프레임워크 전 구간에서 HttpServletRequest에 접근할 수 있게 도와주는 구현체
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = getHttpServletRequest();
 
-        String ip = "";
+        String ip = "218.239.21.150";
         // 로컬 구분
 
-        if (request.getRemoteAddr().equals("127.0.0.1")) {
-            InetAddress local = null;
-            try {
-                local = InetAddress.getLocalHost();
-                log.info("local.getAddress() = {}", local.getAddress());
-                log.info("local.getHostAddress() = {}", local.getHostAddress());
-                log.info("local.getCanonicalHostName() = {}", local.getCanonicalHostName());
-
-                if (local.getHostAddress().equals("127.0.0.1") || local.getHostAddress().equals("192.168.0.100")) {
-                    return ip = "218.239.21.150";
-                }
-                ip = local.getHostAddress();
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
+        if (!request.getRemoteAddr().equals("127.0.0.1")) {
             for (String header : IP_HEADER_CANDIDATES) {
                 String ipFromHeader = request.getHeader(header);
 
@@ -68,6 +51,16 @@ public class HttpReqRespUtils {
             }
         }
         return ip;
+    }
+
+    public static HttpServletRequest getHttpServletRequest() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+        return request;
+    }
+
+    public static String getUserAgent(HttpServletRequest request) {
+        return request.getHeader("User-Agent");
     }
 
 
