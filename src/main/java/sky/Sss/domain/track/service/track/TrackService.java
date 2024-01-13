@@ -21,10 +21,7 @@ import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.track.TrackInfoUpdateDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
-import sky.Sss.domain.track.dto.track.count.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
-import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
-import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
@@ -51,13 +48,14 @@ import sky.Sss.global.file.utili.FileStore;
 public class TrackService {
 
     private final FileStore fileStore;
-    private final TrackRepository trackRepository;
     private final UserQueryService userQueryService;
     private final PlayListSettingRepository playListSettingRepository;
     private final TrackTagService trackTagService;
     private final TempTrackStorageService tempTrackStorageService;
-    private final TrackAllPlayLogService trackAllPlayLogService;
-    private final TrackPlayIncludedService trackPlayIncludedService;
+    private final TrackQueryService trackQueryService;
+    private final TrackRepository trackRepository;
+    private final TrackPlaybackMetricsService trackPlaybackMetricsService;
+
     /**
      * track 생성
      *
@@ -65,7 +63,8 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public TrackInfoRepDto saveTrackFile(TrackInfoSaveDto trackInfoSaveDto, MultipartFile coverImgFile, String sessionId) {
+    public TrackInfoRepDto saveTrackFile(TrackInfoSaveDto trackInfoSaveDto, MultipartFile coverImgFile,
+        String sessionId) {
         User user = userQueryService.findOne();
         // 시간제한 180분
         // 임시 디비에 있던걸
@@ -96,6 +95,23 @@ public class TrackService {
         tempTrackStorageService.delete(tempTrackStorage);
         return TrackInfoRepDto.create(ssbTrack);
 
+    }
+
+    public SsbTrack findOne(Long id, String token, User user, Status isStatus) {
+        return trackQueryService.findOne(id, token, user, isStatus);
+    }
+
+    public SsbTrack findOne(Long id, String token, Status isStatus) {
+        return trackQueryService.findOne(id, token, isStatus);
+    }
+
+    public SsbTrack findOneJoinUser(Long id, Status isStatus) {
+        return trackQueryService.findOneJoinUser(id, isStatus);
+    }
+
+    public Integer getTotalLength(User user) {
+        Integer totalTrackLength = trackQueryService.getTotalLength(user);
+        return totalTrackLength;
     }
 
     /**
@@ -281,11 +297,7 @@ public class TrackService {
         // 자신의 track은 자신이 플레이를 해도 측정 x
         // 해당 트랙에 접근 권한이 없을 경우 x
         if (isMember && !isOwnerPost && trackPlayRepDto != null) {
-            SsbTrackAllPlayLogs ssbTrackAllPlayLogs = trackAllPlayLogService.addPlayLog(user, ssbTrack, userAgent);
-            // 로그 정보 dto 생성
-            TrackPlayLogRepDto trackPlayLogRepDto = TrackPlayLogRepDto.create(ssbTrackAllPlayLogs);
-            // trackPlayRepDto set
-            TrackPlayRepDto.updateTrackPlayLogRepDto(trackPlayRepDto,trackPlayLogRepDto);
+            trackPlaybackMetricsService.createAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
         }
         return trackPlayRepDto;
     }
@@ -302,22 +314,6 @@ public class TrackService {
 
         SsbTrack.deleteTrackFile(ssbTrack, fileStore);
         SsbTrack.changeStatus(ssbTrack, Status.OFF);
-    }
-
-    public SsbTrack findOne(Long id, String token, User user, Status isStatus) {
-        return trackRepository.findOne(id, user, token, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
-    }
-
-    public SsbTrack findOne(Long id, String token, Status isStatus) {
-        return trackRepository.findOne(id, token, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
-    }
-
-
-    public SsbTrack findOneJoinUser(Long id, Status isStatus) {
-        return trackRepository.findByIdJoinUser(id, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
     }
 
     /**
@@ -352,12 +348,6 @@ public class TrackService {
         // 총업로드 제한 180분 이 넘는지 확인
         checkLimit(totalTrackLength, totalUploadTrackLength);
         return ssbTrack;
-    }
-
-
-    public Integer getTotalLength(User user) {
-        Integer totalTrackLength = trackRepository.getTotalTrackLength(user, false);
-        return totalTrackLength;
     }
 
     // 태그 등록

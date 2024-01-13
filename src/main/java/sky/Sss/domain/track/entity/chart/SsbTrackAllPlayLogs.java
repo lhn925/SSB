@@ -66,7 +66,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     // 차트에 반영 안됨
     private Long closeTime;
 
-    // 최소조건은 채웠고 재생횟수에 반영이 되는지 확인값 컬럼
+    // 최소조건은 채웠고 재생횟수에 반영이 되는지 확인 값 컬럼
     @Column(nullable = false)
     @Enumerated(value = STRING)
     private PlayStatus playStatus;
@@ -106,6 +106,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     }
 
     public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, PlayStatus playStatus) {
+
         ssbTrackAllPlayLogs.setPlayStatus(playStatus);
     }
 

@@ -135,7 +135,7 @@ public class CustomAuthenticationSuccessHandler extends
                 request.getSession().removeAttribute(RememberCookie.KEY.getValue());
             }
 
-//            userLoginStatusService.addPlayLog(request.getHeader("User-Agent"),new JwtTokenDto(),null);
+//            userLoginStatusService.savePlayLog(request.getHeader("User-Agent"),new JwtTokenDto(),null);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus: " + e.getMessage());
         }

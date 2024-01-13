@@ -7,8 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.count.TrackPlayLogRepDto;
-import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.dto.track.log.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 
 @Getter

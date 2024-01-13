@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track.count;
+package sky.Sss.domain.track.dto.track.log;
 
 
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TrackCountReqListDto {
+public class TrackChartLogSaveListReqDto {
     @NotNull
-    private List<TrackCountInfoReqDto> list;
+    private List<TrackChartSaveReqDto> list;
 }

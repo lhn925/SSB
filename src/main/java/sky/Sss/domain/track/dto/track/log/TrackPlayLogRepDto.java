@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track.count;
+package sky.Sss.domain.track.dto.track.log;
 
 // track 조회수 테이블에 Dto
 
@@ -6,8 +6,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
-import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.model.ChartStatus;
 
