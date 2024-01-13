@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.repository.track.TrackAllPlayLogRepository;
-import sky.Sss.domain.track.repository.track.TrackLogRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.login.DefaultLocationLog;
@@ -35,9 +34,6 @@ public class TrackPlayLogService {
 
         // Instant 객체 생성
         Instant instant = Instant.ofEpochMilli(nowTimeMillis);
-
-        // 시스템의 기본 시간대를 사용하여 LocalDateTime 으로 변환
-        LocalDateTime nowLocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
         // 유저 지역정보
         DefaultLocationLog defaultLocationLog = DefaultLocationLog.createDefaultLocationLog(Status.ON, location,

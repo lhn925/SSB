@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.repository.track.TrackPlayCountRepository;
+import sky.Sss.domain.track.repository.track.TrackChartIncludedRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
@@ -26,7 +26,7 @@ import sky.Sss.global.locationfinder.service.LocationFinderService;
 public class TrackPlayCountService {
 
     private final LocationFinderService locationFinderService;
-    private final TrackPlayCountRepository trackPlayCountRepository;
+    private final TrackChartIncludedRepository trackChartIncludedRepository;
 
     @Transactional
     public SsbChartIncludedPlays save(SsbTrack ssbTrack, User user, String userAgent) {
@@ -46,7 +46,7 @@ public class TrackPlayCountService {
 //            userAgent);
 //
 //        // 저장
-//        trackPlayCountRepository.save(ssbChartIncludedPlays);
+//        trackChartIncludedRepository.save(ssbChartIncludedPlays);
 //        return ssbChartIncludedPlays;
 
         return null;
@@ -73,10 +73,12 @@ public class TrackPlayCountService {
      * @return
      */
 
+/*
 
     public SsbChartIncludedPlays findOne(SsbTrack ssbTrack, User user, LocalDateTime playDateTime) {
-        return trackPlayCountRepository.checkSongPlayAtTime(user, ssbTrack,
+        return trackChartIncludedRepository.checkSongPlayAtTime(user, ssbTrack,
             playDateTime).orElse(null);
     }
+*/
 
 }
