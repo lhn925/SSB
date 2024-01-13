@@ -33,8 +33,8 @@ public class UserLoginListDto {
         this.session = userLoginStatus.getSessionId().equals(inSession) ? null : userLoginStatus.getSessionId();
         this.os = userLoginStatus.getOs();
         this.browser = userLoginStatus.getBrowser();
-        this.ip = userLoginStatus.getDefaultLoginLog().getIp();
-        this.countryName = userLoginStatus.getDefaultLoginLog().getCountryName();
+        this.ip = userLoginStatus.getDefaultLocationLog().getIp();
+        this.countryName = userLoginStatus.getDefaultLocationLog().getCountryName();
         this.createdDateTime = userLoginStatus.getCreatedDateTime();
         this.loginStatus = userLoginStatus.getLoginStatus();
         this.inSession = inSession.equals(userLoginStatus.getSessionId());

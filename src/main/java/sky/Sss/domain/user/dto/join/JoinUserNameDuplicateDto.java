@@ -20,3 +20,4 @@ public class JoinUserNameDuplicateDto implements Serializable  {
     @JoinValid(regexp = RegexPatterns.USER_NAME_REGEX, message = "{userJoinForm.userName}")
     private String userName;
 }
+

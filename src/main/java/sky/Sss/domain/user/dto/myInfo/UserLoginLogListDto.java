@@ -21,8 +21,8 @@ public class UserLoginLogListDto implements Serializable {
 
     public UserLoginLogListDto(UserLoginLog userLoginLog) {
         this.createdDateTime = userLoginLog.getCreatedDateTime();
-        this.ip = userLoginLog.getDefaultLoginLog().getIp();
-        this.countryCode = userLoginLog.getDefaultLoginLog().getCountryName();
-        this.userAgent = userLoginLog.getDefaultLoginLog().getUserAgent();
+        this.ip = userLoginLog.getDefaultLocationLog().getIp();
+        this.countryCode = userLoginLog.getDefaultLocationLog().getCountryName();
+        this.userAgent = userLoginLog.getDefaultLocationLog().getUserAgent();
     }
 }
