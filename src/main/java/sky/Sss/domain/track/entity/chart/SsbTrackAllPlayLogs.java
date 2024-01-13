@@ -13,14 +13,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
-import sky.Sss.domain.track.model.PlayBackStatus;
+import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.model.TrackMinimumPlayTime;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.utili.UserTokenUtil;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.base.login.DefaultLocationLog;
 import sky.Sss.global.base.login.DeviceDetails;
@@ -53,6 +55,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     private Integer totalPlayTime;
 
     // 최소 재생 시간
+    @Column(nullable = false)
     private Integer minimumPlayTime;
 
     // 재생 시작 시간
@@ -63,12 +66,12 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     // 차트에 반영 안됨
     private Long closeTime;
 
-    // 재생횟수에 반영 여부 구분 컬럼
+    // 최소조건은 채웠고 재생횟수에 반영이 되는지 확인값 컬럼
     @Column(nullable = false)
     @Enumerated(value = STRING)
-    private PlayBackStatus playBackStatus;
+    private PlayStatus playStatus;
 
-    // 차트에 반영 되는 로그인지 구분
+    // 차트에 반영 되는 로그 인지 구분
     @Column(nullable = false)
     @Enumerated(value = STRING)
     private ChartStatus chartStatus;
@@ -80,9 +83,10 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
 
     public static SsbTrackAllPlayLogs create(User user, SsbTrack ssbTrack,
         DefaultLocationLog defaultLocationLog,
-        DeviceDetails deviceDetails, Long startTime) {
+        DeviceDetails deviceDetails, Long startTime,LocalDateTime createdDateTime) {
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = new SsbTrackAllPlayLogs();
         ssbTrackAllPlayLogs.setUser(user);
+        ssbTrackAllPlayLogs.setToken(UserTokenUtil.getToken());
         ssbTrackAllPlayLogs.setSsbTrack(ssbTrack);
         ssbTrackAllPlayLogs.setDefaultLocationLog(defaultLocationLog);
         ssbTrackAllPlayLogs.setDeviceDetails(deviceDetails);
@@ -94,19 +98,18 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         if (ssbTrack.getTrackLength() < trackMiniNum) {
             trackMiniNum = ssbTrack.getTrackLength();
         }
-
         ssbTrackAllPlayLogs.setMinimumPlayTime(trackMiniNum);
-
+        ssbTrackAllPlayLogs.setCreatedDateTime(createdDateTime);
         // 처음 생성시 플레이 횟수에 반영 안됨 으로 설정
-        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs,PlayBackStatus.INCOMPLETE);
+        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, PlayStatus.INCOMPLETE);
         return ssbTrackAllPlayLogs;
     }
 
-    public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, PlayBackStatus playBackStatus) {
-        ssbTrackAllPlayLogs.setPlayBackStatus(playBackStatus);
+    public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, PlayStatus playStatus) {
+        ssbTrackAllPlayLogs.setPlayStatus(playStatus);
     }
 
-    public static void updateChatStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, ChartStatus chartStatus) {
+    public static void updateChartStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, ChartStatus chartStatus) {
         ssbTrackAllPlayLogs.setChartStatus(chartStatus);
     }
 

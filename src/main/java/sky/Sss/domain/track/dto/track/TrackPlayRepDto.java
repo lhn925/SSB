@@ -1,26 +1,27 @@
 package sky.Sss.domain.track.dto.track;
 
+import static lombok.AccessLevel.PRIVATE;
+
 import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.count.TrackCountRepDto;
-import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
+import sky.Sss.domain.track.dto.track.count.TrackPlayLogRepDto;
+import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 
 @Getter
-@Setter
+@Setter(PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TrackPlayRepDto implements Serializable {
 
     private Long id;
+    private String token;
     private String title;
     private String userName;
-    private String token;
     private Integer trackLength;
-
-    private TrackCountRepDto trackCountRepDto;
+    private TrackPlayLogRepDto trackPlayLogRepDto;
 
     public static TrackPlayRepDto create(SsbTrack ssbTrack) {
         TrackPlayRepDto trackPlayDto = new TrackPlayRepDto();
@@ -34,11 +35,8 @@ public class TrackPlayRepDto implements Serializable {
         return trackPlayDto;
     }
 
-    public void setTrackCountRepDto(SsbChartIncludedPlays ssbChartIncludedPlays) {
+    public static void updateTrackPlayLogRepDto(TrackPlayRepDto trackPlayRepDto ,TrackPlayLogRepDto trackPlayLogRepDto ) {
         // 조회수 측정 정보
-        if (ssbChartIncludedPlays != null) {
-            TrackCountRepDto trackCountRepDto = TrackCountRepDto.create(ssbChartIncludedPlays);
-            this.trackCountRepDto = trackCountRepDto;
-        }
+        trackPlayRepDto.setTrackPlayLogRepDto(trackPlayLogRepDto);
     }
 }

@@ -9,6 +9,19 @@ public enum ChartStatus {
 
 
     private String status;
+
+    public static ChartStatus getChartStatus (Boolean isStatus) {
+        if (isStatus) {
+            return REFLECTED;
+        } else {
+            return NOT_REFLECTED;
+        }
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
     ChartStatus(String playBackStatus) {
         this.status = playBackStatus;
     }

@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.UserGrade;
 import sky.Sss.domain.user.repository.UserQueryRepository;
@@ -64,7 +65,7 @@ public class UserQueryService {
         String authorities = authentication.getAuthorities().stream().map(grantedAuthority -> grantedAuthority.getAuthority()
         ).findFirst().orElse(null);
         if (authorities.equals(UserGrade.ANONYMOUS.getRole())) {
-            return null;
+            throw new UserInfoNotFoundException("sky.userId.notFind");
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> optionalUser = userQueryRepository.findByUserId(userDetails.getUsername());

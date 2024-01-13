@@ -1,13 +1,14 @@
 package sky.Sss.domain.track.model;
 
-public enum PlayBackStatus {
+public enum PlayStatus {
     //완료
     COMPLETED("COMPLETED"),
+
     //알수없음
     INCOMPLETE("INCOMPLETE");
 
     private String value;
-    PlayBackStatus(String value) {
+    PlayStatus(String value) {
         this.value = value;
     }
 

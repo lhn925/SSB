@@ -21,11 +21,13 @@ import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.track.TrackInfoUpdateDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
+import sky.Sss.domain.track.dto.track.count.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
+import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
+import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
-import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
@@ -35,6 +37,7 @@ import sky.Sss.domain.track.repository.playList.PlayListSettingRepository;
 import sky.Sss.domain.track.repository.track.TrackRepository;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.UserTokenUtil;
@@ -53,7 +56,8 @@ public class TrackService {
     private final PlayListSettingRepository playListSettingRepository;
     private final TrackTagService trackTagService;
     private final TempTrackStorageService tempTrackStorageService;
-    private final TrackPlayCountService trackPlayCountService;
+    private final TrackAllPlayLogService trackAllPlayLogService;
+    private final TrackPlayIncludedService trackPlayIncludedService;
     /**
      * track 생성
      *
@@ -252,28 +256,38 @@ public class TrackService {
      */
     @Transactional
     public TrackPlayRepDto authorizedTrackInfo(Long id, Status isStatus, String userAgent) {
-        // 요청 유저
-        TrackPlayRepDto trackPlayDto;
+        TrackPlayRepDto trackPlayRepDto;
         SsbTrack ssbTrack = findOneJoinUser(id, isStatus);
-        User playUser = userQueryService.findOne();
-        Boolean isMember = playUser != null; // 멤버인지 확인
-        Boolean isOwnerPost = isMember ? ssbTrack.getUser().equals(playUser) : false; // 작성자인지 확인
+        // 요청 유저
+        User user = null;
+        Boolean isMember = true;
+        try {
+            user = userQueryService.findOne();
+        } catch (UserInfoNotFoundException e) {
+            // 비회원인지 확인
+            isMember = false;
+        }
+        Boolean isOwnerPost = isMember ? ssbTrack.getUser().equals(user) : false; // 작성자인지 확인
         // 파일에 권한이 있는지 없는지 확인
         // isPrivacy : true 비공개 ,false 공개
         // isOwnerPost : true 사용자 자신의 게시물 , false 사용자 자신의 게시물 x
         if (ssbTrack.getIsPrivacy()) {// 비공개일 경우 재생권한이 있는지 확인
-            trackPlayDto = isOwnerPost ? TrackPlayRepDto.create(ssbTrack) : null;
+            trackPlayRepDto = isOwnerPost ? TrackPlayRepDto.create(ssbTrack) : null;
         } else { // 비공개가 아닐경우
-            trackPlayDto = TrackPlayRepDto.create(ssbTrack);
+            trackPlayRepDto = TrackPlayRepDto.create(ssbTrack);
         }
+
         // 비회원 조회수 측정 x
         // 자신의 track은 자신이 플레이를 해도 측정 x
         // 해당 트랙에 접근 권한이 없을 경우 x
-        if (isMember && !isOwnerPost && trackPlayDto != null) {
-            SsbChartIncludedPlays playCounts = trackPlayCountService.save(ssbTrack, playUser, userAgent);
-            trackPlayDto.setTrackCountRepDto(playCounts);
+        if (isMember && !isOwnerPost && trackPlayRepDto != null) {
+            SsbTrackAllPlayLogs ssbTrackAllPlayLogs = trackAllPlayLogService.addPlayLog(user, ssbTrack, userAgent);
+            // 로그 정보 dto 생성
+            TrackPlayLogRepDto trackPlayLogRepDto = TrackPlayLogRepDto.create(ssbTrackAllPlayLogs);
+            // trackPlayRepDto set
+            TrackPlayRepDto.updateTrackPlayLogRepDto(trackPlayRepDto,trackPlayLogRepDto);
         }
-        return trackPlayDto;
+        return trackPlayRepDto;
     }
 
     @Transactional

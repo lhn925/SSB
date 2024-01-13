@@ -28,6 +28,17 @@ public enum Hour {
 
     private int value;
 
+
+    public static Hour findByHour(int hour) {
+        Hour[] values = values();
+        for (Hour value : values) {
+            if (value.getValue() == hour) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     Hour(int value) {
         this.value = value;
     }
