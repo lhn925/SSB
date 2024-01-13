@@ -26,6 +26,8 @@ import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.model.SubMusicGenre;
+import sky.Sss.domain.track.service.temp.TempTrackStorageService;
+import sky.Sss.domain.track.service.track.TrackService;
 
 
 @SpringBootTest
@@ -81,8 +83,6 @@ class TrackServiceTest {
         trackMetaUploadDto.setTitle("sky");
 //        trackMetaUploadDto.setCoverImgFile(multipartFile5);
         trackMetaUploadDto.setGenre("hiphop");
-        trackMetaUploadDto.setDownload(false);
-        trackMetaUploadDto.setPrivacy(false);
         trackMetaUploadDto.setToken(tempTrackInfoDto.getToken());
         trackMetaUploadDto.setId(tempTrackInfoDto.getId());
 
@@ -141,8 +141,7 @@ class TrackServiceTest {
             trackPlayListMetaDto.setTitle("아이유" + i);
             trackPlayListMetaDto.setDesc(playListSettingSaveDto.getDesc());
             trackPlayListMetaDto.setGenre(SubMusicGenre.COUNTRY.name());
-            trackPlayListMetaDto.setDownload(true);
-            trackPlayListMetaDto.setPrivacy(false);
+
             trackPlayListMetaDto.setToken(tempTrackInfoDto.getToken());
             trackPlayListMetaDto.setId(tempTrackInfoDto.getId());
 //            trackPlayListMetaDto.setGenreType(MainGenreType.MUSIC);

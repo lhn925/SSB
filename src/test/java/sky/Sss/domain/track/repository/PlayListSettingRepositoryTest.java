@@ -3,7 +3,7 @@ package sky.Sss.domain.track.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
+import sky.Sss.domain.track.repository.playList.PlayListSettingRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.repository.UserQueryRepository;
 

@@ -7,7 +7,6 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Enumerated;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +24,7 @@ import sky.Sss.global.locationfinder.dto.UserLocationDto;
 @Embeddable
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = PROTECTED)
-public class DefaultLoginLog {
+public class DefaultLocationLog {
 
     private String ip;
     // 로그인시도 국가
@@ -46,7 +45,7 @@ public class DefaultLoginLog {
     private Boolean isStatus;
 
     @Builder
-    public DefaultLoginLog(String ip, String countryName, UserAgent userAgent, String latitude, String longitude,
+    public DefaultLocationLog(String ip, String countryName, UserAgent userAgent, String latitude, String longitude,
         Boolean isStatus) {
         this.ip = ip;
         this.countryName = countryName;
@@ -56,16 +55,16 @@ public class DefaultLoginLog {
         this.isStatus = isStatus;
     }
 
-    public static DefaultLoginLog createDefaultLoginLog(Status isStatus,
+    public static DefaultLocationLog createDefaultLocationLog(Status isStatus,
         UserLocationDto userLocationDto,
         String userAgent) {
 
-        return DefaultLoginLog.builder()
+        return DefaultLocationLog.builder()
             .ip(userLocationDto.getIpAddress()) //ip 저장
             .countryName(userLocationDto.getCountryName()) // iso Code 저장
             .latitude(userLocationDto.getLatitude()) // 위도
             .longitude(userLocationDto.getLongitude()) // 경도
-            .userAgent(UserLocationDto.isDevice(userAgent)) // 기기 저장
+            .userAgent(DeviceDetails.getUserAgent(userAgent)) // 기기 저장
             .isStatus(isStatus.getValue()).build();
     }
 

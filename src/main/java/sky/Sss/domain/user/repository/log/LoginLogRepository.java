@@ -14,24 +14,24 @@ public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
 
     //
     @Query(value = "select u from UserLoginLog u where "
-        + "u.defaultLoginLog.userId = :userId and "
+        + "u.defaultLocationLog.userId = :userId and "
         + "u.isSuccess = :isSuccess and "
-        + "u.defaultLoginLog.isStatus = :isStatus ")
+        + "u.defaultLocationLog.isStatus = :isStatus ")
     Page<UserLoginLog> getLoginLogPageable(@Param("userId") String userId,
         @Param("isSuccess") LoginSuccess isSuccess, @Param("isStatus") Boolean status,
         Pageable pageable);
 
     //
     @Modifying(clearAutomatically = true)
-    @Query(value = "UPDATE UserLoginLog u SET u.defaultLoginLog.isStatus = :isStatus where u.defaultLoginLog.userId = :userId AND u.isSuccess =:isSuccess")
+    @Query(value = "UPDATE UserLoginLog u SET u.defaultLocationLog.isStatus = :isStatus where u.defaultLocationLog.userId = :userId AND u.isSuccess =:isSuccess")
     void isStatusUpdate(@Param("userId") String userId, @Param("isSuccess") LoginSuccess isSuccess,
         @Param("isStatus") boolean isStatus);
 
     //
     @Query(value = "select u from UserLoginLog u where "
-        + "u.defaultLoginLog.userId = :userId and "
+        + "u.defaultLocationLog.userId = :userId and "
         + "u.isSuccess = :isSuccess and "
-        + "u.defaultLoginLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate")
+        + "u.defaultLocationLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate")
     Page<UserLoginLog> getLoginLogPageable(@Param("userId") String userId,
         @Param("isSuccess") LoginSuccess isSuccess,
         @Param("isStatus") Boolean status,
@@ -44,12 +44,12 @@ public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
 
 
     @Query(value = "select count (u.id) from UserLoginLog u where "
-        + "u.defaultLoginLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ")
+        + "u.defaultLocationLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ")
     Integer expireLoginLogCount(@Param("isStatus") Boolean status, @Param("expireDate") LocalDate expireDate);
 
 
     @Modifying(clearAutomatically = true)
-    @Query("update UserLoginLog u set u.defaultLoginLog.isStatus = :offStatus where  u.defaultLoginLog.isStatus = :onStatus"
+    @Query("update UserLoginLog u set u.defaultLocationLog.isStatus = :offStatus where  u.defaultLocationLog.isStatus = :onStatus"
         + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate")
     Integer expireLoginLogOff (@Param("offStatus") Boolean offStatus,@Param("onStatus")
     Boolean onStatus ,@Param("expireDate") LocalDate expireDate);

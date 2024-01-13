@@ -18,23 +18,23 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
     Page<UserLoginStatus> findByUidAndLoginStatus(User user, Boolean loginStatus, Pageable pageable);
 
-    @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus = :isStatus")
+    @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLocationLog.userId = :userId and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLocationLog.isStatus = :isStatus")
     Optional<UserLoginStatus> findOne(@Param("uid") User user, @Param("userId") String userId,
         @Param("refreshToken") String refreshToken,@Param("loginStatus") Boolean loginStatus,@Param("isStatus") Boolean isStatus);
 
-    @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.redisToken = :redisToken and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus = :isStatus")
+    @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLocationLog.userId = :userId and u.redisToken = :redisToken and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLocationLog.isStatus = :isStatus")
     Optional<UserLoginStatus> findOne(@Param("uid") User user, @Param("userId") String userId,
         @Param("redisToken") String redisToken,@Param("refreshToken") String refreshToken,@Param("loginStatus") Boolean loginStatus,@Param("isStatus") Boolean isStatus);
 
 
-    @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.redisToken = :redisToken")
+    @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLocationLog.userId = :userId and u.redisToken = :redisToken")
     List<UserLoginStatus> findList(@Param("uid") User user, @Param("userId") String userId,
         @Param("redisToken") String redisToken);
 
 
     @Query(value =
-        "select u from UserLoginStatus u where u.uid = :uid and u.defaultLoginLog.userId = :userId and u.sessionId = :sessionId"
-            + " and u.loginStatus = :loginStatus and u.defaultLoginLog.isStatus =:isStatus")
+        "select u from UserLoginStatus u where u.uid = :uid and u.defaultLocationLog.userId = :userId and u.sessionId = :sessionId"
+            + " and u.loginStatus = :loginStatus and u.defaultLocationLog.isStatus =:isStatus")
     List<UserLoginStatus> findList(@Param("uid") User user, @Param("userId") String userId, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus,@Param("sessionId") String sessionId);
 
@@ -42,14 +42,14 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
     @Modifying(clearAutomatically = true)
     @Query(value =
-        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where "
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLocationLog.isStatus = :isStatus where "
             + "u.uid = :uid")
     Integer updateAll(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus);
 
     @Modifying(clearAutomatically = true)
     @Query(value =
-        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where "
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLocationLog.isStatus = :isStatus where "
             + "u.uid = :uid")
     Integer updateAllAndNotRedisToken(@Param("uid") User user,
         @Param("loginStatus") Boolean loginStatus,
@@ -58,7 +58,7 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
     @Modifying(clearAutomatically = true)
     @Query(value =
-        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where "
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLocationLog.isStatus = :isStatus where "
             + "u.uid = :uid and u.sessionId = :sessionId")
     Integer update(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus, @Param("sessionId") String sessionId);
@@ -71,7 +71,7 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
     @Modifying(clearAutomatically = true)
     @Query(value =
-        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLoginLog.isStatus = :isStatus where u.redisToken = :redisToken")
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLocationLog.isStatus = :isStatus where u.redisToken = :redisToken")
     Integer updateSession(@Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus, @Param("redisToken") String redisToken);
 

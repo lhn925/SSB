@@ -64,11 +64,8 @@ public class UserLoginLogService {
         //비 로그인으로 접근시 저장할 userId
         AuditorAwareImpl.changeUserId(auditorAware, userId);
         UserLoginLog userLoginLog = getUserLoginLog(uId, userAgent, isSuccess, isStatus);
-        log.info("userLoginLog.getUId() = {}", userLoginLog.getUId());
 
         Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));
-        log.info("saveLog.get().getId() = {}", saveLog.get().getId());
-        log.info("saveLog.get().getCreatedDateTime() = {}", saveLog.get().getCreatedDateTime());
         saveLog.orElseThrow(() -> new RuntimeException());
     }
 

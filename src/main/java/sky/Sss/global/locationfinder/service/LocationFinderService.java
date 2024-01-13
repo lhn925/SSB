@@ -3,6 +3,7 @@ package sky.Sss.global.locationfinder.service;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.DatabaseReader.Builder;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import java.io.IOException;
@@ -31,17 +32,13 @@ public class LocationFinderService {
         } catch (GeoIp2Exception | IOException e) {
             throw new RuntimeException(e);
         }
-        return UserLocationDto.createUserLocationDto(response);
-    }
-
-    // 사용자 ip추출
-    private String getIp() {
-        String ip = HttpReqRespUtils.getClientIpAddressIfServletRequestExist();
-        return ip;
+        return UserLocationDto.create(response);
     }
 
     private InetAddress getInetAddress() throws UnknownHostException {
-        InetAddress ipAddress = InetAddress.getByName(getIp());
+        String ip = HttpReqRespUtils.getClientIpAddressIfServletRequestExist();
+
+        InetAddress ipAddress = InetAddress.getByName(ip);
         return ipAddress;
     }
 
