@@ -9,24 +9,20 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.global.base.BaseTimeEntity;
-import sky.Sss.global.base.login.DefaultLoginLog;
+import sky.Sss.global.base.login.DefaultLocationLog;
+import sky.Sss.global.base.login.DeviceDetails;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Entity
@@ -65,7 +61,7 @@ public class UserLoginStatus extends BaseTimeEntity {
     private String browser;
 
     @Embedded
-    private DefaultLoginLog defaultLoginLog;
+    private DefaultLocationLog defaultLocationLog;
 
     // 로그인 상태 값 혹은 관리
     // true:login , false: logout
@@ -74,7 +70,7 @@ public class UserLoginStatus extends BaseTimeEntity {
 
     @Builder
     private UserLoginStatus(String redisToken, User uid, String os,
-        String browser, DefaultLoginLog defaultLoginLog, String refreshToken,
+        String browser, DefaultLocationLog defaultLocationLog, String refreshToken,
         Boolean loginStatus, String sessionId) {
 
         this.refreshToken = refreshToken;
@@ -84,7 +80,7 @@ public class UserLoginStatus extends BaseTimeEntity {
         this.browser = browser;
         this.sessionId = sessionId;
         this.loginStatus = loginStatus;
-        this.defaultLoginLog = defaultLoginLog;
+        this.defaultLocationLog = defaultLocationLog;
     }
 
 
@@ -105,12 +101,12 @@ public class UserLoginStatus extends BaseTimeEntity {
             .uid(user)
             .loginStatus(Status.ON.getValue())
             .refreshToken(jwtTokenDto.getRefreshToken())
-            .defaultLoginLog(
-                DefaultLoginLog.createDefaultLoginLog(Status.ON, userLocationDto, userAgent)
+            .defaultLocationLog(
+                DefaultLocationLog.createDefaultLocationLog(Status.ON, userLocationDto, userAgent)
             ).redisToken(jwtTokenDto.getRedisToken())
             .sessionId(sessionId)
-            .browser(UserLocationDto.getClientBrowser(userAgent))
-            .os(UserLocationDto.getClientOS(userAgent));
+            .browser(DeviceDetails.getClientBrowser(userAgent))
+            .os(DeviceDetails.getClientOS(userAgent));
 
         return builder.build();
     }
@@ -124,7 +120,7 @@ public class UserLoginStatus extends BaseTimeEntity {
      */
     public static void loginStatusUpdate(UserLoginStatus userLoginStatus, Status loginStatus, Status isStatus) {
         userLoginStatus.setLoginStatus(loginStatus.getValue());
-        userLoginStatus.getDefaultLoginLog().changeIsStatus(loginStatus.getValue());
+        userLoginStatus.getDefaultLocationLog().changeIsStatus(loginStatus.getValue());
     }
 
     public static void wsIdUpdate(UserLoginStatus userLoginStatus, String wsId) {

@@ -3,18 +3,14 @@ package sky.Sss.domain.user.entity;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +19,8 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.model.ChangeSuccess;
-import sky.Sss.global.base.BaseEntity;
 import sky.Sss.global.base.BaseTimeEntity;
-import sky.Sss.global.base.login.DefaultLoginLog;
+import sky.Sss.global.base.login.DefaultLocationLog;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 
@@ -63,19 +58,19 @@ public class UserActivityLog extends BaseTimeEntity {
     @Enumerated(STRING)
     private ChangeSuccess changeSuccess;
     @Embedded
-    private DefaultLoginLog defaultLog;
+    private DefaultLocationLog defaultLog;
 
     @LastModifiedBy
     private String modifiedByUserId;
 
     @Builder
     public UserActivityLog(
-        User user, ChangeSuccess changeSuccess, String chaContent, String chaMethod, DefaultLoginLog defaultLoginLog) {
+        User user, ChangeSuccess changeSuccess, String chaContent, String chaMethod, DefaultLocationLog defaultLocationLog) {
         this.uId = user;
         this.changeSuccess = changeSuccess;
         this.chaContent = chaContent;
         this.chaMethod = chaMethod;
-        this.defaultLog = defaultLoginLog;
+        this.defaultLog = defaultLocationLog;
     }
 
     public static UserActivityLog createActivityLog(User user, LocationFinderService locationFinderService,
@@ -84,13 +79,13 @@ public class UserActivityLog extends BaseTimeEntity {
         UserLocationDto userLocationDto = null;
         userLocationDto = locationFinderService.findLocation();
 
-        DefaultLoginLog defaultLog = DefaultLoginLog.createDefaultLoginLog(isStatus, userLocationDto,userAgent);
+        DefaultLocationLog defaultLog = DefaultLocationLog.createDefaultLocationLog(isStatus, userLocationDto,userAgent);
         return UserActivityLog.builder()
             .user(user)
             .changeSuccess(changeSuccess) // 실패 여부 확인
             .chaContent(chaContent)
             .chaMethod(chaMethod)
-            .defaultLoginLog(defaultLog)
+            .defaultLocationLog(defaultLog)
             .build();
     }
 

@@ -4,15 +4,12 @@ package sky.Sss.domain.user.entity.login;
 import static jakarta.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sky.Sss.domain.user.model.LoginSuccess;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
-import sky.Sss.global.base.login.DefaultLoginLog;
+import sky.Sss.global.base.login.DefaultLocationLog;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 
@@ -48,13 +45,13 @@ public class UserLoginLog extends BaseTimeEntity {
     private LoginSuccess isSuccess;
 
     @Embedded
-    private DefaultLoginLog defaultLoginLog;
+    private DefaultLocationLog defaultLocationLog;
 
     @Builder
-    private UserLoginLog(Long uId, LoginSuccess isSuccess, DefaultLoginLog defaultLoginLog) {
+    private UserLoginLog(Long uId, LoginSuccess isSuccess, DefaultLocationLog defaultLocationLog) {
         this.uId = uId == null ? 0 : uId;
         this.isSuccess = isSuccess;
-        this.defaultLoginLog = defaultLoginLog;
+        this.defaultLocationLog = defaultLocationLog;
     }
 
 
@@ -65,7 +62,7 @@ public class UserLoginLog extends BaseTimeEntity {
         UserLoginLog userLoginLog = UserLoginLog.builder()
             .uId(uId)
             .isSuccess(isSuccess)
-            .defaultLoginLog(DefaultLoginLog.createDefaultLoginLog(
+            .defaultLocationLog(DefaultLocationLog.createDefaultLocationLog(
                     isStatus, userLocationDto, userAgent
                 )
             )
