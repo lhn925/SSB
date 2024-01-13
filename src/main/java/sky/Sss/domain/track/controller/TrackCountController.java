@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.count.TrackCountReqListDto;
-import sky.Sss.domain.track.service.track.TrackPlayCountService;
-import sky.Sss.global.error.dto.ErrorGlobalResultDto;
-import sky.Sss.global.error.dto.Result;
+import sky.Sss.domain.track.service.track.TrackPlayIncludedService;
 
 /**
  * 트랙에 조회수 관련 api 호출 controller
@@ -24,7 +22,7 @@ import sky.Sss.global.error.dto.Result;
 @RequestMapping("/user/track/count")
 public class TrackCountController {
 
-    private final TrackPlayCountService trackPlayCountService;
+    private final TrackPlayIncludedService trackPlayIncludedService;
 
 
     // 조회수

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
-import sky.Sss.domain.track.model.PlayBackStatus;
+import sky.Sss.domain.track.model.PlayStatus;
 
 
 @Getter
@@ -22,7 +22,7 @@ public class TrackCountInfoReqDto {
     @NotNull
     private Integer playTime;// 플레이 시간
     @NotNull
-    private PlayBackStatus playBackStatus;// 플레이 상태
+    private PlayStatus playStatus;// 플레이 상태
     @NotNull
     private Long closeTime; //끝난 시간
     @NotNull

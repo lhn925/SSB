@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
+import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
@@ -90,10 +91,13 @@ public class SsbTrack extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackTagLink> tags = new ArrayList<>();
+
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackLikes> likes = new ArrayList<>();
+
+
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
-    private List<SsbChartIncludedPlays> views = new ArrayList<>();
+    private List<SsbTrackAllPlayLogs> plays = new ArrayList<>();
 
 
     public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
@@ -106,11 +110,6 @@ public class SsbTrack extends BaseTimeEntity {
             rmTagLink(ssbTrack);
         }
     }
-
-    public static void addView(SsbTrack ssbTrack, SsbChartIncludedPlays ssbChartIncludedPlays) {
-        ssbTrack.getViews().add(ssbChartIncludedPlays);
-    }
-
     // 링크 삭제
     public static void rmTagLink(SsbTrack ssbTrack, SsbTrackTagLink tagLinks) {
         ssbTrack.getTags().remove(tagLinks);

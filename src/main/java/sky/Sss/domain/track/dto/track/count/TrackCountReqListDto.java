@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
-import sky.Sss.domain.track.model.PlayBackStatus;
 
 
 @Getter

@@ -26,7 +26,7 @@ public class TrackPlayService {
 
     private final TrackService trackService;
     private final UserQueryService userQueryService;
-    private final TrackPlayLogService trackPlayLogService;
+    private final TrackAllPlayLogService trackAllPlayLogService;
 
     /**
      * 비공개 확인

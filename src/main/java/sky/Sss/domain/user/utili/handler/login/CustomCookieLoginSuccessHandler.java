@@ -71,7 +71,7 @@ public class CustomCookieLoginSuccessHandler extends CustomLoginSuccessHandler {
     public void saveLoginStatus(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
         try {
-//            userLoginStatusService.save(request.getHeader("User-Agent"),new JwtTokenDto(),null);
+//            userLoginStatusService.addPlayLog(request.getHeader("User-Agent"),new JwtTokenDto(),null);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus:" + e);
         }
