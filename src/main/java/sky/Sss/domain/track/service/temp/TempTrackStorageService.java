@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.service;
+package sky.Sss.domain.track.service.temp;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,7 +10,7 @@ import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.exception.SsbFileNotFoundException;
-import sky.Sss.domain.track.repository.TempTrackStorageRepository;
+import sky.Sss.domain.track.repository.temp.TempTrackStorageRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.UserTokenUtil;

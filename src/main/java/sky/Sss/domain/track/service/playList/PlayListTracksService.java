@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.service;
+package sky.Sss.domain.track.service.playList;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
-import sky.Sss.domain.track.repository.PlayListTracksRepository;
+import sky.Sss.domain.track.repository.playList.PlayListTracksRepository;
 import sky.Sss.domain.user.service.UserQueryService;
 
 @Slf4j

@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.service;
+package sky.Sss.domain.track.service.playList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,9 @@ import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.SsbFileNotFoundException;
-import sky.Sss.domain.track.repository.PlayListSettingRepository;
+import sky.Sss.domain.track.repository.playList.PlayListSettingRepository;
+import sky.Sss.domain.track.service.track.TrackService;
+import sky.Sss.domain.track.service.track.TrackTagService;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;

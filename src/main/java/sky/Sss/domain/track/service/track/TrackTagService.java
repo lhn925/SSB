@@ -1,6 +1,5 @@
-package sky.Sss.domain.track.service;
+package sky.Sss.domain.track.service.track;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -8,13 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
-import sky.Sss.domain.track.repository.PlayListTagLinkRepository;
-import sky.Sss.domain.track.repository.TrackTagLinkRepository;
-import sky.Sss.domain.track.repository.TrackTagRepository;
+import sky.Sss.domain.track.repository.playList.PlayListTagLinkRepository;
+import sky.Sss.domain.track.repository.track.TrackTagLinkRepository;
+import sky.Sss.domain.track.repository.track.TrackTagRepository;
 
 
 @Slf4j
