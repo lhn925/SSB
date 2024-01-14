@@ -1,7 +1,5 @@
 package sky.Sss.domain.track.service.track;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,7 +9,6 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.repository.track.TrackAllPlayLogRepository;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.global.locationfinder.service.LocationFinderService;
 
 /**
  * 플레이 조회수 관련 서비스

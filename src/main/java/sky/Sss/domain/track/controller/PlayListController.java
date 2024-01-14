@@ -69,7 +69,7 @@ public class PlayListController {
      * @return
      */
     @PutMapping
-    public ResponseEntity updatePlayList(@Validated @RequestPart PlayListSettingUpdateDto playListSettingUpdateDto,
+    public ResponseEntity modifyPlayList(@Validated @RequestPart PlayListSettingUpdateDto playListSettingUpdateDto,
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -87,7 +87,7 @@ public class PlayListController {
      * @return
      */
     @DeleteMapping
-    public ResponseEntity deletePlayList(@Validated @RequestBody PlayListTrackDeleteDto playListTrackDeleteDto,
+    public ResponseEntity removePlayList(@Validated @RequestBody PlayListTrackDeleteDto playListTrackDeleteDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));

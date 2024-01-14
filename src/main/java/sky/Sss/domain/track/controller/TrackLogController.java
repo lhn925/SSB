@@ -48,7 +48,6 @@ public class TrackLogController {
         trackPlaybackMetricsService.createChartIncluded(trackChartSaveReqDto);
         return ResponseEntity.ok().build();
     }
-
     /**
      *
      *
