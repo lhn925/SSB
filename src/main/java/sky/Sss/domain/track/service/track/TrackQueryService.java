@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.exception.SsbFileNotFoundException;
+import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.track.TrackQueryRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;

@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.track.exception.SsbFileNotFoundException;
+import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.dto.UploadTrackFileDto;

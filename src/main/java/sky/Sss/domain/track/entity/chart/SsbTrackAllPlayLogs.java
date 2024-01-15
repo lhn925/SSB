@@ -64,6 +64,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     // 재생 종료 시간
     // 재생 종료시간이 두 시간대에 겹쳐있으면
     // 차트에 반영 안됨
+    @Column(nullable = false)
     private Long closeTime;
 
     // 최소조건은 채웠고 재생횟수에 반영이 되는지 확인 값 컬럼
@@ -83,14 +84,14 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
 
     public static SsbTrackAllPlayLogs create(User user, SsbTrack ssbTrack,
         DefaultLocationLog defaultLocationLog,
-        DeviceDetails deviceDetails, Long startTime,LocalDateTime createdDateTime) {
+        DeviceDetails deviceDetails, Long startTime, LocalDateTime createdDateTime) {
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = new SsbTrackAllPlayLogs();
         ssbTrackAllPlayLogs.setUser(user);
         ssbTrackAllPlayLogs.setToken(UserTokenUtil.getToken());
         ssbTrackAllPlayLogs.setSsbTrack(ssbTrack);
         ssbTrackAllPlayLogs.setDefaultLocationLog(defaultLocationLog);
         ssbTrackAllPlayLogs.setDeviceDetails(deviceDetails);
-        ssbTrackAllPlayLogs.setStartTime(startTime);
+        ssbTrackAllPlayLogs.setStartTime(removeMillis(startTime));
 
         Integer trackMiniNum = TrackMinimumPlayTime.MINI_NUM_SECOND.getSeconds();
 
@@ -101,17 +102,22 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setMinimumPlayTime(trackMiniNum);
         ssbTrackAllPlayLogs.setCreatedDateTime(createdDateTime);
         // 처음 생성시 플레이 횟수에 반영 안됨 으로 설정
-        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, PlayStatus.INCOMPLETE);
+        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, 0);
         return ssbTrackAllPlayLogs;
     }
 
-    public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, PlayStatus playStatus) {
+    public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, int playTime) {
 
-        ssbTrackAllPlayLogs.setPlayStatus(playStatus);
+        if (playTime != 0) {
+            ssbTrackAllPlayLogs.setPlayStatus(PlayStatus.getPlayStatus(ssbTrackAllPlayLogs.getMinimumPlayTime() <= playTime));
+            return;
+        }
+        ssbTrackAllPlayLogs.setPlayStatus(PlayStatus.INCOMPLETE);
+
     }
 
-    public static void updateChartStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, ChartStatus chartStatus) {
-        ssbTrackAllPlayLogs.setChartStatus(chartStatus);
+    public static void updateChartStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, boolean isStatus) {
+        ssbTrackAllPlayLogs.setChartStatus(ChartStatus.getChartStatus(isStatus));
     }
 
     public static void updateTotalPlayTime(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, Integer playTime) {
@@ -119,8 +125,11 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     }
 
     public static void updateCloseTime(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, Long closeTime) {
-        ssbTrackAllPlayLogs.setStartTime(closeTime);
+        ssbTrackAllPlayLogs.setCloseTime(removeMillis(closeTime));
     }
 
+    public static long removeMillis (Long millisSeconds) {
+        return (millisSeconds / 1000) * 1000;
+    }
 
 }

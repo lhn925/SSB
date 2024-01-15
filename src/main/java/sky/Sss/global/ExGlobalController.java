@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import sky.Sss.domain.track.exception.SsbTrackAccessDeniedException;
+import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.Result;

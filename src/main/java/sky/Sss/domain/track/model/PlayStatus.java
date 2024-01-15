@@ -7,12 +7,21 @@ public enum PlayStatus {
     //알수없음
     INCOMPLETE("INCOMPLETE");
 
-    private String value;
-    PlayStatus(String value) {
-        this.value = value;
+    private String status;
+    PlayStatus(String status) {
+        this.status = status;
     }
 
-    public String getValue() {
-        return this.value;
+    public static PlayStatus getPlayStatus (Boolean isStatus) {
+        if (isStatus) {
+            return COMPLETED;
+        } else {
+            return INCOMPLETE;
+        }
+    }
+
+
+    public String getStatus() {
+        return this.status;
     }
 }

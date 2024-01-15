@@ -10,7 +10,7 @@ public enum ChartStatus {
 
     private String status;
 
-    public static ChartStatus getChartStatus (Boolean isStatus) {
+    public static ChartStatus getChartStatus (boolean isStatus) {
         if (isStatus) {
             return REFLECTED;
         } else {

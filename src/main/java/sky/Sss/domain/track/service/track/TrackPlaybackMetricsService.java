@@ -4,19 +4,20 @@ package sky.Sss.domain.track.service.track;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
-import sky.Sss.domain.track.dto.track.log.TrackPlayLogModifyRepDto;
 import sky.Sss.domain.track.dto.track.log.TrackChartSaveReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogModifyReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.user.entity.User;
@@ -54,7 +55,8 @@ public class TrackPlaybackMetricsService {
      * @param token
      * @return
      */
-    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,ChartStatus chartStatus) {
+    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,
+        ChartStatus chartStatus) {
         return trackAllPlayLogService.findOne(user, ssbTrack, id, token, chartStatus);
     }
 
@@ -65,44 +67,67 @@ public class TrackPlaybackMetricsService {
      * @param token
      * @return
      */
-    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token) {
-        return trackAllPlayLogService.findOne(user, ssbTrack, id, token);
+    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,PlayStatus playStatus) {
+        return trackAllPlayLogService.findOne(user, ssbTrack, id, token,playStatus);
     }
 
 
+    /**
+     * 차트 반영 조회수 생성 (조건 충족되지 않은 경우 일반조회수로 변경)
+     *
+     * @param trackChartSaveReqDto
+     */
     @Transactional
     public void createChartIncluded(TrackChartSaveReqDto trackChartSaveReqDto) {
         TrackInfoReqDto trackInfoReqDto = trackChartSaveReqDto.getTrackInfoReqDto();
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(), Status.ON);
-
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack, trackChartSaveReqDto.getId(),
-            trackChartSaveReqDto.getToken(),ChartStatus.REFLECTED);
+            trackChartSaveReqDto.getToken(), ChartStatus.REFLECTED);
+
         boolean isReflected = true;
+
         try {
             // 이미 테이블 에 반영되어 있는지
-            checkEq(getChartIncludedPlay(user, ssbTrack,
-                ssbTrackAllPlayLogs.getCreatedDateTime()) == null);
+            boolean isChartCreated =
+                getChartIncludedPlay(user, ssbTrack, ssbTrackAllPlayLogs.getCreatedDateTime()) == null;
+            checkEq(isChartCreated);
 
-            // 플레이타임 이 음원 재생 길이와 일치한지
-            checkEqPlayTime(trackChartSaveReqDto, ssbTrack);
+            // 플레이타임 이 Track 음원 재생 길이와 일치한지
+            checkEqPlayTime(trackChartSaveReqDto.getPlayTime(), ssbTrack.getTrackLength());
+            long userCloseTime = SsbTrackAllPlayLogs.removeMillis(trackChartSaveReqDto.getCloseTime());
 
             // startTime 과 closeTime 의 간격이 음원재생길이와 유사한지
-            checkCloseTime(trackChartSaveReqDto, ssbTrack, ssbTrackAllPlayLogs);
-        } catch (IllegalArgumentException e) {
+            checkCloseTime(userCloseTime, ssbTrackAllPlayLogs.getCloseTime());
+        }catch (SsbPlayIncompleteException e) {
             isReflected = false;
         }
-        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs,PlayStatus.COMPLETED);
-        SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs,ChartStatus.getChartStatus(isReflected));
+
+        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, trackChartSaveReqDto.getPlayTime());
+        SsbTrackAllPlayLogs.updateTotalPlayTime(ssbTrackAllPlayLogs, trackChartSaveReqDto.getPlayTime());
+        SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, isReflected);
+
         // 모든 충족이 만족되면
         if (isReflected) {
-            SsbChartIncludedPlays ssbChartIncludedPlays = SsbChartIncludedPlays.create(ssbTrackAllPlayLogs);
-            trackChatIncludedService.save(ssbChartIncludedPlays);
+            saveChartLog(ssbTrackAllPlayLogs);
         }
         // 세가지 결과가 전부 다 옳다면
     }
 
+    public void saveChartLog(SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
+        SsbChartIncludedPlays ssbChartIncludedPlays = SsbChartIncludedPlays.create(ssbTrackAllPlayLogs);
+        trackChatIncludedService.save(ssbChartIncludedPlays);
+    }
 
+
+    /**
+     * 일반 조회수 생성
+     *
+     * @param userAgent
+     * @param trackPlayRepDto
+     * @param ssbTrack
+     * @param user
+     */
     @Transactional
     public void createAllPlayLog(String userAgent, TrackPlayRepDto trackPlayRepDto, SsbTrack ssbTrack, User user) {
         // 현재시간 생성
@@ -123,12 +148,24 @@ public class TrackPlaybackMetricsService {
         // 객체 생성
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = SsbTrackAllPlayLogs.create(user, ssbTrack, defaultLocationLog,
             deviceDetails, nowTimeMillis, nowLocalDateTime);
-        Boolean checkHour = checkHour(ssbTrack, nowLocalDateTime);
-        // checkHour
-        if (checkHour) {
+
+        // 예상 closeTime 계산
+        LocalDateTime closeDateTime = nowLocalDateTime.plusSeconds(ssbTrack.getTrackLength());
+        ZonedDateTime zonedDateTime = closeDateTime.atZone(ZoneId.systemDefault());
+        Instant zoneInstant = zonedDateTime.toInstant();
+
+        long exCloseTime = zoneInstant.toEpochMilli();
+
+        boolean checkHour = checkHour(closeDateTime, nowLocalDateTime);
+
+        // 예상 closeTime 저장
+        SsbTrackAllPlayLogs.updateCloseTime(ssbTrackAllPlayLogs, exCloseTime);
+
+        // checkHour 로 판단  ChartStatus 저장
+        SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, checkHour);
+        // checkHour True일 경우 Chart 있는지 확인
+        if (ssbTrackAllPlayLogs.getChartStatus().equals(ChartStatus.REFLECTED)) {
             checkChartStatus(user, ssbTrack, ssbTrackAllPlayLogs);
-        } else {
-            SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, ChartStatus.NOT_REFLECTED);
         }
         // insert
         trackAllPlayLogService.save(ssbTrackAllPlayLogs);
@@ -141,40 +178,50 @@ public class TrackPlaybackMetricsService {
 
     /**
      * playLog 수정 사항
+     *
      * @param trackPlayLogModifyReqDto
      * @return
      */
     @Transactional
-    public void modifyPlayLog(TrackPlayLogModifyReqDto trackPlayLogModifyReqDto) {
+    public void modifyPlayLog(TrackPlayLogModifyReqDto trackPlayLogModifyReqDto) throws SsbPlayIncompleteException {
         TrackInfoReqDto trackInfoReqDto = trackPlayLogModifyReqDto.getTrackInfoReqDto();
         User user = userQueryService.findOne();
-        SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(), user, Status.ON);
+        SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(),
+            Status.ON);
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack,
-            trackPlayLogModifyReqDto.getId(), trackPlayLogModifyReqDto.getToken());
-        if (ssbTrackAllPlayLogs.getPlayStatus().equals(PlayStatus.COMPLETED)) {
-            return;
-        }
-
+            trackPlayLogModifyReqDto.getId(), trackPlayLogModifyReqDto.getToken(),PlayStatus.INCOMPLETE);
         // REFLECTED 플레이 로그였다면 -> NOT_REFLECTED
         if (ssbTrackAllPlayLogs.getChartStatus().equals(ChartStatus.REFLECTED)) {
-            SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs,ChartStatus.NOT_REFLECTED);
+            SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, false);
         }
+        long userCloseTime = SsbTrackAllPlayLogs.removeMillis(trackPlayLogModifyReqDto.getCloseTime());
 
+        // 사용자가 플레이 재생 시간
         int playTime = trackPlayLogModifyReqDto.getPlayTime();
 
-        // 최소 플레이 재생 시간(60초 혹은 1분 미만은 60초 전부)을 넘겼거나 같은지
+        // 최소 플레이 재생 시간
         int minPlayTime = ssbTrackAllPlayLogs.getMinimumPlayTime();
 
-        // 충족 했는지
+        // 최소시간을 충족 했는지 (60초 혹은 1분 미만은 60초 전부)
         boolean isMinTime = playTime >= minPlayTime;
 
+        int secondBetween = secondBetween(ssbTrackAllPlayLogs.getStartTime(), userCloseTime);
         // startTime 과 closeTime 의 간격이 최소플레이 재생 시간을 넘겼거나 같은지
-        boolean isCloseTime = (trackPlayLogModifyReqDto.getCloseTime() - ssbTrackAllPlayLogs.getStartTime() / 1000) >= minPlayTime;
+        boolean isCloseTime = secondBetween >= minPlayTime;
+
+        /**
+         * 정지 했다가 10초 정도
+         * 다음버튼 이전버튼을 눌렀을 경우도 10초있다
+         */
+
+        SsbTrackAllPlayLogs.updateTotalPlayTime(ssbTrackAllPlayLogs, trackPlayLogModifyReqDto.getPlayTime());
         // 둘다 충족했으면
+        // 뒤로감기나 앞으로가기 버튼을 눌렀을 경우
         if (isCloseTime && isMinTime) {
-            SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs,PlayStatus.COMPLETED);
+            SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, trackPlayLogModifyReqDto.getPlayTime());
+        } else {
+            throw new SsbPlayIncompleteException();
         }
-        SsbTrackAllPlayLogs.updateCloseTime(ssbTrackAllPlayLogs, trackPlayLogModifyReqDto.getCloseTime());
     }
 
     // 현재 시간대에 공식 로그가 있는지 화인
@@ -185,14 +232,18 @@ public class TrackPlaybackMetricsService {
         // 공식 재생 여부 확인
         // true : 공식재생, false : 공식 재생 x
         boolean isChartLog = includedLog == null;
-        ChartStatus chartStatus = ChartStatus.getChartStatus(isChartLog);
         // 차트에 반영 되는 재생인지 저장
-        SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, chartStatus);
+        SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, isChartLog);
     }
 
-    private boolean checkHour(SsbTrack ssbTrack, LocalDateTime nowLocalDateTime) {
-        // 재생이 끝났을 경우의 시간대
-        int closeHour = nowLocalDateTime.plusSeconds(ssbTrack.getTrackLength()).getHour();
+    /**
+     * 재생이 끝났을 경우의 예상 시간대를 구해서
+     * 비교한뒤 true 혹은 false를 반영
+     * 넘어갈경우 차트 반영 x
+     */
+    private boolean checkHour(LocalDateTime closeDateTime, LocalDateTime nowLocalDateTime) {
+        // 재생이 끝났을 경우의 예상 시간대
+        int closeHour = closeDateTime.getHour();
         // 요청 시간대
         int nowHour = nowLocalDateTime.getHour();
 
@@ -200,20 +251,32 @@ public class TrackPlaybackMetricsService {
     }
 
 
-    private void checkCloseTime(TrackChartSaveReqDto trackChartSaveReqDto, SsbTrack ssbTrack,
-        SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
-        boolean isEqCloseTime = (trackChartSaveReqDto.getCloseTime() - ssbTrackAllPlayLogs.getStartTime() / 1000)
-            == ssbTrack.getTrackLength();
+    /**
+     * 서버에 저장되어 있는 closeTime과
+     * 유저가 보낸 closeTime 이 일치한지
+     */
+    private void checkCloseTime(long userCloseTime, long dbCloseTime) throws SsbPlayIncompleteException {
+        // 사용자가 보낸 closeTime
+        boolean isEqCloseTime = (userCloseTime == dbCloseTime);
         checkEq(isEqCloseTime);
     }
 
-    private void checkEq(boolean isInclude) {
+
+    private void checkEq(boolean isInclude) throws SsbPlayIncompleteException {
         if (!isInclude) {
-            throw new IllegalArgumentException();
+            throw new SsbPlayIncompleteException();
         }
     }
 
-    private void checkEqPlayTime(TrackChartSaveReqDto trackChartSaveReqDto, SsbTrack ssbTrack) {
-        checkEq(trackChartSaveReqDto.getPlayTime() == ssbTrack.getTrackLength());
+    /**
+     * 유저가 보낸 playTime 과 서버에 저장되어 있는 TrackLength 길이가 맞는지
+     */
+    private void checkEqPlayTime(int playTime, int trackLength) throws SsbPlayIncompleteException {
+        boolean isPlayTime = playTime == trackLength;
+        checkEq(isPlayTime);
+    }
+
+    private int secondBetween(long startTime, long closeTime) {
+        return (int) ((closeTime - startTime) / 1000);
     }
 }

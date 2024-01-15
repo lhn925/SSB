@@ -2,8 +2,6 @@ package sky.Sss.domain.track.controller.advice;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -11,8 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import sky.Sss.domain.track.exception.SsbFileException;
-import sky.Sss.domain.track.exception.SsbTrackAccessDeniedException;
+import sky.Sss.domain.track.exception.checked.SsbFileException;
+import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
+import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.Result;
@@ -36,9 +35,19 @@ public class ExTrackController {
         return Result.getErrorResult(new ErrorGlobalResultDto(e.getCode(), ms, request.getLocale()), e.getHttpStatus());
     }
 
+    @ExceptionHandler({SsbPlayIncompleteException.class})
+    public ResponseEntity<ErrorResult> playIncompleteExHandler(SsbPlayIncompleteException e,
+        HttpServletRequest request) {
+        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<ErrorResult> ioExHandler(RuntimeException e, HttpServletRequest request) {
-        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),
-            HttpStatus.INTERNAL_SERVER_ERROR);
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (e.getClass().equals(IllegalArgumentException.class)) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),status);
     }
 }

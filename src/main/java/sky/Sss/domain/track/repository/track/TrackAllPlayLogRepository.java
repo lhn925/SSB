@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
+import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.user.entity.User;
 
 public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlayLogs, Long> {
@@ -22,7 +23,9 @@ public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlay
 
     @Query("select s from SsbTrackAllPlayLogs s where s.id = :id and s.token =:token "
         + "and s.user =:user "
-        + "and s.ssbTrack =:ssbTrack ")
+        + "and s.ssbTrack =:ssbTrack "
+        + "and s.playStatus =:playStatus "
+    )
     Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id,@Param("token") String token,@Param("user") User user,@Param("ssbTrack")
-    SsbTrack ssbTrack);
+    SsbTrack ssbTrack,@Param("playStatus")PlayStatus playStatus);
 }

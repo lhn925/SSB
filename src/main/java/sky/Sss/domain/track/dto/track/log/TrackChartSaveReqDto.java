@@ -25,8 +25,9 @@ public class TrackChartSaveReqDto {
     @NotNull
     private Long closeTime; //끝난 시간
 
+    @NotNull
     @AssertTrue
-    private Boolean isChart;// 플레이 상태
+    private boolean isChartLog;// 플레이 상태
 
     @NotNull
     private TrackInfoReqDto trackInfoReqDto;

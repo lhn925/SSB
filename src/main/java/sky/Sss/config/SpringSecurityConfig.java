@@ -99,7 +99,7 @@ public class SpringSecurityConfig {
 //            .logoutUrl("/logout")
 //            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 //            .logoutSuccessHandler(logoutSuccessHandler) // 로그아웃 성공 핸들러
-//            .deleteCookies(RememberCookie.KEY.getValue());
+//            .deleteCookies(RememberCookie.KEY.getStatus());
 
         return http.build();
     }

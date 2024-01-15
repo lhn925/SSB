@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
+import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.repository.track.TrackAllPlayLogRepository;
 import sky.Sss.domain.user.entity.User;
 
@@ -45,8 +46,8 @@ public class TrackAllPlayLogService {
     public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token, ChartStatus chartStatus) {
         return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack, chartStatus).orElseThrow(() -> new IllegalArgumentException());
     }
-    public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token) {
-        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack).orElseThrow(() -> new IllegalArgumentException());
+    public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token, PlayStatus playStatus) {
+        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack,playStatus).orElseThrow(() -> new IllegalArgumentException());
     }
 
 }

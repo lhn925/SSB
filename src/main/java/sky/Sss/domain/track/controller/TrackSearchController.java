@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
-import sky.Sss.domain.track.exception.SsbTrackAccessDeniedException;
+import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.user.model.Status;
 
