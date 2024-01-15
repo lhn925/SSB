@@ -15,7 +15,7 @@ import sky.Sss.domain.track.dto.track.log.TrackChartSaveReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogModifyReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
-import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
 import sky.Sss.domain.track.model.ChartStatus;

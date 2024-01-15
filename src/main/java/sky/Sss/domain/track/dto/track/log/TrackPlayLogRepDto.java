@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.model.ChartStatus;
 
 @Getter

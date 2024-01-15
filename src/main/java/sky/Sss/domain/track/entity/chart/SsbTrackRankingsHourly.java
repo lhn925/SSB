@@ -19,7 +19,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 
 /**
  *
- * 한시간 차트를 나타내는 Table
+ * 실시간 (1시간) 차트를 나타내는 Table
  */
 @Entity
 @Getter

@@ -34,6 +34,8 @@ public class UserJoinService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
+
+    // CacheEvict: value 에 해당되는 캐시값 삭제
     @Caching(evict = {
         @CacheEvict(value = {"checkId"},key = "#userJoinDto.userId"),
         @CacheEvict(value = {"checkUserName"},key = "#userJoinDto.userName"),

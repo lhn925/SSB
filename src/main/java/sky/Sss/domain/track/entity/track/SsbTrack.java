@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
-import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
-import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;

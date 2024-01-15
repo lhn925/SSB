@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.entity.chart.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;

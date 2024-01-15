@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.entity.chart;
+package sky.Sss.domain.track.entity.track;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.model.TrackMinimumPlayTime;
