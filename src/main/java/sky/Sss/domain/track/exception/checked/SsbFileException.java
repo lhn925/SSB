@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.exception;
+package sky.Sss.domain.track.exception.checked;
 
 
 import lombok.Getter;

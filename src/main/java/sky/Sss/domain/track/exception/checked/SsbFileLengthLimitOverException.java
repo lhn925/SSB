@@ -1,6 +1,7 @@
-package sky.Sss.domain.track.exception;
+package sky.Sss.domain.track.exception.checked;
 
 import org.springframework.http.HttpStatus;
+import sky.Sss.domain.track.exception.checked.SsbFileException;
 
 public class SsbFileLengthLimitOverException extends SsbFileException {
 

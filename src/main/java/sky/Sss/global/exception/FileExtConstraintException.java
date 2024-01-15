@@ -3,7 +3,7 @@ package sky.Sss.global.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import sky.Sss.domain.track.exception.SsbFileException;
+import sky.Sss.domain.track.exception.checked.SsbFileException;
 
 @Getter
 public class FileExtConstraintException extends SsbFileException {
