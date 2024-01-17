@@ -18,8 +18,11 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.global.base.BaseTimeEntity;
 
 /**
+ * 최근 24시간 까지의 순위를 저장
+ * 최근 실시간 차트를 나타내는 Table
  *
- * 실시간 (1시간) 차트를 나타내는 Table
+ * 1~1000위 까지의 차트
+ *
  */
 @Entity
 @Getter
@@ -34,12 +37,18 @@ public class SsbTrackRankingsHourly extends BaseTimeEntity {
     @JoinColumn(unique = true, name = "track_id")
     private SsbTrack ssbTrack;
 
+    private Integer prevRanking;
+
     private Integer ranking;
 
     private LocalDate rankingDate;
 
     private Integer hour;
 
+    // 지난 1시간 총 조회수
+    private Long totalPlayCount;
+
+    // 소수점 두번째 자리까지만
     // 지난 24시간 50% + 현시간 50%
     private Double score;
 

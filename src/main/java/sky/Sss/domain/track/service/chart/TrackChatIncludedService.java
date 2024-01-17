@@ -8,17 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
-import sky.Sss.domain.track.dto.track.log.TrackChartSaveReqDto;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.Hour;
 import sky.Sss.domain.track.model.PlayStatus;
-import sky.Sss.domain.track.repository.track.TrackChartIncludedRepository;
+import sky.Sss.domain.track.repository.chart.TrackChartIncludedRepository;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.UserQueryService;
 
 
 /**
