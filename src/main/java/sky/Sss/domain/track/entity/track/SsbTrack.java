@@ -93,7 +93,6 @@ public class SsbTrack extends BaseTimeEntity {
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackLikes> likes = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackAllPlayLogs> plays = new ArrayList<>();
 

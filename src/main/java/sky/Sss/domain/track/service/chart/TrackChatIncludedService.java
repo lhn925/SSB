@@ -1,14 +1,16 @@
-package sky.Sss.domain.track.service.track;
+package sky.Sss.domain.track.service.chart;
 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
+import sky.Sss.domain.track.entity.chart.SsbTrackChartHourly;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.Hour;
@@ -41,6 +43,5 @@ public class TrackChatIncludedService {
             PlayStatus.COMPLETED, createdDate);
         return ssbChartIncludedPlays.orElse(null);
     }
-
 
 }

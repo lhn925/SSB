@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track.log;
+package sky.Sss.domain.track.dto.track.chart;
 
 
 import jakarta.validation.constraints.AssertTrue;
