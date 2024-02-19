@@ -111,9 +111,6 @@ public class UserLoginLogService {
         LocalDate expireDate = LocalDate.now().minusMonths(month);
 
         Integer count = loginLogRepository.expireLoginLogCount(Status.ON.getValue(), expireDate);
-
-        log.info("count = {}", count);
-
         Integer result = 0;
         if (count > 0) {
             result = loginLogRepository.expireLoginLogOff(Status.OFF.getValue(), Status.ON.getValue(), expireDate);

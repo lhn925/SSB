@@ -16,7 +16,7 @@ public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
     @Query(value = "select u from UserLoginLog u where "
         + "u.defaultLocationLog.userId = :userId and "
         + "u.isSuccess = :isSuccess and "
-        + "u.defaultLocationLog.isStatus = :isStatus ",nativeQuery = true)
+        + "u.defaultLocationLog.isStatus = :isStatus ")
     Page<UserLoginLog> getLoginLogPageable(@Param("userId") String userId,
         @Param("isSuccess") LoginSuccess isSuccess, @Param("isStatus") Boolean status,
         Pageable pageable);
@@ -31,7 +31,7 @@ public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
     @Query(value = "select u from UserLoginLog u where "
         + "u.defaultLocationLog.userId = :userId and "
         + "u.isSuccess = :isSuccess and "
-        + "u.defaultLocationLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate",nativeQuery = true)
+        + "u.defaultLocationLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate ")
     Page<UserLoginLog> getLoginLogPageable(@Param("userId") String userId,
         @Param("isSuccess") LoginSuccess isSuccess,
         @Param("isStatus") Boolean status,
@@ -44,13 +44,13 @@ public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
 
 
     @Query(value = "select count (u.id) from UserLoginLog u where "
-        + "u.defaultLocationLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ",nativeQuery = true)
+        + "u.defaultLocationLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ")
     Integer expireLoginLogCount(@Param("isStatus") Boolean status, @Param("expireDate") LocalDate expireDate);
 
 
     @Modifying(clearAutomatically = true)
     @Query(value = "update UserLoginLog u set u.defaultLocationLog.isStatus = :offStatus where  u.defaultLocationLog.isStatus = :onStatus"
-        + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate",nativeQuery = true)
+        + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate")
     Integer expireLoginLogOff (@Param("offStatus") Boolean offStatus,@Param("onStatus")
     Boolean onStatus ,@Param("expireDate") LocalDate expireDate);
 
