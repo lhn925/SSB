@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.controller;
+package sky.Sss.domain.track.controller.temp;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

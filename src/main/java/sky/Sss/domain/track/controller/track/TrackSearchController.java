@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.controller;
+package sky.Sss.domain.track.controller.track;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
