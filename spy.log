@@ -1,0 +1,3 @@
+1708072662155|134|commit|connection 93|url jdbc:mysql://localhost:3306/SpringTest?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999||
+1708072779692|2|commit|connection 137|url jdbc:mysql://localhost:3306/SpringTest?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999||
+1708072849041|143|commit|connection 141|url jdbc:mysql://localhost:3306/SpringTest?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999||

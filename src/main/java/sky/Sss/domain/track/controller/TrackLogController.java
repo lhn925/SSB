@@ -26,7 +26,7 @@ import sky.Sss.domain.user.annotation.UserAuthorize;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user/track/log")
+@RequestMapping("/users/track/log")
 @UserAuthorize
 public class TrackLogController {
     private final TrackPlayMetricsService trackPlayMetricsService;

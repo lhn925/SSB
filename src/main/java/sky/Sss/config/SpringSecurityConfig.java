@@ -38,10 +38,10 @@ public class SpringSecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**", "/user/join",
-        "/example/city", "/email/**", "/user/help", "/user/help/**", "/user/join/**", "/user/file/**", "/app/login",
-        "/login/**", "/user/profile/**","/webSocket/**","/user/search/track","/user/search/track/**"};
-    private final String[] USER_URL = {"/user/logout"};
+    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**", "/users/join",
+        "/example/city", "/email/**", "/users/help", "/users/help/**", "/users/join/**", "/users/file/**", "/app/login",
+        "/login/**", "/users/profile/**","/webSocket/**","/users/search/track","/users/search/track/**"};
+    private final String[] USER_URL = {"/users/logout"};
     private final String[] ADMIN_URL = {"/cron/**"};
 
 

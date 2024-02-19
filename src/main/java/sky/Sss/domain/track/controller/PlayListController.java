@@ -28,7 +28,7 @@ import sky.Sss.global.error.dto.Result;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/user/playlist")
+@RequestMapping("/users/playlist")
 @RestController
 @UserAuthorize
 public class PlayListController {

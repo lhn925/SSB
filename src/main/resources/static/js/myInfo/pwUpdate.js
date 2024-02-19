@@ -111,7 +111,7 @@ PwUpdate.prototype._subBtnClickAddEvent = function ($subBtn, ...$elements) {
       };
 
       // 비밀번호 변경
-      _fetch("POST","/user/myInfo/api/pw", body).then((data) => {
+      _fetch("POST","/users/myInfo/api/pw", body).then((data) => {
         _pwUpdate.modal._open(_pwUpdate.$pwUpdateModal, _pwUpdate.body);
       }).catch((error) => {
         error = JSON.parse(error.message);
@@ -138,7 +138,7 @@ PwUpdate.prototype._radioCheckBtnClickAddEvent = function () {
     let allLogoutChecked = $allLogoutRadio.checked;
     let logoutNonChecked = $logoutNoneRadio.checked;
     if (allLogoutChecked) {
-      _fetch("POST","/user/myInfo/api/login/status").then(() =>{
+      _fetch("POST","/users/myInfo/api/login/status").then(() =>{
         location.href = "/logout";
       }).catch((error) => {
         error = JSON.parse(error.message);
@@ -164,7 +164,7 @@ PwUpdate.prototype._PwSecureCheckAddEvent = function () {
 //패스워드 안전도 체크 이벤트추가
 PwUpdate.prototype._cancelBtn = function () {
   document.getElementById("cancel").onclick = function () {
-    location.href = "/user/myInfo";
+    location.href = "/users/myInfo";
   }
 }
 

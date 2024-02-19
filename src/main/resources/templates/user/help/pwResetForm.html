@@ -7,11 +7,11 @@
   </th:block>
 </head>
 <body>
-<div class="container" th:replace="~{template/container/user/container ::container (~{:: .mainCard})}">
+<div class="container" th:replace="~{template/container/users/container ::container (~{:: .mainCard})}">
   <div class="card mainCard">
     <div class="card-body">
       <h5 class="card-title text-center" th:text="#{sky.pwReset}"></h5>
-      <form class="mt-4" method="post" th:action="@{/user/help/reset}" th:object="${userPwResetFormDto}">
+      <form class="mt-4" method="post" th:action="@{/users/help/reset}" th:object="${userPwResetFormDto}">
 
         <input type="text" hidden="true" th:field="*{userId}"/>
         <input type="text" hidden="true" th:field="*{helpToken}"/>

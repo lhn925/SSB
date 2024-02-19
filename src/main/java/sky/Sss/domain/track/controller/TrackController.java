@@ -33,7 +33,7 @@ import sky.Sss.global.file.utili.FileStore;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/user/track")
+@RequestMapping("/users/track")
 @RestController
 @UserAuthorize
 public class TrackController {

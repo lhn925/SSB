@@ -22,7 +22,7 @@ import sky.Sss.global.file.utili.FileStore;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user/file")
+@RequestMapping("/users/file")
 public class FileController {
 
     private final FileStore fileStore;
@@ -35,7 +35,7 @@ public class FileController {
     //
 
     // https://phinf.pstatic.net/contact/20231211_73/1702273532247G5RXT_JPEG/image.jpg?type=s160
-    // https://static.nid.naver.com/images/web/user/default.png
+    // https://static.nid.naver.com/images/web/users/default.png
     //https://i1.sndcdn.com/avatars-CArjHPU2594ar3d8-zRJ9nw-t500x500.jpg
     //https://i1.sndcdn.com/artworks-ofaAuAuzQo8MEAsM-v2yUgg-t500x500.jpg
     //https://i1.sndcdn.com/artworks-zpso7w5yhucrU6FT-TQdzcg-t500x500.jpg

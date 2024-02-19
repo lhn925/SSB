@@ -24,7 +24,7 @@ import sky.Sss.global.error.dto.Result;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/user/temp/file")
+@RequestMapping("/users/temp/file")
 @RestController
 @UserAuthorize
 public class TempTrackController {

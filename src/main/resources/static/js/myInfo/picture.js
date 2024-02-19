@@ -36,11 +36,11 @@ Picture.prototype._pictureFileBtnChangeEvent = function () {
     let formData = new FormData();
     formData.append("file", file);
 
-    _filePost("/user/myInfo/api/picture", formData, null).then(
+    _filePost("/users/myInfo/api/picture", formData, null).then(
         (data) => {
           _success(messages["picture.success"]);
           _addAttributeByClass("src",
-              "/user/file/api/picture/" + data.data.userId,
+              "/users/file/api/picture/" + data.data.userId,
               "userPicture");
         }
     ).catch((error) => {

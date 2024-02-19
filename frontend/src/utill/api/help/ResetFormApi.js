@@ -3,7 +3,7 @@ import axios from "axios";
 export default async function ResetFormApi(userId, authToken, email) {
   try {
     const response = await axios.get(
-        "./user/help/reset?userId=" + userId + "&authToken=" + authToken
+        "./users/help/reset?userId=" + userId + "&authToken=" + authToken
         + "&email=" + email);
 
     return {code: response.status, data: response.data};

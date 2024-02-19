@@ -51,7 +51,7 @@ import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user/help")
+@RequestMapping("/users/help")
 public class HelpController {
 
     private final UserQueryService userQueryService;

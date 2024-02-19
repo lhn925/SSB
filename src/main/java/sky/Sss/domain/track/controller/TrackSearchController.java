@@ -19,7 +19,7 @@ import sky.Sss.domain.user.model.Status;
 
 @Slf4j
 @RestController
-@RequestMapping("/user/search/track")
+@RequestMapping("/users/search/track")
 @RequiredArgsConstructor
 public class TrackSearchController {
     private final TrackService trackService;

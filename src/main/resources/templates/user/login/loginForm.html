@@ -7,7 +7,7 @@
   </th:block>
 </head>
 <body>
-<div class="container" th:replace="~{template/container/user/container ::container (~{:: .mainCard})}">
+<div class="container" th:replace="~{template/container/users/container ::container (~{:: .mainCard})}">
 
   <div class="card mainCard">
     <div class="card-body">
@@ -73,10 +73,10 @@
 <div class="centered-breadcrumb">
   <div aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a class="text-decoration-none text-dark" th:href="@{/user/help/id}"
+      <li class="breadcrumb-item"><a class="text-decoration-none text-dark" th:href="@{/users/help/id}"
                                      th:text="#{sky.findId}">아이디 찾기</a></li>
-      <li class="breadcrumb-item"><a th:href="@{/user/help/idquery}" class="text-decoration-none text-dark" th:text="#{sky.findPw}">비밀번호 찾기</a></li>
-      <li class="breadcrumb-item"><a class="text-decoration-none text-dark" th:href="@{/user/join/agree}"
+      <li class="breadcrumb-item"><a th:href="@{/users/help/idquery}" class="text-decoration-none text-dark" th:text="#{sky.findPw}">비밀번호 찾기</a></li>
+      <li class="breadcrumb-item"><a class="text-decoration-none text-dark" th:href="@{/users/join/agree}"
                                      th:text="#{sky.signup}">회원가입</a></li>
     </ol>
   </div>

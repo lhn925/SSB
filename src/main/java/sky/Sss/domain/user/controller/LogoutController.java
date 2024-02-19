@@ -22,7 +22,7 @@ import sky.Sss.domain.user.utili.jwt.TokenProvider;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/logout")
+@RequestMapping("/users/logout")
 public class LogoutController {
 
 

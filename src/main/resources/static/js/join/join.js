@@ -19,10 +19,10 @@ Join.prototype._init = function () {
   _typePwToText(document.getElementById("btn-show"), $password);
   this.$isChkUId.checked = this._DuplicateCheckAddEvent("userId",
       "id-NotThyme-msg",
-      "/user/join/api/duplicate/id?userId=", this.$isChkUId);
+      "/users/join/api/duplicate/id?userId=", this.$isChkUId);
   this.$isChkUname.checked = this._DuplicateCheckAddEvent("userName",
       "userName-NotThyme-msg",
-      "/user/join/api/duplicate/userName?userName=", this.$isChkUname);
+      "/users/join/api/duplicate/userName?userName=", this.$isChkUname);
   this.$isChkPw.checked = this._PwSecureCheckAddEvent();
   this._SubmitBtnClickAddEvent();
 
@@ -52,7 +52,7 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
     if (!_isChkUId) { // 아이디 유효성 검증이 안 됐을 경우
       _join.$isChkEmail.checked = _join._duplicateCheckFn("userId",
           "id-NotThyme-msg",
-          "/user/join/api/duplicate/id?userId=", document.getElementById("userId"),
+          "/users/join/api/duplicate/id?userId=", document.getElementById("userId"),
           _join.$isChkUId);
     }
 
@@ -64,7 +64,7 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
     if (!_isChkUname) { // 유저네임 유효성 검증
       _join.$isChkUname.checked = _join._duplicateCheckFn("userName",
           "userName-NotThyme-msg",
-          "/user/join/api/duplicate/userName?userName=",
+          "/users/join/api/duplicate/userName?userName=",
           document.getElementById("userName"),
           _join.$isChkUname);
     }
@@ -72,7 +72,7 @@ Join.prototype._SubmitBtnClickAddEvent = function () {
     if (!_isChkEmail) { // 이메일 유효성 검증
       _join.$isChkEmail.checked = _join._duplicateCheckFn("email",
           "email-NotThyme-msg",
-          "/user/join/api/duplicate/email?email=", document.getElementById("email"),
+          "/users/join/api/duplicate/email?email=", document.getElementById("email"),
           _join.$isChkEmail);
     }
 

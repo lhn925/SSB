@@ -58,8 +58,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
             response.getWriter().write(json);
         }
 
-        ///user/myInfo/api/picture/4a2122bd-772e-4edd-bba9-10d4f53ceabd.jpg
-        ///user/myInfo/api/picture/003a0a7c-c4a1-43ad-9ef6-e5d79692a88d.jpg
+        ///users/myInfo/api/picture/4a2122bd-772e-4edd-bba9-10d4f53ceabd.jpg
+        ///users/myInfo/api/picture/003a0a7c-c4a1-43ad-9ef6-e5d79692a88d.jpg
     }
 
     @Override

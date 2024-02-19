@@ -111,7 +111,7 @@ function CircularImageDropdown({userId, navigate, clickBtnLogout}) {
       <>
         <Dropdown>
           <Dropdown.Toggle variant="" id="dropdown-basic">
-            <img src={"./user/file/picture/" + userId}/>
+            <img src={"./users/file/picture/" + userId}/>
           </Dropdown.Toggle>
 
           <Dropdown.Menu>

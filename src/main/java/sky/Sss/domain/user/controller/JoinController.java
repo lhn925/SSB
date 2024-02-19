@@ -36,7 +36,7 @@ import sky.Sss.global.error.dto.Result;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/user/join")
+@RequestMapping("/users/join")
 public class JoinController {
 
     private final UserJoinService userJoinService;
@@ -147,17 +147,17 @@ public class JoinController {
         if (result != null) {
             result.setMaxAge(0);
             response.addCookie(result);
-            return "redirect:/user/join/agree";
+            return "redirect:/users/join/agree";
         }
 
         // 쿠키 생성
         UserJoinAgreeDto userJoinAgreeDto = UserJoinAgreeDto.createUserJoinAgree();
 
-        CustomCookie.addCookie("/user/join","agreeToken",900,response,userJoinAgreeDto.getAgreeToken());
+        CustomCookie.addCookie("/users/join","agreeToken",900,response,userJoinAgreeDto.getAgreeToken());
 
         //회원가입 토큰 발급
         model.addAttribute("userJoinAgreeDto", userJoinAgreeDto);
-        return "user/join/joinAgreeForm";
+        return "users/join/joinAgreeForm";
     }*/
 
 

@@ -8,11 +8,11 @@
   </th:block>
 </head>
 <body>
-<div class="container" th:replace="~{template/container/user/container ::container (~{:: .mainCard})}">
+<div class="container" th:replace="~{template/container/users/container ::container (~{:: .mainCard})}">
   <div class="card mainCard">
     <div class="card-body">
       <h5 class="card-title text-center" th:text="#{sky.pwReset}"></h5>
-      <form class="mt-4" method="post" th:action="@{/user/myInfo/pw}" th:object="${userPwUpdateFormDto}">
+      <form class="mt-4" method="post" th:action="@{/users/myInfo/pw}" th:object="${userPwUpdateFormDto}">
 
         <input type="checkbox" hidden="true" id="_isChkPw"/>
         <input type="checkbox" hidden="true" id="_isChkNewPw"/>

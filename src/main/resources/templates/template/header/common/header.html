@@ -28,13 +28,13 @@
             <div class="dropdown text-end">
               <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
                  data-bs-toggle="dropdown" aria-expanded="false">
-                <img th:src="@{|/user/file/api/picture/${userInfo.userId}|}" width="32" height="32"
+                <img th:src="@{|/users/file/api/picture/${userInfo.userId}|}" width="32" height="32"
                      class="rounded-circle userPicture">
               </a>
               <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
                 <li><a class="dropdown-item" href="#">New project...</a></li>
                 <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" th:text="#{sky.myInfo}" th:href="@{/user/myInfo}">Profile</a></li>
+                <li><a class="dropdown-item" th:text="#{sky.myInfo}" th:href="@{/users/myInfo}">Profile</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
@@ -49,10 +49,10 @@
                                                                               th:text="#{sky.login}"
                                                                               th:href="@{/login}">Login</a></button>
               <button type="button" class="btn btn-primary"><a class="text-decoration-none text-white"
-                                                               th:text="#{sky.signup}" th:href="@{/user/join}"></a>
+                                                               th:text="#{sky.signup}" th:href="@{/users/join}"></a>
               </button>
               <button type="button" class="btn btn-primary"><a class="text-decoration-none text-white"
-                                                               th:text="#{sky.signup}" th:href="@{/user/join}"></a>
+                                                               th:text="#{sky.signup}" th:href="@{/users/join}"></a>
               </button>
 
             </div>

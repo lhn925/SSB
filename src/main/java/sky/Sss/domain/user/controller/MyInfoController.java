@@ -66,7 +66,7 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/myInfo")
+@RequestMapping("/users/myInfo")
 @UserAuthorize
 public class MyInfoController {
     private final UserQueryService userQueryService;

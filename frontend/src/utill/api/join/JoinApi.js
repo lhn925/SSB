@@ -6,7 +6,7 @@ export async function JoinApi(body) {
   };
   const dataObject = {code: null, data: null}
   try {
-    const response = await axios.post("./user/join", body, {headers: headers})
+    const response = await axios.post("./users/join", body, {headers: headers})
     dataObject.code = response.status;
     dataObject.data = response.data;
   } catch (error) {

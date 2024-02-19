@@ -8,10 +8,10 @@
   </th:block>
 </head>
 <body>
-<div class="container" th:replace="~{template/container/user/container ::container (~{:: .card})}">
+<div class="container" th:replace="~{template/container/users/container ::container (~{:: .card})}">
   <div class="card">
     <div class="card-body">
-      <form id="form" th:method="get" th:action="@{/user/help/idquery/check}"
+      <form id="form" th:method="get" th:action="@{/users/help/idquery/check}"
             th:object="${userIdHelpQueryDto}">
         <div class="text-center mb-4">
           <span class="logo-text" th:text="#{sky.idqueryForm}"></span>
@@ -37,7 +37,7 @@
   <div aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><span th:text="#{sky.idqueryForm2}"></span></li>
-      <li class="breadcrumb-item"><a class="text-decoration-none mainLogo" th:href="@{/user/help/id}"
+      <li class="breadcrumb-item"><a class="text-decoration-none mainLogo" th:href="@{/users/help/id}"
                                      th:text="#{sky.findId}">아이디 찾기</a></li>
 
     </ol>

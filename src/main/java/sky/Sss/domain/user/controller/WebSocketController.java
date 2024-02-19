@@ -46,7 +46,7 @@ public class WebSocketController {
 
     // OrderController.java class
     @MessageExceptionHandler // message 처리
-    @SendToUser("/queue/errors") // '/user/queue/errors' 를 구독하고 있으면 보낸 사람에게만 ErrorDto가 전달된다.
+    @SendToUser("/queue/errors") // '/users/queue/errors' 를 구독하고 있으면 보낸 사람에게만 ErrorDto가 전달된다.
     public String handleException(SocketException exception) {
         // throw new SocketException('message custom')을 던지면 이리로 들어온다.
         log.warn(exception.getMessage());

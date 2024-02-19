@@ -65,7 +65,7 @@ MyInfo.prototype._changeUserNameBtnClickAddEvent = function ($userNameModal,
  * @private
  */
 MyInfo.prototype._getPatchLoginDeviceList = function (offset) {
-  _get("/user/myInfo/api/loginDevice?offset=" + offset)
+  _get("/users/myInfo/api/loginDevice?offset=" + offset)
   .then((data) => {
     const pageData = data.data;
     let isEmpty = pageData.empty;
@@ -108,7 +108,7 @@ MyInfo.prototype._pagingSetting = function (pageData, $userManagePaging) {
  */
 MyInfo.prototype._getPatchUserLogList = function (type, startDate, endDate,
     offset) {
-  _get("/user/myInfo/api/userLog?offset=" + offset + "&startDate="
+  _get("/users/myInfo/api/userLog?offset=" + offset + "&startDate="
       + startDate + "&endDate=" + endDate + "&type=" + type)
   .then((data) => {
     const pageData = data.data;
@@ -421,7 +421,7 @@ MyInfo.prototype._deviceLogoutBtnClickAddEvent = function () {
       if (!isLogout) {
         return;
       }
-      _fetch("PATCH", "/user/myInfo/api/login/status", {session: data})
+      _fetch("PATCH", "/users/myInfo/api/login/status", {session: data})
       .then(() => {
         _success(messages["device.logout.success"]);
 
@@ -522,7 +522,7 @@ MyInfo.prototype._loginDeviceModalCancelBtnClickAddEvent = function ($userManage
  */
 MyInfo.prototype._changePwBtnClickAddEvent = function () {
   this.$changePwBtn.onclick = function () {
-    location.href = "/user/myInfo/pw";
+    location.href = "/users/myInfo/pw";
   }
 }
 /**
@@ -532,7 +532,7 @@ MyInfo.prototype._changePwBtnClickAddEvent = function () {
 MyInfo.prototype._blockCheckedChangeAddEvent = function () {
   this.$isLoginBlocked.onchange = function () {
     let isChecked = this.checked;
-    _fetch("POST", "/user/myInfo/api/block", {isLoginBlocked: isChecked})
+    _fetch("POST", "/users/myInfo/api/block", {isLoginBlocked: isChecked})
     .then(() => {
       let code = "loginUnblock";
       if (isChecked) {
@@ -604,7 +604,7 @@ MyInfo.prototype._modalSaveBtnClickAddEvent = function ($userNameModal, body) {
       _warning(messages["userJoinForm." + "userName"]);
       return false;
     }
-    _fetch("POST", "/user/myInfo/api/userName", {userName: value}, null)
+    _fetch("POST", "/users/myInfo/api/userName", {userName: value}, null)
     .then((data) => {
       _myInfo.modal._close($userNameModal, body);
       let changeName = data.data.userName;

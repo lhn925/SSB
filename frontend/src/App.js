@@ -40,7 +40,7 @@ function App() {
       heartbeatOutgoing: 4000,
     })
     clientData.onConnect = function () {
-      clientData.subscribe("/user/queue/alarm", function (message) {
+      clientData.subscribe("/users/queue/alarm", function (message) {
         console.log(message.body);
       });
     };
@@ -110,7 +110,7 @@ function App() {
             theme="light"
         />
 
-        <ReactPlayer url={process.env.PUBLIC_URL + "/user/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />
+        <ReactPlayer url={process.env.PUBLIC_URL + "/users/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />
         <div className="l-container">
           <Routes>
             <Route path="/">

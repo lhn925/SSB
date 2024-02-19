@@ -9,7 +9,7 @@ import axios from "axios";
 async function UserInfoApi(headers) {
 
   try {
-    const response = await axios.get("./user/myInfo",{headers:headers});
+    const response = await axios.get("./users/myInfo",{headers:headers});
     return {
       code:response.status,
       data:response.data
