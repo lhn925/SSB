@@ -1,21 +1,15 @@
 package sky.Sss.domain.user.service.login;
 
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -23,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.dto.login.UserLoginFormDto;
 import sky.Sss.domain.user.exception.CaptchaMisMatchFactorException;
-import sky.Sss.domain.user.exception.LoginFailException;
-import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.LoginSuccess;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
@@ -32,7 +24,6 @@ import sky.Sss.domain.user.utili.jwt.JwtDto;
 import sky.Sss.domain.user.utili.jwt.JwtFilter;
 import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
-import sky.Sss.global.error.dto.Result;
 import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 
 @RequiredArgsConstructor
@@ -135,7 +126,7 @@ public class LoginService {
     @Transactional
     public void saveLoginLog(String userAgent, String userId, LoginSuccess success) {
         //로그인 성공 기록 저장
-        userLoginLogService.save(userAgent, userId, success,
+        userLoginLogService.add(userAgent, userId, success,
             Status.ON);
     }
 
@@ -143,7 +134,7 @@ public class LoginService {
     @Transactional
     public void saveLoginStatus(String userAgent, JwtTokenDto jwtTokenDto, UserDetails userDetails, String sessionId) {
         try {
-            userLoginStatusService.save(userAgent, jwtTokenDto, userDetails, sessionId);
+            userLoginStatusService.add(userAgent, jwtTokenDto, userDetails, sessionId);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus: " + e.getMessage());
         }

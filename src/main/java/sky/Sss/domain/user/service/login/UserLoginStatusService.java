@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.dto.myInfo.UserLoginListDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.login.UserLoginStatus;
-import sky.Sss.domain.user.exception.LoginFailException;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.repository.login.UserLoginStatusRepository;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -48,7 +47,7 @@ public class UserLoginStatusService {
      * 저장
      */
     @Transactional
-    public void save(String userAgent, JwtTokenDto jwtTokenDto, UserDetails userDetails, String sessionId) {
+    public void add(String userAgent, JwtTokenDto jwtTokenDto, UserDetails userDetails, String sessionId) {
 
         if (userDetails == null) {
             throw new IllegalArgumentException("code.error");

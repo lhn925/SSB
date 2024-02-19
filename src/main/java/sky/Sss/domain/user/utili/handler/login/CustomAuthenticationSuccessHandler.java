@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -22,9 +21,6 @@ import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
-import sky.Sss.domain.user.utili.jwt.JwtFilter;
-import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
-import sky.Sss.domain.user.utili.jwt.TokenProvider;
 import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisService;
@@ -102,7 +98,7 @@ public class CustomAuthenticationSuccessHandler extends
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
         //로그인 성공 기록 저장
-        userLoginLogService.save(request.getHeader("User-Agent"), request.getParameter("userId"), LoginSuccess.SUCCESS,
+        userLoginLogService.add(request.getHeader("User-Agent"), request.getParameter("userId"), LoginSuccess.SUCCESS,
             Status.ON);
     }
 

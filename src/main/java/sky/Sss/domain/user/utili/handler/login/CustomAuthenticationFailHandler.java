@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import sky.Sss.domain.user.exception.CaptchaMisMatchFactorException;
 import sky.Sss.domain.user.exception.LoginBlockException;
 import sky.Sss.domain.user.exception.LoginFailCountException;
 import sky.Sss.domain.user.model.LoginSuccess;
@@ -61,7 +60,7 @@ public class CustomAuthenticationFailHandler implements AuthenticationFailureHan
             errMsg = exception.getMessage();
         }
 
-        userLoginLogService.save(request.getHeader("User-Agent"), request.getParameter("userId"), LoginSuccess.FAIL,
+        userLoginLogService.add(request.getHeader("User-Agent"), request.getParameter("userId"), LoginSuccess.FAIL,
             Status.ON);
         sendRedirect(request, response, errMsg, sbPath, retryTwoFactor);
     }

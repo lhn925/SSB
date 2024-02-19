@@ -1,9 +1,6 @@
 package sky.Sss.domain.user.service.log;
 
-import com.maxmind.geoip2.exception.GeoIp2Exception;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
@@ -12,17 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginLogListDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.login.UserLoginLog;
 import sky.Sss.domain.user.exception.LoginBlockException;
-import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.LoginSuccess;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.repository.log.LoginLogRepository;
@@ -31,7 +24,6 @@ import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.utili.auditor.AuditorAwareImpl;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +43,7 @@ public class UserLoginLogService {
      * 로그인 기록 저장
      */
     @Transactional
-    public void save(String userAgent, String userId, LoginSuccess isSuccess,
+    public void add(String userAgent, String userId, LoginSuccess isSuccess,
         Status isStatus) {
 
         Long uId = null;

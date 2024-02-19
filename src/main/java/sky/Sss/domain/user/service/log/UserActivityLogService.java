@@ -41,7 +41,7 @@ public class UserActivityLogService {
      * 유저 정보 수정 기록 저장
      */
     @Transactional
-    public void save(String userId, String chaContent, String chaMethod,
+    public void add(String userId, String chaContent, String chaMethod,
         String userAgent, ChangeSuccess changeSuccess) {
         Optional<User> byUserId = userQueryRepository.findByUserId(userId);
         /*if (uId == null && !byUserId.isEmpty()) {

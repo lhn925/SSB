@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.socket.WebSocketSession;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
@@ -218,13 +217,13 @@ public class MyInfoController {
 
             userHelpService.myPagePwUpdate(userPwUpdateFormDto);
             //변경로그
-            userActivityLogService.save(userDetails.getUsername(), "sky.pw",
+            userActivityLogService.add(userDetails.getUsername(), "sky.pw",
                 "sky.log.pw.update", request.getHeader("User-Agent"), ChangeSuccess.SUCCESS);
             //인증 이미지 삭제
             deleteImage(userPwUpdateFormDto);
             return ResponseEntity.ok(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            userActivityLogService.save(userDetails.getUsername(), "sky.pw", "sky.log.pw.update",
+            userActivityLogService.add(userDetails.getUsername(), "sky.pw", "sky.log.pw.update",
                 request.getHeader("User-Agent"), ChangeSuccess.FAIL);
             deleteImage(userPwUpdateFormDto);
             throw new IllegalArgumentException(e.getMessage());

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.email.dto.EmailAuthCodeDto;
 import sky.Sss.domain.email.entity.Email;
@@ -42,7 +41,6 @@ import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.CustomCookie;
 import sky.Sss.domain.user.utili.PwChecker;
 import sky.Sss.domain.user.utili.UserTokenUtil;
-import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.FieldErrorCustom;
 import sky.Sss.global.error.dto.Result;
@@ -275,7 +273,7 @@ public class HelpController {
         try {
             CustomUserDetails userDetails = (CustomUserDetails) userHelpService.passwordUpdate(userPwResetFormDto);
             //변경로그
-            userActivityLogService.save(userDetails.getUsername(), "sky.pw",
+            userActivityLogService.add(userDetails.getUsername(), "sky.pw",
                 "sky.log.pw.chaContent", request.getHeader("User-Agent"), ChangeSuccess.SUCCESS);
             // 비밀번호가 전과 같을시에 IllegalArgumentException
 
@@ -291,7 +289,7 @@ public class HelpController {
         } catch (IllegalArgumentException e) {
             setApiCaptcha(userPwResetFormDto);
             addCaptchaError(userPwResetFormDto, bindingResult);
-            userActivityLogService.save(userPwResetFormDto.getUserId(), "sky.pw", "sky.log.pw.chaContent",
+            userActivityLogService.add(userPwResetFormDto.getUserId(), "sky.pw", "sky.log.pw.chaContent",
                 request.getHeader("User-Agent"), ChangeSuccess.FAIL);
             addError(bindingResult, "userPwResetFormDto", "newPw", userPwResetFormDto.getNewPw(), e.getMessage());
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
