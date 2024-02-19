@@ -29,7 +29,7 @@ public class BoardJdbcRepository implements BoardRepository {
     }
 
     @Override
-    public void save (Board board) {
+    public void add (Board board) {
         try {
             getConn();
             pstm = conn.prepareStatement("INSERT INTO board(title,text,nickname) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);

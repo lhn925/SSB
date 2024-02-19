@@ -49,9 +49,9 @@ public class PlayListService {
      * @return
      */
     @Transactional
-    public PlayListInfoDto savePlayList(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
+    public PlayListInfoDto addPlayList(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
         String sessionId) {
-        return trackService.saveTrackFiles(playListSettingSaveDto, coverImgFile, sessionId);
+        return trackService.addTrackFiles(playListSettingSaveDto, coverImgFile, sessionId);
     }
 
     @Transactional

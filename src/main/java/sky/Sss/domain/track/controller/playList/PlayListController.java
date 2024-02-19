@@ -28,7 +28,7 @@ import sky.Sss.global.error.dto.Result;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/users/playlist")
+@RequestMapping("/tracks/playlist")
 @RestController
 @UserAuthorize
 public class PlayListController {
@@ -56,7 +56,7 @@ public class PlayListController {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
         HttpSession session = request.getSession();
-        PlayListInfoDto trackPlayListInfoDto = playListService.savePlayList(playListSettingSaveDto, coverImgFile,
+        PlayListInfoDto trackPlayListInfoDto = playListService.addPlayList(playListSettingSaveDto, coverImgFile,
             session.getId());
         return ResponseEntity.ok(trackPlayListInfoDto);
     }

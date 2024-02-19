@@ -31,7 +31,7 @@ public class TrackHourlyTotalPlaysService {
      * @return
      */
     @Transactional
-    public void saveAll(List<SsbTrackHourlyTotalPlays> hourlyTotalPlays) {
+    public void addAll(List<SsbTrackHourlyTotalPlays> hourlyTotalPlays) {
         trackHourlyTotalPlaysRepository.saveAll(hourlyTotalPlays);
     }
 

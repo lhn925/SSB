@@ -26,7 +26,7 @@ import sky.Sss.domain.user.annotation.UserAuthorize;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users/track/log")
+@RequestMapping("/tracks/log")
 @UserAuthorize
 public class TrackLogController {
     private final TrackPlayMetricsService trackPlayMetricsService;
@@ -49,15 +49,9 @@ public class TrackLogController {
     @PostMapping("/chart")
     public ResponseEntity<HttpStatus> saveChartLog (@Validated @RequestBody TrackChartSaveReqDto trackChartSaveReqDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-            for (FieldError fieldError : fieldErrors) {
-                log.info("fieldError.getField() = {}", fieldError.getField());
-                log.info("fieldError.getArguments() = {}", fieldError.getArguments());
-                log.info("fieldError.getRejectedValue() = {}", fieldError.getRejectedValue());
-            }
             throw new IllegalArgumentException();
         }
-        trackPlayMetricsService.createChartIncluded(trackChartSaveReqDto);
+        trackPlayMetricsService.addChartIncluded(trackChartSaveReqDto);
         return ResponseEntity.ok().build();
     }
     /**

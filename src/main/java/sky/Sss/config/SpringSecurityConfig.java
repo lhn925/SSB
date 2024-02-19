@@ -40,7 +40,7 @@ public class SpringSecurityConfig {
 
     private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**", "/users/join",
         "/example/city", "/email/**", "/users/help", "/users/help/**", "/users/join/**", "/users/file/**", "/app/login",
-        "/login/**", "/users/profile/**","/webSocket/**","/users/search/track","/users/search/track/**"};
+        "/login/**", "/users/profile/**","/webSocket/**","/tracks/info"};
     private final String[] USER_URL = {"/users/logout"};
     private final String[] ADMIN_URL = {"/cron/**"};
 

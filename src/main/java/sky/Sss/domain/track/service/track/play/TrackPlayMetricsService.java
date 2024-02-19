@@ -87,7 +87,7 @@ public class TrackPlayMetricsService {
      * @param trackChartSaveReqDto
      */
     @Transactional
-    public void createChartIncluded(TrackChartSaveReqDto trackChartSaveReqDto) {
+    public void addChartIncluded(TrackChartSaveReqDto trackChartSaveReqDto) {
         TrackInfoReqDto trackInfoReqDto = trackChartSaveReqDto.getTrackInfoReqDto();
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(), Status.ON);
@@ -135,7 +135,7 @@ public class TrackPlayMetricsService {
      * @param user
      */
     @Transactional
-    public void createAllPlayLog(String userAgent, TrackPlayRepDto trackPlayRepDto, SsbTrack ssbTrack, User user) {
+    public void addAllPlayLog(String userAgent, TrackPlayRepDto trackPlayRepDto, SsbTrack ssbTrack, User user) {
         // 현재시간 생성
         UserLocationDto location = locationFinderService.findLocation();
 
@@ -174,7 +174,7 @@ public class TrackPlayMetricsService {
             checkChartStatus(user, ssbTrack, ssbTrackAllPlayLogs);
         }
         // insert
-        trackAllPlayLogService.save(ssbTrackAllPlayLogs);
+        trackAllPlayLogService.add(ssbTrackAllPlayLogs);
         // 로그 정보 dto 생성
         TrackPlayLogRepDto trackPlayLogRepDto = TrackPlayLogRepDto.create(ssbTrackAllPlayLogs);
         // trackPlayRepDto set
@@ -238,7 +238,7 @@ public class TrackPlayMetricsService {
      * @param dayTime
      */
     @Transactional
-    public void createTrackHourlyTotalPlays(int dayTime) {
+    public void addTrackHourlyTotalPlays(int dayTime) {
         /**
          * 해당 dayTime이 생성 되 었는지 확인 후
          */
@@ -249,7 +249,7 @@ public class TrackPlayMetricsService {
             .map(dto ->
                 SsbTrackHourlyTotalPlays.create(dto)
             ).collect(Collectors.toList());
-        trackHourlyTotalPlaysService.saveAll(totalPlays);
+        trackHourlyTotalPlaysService.addAll(totalPlays);
     }
 
     /**
@@ -260,12 +260,12 @@ public class TrackPlayMetricsService {
      * @param endDayTime
      */
     @Transactional
-    public void createTrackDailyTotalPlays(int startDayTime, int endDayTime) {
+    public void addTrackDailyTotalPlays(int startDayTime, int endDayTime) {
         List<SsbTrackDailyTotalPlays> totalPlays = trackHourlyTotalPlaysService.getDailyTotalPlayDtoList(
                 startDayTime,
                 endDayTime).stream().map(dto -> SsbTrackDailyTotalPlays.create(dto, endDayTime))
             .collect(Collectors.toList());
-        trackDailyTotalPlaysService.saveAll(totalPlays);
+        trackDailyTotalPlaysService.addAll(totalPlays);
     }
 
 
@@ -279,7 +279,7 @@ public class TrackPlayMetricsService {
      *     // 최근 24시간 마지막 시간대
      */
     @Transactional
-    public void createChartHourly(int ranDayTime, int startDayTime, int endDayTime, PageRequest pageRequest) {
+    public void addChartHourly(int ranDayTime, int startDayTime, int endDayTime, PageRequest pageRequest) {
         final int NUM = 10;
         // 차트 계산 비율 변수
         final double DIV = 0.2;
@@ -358,7 +358,7 @@ public class TrackPlayMetricsService {
         return hourlyPlayList;
     }
     @Transactional
-    public void createChartDaily(int ranDayTime, int prevDayTime, PageRequest pageRequest) {
+    public void addChartDaily(int ranDayTime, int prevDayTime, PageRequest pageRequest) {
 
         // totalCount reversed 내림차순 정렬 후
         // thenComparing 으로 아이디 오름차순으로 정렬

@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,32 +17,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import sky.Sss.domain.track.dto.track.TotalLengthRepDto;
 import sky.Sss.domain.track.dto.track.TrackDeleteDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.dto.track.TrackInfoUpdateDto;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
-import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.Result;
-import sky.Sss.global.file.utili.FileStore;
 
 /**
- * 트랙 생성,수정,삭제
+ *
+ *
+ * 트랙 생성,수정,삭제 Crud를 모아 놓은 Controller
+ *
+ *
  *
  */
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/users/track")
+@RequestMapping("/tracks")
 @RestController
 @UserAuthorize
 public class TrackController {
 
     private final TrackService trackService;
     private final MessageSource ms;
-    private final UserQueryService userQueryService;
     /**
      * track 생성
      * track 수정
@@ -68,7 +67,7 @@ public class TrackController {
         }
 
         HttpSession session = request.getSession();
-        TrackInfoRepDto trackInfoRepDto = trackService.saveTrackFile(trackInfoSaveDto, coverImgFile, session.getId());
+        TrackInfoRepDto trackInfoRepDto = trackService.addTrackFile(trackInfoSaveDto, coverImgFile, session.getId());
         return ResponseEntity.ok(trackInfoRepDto);
     }
 
@@ -99,17 +98,5 @@ public class TrackController {
         }
         trackService.deleteTrack(trackDeleteDto.getId(), trackDeleteDto.getToken());
         return ResponseEntity.ok().build();
-    }
-
-
-    /**
-     * 업로드한 track 시간 총합
-     *
-     * @return
-     */
-    @GetMapping("/total")
-    public ResponseEntity<TotalLengthRepDto> getTotalLength() {
-        Integer totalLength = trackService.getTotalLength(userQueryService.findOne());
-        return ResponseEntity.ok(new TotalLengthRepDto(totalLength, FileStore.TRACK_UPLOAD_LIMIT));
     }
 }

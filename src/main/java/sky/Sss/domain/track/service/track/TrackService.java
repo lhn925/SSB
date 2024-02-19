@@ -64,7 +64,7 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public TrackInfoRepDto saveTrackFile(TrackInfoSaveDto trackInfoSaveDto, MultipartFile coverImgFile,
+    public TrackInfoRepDto addTrackFile(TrackInfoSaveDto trackInfoSaveDto, MultipartFile coverImgFile,
         String sessionId) {
         User user = userQueryService.findOne();
         // 시간제한 180분
@@ -122,7 +122,7 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public PlayListInfoDto saveTrackFiles(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
+    public PlayListInfoDto addTrackFiles(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
         String sessionId) {
         User user = userQueryService.findOne();
         // playList 안에 있는 Track 정보
@@ -272,7 +272,7 @@ public class TrackService {
      * @return
      */
     @Transactional
-    public TrackPlayRepDto authorizedTrackInfo(Long id, Status isStatus, String userAgent) {
+    public TrackPlayRepDto getAuthorizedTrackInfo(Long id, Status isStatus, String userAgent) {
         TrackPlayRepDto trackPlayRepDto;
         SsbTrack ssbTrack = findOneJoinUser(id, isStatus);
         // 요청 유저

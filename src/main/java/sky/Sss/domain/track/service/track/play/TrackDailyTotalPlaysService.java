@@ -26,7 +26,7 @@ public class TrackDailyTotalPlaysService {
      * @return
      */
     @Transactional
-    public void saveAll(List<SsbTrackDailyTotalPlays> dailyTotalPlays) {
+    public void addAll(List<SsbTrackDailyTotalPlays> dailyTotalPlays) {
         trackDailyTotalPlaysRepository.saveAll(dailyTotalPlays);
     }
 

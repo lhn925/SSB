@@ -31,7 +31,7 @@ public class ChartCronService {
         LocalDateTime rankingDateTime = LocalDateTime.now().minusHours(Hour.HOUR_01.getValue());
         int ranDayTime = DayTime.getDayTime(rankingDateTime);
         // track 시간대 별 종합 조회수 생성
-        trackPlayMetricsService.createTrackHourlyTotalPlays(ranDayTime);
+        trackPlayMetricsService.addTrackHourlyTotalPlays(ranDayTime);
     }
 
 
@@ -50,7 +50,7 @@ public class ChartCronService {
         // 24시간 마지막 시간대
         int endDayTime = DayTime.getDayTime(rankingDateTime);
         // track 시간대 별 종합 조회수 생성
-        trackPlayMetricsService.createTrackDailyTotalPlays(startDayTime, endDayTime);
+        trackPlayMetricsService.addTrackDailyTotalPlays(startDayTime, endDayTime);
     }
     /**
      * 시간대별 차트
@@ -66,7 +66,7 @@ public class ChartCronService {
         // 24시간 마지막 시간대
         int endDayTime = DayTime.getDayTime(rankingDateTime, Hour.HOUR_01);
         PageRequest pageRequest = PageRequest.of(0, 500);
-        trackPlayMetricsService.createChartHourly(ranDayTime, startDayTime, endDayTime, pageRequest);
+        trackPlayMetricsService.addChartHourly(ranDayTime, startDayTime, endDayTime, pageRequest);
     }
     /**
      * 일간 차트
@@ -78,7 +78,7 @@ public class ChartCronService {
         LocalDateTime rankingDateTime = LocalDateTime.now().minusHours(Hour.HOUR_01.getValue());
         int dayTime = DayTime.getDayTime(rankingDateTime);
         int prevDayTime = DayTime.getDayTime(rankingDateTime, Hour.HOUR_24);
-        trackPlayMetricsService.createChartDaily(dayTime, prevDayTime, PageRequest.of(0, 500));
+        trackPlayMetricsService.addChartDaily(dayTime, prevDayTime, PageRequest.of(0, 500));
     }
 
 

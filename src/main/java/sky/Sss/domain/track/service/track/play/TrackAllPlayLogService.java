@@ -39,7 +39,7 @@ public class TrackAllPlayLogService {
      * @return
      */
     @Transactional
-    public void save(SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
+    public void add(SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
         trackAllPlayLogRepository.save(ssbTrackAllPlayLogs);
     }
 
