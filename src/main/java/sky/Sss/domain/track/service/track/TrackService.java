@@ -298,7 +298,7 @@ public class TrackService {
         // 자신의 track은 자신이 플레이를 해도 측정 x
         // 해당 트랙에 접근 권한이 없을 경우 x
         if (isMember && !isOwnerPost && trackPlayRepDto != null) {
-            trackPlayMetricsService.createAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
+            trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
         }
         return trackPlayRepDto;
     }
