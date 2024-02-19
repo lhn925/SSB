@@ -19,7 +19,7 @@ import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 
 
-//@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid","track_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid","track_id"})})
 @Entity
 @Setter(value = PRIVATE)
 @Getter
@@ -31,10 +31,10 @@ public class SsbTrackLikes extends BaseTimeEntity {
 
     // 좋아요를 누른 사람
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "uid")
+    @JoinColumn(name = "uid",nullable = false)
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "track_id")
+    @JoinColumn(name = "track_id",nullable = false)
     private SsbTrack ssbTrack;
 }

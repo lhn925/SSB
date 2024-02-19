@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.model.Hour;
-import sky.Sss.domain.track.service.track.TrackPlayMetricsService;
+import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
 import sky.Sss.global.utili.DayTime;
 
 @Slf4j

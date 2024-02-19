@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.repository.track.log;
+package sky.Sss.domain.track.repository.track.play;
 
 import java.util.List;
 import org.springframework.data.domain.PageRequest;

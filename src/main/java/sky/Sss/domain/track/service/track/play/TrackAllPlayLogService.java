@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.service.track;
+package sky.Sss.domain.track.service.track.play;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
-import sky.Sss.domain.track.repository.track.log.TrackAllPlayLogRepository;
+import sky.Sss.domain.track.repository.track.play.TrackAllPlayLogRepository;
 import sky.Sss.domain.user.entity.User;
 
 /**

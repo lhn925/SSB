@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.service.track;
+package sky.Sss.domain.track.service.track.play;
 
 
 import java.util.List;
@@ -12,7 +12,7 @@ import sky.Sss.domain.track.dto.track.chart.DailyTotalPlaysCreateDto;
 import sky.Sss.domain.track.dto.track.chart.TrackTotalPlaysDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.log.SsbTrackHourlyTotalPlays;
-import sky.Sss.domain.track.repository.track.log.TrackHourlyTotalPlaysRepository;
+import sky.Sss.domain.track.repository.track.play.TrackHourlyTotalPlaysRepository;
 
 @Service
 @Slf4j

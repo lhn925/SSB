@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.service.track;
+package sky.Sss.domain.track.service.track.play;
 
 
 import java.util.List;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.track.chart.TrackTotalPlaysDto;
 import sky.Sss.domain.track.entity.track.log.SsbTrackDailyTotalPlays;
-import sky.Sss.domain.track.repository.track.log.TrackDailyTotalPlaysRepository;
+import sky.Sss.domain.track.repository.track.play.TrackDailyTotalPlaysRepository;
 
 @Service
 @Slf4j
