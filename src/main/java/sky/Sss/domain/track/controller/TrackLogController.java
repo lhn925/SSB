@@ -1,11 +1,13 @@
 package sky.Sss.domain.track.controller;
 
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.chart.TrackChartSaveReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogModifyReqDto;
 import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
-import sky.Sss.domain.track.service.track.TrackPlaybackMetricsService;
+import sky.Sss.domain.track.service.track.TrackPlayMetricsService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 
 /**
@@ -27,7 +29,7 @@ import sky.Sss.domain.user.annotation.UserAuthorize;
 @RequestMapping("/user/track/log")
 @UserAuthorize
 public class TrackLogController {
-    private final TrackPlaybackMetricsService trackPlaybackMetricsService;
+    private final TrackPlayMetricsService trackPlayMetricsService;
     // 조회수
 
     // 정지
@@ -47,9 +49,15 @@ public class TrackLogController {
     @PostMapping("/chart")
     public ResponseEntity<HttpStatus> saveChartLog (@Validated @RequestBody TrackChartSaveReqDto trackChartSaveReqDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            for (FieldError fieldError : fieldErrors) {
+                log.info("fieldError.getField() = {}", fieldError.getField());
+                log.info("fieldError.getArguments() = {}", fieldError.getArguments());
+                log.info("fieldError.getRejectedValue() = {}", fieldError.getRejectedValue());
+            }
             throw new IllegalArgumentException();
         }
-        trackPlaybackMetricsService.createChartIncluded(trackChartSaveReqDto);
+        trackPlayMetricsService.createChartIncluded(trackChartSaveReqDto);
         return ResponseEntity.ok().build();
     }
     /**
@@ -74,7 +82,7 @@ public class TrackLogController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackPlaybackMetricsService.modifyPlayLog(trackPlayLogModifyReqDto);
+        trackPlayMetricsService.modifyPlayLog(trackPlayLogModifyReqDto);
         return ResponseEntity.ok().build();
     }
 

@@ -35,8 +35,6 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
             log.info("grantedAuthorities.size() = {}", grantedAuthorities.size());
             for (GrantedAuthority auth : grantedAuthorities) {
-                log.info("auth = {}", auth);
-
                 if (!auth.getAuthority().equals(UserGrade.ANONYMOUS.getRole())) {
                     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                     AuditorAwareImpl.changeUserId(this, userDetails.getUsername());
@@ -44,7 +42,6 @@ public class AuditorAwareImpl implements AuditorAware<String> {
             }
         }
 
-        log.info("this.userId = {}", this.userId);
         return Optional.of(this.userId);
     }
 

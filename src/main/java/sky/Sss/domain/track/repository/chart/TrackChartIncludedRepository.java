@@ -1,12 +1,12 @@
-package sky.Sss.domain.track.repository.track;
+package sky.Sss.domain.track.repository.chart;
 
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import sky.Sss.domain.track.dto.track.chart.HourlyChartPlaysDto;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
@@ -20,13 +20,25 @@ public interface TrackChartIncludedRepository extends JpaRepository<SsbChartIncl
     @Query(
         "select c from SsbChartIncludedPlays c join fetch c.ssbTrackAllPlayLogs where "
             + " c.ssbTrackAllPlayLogs.user = :user and c.ssbTrackAllPlayLogs.ssbTrack =:ssbTrack"
-            + " and c.createDate =:playDate and c.hour =:hour "
-            + "and c.ssbTrackAllPlayLogs.chartStatus =:chartStatus "
-            + "and c.ssbTrackAllPlayLogs.playStatus =:playStatus ")
+            + " and c.dayTime =:dayTime "
+            + " and c.ssbTrackAllPlayLogs.chartStatus =:chartStatus "
+            + " and c.ssbTrackAllPlayLogs.playStatus =:playStatus ")
     Optional<SsbChartIncludedPlays> checkPlayAtTime(@Param("user") User user, @Param("ssbTrack") SsbTrack ssbTrack,
-        @Param("hour") Integer hour, @Param("chartStatus")
-    ChartStatus chartStatus, @Param("playStatus") PlayStatus playStatus,
-        @Param("playDate") LocalDate localDate);
+        @Param("dayTime") int dayTime, @Param("chartStatus")
+    ChartStatus chartStatus, @Param("playStatus") PlayStatus playStatus);
+
+    /**
+     * 지난 한시간동안의 includeChart 데이터
+     *
+     * @return
+     */
+    @Query(value =
+        " select new sky.Sss.domain.track.dto.track.chart.HourlyChartPlaysDto(c.ssbTrack, count(c.id) ,c.dayTime) "
+            + " from SsbChartIncludedPlays c "
+            + " where c.dayTime = :dayTime group by c.ssbTrack  order by count (c.id) desc")
+    List<HourlyChartPlaysDto> getHourlyChartPlays(@Param("dayTime") int dayTime);
+
+
 
 
 //    /**
@@ -42,5 +54,6 @@ public interface TrackChartIncludedRepository extends JpaRepository<SsbChartIncl
 //        + "DATE_FORMAT(:playDateTime,'%Y-%m-%d %H:00:00')")
 //    SsbChartIncludedPlays checkSongPlayAtTimeNotMember(@Param("uid") Long uid, @Param("ssbTrack") SsbTrack ssbTrack,
 //        @Param("playDateTime") LocalDateTime playDateTime);
+
 
 }

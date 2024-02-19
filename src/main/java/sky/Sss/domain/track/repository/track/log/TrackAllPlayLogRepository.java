@@ -1,11 +1,11 @@
-package sky.Sss.domain.track.repository.track;
+package sky.Sss.domain.track.repository.track.log;
 
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.entity.track.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
@@ -28,4 +28,5 @@ public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlay
     )
     Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id,@Param("token") String token,@Param("user") User user,@Param("ssbTrack")
     SsbTrack ssbTrack,@Param("playStatus")PlayStatus playStatus);
+
 }

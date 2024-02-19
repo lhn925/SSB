@@ -1,7 +1,6 @@
 package sky.Sss.domain.track.model;
 
 public enum Hour {
-    HOUR_00(0),
     HOUR_01(1),
     HOUR_02(2),
     HOUR_03(3),
@@ -24,12 +23,24 @@ public enum Hour {
     HOUR_20(20),
     HOUR_21(21),
     HOUR_22(22),
-    HOUR_23(23);
+    HOUR_23(23),
+    HOUR_24(24);
 
     private int value;
 
 
     public static Hour findByHour(int hour) {
+        Hour[] values = values();
+        for (Hour value : values) {
+            if (value.getValue() == hour) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    // 최근 24시간에 끝 시간과 처음 시간을 알리는
+    public static Hour findByOneDay(int hour) {
         Hour[] values = values();
         for (Hour value : values) {
             if (value.getValue() == hour) {

@@ -17,7 +17,7 @@ public interface UserActivityLogRepository extends JpaRepository<UserActivityLog
     @Query(value = "select u from UserActivityLog u where u.uId = :uid "
         + " and u.changeSuccess = :changeSuccess "
         + " and u.defaultLog.isStatus = :isStatus "
-        + " and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate")
+        + " and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate",nativeQuery = true)
     Page<UserActivityLog> getPagedDataByUid(@Param("uid") User uid, @Param("changeSuccess") ChangeSuccess changeSuccess,
         @Param("isStatus") Boolean isStatus, @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
@@ -25,12 +25,12 @@ public interface UserActivityLogRepository extends JpaRepository<UserActivityLog
 
 
     @Query(value = "select count (u.id) from UserActivityLog u where "
-        + "u.defaultLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ")
+        + "u.defaultLog.isStatus = :isStatus and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate ",nativeQuery = true)
     Integer expireActivityCount(@Param("isStatus") Boolean isStatus, @Param("expireDate") LocalDate expireDate);
 
     @Modifying(clearAutomatically = true)
     @Query(
-        "update UserActivityLog u set u.defaultLog.isStatus = :offStatus where  u.defaultLog.isStatus = :onStatus"
-            + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate")
+        value = "update UserActivityLog u set u.defaultLog.isStatus = :offStatus where  u.defaultLog.isStatus = :onStatus"
+            + " and  DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') < :expireDate",nativeQuery = true)
     Integer expireActivityOff(@Param("offStatus") Boolean offStatus, @Param("onStatus") Boolean onStatus,@Param("expireDate") LocalDate expireDate);
 }

@@ -1,5 +1,6 @@
-package sky.Sss.domain.track.entity.track;
+package sky.Sss.domain.track.entity.track.log;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PRIVATE;
@@ -13,10 +14,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.model.TrackMinimumPlayTime;
@@ -75,6 +79,9 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     @Column(nullable = false)
     @Enumerated(value = STRING)
     private ChartStatus chartStatus;
+//
+//    @OneToOne(mappedBy = "ssbTrackAllPlayLogs",cascade = ALL,fetch = LAZY)
+//    private SsbChartIncludedPlays ssbChartIncludedPlays;
 
     @Embedded
     private DefaultLocationLog defaultLocationLog;

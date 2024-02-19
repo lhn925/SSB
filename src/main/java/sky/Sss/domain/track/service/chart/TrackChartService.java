@@ -1,15 +1,13 @@
 package sky.Sss.domain.track.service.chart;
 
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.entity.chart.SsbTrackChartHourly;
-import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.model.Hour;
+import sky.Sss.domain.track.entity.chart.SsbChartHourly;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.service.UserQueryService;
 
@@ -30,8 +28,8 @@ public class TrackChartService {
      * 최근 24시간 50% + 해당 시간대에 50%
      */
     @Transactional
-    public void updateHourChart(LocalDate createDate, Hour hour) {
-        List<SsbTrackChartHourly> ssbTrackChartHourlyList = null;
+    public void updateHourChart(LocalDateTime localDateTime) {
+        List<SsbChartHourly> ssbChartHourlyList = null;
 
 
     }

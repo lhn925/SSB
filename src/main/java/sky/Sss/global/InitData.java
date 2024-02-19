@@ -5,19 +5,17 @@ import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import sky.Sss.domain.user.dto.join.UserJoinAgreeDto;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.service.join.UserJoinService;
 
 @Component
 @RequiredArgsConstructor
-public class InitUser {
+public class InitData {
 
     private final InitUserService initUserService;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         initUserService.init();
 
@@ -56,4 +54,6 @@ public class InitUser {
             userJoinService.join(userJoinDto);
         }
     }
+
+
 }

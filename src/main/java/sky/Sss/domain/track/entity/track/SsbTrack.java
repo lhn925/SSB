@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,19 +24,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
+import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.utili.FileStore;
-import sky.Sss.global.utili.JSEscape;
+import sky.Sss.global.utili.JsEscape;
 
 @Slf4j
 @Entity
 @Setter(AccessLevel.PRIVATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SsbTrack extends BaseTimeEntity {
+public class SsbTrack extends BaseTimeEntity  {
 
     @Id
     @GeneratedValue
@@ -97,6 +99,7 @@ public class SsbTrack extends BaseTimeEntity {
     private List<SsbTrackAllPlayLogs> plays = new ArrayList<>();
 
 
+
     public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
         if (tagLinks != null && tagLinks.size() > 0) {
             tagLinks.stream().forEach(ssbTrackTagLink ->
@@ -134,7 +137,7 @@ public class SsbTrack extends BaseTimeEntity {
         // enum Type 적용
         MainGenreType type = MainGenreType.findByType(mainGenreType);
         String subGenreType = type.getSubGenreValue(genre);
-        ssbTrack.setTitle(JSEscape.escapeJS(title));
+        ssbTrack.setTitle(JsEscape.escapeJS(title));
 
         ssbTrack.setGenre(subGenreType);
 
@@ -145,7 +148,7 @@ public class SsbTrack extends BaseTimeEntity {
             throw new IllegalArgumentException("track.desc.error.length");
         }
 
-        ssbTrack.setDescription(JSEscape.escapeJS(description));
+        ssbTrack.setDescription(JsEscape.escapeJS(description));
     }
 
     public static void updateToken(String token, SsbTrack ssbTrack) {

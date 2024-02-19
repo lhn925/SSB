@@ -67,7 +67,6 @@ public class LoginController {
         BindingResult bindingResult,
         HttpServletRequest request) throws UsernameNotFoundException, NoSuchFileException {
         if (bindingResult.hasErrors()) {
-            log.info("로그인 실패");
             throw new LoginFailException("login.error");
         }
 

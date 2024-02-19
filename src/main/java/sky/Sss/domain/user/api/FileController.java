@@ -72,13 +72,10 @@ public class FileController {
      * @return
      */
     // 한시간에 한번만 플레이 인정
-    // 70% 혹은 1분 이하의 곡은 전부다 들어야 조회수 인정
     // track file 출력
     @GetMapping("/track/play/{id}/{token}")
     public ResponseEntity<UrlResource> getTrackFile(@PathVariable Long id, @PathVariable String token) {
-
         return ResponseEntity.ok(trackPlayService.getTrackPlayFile(id, token));
-
     }
 
     @GetMapping("/image/default")

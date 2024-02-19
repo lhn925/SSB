@@ -28,7 +28,7 @@ import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.file.utili.FileStore;
-import sky.Sss.global.utili.JSEscape;
+import sky.Sss.global.utili.JsEscape;
 
 
 @Slf4j
@@ -102,9 +102,9 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         if (playListSettingSaveDto.getDesc().trim().length() > 1000) {
             throw new IllegalArgumentException("track.desc.error.length");
         }
-        ssbPlayListSettings.setTitle(JSEscape.escapeJS(playListSettingSaveDto.getTitle()));
+        ssbPlayListSettings.setTitle(JsEscape.escapeJS(playListSettingSaveDto.getTitle()));
 
-        ssbPlayListSettings.setDescription(JSEscape.escapeJS(playListSettingSaveDto.getDesc()));
+        ssbPlayListSettings.setDescription(JsEscape.escapeJS(playListSettingSaveDto.getDesc()));
 
         PlayListType playListType = PlayListType.findByListType(playListSettingSaveDto.getPlayListType());
         ssbPlayListSettings.setPlayListType(playListType);
@@ -123,7 +123,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         ssbPlayListSettings.setIsPrivacy(isPrivacy);
         ssbPlayListSettings.setIsDownload(isDownload);
         ssbPlayListSettings.setPlayListType(type);
-        ssbPlayListSettings.setTitle(JSEscape.escapeJS(title));
+        ssbPlayListSettings.setTitle(JsEscape.escapeJS(title));
         if (desc.trim().length() > 1000) {
             throw new IllegalArgumentException("track.desc.error.length");
         }

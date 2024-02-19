@@ -50,13 +50,13 @@ spring:
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         order_inserts: true
         order_updates: true
         format_sql: true
-        default_batch_fetch_size: 1000
+        default_batch_fetch_size: 300
         jdbc:
           batch_size: 100
     open-in-view: false

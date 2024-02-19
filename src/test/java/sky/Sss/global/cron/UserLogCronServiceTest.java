@@ -7,7 +7,7 @@ import org.springframework.test.annotation.Rollback;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
 
 @SpringBootTest
-class CronControllerTest {
+class UserLogCronServiceTest {
 
 
     @Autowired

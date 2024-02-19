@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.entity.track.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
-import sky.Sss.domain.track.repository.track.TrackAllPlayLogRepository;
+import sky.Sss.domain.track.repository.track.log.TrackAllPlayLogRepository;
 import sky.Sss.domain.user.entity.User;
 
 /**

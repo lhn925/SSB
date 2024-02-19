@@ -5,21 +5,38 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
-import sky.Sss.domain.track.dto.track.log.TrackChartSaveReqDto;
+import sky.Sss.domain.track.dto.track.chart.DailyPlaysSearchDto;
+import sky.Sss.domain.track.dto.track.chart.TrackTotalPlaysDto;
+import sky.Sss.domain.track.dto.track.chart.TrackChartSaveReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogModifyReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogRepDto;
+import sky.Sss.domain.track.entity.chart.SsbChartDaily;
+import sky.Sss.domain.track.entity.chart.SsbChartHourly;
 import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
-import sky.Sss.domain.track.entity.track.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.entity.track.log.SsbTrackDailyTotalPlays;
+import sky.Sss.domain.track.entity.track.log.SsbTrackHourlyTotalPlays;
 import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
+import sky.Sss.domain.track.service.chart.TrackChartDailyService;
+import sky.Sss.domain.track.service.chart.TrackChartHourlyService;
+import sky.Sss.domain.track.service.chart.TrackChatIncludedService;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -30,13 +47,13 @@ import sky.Sss.global.locationfinder.service.LocationFinderService;
 
 
 /**
- * 재생 관련 메트릭스, 즉 재생 로그와 차트 데이터를 분석하는 역할을 강조하는 이름입니다.
+ * 재생 관련 메트릭스, 즉 재생 로그와 차트 데이터를 분석하고 생성하는 서비스
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class TrackPlaybackMetricsService {
+public class TrackPlayMetricsService {
 
     private final LocationFinderService locationFinderService;
     private final TrackChatIncludedService trackChatIncludedService;
@@ -44,10 +61,11 @@ public class TrackPlaybackMetricsService {
     private final TrackQueryService trackQueryService;
     private final UserQueryService userQueryService;
 
-    public SsbChartIncludedPlays getChartIncludedPlay(User user, SsbTrack ssbTrack, LocalDateTime playDateTime) {
-        return trackChatIncludedService.findOne(user, ssbTrack, playDateTime);
-    }
+    private final TrackHourlyTotalPlaysService trackHourlyTotalPlaysService;
+    private final TrackDailyTotalPlaysService trackDailyTotalPlaysService;
 
+    private final TrackChartHourlyService trackChartHourlyService;
+    private final TrackChartDailyService trackChartDailyService;
     /**
      * @param user
      * @param ssbTrack
@@ -56,20 +74,11 @@ public class TrackPlaybackMetricsService {
      * @return
      */
     public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,
-        ChartStatus chartStatus) {
-        return trackAllPlayLogService.findOne(user, ssbTrack, id, token, chartStatus);
+        PlayStatus playStatus) {
+        return trackAllPlayLogService.findOne(user, ssbTrack, id, token, playStatus);
     }
 
-    /**
-     * @param user
-     * @param ssbTrack
-     * @param id
-     * @param token
-     * @return
-     */
-    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,PlayStatus playStatus) {
-        return trackAllPlayLogService.findOne(user, ssbTrack, id, token,playStatus);
-    }
+    // include 테이블 총합
 
 
     /**
@@ -85,7 +94,7 @@ public class TrackPlaybackMetricsService {
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack, trackChartSaveReqDto.getId(),
             trackChartSaveReqDto.getToken(), ChartStatus.REFLECTED);
 
-        boolean isReflected = true;
+        Boolean isReflected = true;
 
         try {
             // 이미 테이블 에 반영되어 있는지
@@ -99,7 +108,7 @@ public class TrackPlaybackMetricsService {
 
             // startTime 과 closeTime 의 간격이 음원재생길이와 유사한지
             checkCloseTime(userCloseTime, ssbTrackAllPlayLogs.getCloseTime());
-        }catch (SsbPlayIncompleteException e) {
+        } catch (SsbPlayIncompleteException e) {
             isReflected = false;
         }
 
@@ -107,16 +116,13 @@ public class TrackPlaybackMetricsService {
         SsbTrackAllPlayLogs.updateTotalPlayTime(ssbTrackAllPlayLogs, trackChartSaveReqDto.getPlayTime());
         SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, isReflected);
 
+        // insert into ssb_chart_included_plays (created_date_time, day_time, last_modified_date_time, track_id, log_id, id) values ('2024-02-12 05:40:18.142732', 2024021214, '2024-02-12 05:40:18.142732', 1, 1, 1);
         // 모든 충족이 만족되면
         if (isReflected) {
-            saveChartLog(ssbTrackAllPlayLogs);
+            SsbChartIncludedPlays ssbChartIncludedPlays = SsbChartIncludedPlays.create(ssbTrackAllPlayLogs);
+            trackChatIncludedService.save(ssbChartIncludedPlays);
         }
         // 세가지 결과가 전부 다 옳다면
-    }
-
-    public void saveChartLog(SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
-        SsbChartIncludedPlays ssbChartIncludedPlays = SsbChartIncludedPlays.create(ssbTrackAllPlayLogs);
-        trackChatIncludedService.save(ssbChartIncludedPlays);
     }
 
 
@@ -189,7 +195,7 @@ public class TrackPlaybackMetricsService {
         SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(),
             Status.ON);
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack,
-            trackPlayLogModifyReqDto.getId(), trackPlayLogModifyReqDto.getToken(),PlayStatus.INCOMPLETE);
+            trackPlayLogModifyReqDto.getId(), trackPlayLogModifyReqDto.getToken(), PlayStatus.INCOMPLETE);
         // REFLECTED 플레이 로그였다면 -> NOT_REFLECTED
         if (ssbTrackAllPlayLogs.getChartStatus().equals(ChartStatus.REFLECTED)) {
             SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, false);
@@ -224,6 +230,188 @@ public class TrackPlaybackMetricsService {
         }
     }
 
+
+    /**
+     * track 시간대 별 조회수 데이터 생성
+     * createTrackHourlyTotalPlays
+     *
+     * @param dayTime
+     */
+    @Transactional
+    public void createTrackHourlyTotalPlays(int dayTime) {
+        /**
+         * 해당 dayTime이 생성 되 었는지 확인 후
+         */
+
+        // 한시간동안의 공식 조회수 조회 후
+        // SsbTrackHourlyTotalPlays List 생성
+        List<SsbTrackHourlyTotalPlays> totalPlays = trackChatIncludedService.hourlyChartFindByDayTime(dayTime).stream()
+            .map(dto ->
+                SsbTrackHourlyTotalPlays.create(dto)
+            ).collect(Collectors.toList());
+        trackHourlyTotalPlaysService.saveAll(totalPlays);
+    }
+
+    /**
+     * track 일간 총 조회수 생성
+     * createTrackHourlyTotalPlays
+     *
+     * @param startDayTime
+     * @param endDayTime
+     */
+    @Transactional
+    public void createTrackDailyTotalPlays(int startDayTime, int endDayTime) {
+        List<SsbTrackDailyTotalPlays> totalPlays = trackHourlyTotalPlaysService.getDailyTotalPlayDtoList(
+                startDayTime,
+                endDayTime).stream().map(dto -> SsbTrackDailyTotalPlays.create(dto, endDayTime))
+            .collect(Collectors.toList());
+        trackDailyTotalPlaysService.saveAll(totalPlays);
+    }
+
+
+    /**
+     * 시간대 별 차트 생성
+     *
+     * @param ranDayTime
+     * @param startDayTime
+     *     // 최근 24시간 시작 시간대
+     * @param endDayTime
+     *     // 최근 24시간 마지막 시간대
+     */
+    @Transactional
+    public void createChartHourly(int ranDayTime, int startDayTime, int endDayTime, PageRequest pageRequest) {
+        final int NUM = 10;
+        // 차트 계산 비율 변수
+        final double DIV = 0.2;
+        // 최근 24시간 sum
+        Map<Long, Long> dailyMap = null;
+        if (trackChartHourlyService.checkChart(ranDayTime)) {
+            return;
+        }
+
+        // 생성 할려는 시간대 종합 조회수 리스트 불러오기
+        List<TrackTotalPlaysDto> hourlyPlayList = getHourlyPlaysDtos(ranDayTime, endDayTime,
+            pageRequest);
+
+        // 현재 시간대 트랙 플레이 검색
+        List<SsbTrack> ssbTracks = hourlyPlayList.stream().map(hourlyPlaysDto -> hourlyPlaysDto.getSsbTrack())
+            .collect(Collectors.toList());
+
+        // 최근 24시간 조회수 sum
+        // dailyMap 생성
+        if (!ssbTracks.isEmpty()) {
+            dailyMap = trackHourlyTotalPlaysService.getDailyTotalPlayDtoList(startDayTime,
+                    endDayTime, ssbTracks).stream()
+                .collect(Collectors.toMap(DailyPlaysSearchDto::getTrackId, DailyPlaysSearchDto::getTotalCount));
+        }
+
+        // chartHourlyList 생성
+        List<SsbChartHourly> saveChartList = new ArrayList<>();
+
+        double hourCount; // 현재 count
+        double totalCount;// 최근 24시간
+        double score;// 점수
+
+        for (TrackTotalPlaysDto trackTotalPlaysDto : hourlyPlayList) {
+            // 최근 24시간 플레이 횟수가 있을 경우
+            totalCount = 0;
+            hourCount = this.countDivCalc(trackTotalPlaysDto.getTotalCount(), DIV, NUM);
+
+            Long trackId = trackTotalPlaysDto.getSsbTrack().getId();
+            if (dailyMap != null && dailyMap.containsKey(trackId)) {
+                // 최근 24시간 50%
+                totalCount = this.countDivCalc(dailyMap.get(trackId), DIV, NUM);
+                dailyMap.remove(trackId);
+            }
+            score = totalCount + hourCount;
+            saveChartList.add(SsbChartHourly.create(trackTotalPlaysDto, score));
+        }
+
+        // score 내림차순
+        // id는 오름차순
+        List<SsbChartHourly> sortedList = saveChartList.stream().sorted(
+                Comparator.comparingDouble(SsbChartHourly::getScore).reversed().thenComparing(o -> o.getSsbTrack().getId()))
+            .collect(Collectors.toList());
+        // score 기준 내림차순으로 id 기준으로 오름차순 정렬
+//        Collections.sort(saveChartList, (o1, o2) -> {
+//            if (o2.getScore() - o1.getScore() != 0.0) {
+//                // 마이너스면은 내림차 순
+//                // 플러스면은 오름차 순
+//                double value = o2.getScore() - o1.getScore();
+//                if (value < 0.0) {
+//                    return -1;
+//                }
+//                return 1;
+//            }
+//            return (int) (o1.getSsbTrack().getId() - o2.getSsbTrack().getId());
+//        });
+        // 랭킹 순위 저장
+        IntStream.range(0, sortedList.size()).forEach(i -> SsbChartHourly.updateRanking(sortedList.get(i), i + 1));
+
+        trackChartHourlyService.saveAll(sortedList);
+    }
+
+    public List<TrackTotalPlaysDto> getHourlyPlaysDtos(int ranDayTime, int endDayTime, PageRequest pageRequest) {
+        List<TrackTotalPlaysDto> hourlyPlayList = trackHourlyTotalPlaysService.getHourlyPlayDtoList(ranDayTime,
+            endDayTime,
+            pageRequest);
+        return hourlyPlayList;
+    }
+    @Transactional
+    public void createChartDaily(int ranDayTime, int prevDayTime, PageRequest pageRequest) {
+
+        // totalCount reversed 내림차순 정렬 후
+        // thenComparing 으로 아이디 오름차순으로 정렬
+        List<SsbChartDaily> chartDailyList = trackDailyTotalPlaysService.getDailyTotalPlays(ranDayTime,
+                prevDayTime, pageRequest).stream()
+            .map(SsbChartDaily::create).sorted(
+                Comparator.comparingLong(SsbChartDaily::getTotalCount).reversed()
+                    .thenComparing(o -> o.getSsbTrack().getId())).collect(
+                Collectors.toList());
+
+//        IntStream.range를 사용하여 리스트의 인덱스를 이용한 스트림 처리를 수행합니다. 이는 각 요소에 순위를 할당하는 과정을 보다 함수형 스타일로 처리
+        IntStream.range(0, chartDailyList.size())
+            .forEach(i -> SsbChartDaily.updateRanking(chartDailyList.get(i), i + 1));
+        trackChartDailyService.saveAll(chartDailyList);
+    }
+
+
+    /**
+     * count 나누기 계산 함수
+     *
+     * @param count
+     * @param div
+     * @param num
+     * @return
+     */
+    public double countDivCalc(long count, double div, int num) {
+        return (count / div) / num;
+    }
+
+    /**
+     * chartIncluded 검색 후 반환
+     *
+     * @param user
+     * @param ssbTrack
+     * @param playDateTime
+     * @return
+     */
+    public SsbChartIncludedPlays getChartIncludedPlay(User user, SsbTrack ssbTrack, LocalDateTime playDateTime) {
+        return trackChatIncludedService.findOne(user, ssbTrack, playDateTime);
+    }
+
+    /**
+     * @param user
+     * @param ssbTrack
+     * @param id
+     * @param token
+     * @return
+     */
+    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,
+        ChartStatus chartStatus) {
+        return trackAllPlayLogService.findOne(user, ssbTrack, id, token, chartStatus);
+    }
+
     // 현재 시간대에 공식 로그가 있는지 화인
     private void checkChartStatus(User user, SsbTrack ssbTrack, SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
         // 현재 시간대에 공식 로그가 있는지 화인
@@ -235,6 +423,7 @@ public class TrackPlaybackMetricsService {
         // 차트에 반영 되는 재생인지 저장
         SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, isChartLog);
     }
+
 
     /**
      * 재생이 끝났을 경우의 예상 시간대를 구해서

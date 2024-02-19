@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import sky.Sss.domain.user.dto.join.UserJoinAgreeDto;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserJoinAgreement;
@@ -28,7 +27,7 @@ import sky.Sss.domain.user.utili.PwEncryptor;
 public class UserJoinService {
 
     private final MessageSource ms;
-    private final UserAgreeRepository UserAgreeRepository;
+    private final UserAgreeRepository userAgreeRepository;
     private final UserQueryRepository userQueryRepository;
     private final UserJoinRepository userJoinRepository;
     private final PasswordEncoder passwordEncoder;
@@ -59,7 +58,7 @@ public class UserJoinService {
         // 이용약관 저장
         UserJoinAgreement userJoinAgreement = UserJoinAgreement.createUserJoinAgreement(user, userJoinDto);
 
-        UserAgreeRepository.save(userJoinAgreement);
+        userAgreeRepository.save(userJoinAgreement);
 
         return user.getId();
     }

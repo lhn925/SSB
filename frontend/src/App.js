@@ -14,8 +14,6 @@ import {userActions} from "store/userInfo/userReducers";
 import {authActions} from "store/auth/authReducers";
 import {persistor} from "store/store";
 import {Profile} from "content/profile/Profile";
-import Stomp from 'stompjs';
-import SockJS from 'sockjs-client';
 import * as StompJs from "@stomp/stompjs";
 import ReactPlayer from "react-player";
 
@@ -57,10 +55,10 @@ function App() {
       window.location.replace(location.pathname);
     }
   }
-  async function CheckUserInfo(aucessToken, refreshToken, accessHeader,
+  async function CheckUserInfo(accessToken, refreshToken, accessHeader,
       refreshHeader) {
     try {
-      if (aucessToken) {
+      if (accessToken) {
         const response = await UserInfoApi(accessHeader);
         if (response.code === 200) {
           const userData = response.data;
@@ -68,7 +66,7 @@ function App() {
           dispatch(userActions.setEmail(userData));
           dispatch(userActions.setPictureUrl(userData));
           dispatch(userActions.setUserName(userData));
-          connect(aucessToken);
+          connect(accessToken);
           return;
         } else if (response.code === 401 && refreshToken) {
           const renewTokenResponse = await ReNewTokenApi(refreshHeader);

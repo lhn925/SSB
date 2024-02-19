@@ -1,6 +1,6 @@
 package sky.Sss.global.utili;
 
-public class JSEscape {
+public class JsEscape {
 
     public static String escapeJS(String text) {
         if (text == null || text.length() == 0) {

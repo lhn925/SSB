@@ -54,7 +54,7 @@ public class TrackService {
     private final TempTrackStorageService tempTrackStorageService;
     private final TrackQueryService trackQueryService;
     private final TrackRepository trackRepository;
-    private final TrackPlaybackMetricsService trackPlaybackMetricsService;
+    private final TrackPlayMetricsService trackPlayMetricsService;
 
     /**
      * track 생성
@@ -297,7 +297,7 @@ public class TrackService {
         // 자신의 track은 자신이 플레이를 해도 측정 x
         // 해당 트랙에 접근 권한이 없을 경우 x
         if (isMember && !isOwnerPost && trackPlayRepDto != null) {
-            trackPlaybackMetricsService.createAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
+            trackPlayMetricsService.createAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
         }
         return trackPlayRepDto;
     }
