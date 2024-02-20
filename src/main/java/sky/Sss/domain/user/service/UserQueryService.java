@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.naming.AuthenticationNotSupportedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
@@ -59,6 +60,8 @@ public class UserQueryService {
 
         return UserInfoDto.createUserInfo(userDetails);
     }
+
+
 
     public User findOne() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

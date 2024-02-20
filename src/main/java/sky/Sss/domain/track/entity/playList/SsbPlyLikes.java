@@ -14,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 
@@ -23,7 +25,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 @Setter(AccessLevel.PRIVATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SsbPlayListLikes extends BaseTimeEntity {
+public class SsbPlyLikes extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -37,5 +39,12 @@ public class SsbPlayListLikes extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "setting_id", nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
+
+    public static SsbPlyLikes create(User user, SsbPlayListSettings playListSettings) {
+        SsbPlyLikes ssbPlyLikes = new SsbPlyLikes();
+        ssbPlyLikes.setUser(user);
+        ssbPlyLikes.setSsbPlayListSettings(playListSettings);
+        return ssbPlyLikes;
+    }
 
 }

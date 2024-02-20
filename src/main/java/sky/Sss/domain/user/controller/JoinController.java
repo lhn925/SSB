@@ -24,8 +24,10 @@ import sky.Sss.domain.user.dto.join.JoinEmailDuplicateDto;
 import sky.Sss.domain.user.dto.join.JoinIdDuplicateDto;
 import sky.Sss.domain.user.dto.join.JoinUserNameDuplicateDto;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
+import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.PwSecLevel;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.join.UserJoinService;
 import sky.Sss.domain.user.utili.PwChecker;
 import sky.Sss.global.error.dto.ErrorResultDto;
@@ -41,6 +43,7 @@ public class JoinController {
 
     private final UserJoinService userJoinService;
     private final MessageSource ms;
+    private final UserQueryService userQueryService;
 
     /*  *//**
      * id:join_1

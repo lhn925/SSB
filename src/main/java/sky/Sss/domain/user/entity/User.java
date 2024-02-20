@@ -5,6 +5,7 @@ import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -185,5 +186,24 @@ public class User extends BaseTimeEntity {
         user.setIsLoginBlocked(userLoginBlockUpdateDto.getIsLoginBlocked());
         return user;
     }
+    @Override
+    public String toString() {
+        return "User{" +
+            "id=" + id +
+            ", token='" + token + '\'' +
+            ", userId='" + userId + '\'' +
+            ", password='" + password + '\'' +
+            ", userName='" + userName + '\'' +
+            ", email='" + email + '\'' +
+            ", pictureUrl='" + pictureUrl + '\'' +
+            ", userNameModifiedDate=" + userNameModifiedDate +
+            ", grade=" + grade +
+            ", pwSecLevel=" + pwSecLevel +
+            ", salt='" + salt + '\'' +
+            ", isLoginBlocked=" + isLoginBlocked +
+            ", isEnabled=" + isEnabled +
+            '}';
+    }
+
 
 }

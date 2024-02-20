@@ -23,7 +23,7 @@ import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.jwt.JwtAccessDeniedHandler;
 import sky.Sss.domain.user.utili.jwt.JwtAuthenticationEntryPoint;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +33,7 @@ import sky.Sss.global.redis.service.RedisService;
 public class SpringSecurityConfig {
 
 
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -104,7 +104,7 @@ public class SpringSecurityConfig {
     @Bean
     public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,
         UserLoginStatusService userLoginStatusService) {
-        return new RedisRememberService(RememberCookie.KEY.getValue(), userDetailsService, redisService,
+        return new RedisRememberService(RememberCookie.KEY.getValue(), userDetailsService, redisQueryService,
             userLoginStatusService);
     }
 

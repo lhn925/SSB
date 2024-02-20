@@ -48,6 +48,12 @@ public class ExTrackController {
         if (e.getClass().equals(IllegalArgumentException.class)) {
             status = HttpStatus.BAD_REQUEST;
         }
-        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),status);
+        try {
+            ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale());
+            return Result.getErrorResult(errorGlobalResultDto,status);
+        }catch (Exception ex) {
+            return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),status);
+        }
+
     }
 }

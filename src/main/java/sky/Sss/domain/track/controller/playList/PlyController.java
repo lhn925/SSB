@@ -21,18 +21,18 @@ import sky.Sss.domain.track.dto.playlist.PlayListInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingUpdateDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackDeleteDto;
-import sky.Sss.domain.track.service.playList.PlayListService;
+import sky.Sss.domain.track.service.playList.PlyService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.Result;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/tracks/playlist")
+@RequestMapping("/tracks/ply")
 @RestController
 @UserAuthorize
-public class PlayListController {
-    private final PlayListService playListService;
+public class PlyController {
+    private final PlyService plyService;
     private final MessageSource ms;
     /**
      * 새로 생성
@@ -49,14 +49,14 @@ public class PlayListController {
      * @return
      */
     @PostMapping
-    public ResponseEntity savePlayList(@Validated @RequestPart PlayListSettingSaveDto playListSettingSaveDto,
+    public ResponseEntity savePly(@Validated @RequestPart PlayListSettingSaveDto playListSettingSaveDto,
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
         HttpSession session = request.getSession();
-        PlayListInfoDto trackPlayListInfoDto = playListService.addPlayList(playListSettingSaveDto, coverImgFile,
+        PlayListInfoDto trackPlayListInfoDto = plyService.addPly(playListSettingSaveDto, coverImgFile,
             session.getId());
         return ResponseEntity.ok(trackPlayListInfoDto);
     }
@@ -69,13 +69,13 @@ public class PlayListController {
      * @return
      */
     @PutMapping
-    public ResponseEntity modifyPlayList(@Validated @RequestPart PlayListSettingUpdateDto playListSettingUpdateDto,
+    public ResponseEntity modifyPly(@Validated @RequestPart PlayListSettingUpdateDto playListSettingUpdateDto,
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
-        playListService.updatePlayListInfo(playListSettingUpdateDto,coverImgFile);
+        plyService.updatePlyInfo(playListSettingUpdateDto,coverImgFile);
         return ResponseEntity.ok().build();
     }
 
@@ -87,12 +87,12 @@ public class PlayListController {
      * @return
      */
     @DeleteMapping
-    public ResponseEntity removePlayList(@Validated @RequestBody PlayListTrackDeleteDto playListTrackDeleteDto,
+    public ResponseEntity removePly(@Validated @RequestBody PlayListTrackDeleteDto playListTrackDeleteDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
-        playListService.deletePlayList(playListTrackDeleteDto.getId(),playListTrackDeleteDto.getToken());
+        plyService.deletePly(playListTrackDeleteDto.getId(),playListTrackDeleteDto.getToken());
 
         return ResponseEntity.ok().build();
     }

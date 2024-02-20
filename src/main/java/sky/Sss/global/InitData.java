@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import sky.Sss.domain.track.repository.track.TrackQueryRepository;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.service.join.UserJoinService;
 
@@ -15,7 +16,7 @@ public class InitData {
 
     private final InitUserService initUserService;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         initUserService.init();
 
@@ -25,6 +26,7 @@ public class InitData {
     @RequiredArgsConstructor
     static class InitUserService {
         private final UserJoinService userJoinService;
+        private final TrackQueryRepository trackQueryRepository;
         @PersistenceContext
         private EntityManager em;
 

@@ -15,7 +15,7 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
 import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class LogoutService {
 
     private final TokenProvider tokenProvider;
     private final UserQueryService userQueryService;
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
     private final UserLoginStatusService userLoginStatusService;
 
     @Transactional
@@ -56,8 +56,8 @@ public class LogoutService {
             Status.OFF, Status.OFF);
 
         // 레디스 삭제
-        if (findStatus != null || redisService.hasRedis(redisToken)) {
-            redisService.delete(redisToken);
+        if (findStatus != null || redisQueryService.hasRedis(redisToken)) {
+            redisQueryService.delete(redisToken);
         }
     }
 }

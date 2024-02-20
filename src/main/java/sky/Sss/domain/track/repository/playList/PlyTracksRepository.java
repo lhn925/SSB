@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 
-public interface PlayListTracksRepository extends JpaRepository<SsbPlayListTracks,Long> {
+public interface PlyTracksRepository extends JpaRepository<SsbPlayListTracks,Long> {
 
 
 

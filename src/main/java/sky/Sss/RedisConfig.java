@@ -1,6 +1,7 @@
 package sky.Sss;
 
 
+import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,6 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
-
         redisConfiguration.setHostName(host);
         redisConfiguration.setPort(port);
         redisConfiguration.setDatabase(0);
@@ -55,7 +55,6 @@ public class RedisConfig {
         redisTemplate.setDefaultSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
-
     @Bean(name = "redisTemplateToken")
     public RedisTemplate<?, ?> redisTemplateToken() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();

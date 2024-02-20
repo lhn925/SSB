@@ -6,27 +6,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
-import sky.Sss.domain.track.repository.playList.PlayListTracksRepository;
-import sky.Sss.domain.user.service.UserQueryService;
+import sky.Sss.domain.track.repository.playList.PlyTracksRepository;
 
 @Slf4j
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
-public class PlayListTracksService {
-    private final PlayListTracksRepository playListTracksRepository;
-    private final UserQueryService userQueryService;
+public class PlyTracksService {
+    private final PlyTracksRepository plyTracksRepository;
 
     @Transactional
     public void deleteTracksInBatch(List<SsbPlayListTracks> tracksList) {
         if (!tracksList.isEmpty()) {
-            playListTracksRepository.deleteAllInBatch(tracksList);
+            plyTracksRepository.deleteAllInBatch(tracksList);
         }
     }
 
     @Transactional
     public void deleteBySettingsId (Long settingsId){
-        playListTracksRepository.deleteBySettingsId(settingsId);
+        plyTracksRepository.deleteBySettingsId(settingsId);
     }
 
 }

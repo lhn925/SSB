@@ -17,7 +17,7 @@ import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
-import sky.Sss.domain.track.repository.playList.PlayListSettingRepository;
+import sky.Sss.domain.track.repository.playList.PlySettingRepository;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.track.service.track.TrackTagService;
 import sky.Sss.domain.user.entity.User;
@@ -30,10 +30,10 @@ import sky.Sss.global.file.utili.FileStore;
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
-public class PlayListService {
+public class PlyService {
 
-    private final PlayListSettingRepository playListSettingRepository;
-    private final PlayListTracksService playListTracksService;
+    private final PlySettingRepository plySettingRepository;
+    private final PlyTracksService plyTracksService;
     private final UserQueryService userQueryService;
     private final TrackService trackService;
     private final TrackTagService trackTagService;
@@ -49,13 +49,13 @@ public class PlayListService {
      * @return
      */
     @Transactional
-    public PlayListInfoDto addPlayList(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
+    public PlayListInfoDto addPly(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
         String sessionId) {
         return trackService.addTrackFiles(playListSettingSaveDto, coverImgFile, sessionId);
     }
 
     @Transactional
-    public void updatePlayListInfo(PlayListSettingUpdateDto playListSettingUpdateDto, MultipartFile coverImgFile) {
+    public void updatePlyInfo(PlayListSettingUpdateDto playListSettingUpdateDto, MultipartFile coverImgFile) {
         User user = userQueryService.findOne();
         SsbPlayListSettings ssbPlayListSettings = findOne(playListSettingUpdateDto.getId(),
             playListSettingUpdateDto.getToken(), user,Status.ON);
@@ -102,7 +102,7 @@ public class PlayListService {
     }
 
     @Transactional
-    public void deletePlayList(Long id, String token) {
+    public void deletePly(Long id, String token) {
         User user = userQueryService.findOne();
         SsbPlayListSettings ssbPlayListSettings = findOne(id, token, user, Status.ON);
         //status 변경
@@ -114,12 +114,12 @@ public class PlayListService {
         trackTagService.delPlyTagLinksInBatch(ssbPlayListSettings.getTags());
 //        // tracks 삭제
 
-        playListTracksService.deleteTracksInBatch(ssbPlayListSettings.getPlayListTracks());
+        plyTracksService.deleteTracksInBatch(ssbPlayListSettings.getPlayListTracks());
 
     }
 
     public SsbPlayListSettings findOne(Long id, String token, User user, Status isStatus) {
-        return playListSettingRepository.findOne(id, token, user, isStatus.getValue())
+        return plySettingRepository.findOne(id, token, user, isStatus.getValue())
             .orElseThrow(() -> new SsbFileNotFoundException());
     }
 
@@ -171,7 +171,7 @@ public class PlayListService {
                     removeList.add(removeTracks);
                 }
             });
-            playListTracksService.deleteTracksInBatch(removeList);
+            plyTracksService.deleteTracksInBatch(removeList);
         }
     }
 

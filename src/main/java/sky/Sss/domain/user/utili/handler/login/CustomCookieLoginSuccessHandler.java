@@ -9,16 +9,12 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
-import sky.Sss.domain.user.utili.UserTokenUtil;
-import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 @Slf4j
 //@Component
@@ -27,7 +23,7 @@ public class CustomCookieLoginSuccessHandler extends CustomLoginSuccessHandler {
 
 
     private final UserLoginStatusService userLoginStatusService;
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
 
 
     @Override
@@ -62,7 +58,7 @@ public class CustomCookieLoginSuccessHandler extends CustomLoginSuccessHandler {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
 
-        setLoginToken(redisService, request, userInfo);
+        setLoginToken(redisQueryService, request, userInfo);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
 
     }

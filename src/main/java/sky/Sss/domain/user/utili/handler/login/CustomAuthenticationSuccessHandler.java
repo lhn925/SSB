@@ -23,7 +23,7 @@ import sky.Sss.domain.user.service.log.UserLoginLogService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 /**
  * 로그인 성공 시 로직을 실행하는 핸들러
@@ -39,7 +39,7 @@ public class CustomAuthenticationSuccessHandler extends
     private final SecurityContextImpl securityContext;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final UserLoginStatusService userLoginStatusService;
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
@@ -115,7 +115,7 @@ public class CustomAuthenticationSuccessHandler extends
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
 
         // 리액트단에서 접근할 유저정보 저장
-        setLoginToken(redisService, request, userInfo);
+        setLoginToken(redisQueryService, request, userInfo);
         session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
     }
 

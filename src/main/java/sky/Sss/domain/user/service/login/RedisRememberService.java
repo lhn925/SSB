@@ -23,21 +23,21 @@ import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.utili.CustomCookie;
 import sky.Sss.domain.user.utili.UserTokenUtil;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 @Slf4j
 public class RedisRememberService extends AbstractRememberMeServices {
 
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
     private final UserLoginStatusService userLoginStatusService;
 
     private String token;
 
-    public RedisRememberService(String key, UserDetailsService userDetailsService, RedisService redisService,UserLoginStatusService userLoginStatusService) {
+    public RedisRememberService(String key, UserDetailsService userDetailsService, RedisQueryService redisQueryService,UserLoginStatusService userLoginStatusService) {
         super(key, userDetailsService);
         super.setParameter(key);
         super.setCookieName(key);
-        this.redisService = redisService;
+        this.redisQueryService = redisQueryService;
         this.userLoginStatusService = userLoginStatusService;
     }
 
@@ -110,7 +110,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
         JSONArray userArray = new JSONArray();
         userArray.add("userId:" + userId);
         userArray.add("expireTime:" + expiryTime);
-        redisService.setRememberData(redisKey, userArray.toString(), expiryTime);
+        redisQueryService.setRememberData(redisKey, userArray.toString(), expiryTime);
     }
 
 
@@ -191,7 +191,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
     public String getRedisData(String rememberMeCookie) {
         rememberMeCookie = hashing(rememberMeCookie);
 
-        String redisData = redisService.getRememberData(rememberMeCookie);
+        String redisData = redisQueryService.getRememberData(rememberMeCookie);
         return redisData;
     }
 
@@ -249,8 +249,8 @@ public class RedisRememberService extends AbstractRememberMeServices {
     }
 
 
-    public RedisService getRedisService() {
-        return redisService;
+    public RedisQueryService getRedisService() {
+        return redisQueryService;
     }
 
     public UserLoginStatusService getUserLoginStatusService() {

@@ -6,9 +6,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
@@ -20,9 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,7 +32,7 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.UserTokenUtil;
 import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 //추가된 라이브러리를 사용해서 JWT를 생성하고 검증하는 컴포넌트
 @Slf4j
@@ -44,7 +40,7 @@ import sky.Sss.global.redis.service.RedisService;
 public class TokenProvider implements InitializingBean {
 
 
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
     public static final String AUTHORITIES_KEY = "auth";
     public static final String REDIS_TOKEN_KEY = "redis";
     private final String accessSecret;
@@ -61,14 +57,14 @@ public class TokenProvider implements InitializingBean {
         @Value("${jwt.refreshSecret}") String refreshSecret,
         @Value("${jwt.token-validity-in-seconds}") long tokenValidityInMilliseconds,
         @Value("${jwt.token-validity-in-one-Hour-seconds}") long tokenValidityOneHourInSeconds,
-        RedisService redisService, UserLoginStatusService userLoginStatusService) {
+        RedisQueryService redisQueryService, UserLoginStatusService userLoginStatusService) {
         this.accessSecret = accessSecret;
         this.refreshSecret = refreshSecret;
         // 14일 refreshToken 발급
         this.tokenValidityInMilliseconds = tokenValidityInMilliseconds * 14000;
         // 1 시간 accessToken 발급
         this.tokenValidityOneHourInSeconds = tokenValidityOneHourInSeconds * 60;
-        this.redisService = redisService;
+        this.redisQueryService = redisQueryService;
         this.userLoginStatusService = userLoginStatusService;
     }
 
@@ -96,8 +92,10 @@ public class TokenProvider implements InitializingBean {
         String refreshToken = createRefreshToken(authentication, redisToken, now);
 
         JwtTokenDto jwtTokenDto = JwtTokenDto.createJwtTokenDto(redisToken, accessToken, refreshToken);
-        redisService.setData(jwtTokenDto.getRedisToken(), authentication.getName(),
-            now + this.tokenValidityOneHourInSeconds);
+
+        // redisToken redis 에 유효기간 14일 저장
+        redisQueryService.setData(jwtTokenDto.getRedisToken(), authentication.getName(),
+            now + this.tokenValidityInMilliseconds);
         return jwtTokenDto;
     }
 
@@ -222,7 +220,7 @@ public class TokenProvider implements InitializingBean {
         }
 
         // 레디스에 저장한 아이디와 전달한 아이디가 서로 다른 경우
-        String userId = redisService.getData(redisToken);
+        String userId = redisQueryService.getData(redisToken);
         log.info("userId = {}", userId);
         log.info("sub = {}", sub);
         if (!sub.equals(userId)) {
@@ -238,7 +236,7 @@ public class TokenProvider implements InitializingBean {
         log.info("findStatus = {}", findStatus);
 
         if (findStatus == null) {
-            redisService.delete(redisToken);
+            redisQueryService.delete(redisToken);
             throw new RefreshTokenNotFoundException();
         }
     }
@@ -253,7 +251,7 @@ public class TokenProvider implements InitializingBean {
     }
 
     private Boolean hasRedisToken(String redisToken) {
-        Boolean result = redisService.hasRedis(RedisKeyDto.REDIS_LOGIN_KEY + redisToken);
+        Boolean result = redisQueryService.hasRedis(RedisKeyDto.REDIS_LOGIN_KEY + redisToken);
         return result;
     }
 
@@ -300,5 +298,9 @@ public class TokenProvider implements InitializingBean {
     public Jws<Claims> getAccessClaimsJws(String accessToken) {
         Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(this.accessKey).build().parseClaimsJws(accessToken);
         return claimsJws;
+    }
+
+    public long getTokenValidityInMilliseconds() {
+        return tokenValidityInMilliseconds;
     }
 }

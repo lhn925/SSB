@@ -1,27 +1,16 @@
 package sky.Sss.domain.user.utili.handler.logout;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.user.dto.UserInfoDto;
-import sky.Sss.domain.user.model.RememberCookie;
-import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.login.RedisRememberService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
-import sky.Sss.domain.user.utili.CustomCookie;
 import sky.Sss.domain.user.utili.jwt.JwtFilter;
-import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisService;
 
 
 @Slf4j

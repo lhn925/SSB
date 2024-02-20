@@ -28,6 +28,11 @@ public class TrackQueryService {
         return trackQueryRepository.findOne(id, token, isStatus.getValue())
             .orElseThrow(() -> new SsbFileNotFoundException());
     }
+    public SsbTrack findById(Long id, Status isStatus) {
+        return trackQueryRepository.findByIdAndIsStatus(id, isStatus.getValue())
+            .orElseThrow(() -> new SsbFileNotFoundException());
+    }
+
 
 
     public SsbTrack findOneJoinUser(Long id, Status isStatus) {

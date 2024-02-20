@@ -4,11 +4,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.user.entity.User;
 
-public interface PlayListSettingRepository extends JpaRepository<SsbPlayListSettings, Long> {
+public interface PlySettingRepository extends JpaRepository<SsbPlayListSettings, Long> {
 
 
     @Query("select p from SsbPlayListSettings p  where p.id= :id "

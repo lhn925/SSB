@@ -14,8 +14,6 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @Component
 public class RedisKeyExpireEventListener extends KeyExpirationEventMessageListener {
 
-
-
     private final UserLoginStatusService userLoginStatusService;
 
     public RedisKeyExpireEventListener(RedisMessageListenerContainer listenerContainer,
@@ -23,6 +21,8 @@ public class RedisKeyExpireEventListener extends KeyExpirationEventMessageListen
         super(listenerContainer);
         this.userLoginStatusService = userLoginStatusService;
     }
+
+
 
     /**
      * Redis 세션 키 만료시 login 세션 기기 상태 변경

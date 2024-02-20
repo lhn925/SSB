@@ -77,7 +77,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
     private Boolean isStatus;
 
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
-    private List<SsbPlayListLikes> likes = new ArrayList<>();
+    private List<SsbPlyLikes> likes = new ArrayList<>();
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
     private List<SsbPlayListTagLink> tags = new ArrayList<>();
 

@@ -22,7 +22,7 @@ import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisService;
+import sky.Sss.global.redis.service.RedisQueryService;
 
 /**
  * 사용자가 로그인 성공한
@@ -39,7 +39,7 @@ public class UserLoginStatusService {
     private final UserLoginStatusRepository userLoginStatusRepository;
     private final UserQueryService userQueryService;
     private final LocationFinderService locationFinderService;
-    private final RedisService redisService;
+    private final RedisQueryService redisQueryService;
 
     /**
      * 로그인 시
@@ -74,8 +74,8 @@ public class UserLoginStatusService {
         if (findStatus.size() > 0) { // 기존에 있던 현재 세션아이디를 가진 Status 다 로그아웃
             userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), sessionId);
             for (UserLoginStatus status : findStatus) {
-                if (redisService.hasRedis(status.getRedisToken())) {
-                    redisService.delete(status.getRedisToken());
+                if (redisQueryService.hasRedis(status.getRedisToken())) {
+                    redisQueryService.delete(status.getRedisToken());
                 }
             }
         }
@@ -277,14 +277,14 @@ public class UserLoginStatusService {
     private void removeLoginToken(List<UserLoginStatus> userLoginStatusList, String sessionId) {
         for (UserLoginStatus userLoginStatus : userLoginStatusList) {
             // 레디스 토큰 값 삭제
-            if (redisService.hasRedis(userLoginStatus.getRedisToken())) {
-                redisService.delete(userLoginStatus.getRedisToken());
+            if (redisQueryService.hasRedis(userLoginStatus.getRedisToken())) {
+                redisQueryService.delete(userLoginStatus.getRedisToken());
             }
             // 세션 삭제
             // 현재 접속하고 있는 세션 제외
-            if (!userLoginStatus.getSessionId().equals(sessionId) && redisService.hasRedis(
+            if (!userLoginStatus.getSessionId().equals(sessionId) && redisQueryService.hasRedis(
                 RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId())) {
-                redisService.delete(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId());
+                redisQueryService.delete(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId());
             }
 
         }

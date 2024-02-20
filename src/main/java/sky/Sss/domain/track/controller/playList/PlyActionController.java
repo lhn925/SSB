@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.controller.track;
+package sky.Sss.domain.track.controller.playList;
 
 
 import lombok.RequiredArgsConstructor;
@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.TotalLikesCountDto;
+import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.service.track.TrackActionService;
-import sky.Sss.domain.track.service.track.TrackQueryService;
+import sky.Sss.domain.track.service.playList.PlyActionService;
+import sky.Sss.domain.track.service.playList.PlyQueryService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.model.Status;
 
@@ -22,17 +23,15 @@ import sky.Sss.domain.user.model.Status;
  */
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/tracks/action")
+@RequestMapping("/tracks/ply/action")
 @UserAuthorize
 @RestController
-public class TrackActionController {
-    private final TrackActionService trackActionService;
-    private final TrackQueryService trackQueryService;
+public class PlyActionController {
+    private final PlyActionService plyActionService;
+    private final PlyQueryService plyQueryService;
 
     /**
-     * track 좋아요 등록
-     */
-    /**
+     * playList 좋아요 등록 후 총 좋아요수 반환
      *
      * @param id trackId
      * @return
@@ -43,16 +42,16 @@ public class TrackActionController {
             throw new IllegalArgumentException();
         }
         // track 검색
-        SsbTrack ssbTrack = trackQueryService.findById(id, Status.ON);
+        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findById(id, Status.ON);
 
-        trackActionService.addLikes(ssbTrack);
+        plyActionService.addLikes(ssbPlayListSettings);
 
-        int totalLikesCount = trackActionService.getTotalLikesCount(ssbTrack.getToken());
+        int totalLikesCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
         return ResponseEntity.ok(new TotalLikesCountDto(totalLikesCount));
     }
     /**
-     * track 좋아요 취소 후 총 좋아요수 반환
+     * playList 좋아요 취소 후 총 좋아요수 반환
      *
      * @param id trackId
      * @return
@@ -63,19 +62,12 @@ public class TrackActionController {
             throw new IllegalArgumentException();
         }
         // track 검색
-        SsbTrack ssbTrack = trackQueryService.findById(id, Status.ON);
-        trackActionService.cancelLikes(ssbTrack);
+        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findById(id, Status.ON);
+        plyActionService.cancelLikes(ssbPlayListSettings);
 
-        int totalCount = trackActionService.getTotalLikesCount(ssbTrack.getToken());
+        int totalCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
         return ResponseEntity.ok(new TotalLikesCountDto(totalCount));
     }
-
-    /**
-     *
-     * 좋아요 시 알림
-     *
-     *
-     */
 
 }

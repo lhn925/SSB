@@ -30,7 +30,7 @@ import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.exception.checked.SsbFileLengthLimitOverException;
-import sky.Sss.domain.track.repository.playList.PlayListSettingRepository;
+import sky.Sss.domain.track.repository.playList.PlySettingRepository;
 import sky.Sss.domain.track.repository.track.TrackRepository;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
@@ -50,7 +50,7 @@ public class TrackService {
 
     private final FileStore fileStore;
     private final UserQueryService userQueryService;
-    private final PlayListSettingRepository playListSettingRepository;
+    private final PlySettingRepository plySettingRepository;
     private final TrackTagService trackTagService;
     private final TempTrackStorageService tempTrackStorageService;
     private final TrackQueryService trackQueryService;
@@ -195,7 +195,7 @@ public class TrackService {
 
         trackRepository.saveAll(savaTracks);
         // 등록
-        playListSettingRepository.save(ssbPlayListSettings);
+        plySettingRepository.save(ssbPlayListSettings);
 
         return PlayListInfoDto.create(ssbPlayListSettings);
     }
