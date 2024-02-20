@@ -12,5 +12,5 @@ public class TempTrackFileUploadDto {
 
     @MultipartTrackFileValid
     private MultipartFile trackFile;
-    private boolean isPlayList;
+    private Boolean isPlayList;
 }

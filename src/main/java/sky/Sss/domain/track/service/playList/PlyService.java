@@ -37,7 +37,6 @@ public class PlyService {
     private final UserQueryService userQueryService;
     private final TrackService trackService;
     private final TrackTagService trackTagService;
-    private final FileStore fileStore;
 
 
     /**

@@ -65,7 +65,7 @@ class TrackServiceTest {
         String sessionId = "a8702363-50ad-4de1-8e6b-928cf988e3a9";
         TempTrackFileUploadDto temp = new TempTrackFileUploadDto();
 
-        temp.setPlayList(false);
+        temp.setIsPlayList(false);
         temp.setTrackFile(multipartFile);
 
         TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(temp, sessionId);
@@ -129,7 +129,7 @@ class TrackServiceTest {
                 Mp4ContentTypeValue.MUSIC_VIDEO.name(), fileInputStream1);
 
             TempTrackFileUploadDto tempTrackFileUploadDto = new TempTrackFileUploadDto();
-            tempTrackFileUploadDto.setPlayList(true);
+            tempTrackFileUploadDto.setIsPlayList(true);
             tempTrackFileUploadDto.setTrackFile(multipartFile1);
 
             TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(tempTrackFileUploadDto,

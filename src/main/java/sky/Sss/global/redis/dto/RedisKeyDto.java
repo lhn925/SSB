@@ -11,8 +11,8 @@ public class RedisKeyDto {
     public static final String REDIS_TRACK_LIKES_KEY = "spring:track:likes:";
     public static final String REDIS_PLY_LIKES_KEY = "spring:ply:likes:";
     public static final String REDIS_REPLY_LIKES_KEY = "spring:reply:likes:";
-    public static final String REDIS_TRACK_LIKES_TOTAL_KEY = "spring:track:likes:total:";
-    public static final String REDIS_PLY_LIKES_TOTAL_KEY = "spring:ply:likes:total:";
+    public static final String REDIS_TRACK_LIKES_TOTAL_KEY = "spring:track:likes:total";
+    public static final String REDIS_PLY_LIKES_TOTAL_KEY = "spring:ply:likes:total";
     public static final String REDIS_REPLY_LIKES_TOTAL_KEY = "spring:reply:likes:total";
     public static final String USER_KEY = "USER_ID";
 
