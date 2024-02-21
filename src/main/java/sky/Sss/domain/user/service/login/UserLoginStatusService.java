@@ -54,8 +54,6 @@ public class UserLoginStatusService {
         }
         String userId = userDetails.getUsername();
 
-        log.info("userId = {}", userId);
-
         User user = userQueryService.findOne(userId);
 
         // UserLoginStatus 생성 후

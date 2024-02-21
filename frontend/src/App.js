@@ -40,11 +40,17 @@ function App() {
       heartbeatOutgoing: 4000,
     })
     clientData.onConnect = function () {
-      clientData.subscribe("/users/queue/alarm", function (message) {
-        console.log(message.body);
+      // 구독
+      clientData.subscribe("/user/queue/alarm", function (message) {
+        console.log("구독 : "+ message.body);
+      });
+      clientData.subscribe("/user/queue/push/msg", function (message) {
+        console.log("push : "+ message.body);
       });
     };
+    // 연결
     clientData.activate();
+    clientData.publish({destination:"/app/push"});
     client.current.client = clientData;
   }
   bc.onmessage = function (e) {
@@ -110,7 +116,7 @@ function App() {
             theme="light"
         />
 
-        <ReactPlayer url={process.env.PUBLIC_URL + "/users/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />
+        {/*<ReactPlayer url={process.env.PUBLIC_URL + "/users/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />*/}
         <div className="l-container">
           <Routes>
             <Route path="/">

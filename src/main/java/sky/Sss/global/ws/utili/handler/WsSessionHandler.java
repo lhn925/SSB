@@ -1,22 +1,17 @@
-package sky.Sss.domain.user.utili.handler.webSocket;
+package sky.Sss.global.ws.utili.handler;
 
-import com.fasterxml.jackson.core.filter.TokenFilter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.SimpMessageType;
-import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.core.Authentication;
@@ -26,11 +21,15 @@ import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.jwt.JwtFilter;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
 
+/**
+ *
+ * socket handler
+ */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE + 99) // 가장 높은 우선순위로 설정
 @RequiredArgsConstructor
 @Component
-public class SessionHandler implements ChannelInterceptor {
+public class WsSessionHandler implements ChannelInterceptor {
 
     private final UserLoginStatusService userLoginStatusService;
     private final TokenProvider tokenProvider;

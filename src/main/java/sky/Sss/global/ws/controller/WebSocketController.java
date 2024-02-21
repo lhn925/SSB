@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.controller;
+package sky.Sss.global.ws.controller;
 
 
 import java.net.SocketException;
@@ -11,7 +11,6 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.user.dto.LoginWebSocketDto;
-import sky.Sss.domain.user.service.login.UserLoginStatusService;
 
 @Slf4j
 @RestController
@@ -19,17 +18,35 @@ import sky.Sss.domain.user.service.login.UserLoginStatusService;
 public class WebSocketController {
 
     private final SimpMessageSendingOperations messagingTemplate;
-    private final UserLoginStatusService userLoginStatusService;
+
+    /**
+     * @MessageMapping: 클라이언트에서 서버로 보낸 메시지를 메시지를 라우팅
+     * @SendTo: 구독한 클라이언트에게 response를 제공할 url 정의
+     * @DestinationVariable: 구독 및 메시징의 동적 url 변수를 설정. RestAPI의 @PathValue와 같다.
+     * @Payload: 메시지의 body를 정의한 객체에 매핑합니다.
+     */
+
+
 
 
     @MessageMapping("/login")
     @SendToUser("/queue/alarm")
-    public LoginWebSocketDto login(SimpMessageHeaderAccessor headerAccessor,final LoginWebSocketDto message) throws Exception {
-
+    public LoginWebSocketDto login(SimpMessageHeaderAccessor headerAccessor,LoginWebSocketDto message) throws Exception {
         log.info("WebSocketController.ge = {}");
         String uuid = headerAccessor.getSessionId();
         message.setData("/queue/alarm/" + uuid);
         messagingTemplate.convertAndSendToUser(uuid,"/queue/alarm/"+uuid,message);
+        return message;
+    }
+
+    @MessageMapping("/push")
+    @SendToUser("/queue/push/msg")
+    public LoginWebSocketDto push(SimpMessageHeaderAccessor headerAccessor,LoginWebSocketDto message) throws Exception {
+        log.info("push ebSocketController.ge = {}");
+        String uuid = headerAccessor.getSessionId();
+        log.info("uuid = {}", uuid);
+        message.setData("/queue/push/msg" + uuid);
+        messagingTemplate.convertAndSendToUser(uuid,"/queue/push/msg/"+uuid,message);
         return message;
     }
 
@@ -38,8 +55,6 @@ public class WebSocketController {
     public LoginWebSocketDto logout(SimpMessageHeaderAccessor headerAccessor,final LoginWebSocketDto message) throws Exception {
         String uuid = headerAccessor.getSessionId();
         message.setData("/queue/logout/" + message.getSessionId());
-
-
         messagingTemplate.convertAndSendToUser(uuid,"/queue/alarm/"+uuid,message);
         return message;
     }
