@@ -29,7 +29,7 @@ import sky.Sss.domain.user.utili.jwt.TokenProvider;
 @Order(Ordered.HIGHEST_PRECEDENCE + 99) // 가장 높은 우선순위로 설정
 @RequiredArgsConstructor
 @Component
-public class WsSessionHandler implements ChannelInterceptor {
+public class WebSocketSessionHandler implements ChannelInterceptor {
 
     private final UserLoginStatusService userLoginStatusService;
     private final TokenProvider tokenProvider;

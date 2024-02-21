@@ -1,6 +1,5 @@
 package sky.Sss.domain.track.entity.track.log;
 
-import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PRIVATE;
@@ -14,18 +13,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.entity.chart.SsbChartIncludedPlays;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.model.TrackMinimumPlayTime;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.base.login.DefaultLocationLog;
 import sky.Sss.global.base.login.DeviceDetails;
@@ -93,7 +90,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         DeviceDetails deviceDetails, Long startTime, LocalDateTime createdDateTime) {
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = new SsbTrackAllPlayLogs();
         ssbTrackAllPlayLogs.setUser(user);
-        ssbTrackAllPlayLogs.setToken(UserTokenUtil.getToken());
+        ssbTrackAllPlayLogs.setToken(TokenUtil.getToken());
         ssbTrackAllPlayLogs.setSsbTrack(ssbTrack);
         ssbTrackAllPlayLogs.setDefaultLocationLog(defaultLocationLog);
         ssbTrackAllPlayLogs.setDeviceDetails(deviceDetails);

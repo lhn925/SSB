@@ -5,7 +5,6 @@ import static jakarta.persistence.EnumType.STRING;
 
 import jakarta.persistence.*;
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -28,7 +27,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.model.PwSecLevel;
 import sky.Sss.domain.user.model.UserGrade;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.file.utili.FileStore;
 
 
@@ -110,7 +109,7 @@ public class User extends BaseTimeEntity {
     public static User createJoinUser(UserJoinPostDto userJoinDto, String salt, PasswordEncoder passwordEncoder) {
         return User.builder().userId(userJoinDto.getUserId())
             .email(userJoinDto.getEmail())
-            .token(UserTokenUtil.hashing(userJoinDto.getEmail().getBytes(), salt))
+            .token(TokenUtil.hashing(userJoinDto.getEmail().getBytes(), salt))
             .password(passwordEncoder.encode(userJoinDto.getPassword()))
             .userName(userJoinDto.getUserName())
             .salt(salt)

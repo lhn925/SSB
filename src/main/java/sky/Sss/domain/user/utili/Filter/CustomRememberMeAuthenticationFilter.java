@@ -13,10 +13,9 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.model.RememberCookie;
-import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.login.RedisRememberService;
 import sky.Sss.domain.user.utili.CustomCookie;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 
 @Slf4j
 public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticationFilter {
@@ -51,7 +50,7 @@ public class CustomRememberMeAuthenticationFilter extends RememberMeAuthenticati
         String rmRedisToken = rememberMeServices.hashing(key);
 
         // 새롭게 쿠키에 저장될 토큰 생성
-        String token = UserTokenUtil.getToken();
+        String token = TokenUtil.getToken();
 
         CustomUserDetails principal = (CustomUserDetails) authResult.getPrincipal();
 

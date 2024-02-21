@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.model.RememberCookie;
 import sky.Sss.domain.user.utili.CustomCookie;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.redis.service.RedisQueryService;
 
 @Slf4j
@@ -63,7 +63,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
 
         int tokenLifetime = getTokenValiditySeconds(); // 2주
         long expiryTime = getExpiryTime(tokenLifetime);
-        String token = UserTokenUtil.getToken();
+        String token = TokenUtil.getToken();
         this.setToken(token);
         // 쿠키 생성
         setCookie(null, tokenLifetime, request, response);
@@ -106,7 +106,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
     }
 
     public void setRedis(String userId, HttpSession session, long expiryTime, String token) {
-        String redisKey = UserTokenUtil.hashing(session.getId().getBytes(), token);
+        String redisKey = TokenUtil.hashing(session.getId().getBytes(), token);
         JSONArray userArray = new JSONArray();
         userArray.add("userId:" + userId);
         userArray.add("expireTime:" + expiryTime);
@@ -203,7 +203,7 @@ public class RedisRememberService extends AbstractRememberMeServices {
      */
     public String hashing(String rememberMeCookie) {
         String[] cookie = rememberMeCookie.split(":");
-        rememberMeCookie = UserTokenUtil.hashing(cookie[0].getBytes(), cookie[1]);
+        rememberMeCookie = TokenUtil.hashing(cookie[0].getBytes(), cookie[1]);
         return rememberMeCookie;
     }
 

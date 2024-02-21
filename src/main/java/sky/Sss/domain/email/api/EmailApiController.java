@@ -34,7 +34,7 @@ import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.HelpType;
 import sky.Sss.domain.user.service.join.UserJoinService;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.ErrorResultDto;
@@ -213,9 +213,9 @@ public class EmailApiController {
         String code = optCode.orElse(null);
 
         // authToken 요청 구분을 위해 pw,id,join 각각 키를 만들어 구분
-        String authToken = UserTokenUtil.getToken(); // 유저에게 줄 token
+        String authToken = TokenUtil.getToken(); // 유저에게 줄 token
         String salt = getTokeKey(sendType); // salt
-        String hashingToken = UserTokenUtil.hashing(authToken.getBytes(), salt); // 서버가 가지고 있을 해싱 토큰
+        String hashingToken = TokenUtil.hashing(authToken.getBytes(), salt); // 서버가 가지고 있을 해싱 토큰
         EmailAuthCodeDto emailResponseDto = EmailAuthCodeDto.builder()
             .code(code)
             .authToken(hashingToken)
@@ -256,7 +256,7 @@ public class EmailApiController {
         log.info("authCode.getSendType() = {}", authCode.getSendType());
         String salt = getTokeKey(authCode.getSendType());
         String authToken = authCode.getAuthToken();
-        String hashingToken = UserTokenUtil.hashing(authToken.getBytes(), salt);
+        String hashingToken = TokenUtil.hashing(authToken.getBytes(), salt);
         return hashingToken;
     }
 

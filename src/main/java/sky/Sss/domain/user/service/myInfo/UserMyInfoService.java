@@ -21,7 +21,6 @@ import sky.Sss.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.join.UserJoinService;
-import sky.Sss.domain.user.utili.UserTokenUtil;
 import sky.Sss.global.file.utili.FileStore;
 import sky.Sss.global.file.dto.UploadFileDto;
 

@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import sky.Sss.global.ws.utili.handler.WsSessionHandler;
+import sky.Sss.global.ws.utili.handler.WebSocketSessionHandler;
 import sky.Sss.global.ws.utili.handler.WebSocketErrorHandler;
 
 @Configuration
@@ -15,7 +15,7 @@ import sky.Sss.global.ws.utili.handler.WebSocketErrorHandler;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final WsSessionHandler wsSessionHandler;
+    private final WebSocketSessionHandler webSocketSessionHandler;
     private final WebSocketErrorHandler webSocketErrorHandler;
 
     @Override
@@ -55,6 +55,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(wsSessionHandler);
+        registration.interceptors(webSocketSessionHandler);
     }
 }

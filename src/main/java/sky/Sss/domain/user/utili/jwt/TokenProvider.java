@@ -30,7 +30,7 @@ import sky.Sss.domain.user.entity.login.UserLoginStatus;
 import sky.Sss.domain.user.exception.RefreshTokenNotFoundException;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisQueryService;
 
@@ -83,7 +83,7 @@ public class TokenProvider implements InitializingBean {
     public JwtTokenDto createToken(Authentication authentication) {
 
         //레디스 토큰값 생성
-        String redisToken = UserTokenUtil.getToken();
+        String redisToken = TokenUtil.getToken();
         // expire 시간 설정
         long now = (new Date()).getTime();
 

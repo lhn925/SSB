@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import sky.Sss.domain.user.dto.UserInfoDto;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisQueryService;
 
@@ -34,7 +34,7 @@ public abstract class CustomLoginSuccessHandler implements AuthenticationSuccess
     public abstract void setSession(HttpServletRequest request, Authentication authentication);
 
     public void setLoginToken(RedisQueryService redisQueryService,HttpServletRequest request, UserInfoDto userInfo) {
-        String redisToken = UserTokenUtil.getToken();
+        String redisToken = TokenUtil.getToken();
         request.setAttribute(RedisKeyDto.REDIS_LOGIN_KEY, redisToken);
         JSONObject userObject = new JSONObject();
         userObject.put("userId", userInfo.getUserId());

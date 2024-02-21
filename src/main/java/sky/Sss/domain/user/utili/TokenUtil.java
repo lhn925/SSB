@@ -4,7 +4,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class UserTokenUtil {
+public class TokenUtil {
+
+    private static final int SALT_SIZE = 10;
 
     // token 발급
     public static String hashing(byte[] value, String Salt) {
@@ -36,7 +38,7 @@ public class UserTokenUtil {
     public static String getToken() {
         try {
             SecureRandom rnd = new SecureRandom();
-            byte[] temp = new byte[10];
+            byte[] temp = new byte[SALT_SIZE];
             rnd.nextBytes(temp);
             return Byte_to_String(temp);
         } catch (Exception e) {

@@ -40,7 +40,7 @@ import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.CustomCookie;
 import sky.Sss.domain.user.utili.PwChecker;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.FieldErrorCustom;
 import sky.Sss.global.error.dto.Result;
@@ -87,7 +87,7 @@ public class HelpController {
             return Result.getErrorResult(new ErrorResultDto("email", "userJoinForm.email2",
                 ms, request.getLocale()));
         }
-        String hashing = UserTokenUtil.hashing(userIdHelpReqDto.getAuthToken().getBytes(), Email.ID_TOKEN_KEY);
+        String hashing = TokenUtil.hashing(userIdHelpReqDto.getAuthToken().getBytes(), Email.ID_TOKEN_KEY);
         // 요청한 토큰의 sendType 이 다른 경우
         if (!emailAuthCodeDto.getAuthToken().equals(hashing)) {
             session.removeAttribute("emailAuthCodeDto");
@@ -176,7 +176,7 @@ public class HelpController {
             session.removeAttribute("emailAuthCodeDto");
             return Result.getErrorResult(new ErrorResultDto("email", "userJoinForm.email2", ms, request.getLocale()));
         }
-        String hashing = UserTokenUtil.hashing(userHelpDto.getAuthToken().getBytes(), Email.PW_TOKEN_KEY);
+        String hashing = TokenUtil.hashing(userHelpDto.getAuthToken().getBytes(), Email.PW_TOKEN_KEY);
         // 요청한 토큰의 sendType 이 다른 경우
         if (!emailAuthCodeDto.getAuthToken().equals(hashing)) {
             session.removeAttribute("emailAuthCodeDto");
@@ -189,8 +189,8 @@ public class HelpController {
             .userId(userHelpDto.getUserId())
             .captchaKey(key)
             .imageName(apiExamCaptchaImage).build();
-        String salt = UserTokenUtil.getToken();
-        String resetToken = UserTokenUtil.hashing(userHelpDto.getUserId().getBytes(), salt);
+        String salt = TokenUtil.getToken();
+        String resetToken = TokenUtil.hashing(userHelpDto.getUserId().getBytes(), salt);
         session.setAttribute("resetToken", salt);
         CustomCookie.addCookie("/", "resetToken", 600, response, resetToken);
         return new ResponseEntity(userPwResetFormDto, HttpStatus.OK);
@@ -234,7 +234,7 @@ public class HelpController {
                 HttpStatus.FORBIDDEN);
         }
         String resetToken = tokenCookie.getValue();
-        String compToken = UserTokenUtil.hashing(userPwResetFormDto.getUserId().getBytes(),
+        String compToken = TokenUtil.hashing(userPwResetFormDto.getUserId().getBytes(),
             (String) session.getAttribute("resetToken"));
         Boolean isMatch = resetToken.equals(compToken);
 

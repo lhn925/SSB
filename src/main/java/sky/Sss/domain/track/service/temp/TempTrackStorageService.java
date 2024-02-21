@@ -13,7 +13,7 @@ import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.temp.TempTrackStorageRepository;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.file.dto.UploadTrackFileDto;
 import sky.Sss.global.file.utili.FileStore;
 
@@ -37,7 +37,7 @@ public class TempTrackStorageService {
         User user = userQueryService.findOne();
         // track/{fileToken}폴더/track 이름
         // cover/fileToken/cover
-        String fileToken = UserTokenUtil.getToken();
+        String fileToken = TokenUtil.getToken();
 
         UploadTrackFileDto uploadTrackFileDto = (UploadTrackFileDto) fileStore.storeTrackFileSave(
             tempTrackFileUploadDto.getTrackFile(),

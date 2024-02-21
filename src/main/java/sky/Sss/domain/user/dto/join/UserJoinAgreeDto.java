@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class UserJoinAgreeDto implements Serializable  {
 
     public static UserJoinAgreeDto createUserJoinAgree() {
         UserJoinAgreeDto userJoinAgreeResponseDto = new UserJoinAgreeDto();
-        String token = UserTokenUtil.getToken();
+        String token = TokenUtil.getToken();
         userJoinAgreeResponseDto.setAgreeToken(token);
         return userJoinAgreeResponseDto;
     }

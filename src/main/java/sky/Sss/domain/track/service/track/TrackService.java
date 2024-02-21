@@ -38,7 +38,7 @@ import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.domain.user.utili.UserTokenUtil;
+import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.utili.FileStore;
 
@@ -131,7 +131,7 @@ public class TrackService {
         SsbPlayListSettings ssbPlayListSettings = SsbPlayListSettings.create(playListSettingSaveDto,
             user);
         // Token 생성
-        String playListToken = UserTokenUtil.getToken();
+        String playListToken = TokenUtil.getToken();
         //playList token 저장
         SsbPlayListSettings.updateToken(playListToken, ssbPlayListSettings);
         // ssbTrack 저장을 위한 Map 생성

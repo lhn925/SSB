@@ -2,7 +2,6 @@ package sky.Sss.domain.user.service.join;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.context.MessageSource;
@@ -19,7 +18,7 @@ import sky.Sss.domain.user.repository.join.UserAgreeRepository;
 
 import sky.Sss.domain.user.repository.join.UserJoinRepository;
 import sky.Sss.domain.user.repository.UserQueryRepository;
-import sky.Sss.domain.user.utili.PwEncryptor;
+import sky.Sss.domain.user.utili.TokenUtil;
 
 
 @Transactional(readOnly = true)
@@ -44,8 +43,7 @@ public class UserJoinService {
     public Long join(UserJoinPostDto userJoinDto) {
 
         // 유저토큰 생성 할 객체 생성
-        PwEncryptor pwEncryptor = new PwEncryptor();
-        String salt = pwEncryptor.getSALT();
+        String salt = TokenUtil.getToken();
 
         // 중복검사
         checkSalt(salt);
