@@ -30,7 +30,7 @@ public class RedisQueryService {
 
 
     public void setRememberData(String key, String value, Long expiredTime) {
-        redisTemplate.opsForValue().set(RedisKeyDto.REMEMBER_KEY + key, value, expiredTime, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(RedisKeyDto.REDIS_REMEMBER_KEY + key, value, expiredTime, TimeUnit.MILLISECONDS);
     }
 
     public String getData(String key) {
@@ -47,7 +47,7 @@ public class RedisQueryService {
     }
 
     public String getRememberData(String key) {
-        return (String) redisTemplate.opsForValue().get(RedisKeyDto.REMEMBER_KEY + key);
+        return (String) redisTemplate.opsForValue().get(RedisKeyDto.REDIS_REMEMBER_KEY + key);
     }
 
     public Boolean delete(String key) {
@@ -55,11 +55,11 @@ public class RedisQueryService {
     }
 
     public Boolean deleteRemember(String key) {
-        return redisTemplate.delete(RedisKeyDto.REMEMBER_KEY + key);
+        return redisTemplate.delete(RedisKeyDto.REDIS_REMEMBER_KEY + key);
     }
 
     public Boolean deleteSession(String key) {
-        return redisTemplate.delete(RedisKeyDto.SESSION_KEY + key);
+        return redisTemplate.delete(RedisKeyDto.REDIS_SESSION_KEY + key);
     }
 
 

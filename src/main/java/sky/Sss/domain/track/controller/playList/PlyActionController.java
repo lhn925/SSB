@@ -11,11 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.TotalLikesCountDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
-import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.playList.PlyActionService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
+import sky.Sss.domain.user.dto.PushMsgDto;
+import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.entity.UserPushMessages;
+import sky.Sss.domain.user.model.ContentsType;
+import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.model.Status;
+import sky.Sss.domain.user.service.MsgTemplateService;
+import sky.Sss.domain.user.service.PushMsgService;
+import sky.Sss.domain.user.service.UserQueryService;
+import sky.Sss.global.redis.service.RedisCacheService;
 
 
 /**
@@ -27,13 +35,19 @@ import sky.Sss.domain.user.model.Status;
 @UserAuthorize
 @RestController
 public class PlyActionController {
+
     private final PlyActionService plyActionService;
     private final PlyQueryService plyQueryService;
+    private final UserQueryService userQueryService;
+    private final PushMsgService pushMsgService;
+    private final RedisCacheService redisCacheService;
+    private final MsgTemplateService msgTemplateService;
 
     /**
      * playList 좋아요 등록 후 총 좋아요수 반환
      *
-     * @param id trackId
+     * @param id
+     *     trackId
      * @return
      */
     @PostMapping("/likes/{id}")
@@ -42,18 +56,37 @@ public class PlyActionController {
             throw new IllegalArgumentException();
         }
         // track 검색
-        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findById(id, Status.ON);
+        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findOneJoinUser(id, Status.ON);
 
-        plyActionService.addLikes(ssbPlayListSettings);
+        // 사용자 검색
+        User fromUser = userQueryService.findOne();
+
+        User toUser = ssbPlayListSettings.getUser();
+
+        plyActionService.addLikes(ssbPlayListSettings, fromUser);
+
+        UserPushMessages userPushMessages = UserPushMessages.create(toUser, fromUser, PushMsgType.LIKES,
+            ContentsType.PLAYLIST,
+            ssbPlayListSettings.getId());
+        // 현재 유저가 접속 되어 있는지 확인
+
+        pushMsgService.addUserPushMsg(userPushMessages);
+
+        // push messages
+        pushMsgService.sendOrCacheMessages(ContentsType.PLAYLIST.getUrl() + ssbPlayListSettings.getId()
+            , ssbPlayListSettings.getTitle(), toUser, userPushMessages);
 
         int totalLikesCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
         return ResponseEntity.ok(new TotalLikesCountDto(totalLikesCount));
     }
+
+
     /**
      * playList 좋아요 취소 후 총 좋아요수 반환
      *
-     * @param id trackId
+     * @param id
+     *     trackId
      * @return
      */
     @DeleteMapping("/likes/{id}")

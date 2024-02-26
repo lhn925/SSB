@@ -4,12 +4,15 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.model.Hour;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
 import sky.Sss.global.utili.DayTime;
+import sky.Sss.global.ws.dto.TestWebSocketDto;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,7 +23,7 @@ public class ChartCronService {
 
     private final TrackPlayMetricsService trackPlayMetricsService;
 
-
+    private final SimpMessagingTemplate messagingTemplate;
     /**
      * 정각마다 현재 시간대에 조회수 총합
      */
@@ -81,6 +84,19 @@ public class ChartCronService {
         trackPlayMetricsService.addChartDaily(dayTime, prevDayTime, PageRequest.of(0, 500));
     }
 
+
+//    /**
+//     * 일간 차트
+//     * 매일 낮 12시 기준 최근 24시간 이용량 집계 후 13시에 업데이트
+////     */
+//    @Scheduled(fixedDelay = 5000L)  //    초 - 분 - 시 - 일 - 월 - 요일
+//    public void test() {
+//
+//        log.info("==========테스트 중===========");
+//        TestWebSocketDto testWebSocketDto = new TestWebSocketDto("lim222", "안녕하세요","hihihi");
+//        messagingTemplate.convertAndSend("/topic/push/lim222",testWebSocketDto);
+//        log.info("==========테스트 중===========");
+//    }
 
 }
 

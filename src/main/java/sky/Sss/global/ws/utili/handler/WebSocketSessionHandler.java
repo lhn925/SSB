@@ -1,8 +1,5 @@
 package sky.Sss.global.ws.utili.handler;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +14,13 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import sky.Sss.domain.user.service.login.UserLoginStatusService;
-import sky.Sss.domain.user.utili.jwt.JwtFilter;
+import sky.Sss.domain.user.model.Enabled;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
+import sky.Sss.global.redis.dto.RedisKeyDto;
+import sky.Sss.global.redis.service.RedisCacheService;
 
 /**
- *
  * socket handler
  */
 @Slf4j
@@ -31,37 +29,52 @@ import sky.Sss.domain.user.utili.jwt.TokenProvider;
 @Component
 public class WebSocketSessionHandler implements ChannelInterceptor {
 
-    private final UserLoginStatusService userLoginStatusService;
     private final TokenProvider tokenProvider;
-    private String redisToken;
+    private final RedisCacheService redisCacheService;
+    private final UserQueryService userQueryService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-        if (accessor.getCommand().getMessageType().equals(SimpMessageType.CONNECT)) {
-            Authentication authentication = getAuthByAuthorizationHeader(accessor);
+        SimpMessageType messageType = accessor.getCommand().getMessageType();
+        String sessionId = accessor.getSessionId();
+
+        if (messageType.equals(SimpMessageType.CONNECT)) {
+            Authentication authentication = tokenProvider.getAuthByAuthorizationHeader(accessor);
             Optional.ofNullable(authentication).orElseThrow(() -> {
                 throw new MessageDeliveryException("JWT");
             });
-            UserDetails principal = (UserDetails) authentication.getPrincipal();
-            userLoginStatusService.wsIdUpdate(principal.getUsername(), redisToken, accessor.getSessionId());
-        }
-        return message;
-    }
 
-    public Authentication getAuthByAuthorizationHeader(StompHeaderAccessor accessor) {
-        List<String> authorization = accessor.getNativeHeader(JwtFilter.AUTHORIZATION_HEADER);
-        if (authorization != null && authorization.size() != 0) {
-            String accessToken = tokenProvider.resolveToken(authorization.get(0));
-            Boolean success = (Boolean) tokenProvider.validateAccessToken(accessToken).get("success");
-            if (success) { // redisToken
-                Jws<Claims> accessClaimsJws = tokenProvider.getAccessClaimsJws(accessToken);
-                this.redisToken = (String) accessClaimsJws.getBody().get(TokenProvider.REDIS_TOKEN_KEY);
-            }
-            return success ? tokenProvider.getAuthentication(accessToken) : null;
+            /**
+             *
+             * userId로 userToken 을 얻은 후
+             * Redis에 저장된 WebSocketKey + userToken에
+             * webSocket key 를 저장 혹은 삭제
+             *
+             */
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String userId = userDetails.getUsername();
+            String userToken = userQueryService.getToken(userId, Enabled.ENABLED);
+            /**
+             * redis cache 저장
+             * RedisKeyDto.REDIS_USER_WS_LIST_SESSION_KEY + userToken
+             * set 으로 저장 : {key1,key2,...}
+             *
+             */
+
+            redisCacheService.setData(RedisKeyDto.REDIS_WS_SESSION_KEY + sessionId, sessionId);
+            redisCacheService.upsertCacheSetValue(sessionId, RedisKeyDto.REDIS_USER_WS_LIST_SESSION_KEY + userToken);
+//            log.info("Received a new web socket connection. Session ID : [{}]", headerAccessor.getSessionId());
         }
-        return null;
+        if (messageType.equals(SimpMessageType.DISCONNECT)) {
+            redisCacheService.delete(RedisKeyDto.REDIS_WS_SESSION_KEY + sessionId);
+        }
+        /*
+        [payload=byte[0], headers={simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE,
+        nativeHeaders={id=[sub-1], destination=[/user/queue/push/msg]}, simpSessionAttributes={}, simpHeartbeat=[J@4208bf42, simpSubscriptionId=sub-1, simpSessionId=da8359f2-4d52-8adf-3dad-4a7680a030b1, simpDestination=/user/queue/push/msg}]
+         */
+        return message;
     }
 
 

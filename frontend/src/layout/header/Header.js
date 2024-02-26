@@ -41,6 +41,7 @@ function Header(props) {
     })
   }
 
+
   useEffect(() => {
   },[user])
   const openModal = () => {
@@ -88,6 +89,7 @@ function Header(props) {
                 user.userId !== null ? <CircularImageDropdown
                     clickBtnLogout={clickBtnLogout}
                     navigate={navigate}
+                    client={props.client}
                     userId={user.userId}/> : <>
                   <button onClick={openModal} className="btn-login-open btn-blue-outline btn-outline" >
                     {t(`msg.loginForm.sky.login`)}</button>
@@ -105,8 +107,12 @@ function Header(props) {
   )
 }
 
-function CircularImageDropdown({userId, navigate, clickBtnLogout}) {
-
+function CircularImageDropdown({userId, navigate, clickBtnLogout,client}) {
+  const sendMessage = () =>{
+    if (client) {
+      client.publish({headers:{name:"lim222"},destination:"/app/push",body:JSON.stringify({userId:'lim222',message:'안녕하세요'})});
+    }
+  }
   return (
       <>
         <Dropdown>
@@ -119,7 +125,7 @@ function CircularImageDropdown({userId, navigate, clickBtnLogout}) {
                            onClick={() => navigate(`/${userId}`)}>
               <img/>Profile
             </Dropdown.Item>
-            <Dropdown.Item href="#/action-2">
+            <Dropdown.Item href="#/action-2" onClick={() => sendMessage()}>
               <img src="./../../css/image/profile2.png"/>
               Likes
             </Dropdown.Item>

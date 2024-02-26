@@ -116,7 +116,7 @@ public class CustomAuthenticationSuccessHandler extends
 
         // 리액트단에서 접근할 유저정보 저장
         setLoginToken(redisQueryService, request, userInfo);
-        session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
+        session.setAttribute(RedisKeyDto.REDIS_USER_KEY, userInfo);
     }
 
 

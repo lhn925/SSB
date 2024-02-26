@@ -242,7 +242,7 @@ public class MyInfoController {
     public ResponseEntity updateLoginStatus(HttpServletRequest request) {
         HttpSession session = request.getSession();
 
-        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+        UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.REDIS_USER_KEY);
         userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(), session.getId());
         return ResponseEntity.ok(HttpStatus.OK);
     }

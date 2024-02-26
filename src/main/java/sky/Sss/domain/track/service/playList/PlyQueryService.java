@@ -22,20 +22,20 @@ public class PlyQueryService {
 
     public SsbPlayListSettings findOne(Long id, String token, User user, Status isStatus) {
         return plyQueryRepository.findOne(id, user, token, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
 
     public SsbPlayListSettings findOne(Long id, String token, Status isStatus) {
         return plyQueryRepository.findOne(id, token, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
     public SsbPlayListSettings findById(Long id, Status isStatus) {
         return plyQueryRepository.findByIdAndIsStatus(id, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
     public SsbPlayListSettings findOneJoinUser(Long id, Status isStatus) {
         return plyQueryRepository.findByIdJoinUser(id, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
 
 }

@@ -42,7 +42,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         HttpSession session = request.getSession(false);
 
         try {
-            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.USER_KEY);
+            UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.REDIS_USER_KEY);
             if (userInfoDto == null) {
                 throw new UserInfoNotFoundException();
             }

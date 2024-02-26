@@ -281,8 +281,8 @@ public class UserLoginStatusService {
             // 세션 삭제
             // 현재 접속하고 있는 세션 제외
             if (!userLoginStatus.getSessionId().equals(sessionId) && redisQueryService.hasRedis(
-                RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId())) {
-                redisQueryService.delete(RedisKeyDto.SESSION_KEY + userLoginStatus.getSessionId());
+                RedisKeyDto.REDIS_SESSION_KEY + userLoginStatus.getSessionId())) {
+                redisQueryService.delete(RedisKeyDto.REDIS_SESSION_KEY + userLoginStatus.getSessionId());
             }
 
         }

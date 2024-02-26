@@ -26,33 +26,33 @@ function App() {
   const dispatch = useDispatch();
   const bc = new BroadcastChannel(`my_chanel`);
   const location = useLocation();
-  const client = useRef({client:null});
 
-  function connect(accessToken) {
+  //
+  const client = useRef({client: null});
+
+  function connect(accessToken, userId) {
     const clientData = new StompJs.Client({
       brokerURL: "ws://localhost:8080/webSocket",
       connectHeaders: {
         Authorization: accessToken,
       }, debug: function (message) {
+      }, onStompError: function (message) {
+        console.log("onStompError: " + message)
       },
-      // reconnectDelay: 5000, // 자동 재 연결
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     })
     clientData.onConnect = function () {
       // 구독
-      clientData.subscribe("/user/queue/alarm", function (message) {
-        console.log("구독 : "+ message.body);
-      });
-      clientData.subscribe("/user/queue/push/msg", function (message) {
-        console.log("push : "+ message.body);
+      clientData.subscribe("/topic/push/" + userId, function (message) {
+        console.log("topic : " + message.body);
       });
     };
     // 연결
     clientData.activate();
-    clientData.publish({destination:"/app/push"});
     client.current.client = clientData;
   }
+
   bc.onmessage = function (e) {
     let data = e.data;
     if (data.type === "logout") {
@@ -61,6 +61,7 @@ function App() {
       window.location.replace(location.pathname);
     }
   }
+
   async function CheckUserInfo(accessToken, refreshToken, accessHeader,
       refreshHeader) {
     try {
@@ -72,7 +73,7 @@ function App() {
           dispatch(userActions.setEmail(userData));
           dispatch(userActions.setPictureUrl(userData));
           dispatch(userActions.setUserName(userData));
-          connect(accessToken);
+          connect(accessToken, userData.userId);
           return;
         } else if (response.code === 401 && refreshToken) {
           const renewTokenResponse = await ReNewTokenApi(refreshHeader);
@@ -99,10 +100,11 @@ function App() {
   useEffect(() => {
     CheckUserInfo(currentAuth.access, currentAuth.refresh,
         currentAuth.accessHeader, currentAuth.refreshHeader);
+
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
   return (
       <div className="App">
-        <Header bc={bc}/>
+        <Header bc={bc} client={client.current.client}/>
         <ToastContainer
             position="top-right"
             autoClose={3000}

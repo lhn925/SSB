@@ -16,7 +16,7 @@ public class InitData {
 
     private final InitUserService initUserService;
 
-//    @PostConstruct
+    @PostConstruct
     public void init() {
         initUserService.init();
 

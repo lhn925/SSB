@@ -13,7 +13,6 @@ import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
-import sky.Sss.global.redis.service.RedisQueryService;
 
 
 /**
@@ -116,7 +115,7 @@ public class PlyLikesService {
     public int getTotalCount(String token) {
         String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_KEY;
         // redis 에 total 캐시가 있으면
-        Integer count = redisCacheService.getCount(key, token);
+        Integer count = redisCacheService.getLikeCount(key, token);
 
         count = count != null ? count : getPlyCount(token);
         // redis 에 저장이 안되어 있을경우 count 후 저장

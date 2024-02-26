@@ -51,6 +51,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             .setAllowedOriginPatterns("http://localhost:3000").withSockJS();
         registry.setErrorHandler(webSocketErrorHandler).addEndpoint("/webSocket")
             .setAllowedOriginPatterns("http://localhost:3000");
+
+        // 서버에서 전달에 필요한 경로 설정
+        registry.setErrorHandler(webSocketErrorHandler).addEndpoint("/webSocket").setAllowedOrigins("http://localhost:8080").withSockJS();
     }
 
     @Override

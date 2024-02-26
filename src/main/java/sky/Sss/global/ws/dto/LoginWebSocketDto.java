@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.dto;
+package sky.Sss.global.ws.dto;
 
 import lombok.Getter;
 import lombok.Setter;

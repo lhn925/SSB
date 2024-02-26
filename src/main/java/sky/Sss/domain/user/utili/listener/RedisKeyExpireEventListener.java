@@ -45,7 +45,7 @@ public class RedisKeyExpireEventListener extends KeyExpirationEventMessageListen
      */
     public void expireLoginStatusUpdate (String session) {
 
-        boolean isSession = session.contains(RedisKeyDto.SESSION_KEY);
+        boolean isSession = session.contains(RedisKeyDto.REDIS_SESSION_KEY);
         int index = 0;
         String key = "";
         if (isSession) {

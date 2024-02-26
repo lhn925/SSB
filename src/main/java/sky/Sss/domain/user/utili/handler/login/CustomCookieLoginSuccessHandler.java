@@ -59,7 +59,7 @@ public class CustomCookieLoginSuccessHandler extends CustomLoginSuccessHandler {
         UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
 
         setLoginToken(redisQueryService, request, userInfo);
-        session.setAttribute(RedisKeyDto.USER_KEY, userInfo);
+        session.setAttribute(RedisKeyDto.REDIS_USER_KEY, userInfo);
 
     }
 

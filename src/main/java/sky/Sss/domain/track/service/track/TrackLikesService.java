@@ -11,9 +11,9 @@ import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.repository.track.TrackLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.service.PushMsgService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
-import sky.Sss.global.redis.service.RedisQueryService;
 
 
 /**
@@ -28,6 +28,7 @@ public class TrackLikesService {
 
     private final TrackLikesRepository trackLikesRepository;
     private final RedisCacheService redisCacheService;
+    private final PushMsgService pushMsgService;
 
     /**
      * Track 좋아요 추가
@@ -40,6 +41,9 @@ public class TrackLikesService {
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = ssbTrackLikes.getUser().getUserId();
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(ssbTrackLikes.getUser()), key, subUserKey);
+
+        // 좋아요 알림
+
     }
 
     /**
@@ -119,7 +123,7 @@ public class TrackLikesService {
     public int getTotalCount(String token) {
         String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_KEY;
         // redis 에 total 캐시가 있으면
-        Integer count = redisCacheService.getCount(key, token);
+        Integer count = redisCacheService.getLikeCount(key, token);
 
         count = count != null ? count : getCountByTrackToken(token);
         // redis 에 저장이 안되어 있을경우 count 후 저장

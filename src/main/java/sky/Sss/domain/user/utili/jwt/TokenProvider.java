@@ -13,11 +13,13 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -299,6 +301,23 @@ public class TokenProvider implements InitializingBean {
         Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(this.accessKey).build().parseClaimsJws(accessToken);
         return claimsJws;
     }
+
+
+    public  Authentication getAuthByAuthorizationHeader(StompHeaderAccessor accessor) {
+        String redisToken = null;
+        List<String> authorization = accessor.getNativeHeader(JwtFilter.AUTHORIZATION_HEADER);
+        if (authorization != null && authorization.size() != 0) {
+            String accessToken = resolveToken(authorization.get(0));
+            Boolean success = (Boolean) validateAccessToken(accessToken).get("success");
+            if (success) { // redisToken
+                Jws<Claims> accessClaimsJws = getAccessClaimsJws(accessToken);
+                redisToken = (String) accessClaimsJws.getBody().get(TokenProvider.REDIS_TOKEN_KEY);
+            }
+            return success ? getAuthentication(accessToken) : null;
+        }
+        return null;
+    }
+
 
     public long getTokenValidityInMilliseconds() {
         return tokenValidityInMilliseconds;

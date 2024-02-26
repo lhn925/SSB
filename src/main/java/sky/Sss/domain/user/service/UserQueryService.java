@@ -1,22 +1,16 @@
 package sky.Sss.domain.user.service;
 
 
-import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
-import javax.naming.AuthenticationNotSupportedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.entity.User;
@@ -49,6 +43,16 @@ public class UserQueryService {
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
 
         return (CustomUserDetails) User.UserBuilder(user);
+    }
+
+
+
+//    @Cacheable(value = RedisKeyDto.REDIS_USER_CACHE_TOKEN_KEY,key = "#userId",cacheManager = "contentCacheManager")
+    public String getToken(String userId, Enabled enabled)
+        throws UsernameNotFoundException {
+        Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
+        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
+        return user.getToken();
     }
 
     public UserInfoDto findByUser(UserInfoDto userInfoDto)

@@ -40,7 +40,7 @@ spring:
           auth: true
           timeout: 5000
   messages:
-    basename: messages,errors
+    basename: messages,errors,push
   datasource:
 
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -50,7 +50,7 @@ spring:
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         order_inserts: true

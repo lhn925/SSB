@@ -6,18 +6,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.user.dto.LoginWebSocketDto;
+import sky.Sss.global.ws.dto.LoginWebSocketDto;
+import sky.Sss.global.ws.dto.TestWebSocketDto;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class WebSocketController {
 
-    private final SimpMessageSendingOperations messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * @MessageMapping: 클라이언트에서 서버로 보낸 메시지를 메시지를 라우팅
@@ -40,15 +43,31 @@ public class WebSocketController {
     }
 
     @MessageMapping("/push")
-    @SendToUser("/queue/push/msg")
-    public LoginWebSocketDto push(SimpMessageHeaderAccessor headerAccessor,LoginWebSocketDto message) throws Exception {
-        log.info("push ebSocketController.ge = {}");
+    @SendToUser("/queue/push/msg/{userId}")
+    public TestWebSocketDto push(SimpMessageHeaderAccessor headerAccessor,@Payload TestWebSocketDto message) throws Exception {
+        log.info("push ebSocketController.ge = {}",message.getUserId());
+        log.info("push headerAccessor.getSessionId() = {}", headerAccessor.getSessionId());
+        log.info("push message = {}", message.getMessage());
         String uuid = headerAccessor.getSessionId();
         log.info("uuid = {}", uuid);
-        message.setData("/queue/push/msg" + uuid);
-        messagingTemplate.convertAndSendToUser(uuid,"/queue/push/msg/"+uuid,message);
+//        message.setData("/queue/push/msg" + uuid);
+//        messagingTemplate.convertAndSendToUser(uuid,"/queue/push/msg/"+uuid,message);
         return message;
     }
+
+    @MessageMapping("/push/sub")
+    @SendTo("/topic/push/{userId}")
+    public TestWebSocketDto pushSub(SimpMessageHeaderAccessor headerAccessor,@Payload TestWebSocketDto message) throws Exception {
+        log.info("pushSub ebSocketController.ge = {}",message.getUserId());
+        log.info("pushSub headerAccessor.getSessionId() = {}", headerAccessor.getSessionId());
+        log.info("pushSub message = {}", message.getMessage());
+        String uuid = headerAccessor.getSessionId();
+        log.info("pushSub = {}", uuid);
+//        message.setData("/queue/push/msg" + uuid);
+//        messagingTemplate.convertAndSendToUser(uuid,"/queue/push/msg/"+uuid,message);
+        return message;
+    }
+
 
     @MessageMapping("/logout")
     @SendToUser("/queue/logout")

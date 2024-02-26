@@ -31,7 +31,7 @@ public class PlyActionService {
      * playList 좋아요 추가 후 총 좋아요 수 반환
      */
     @Transactional
-    public void addLikes (SsbPlayListSettings ssbPlayListSettings) {
+    public void addLikes (SsbPlayListSettings ssbPlayListSettings,User fromUser) {
         // 사용자 검색
         User user = userQueryService.findOne();
 

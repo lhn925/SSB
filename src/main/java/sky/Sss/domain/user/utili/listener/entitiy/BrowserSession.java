@@ -15,5 +15,5 @@ import lombok.Setter;
 public class BrowserSession {
     private String sessionId;
     private String userId;
-    private String uuid;
+    private String token;
 }
