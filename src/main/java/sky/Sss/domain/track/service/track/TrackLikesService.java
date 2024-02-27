@@ -28,7 +28,6 @@ public class TrackLikesService {
 
     private final TrackLikesRepository trackLikesRepository;
     private final RedisCacheService redisCacheService;
-    private final PushMsgService pushMsgService;
 
     /**
      * Track 좋아요 추가
@@ -39,11 +38,10 @@ public class TrackLikesService {
         String key = getLikeKey(save.getSsbTrack());
 
         // likesMap 안에 들어갈 user 를 검색하는 key
-        String subUserKey = ssbTrackLikes.getUser().getUserId();
+        String subUserKey = ssbTrackLikes.getUser().getToken();
+
+        // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(ssbTrackLikes.getUser()), key, subUserKey);
-
-        // 좋아요 알림
-
     }
 
     /**
@@ -53,12 +51,12 @@ public class TrackLikesService {
     public void cancelLike(SsbTrack ssbTrack ,User user) {
         SsbTrackLikes ssbTrackLikes = findOne(ssbTrack, user);
 
-        deleteByEntity(ssbTrackLikes);
+        delete(ssbTrackLikes);
 
         String key = getLikeKey(ssbTrack);
 
         // likesMap 안에 들어갈 user 를 검색하는 key
-        String subUserKey = user.getUserId();
+        String subUserKey = user.getToken();
 
         redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
@@ -82,9 +80,8 @@ public class TrackLikesService {
      * @return
      */
     @Transactional
-    public void deleteByEntity (SsbTrackLikes ssbTrackLikes) {
+    public void delete(SsbTrackLikes ssbTrackLikes) {
         trackLikesRepository.delete(ssbTrackLikes);
-
     }
 
     /**
@@ -99,36 +96,41 @@ public class TrackLikesService {
         Optional<SsbTrackLikes> trackLikesOptional = trackLikesRepository.findBySsbTrackAndUser(ssbTrack, user);
 
         // 만약 레디스에는 없고 디비에는 있으면
-        if (!trackLikesOptional.isEmpty()) {
-            redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getUserId());
+        if (trackLikesOptional.isPresent()) {
+            redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getToken());
         }
-        return !trackLikesOptional.isEmpty();
+        return trackLikesOptional.isPresent();
     }
 
+    /**
+     *
+     *
+     * @param trackToken
+     */
     // likes Total 업데이트
-    public void updateTotalCount(String token) {
+    public void updateTotalCount(String trackToken) {
         // likes Size 를 구하긴 위한 key 값
-        String key = RedisKeyDto.REDIS_TRACK_LIKES_KEY + token;
+        String key = RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + trackToken;
 
-        String totalKey = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_KEY;
+        String totalKey = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
 
         // redis 에서 총 size 검색
         Integer count = redisCacheService.getRedisTotalCount(key);
 
-        count = count != null ? count : getCountByTrackToken(token);
-        redisCacheService.upsertCacheMapValueByKey(count, totalKey, token);
+        count = count != null ? count : getCountByTrackToken(trackToken);
+        redisCacheService.upsertCacheMapValueByKey(count, totalKey, trackToken);
     }
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
-    public int getTotalCount(String token) {
-        String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_KEY;
+    public int getTotalCount(String trackToken) {
+        String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
         // redis 에 total 캐시가 있으면
-        Integer count = redisCacheService.getLikeCount(key, token);
+        Integer count = redisCacheService.getLikeCount(key, trackToken);
 
-        count = count != null ? count : getCountByTrackToken(token);
+        count = count != null ? count : getCountByTrackToken(trackToken);
         // redis 에 저장이 안되어 있을경우 count 후 저장
         if (count == null) {
-            redisCacheService.upsertCacheMapValueByKey(count, key, token);
+            redisCacheService.upsertCacheMapValueByKey(count, key, trackToken);
         }
         return count;
     }
@@ -138,6 +140,6 @@ public class TrackLikesService {
     }
 
     public String getLikeKey(SsbTrack ssbTrack) {
-        return RedisKeyDto.REDIS_TRACK_LIKES_KEY + ssbTrack.getToken();
+        return RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + ssbTrack.getToken();
     }
 }

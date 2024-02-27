@@ -91,19 +91,19 @@ public class PlyLikesService {
         Optional<SsbPlyLikes> plyLikesOptional = plyLikesRepository.findByPlyIdAndUser(settings, user);
 
         // 만약 레디스에는 없고 디비에는 있으면
-        if (!plyLikesOptional.isEmpty()) {
+        if (plyLikesOptional.isPresent()) {
             redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getUserId());
         }
-        return !plyLikesOptional.isEmpty();
+        return plyLikesOptional.isPresent();
     }
 
 
     // likes Total 업데이트
     public void updateTotalCount(String token) {
         // likes Size 를 구하긴 위한 key 값
-        String key = RedisKeyDto.REDIS_PLY_LIKES_KEY + token;
+        String key = RedisKeyDto.REDIS_PLY_LIKES_MAP_KEY + token;
 
-        String totalKey = RedisKeyDto.REDIS_PLY_LIKES_TOTAL_KEY;
+        String totalKey = RedisKeyDto.REDIS_PLY_LIKES_TOTAL_MAP_KEY;
 
         Integer count = redisCacheService.getRedisTotalCount(key);
 
@@ -113,7 +113,7 @@ public class PlyLikesService {
 
     // likes Total 조회수 검색
     public int getTotalCount(String token) {
-        String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_KEY;
+        String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
         // redis 에 total 캐시가 있으면
         Integer count = redisCacheService.getLikeCount(key, token);
 
@@ -131,6 +131,6 @@ public class PlyLikesService {
 
 
     private String getLikeKey(SsbPlayListSettings ssbPlayListSettings) {
-        return RedisKeyDto.REDIS_PLY_LIKES_KEY + ssbPlayListSettings.getToken();
+        return RedisKeyDto.REDIS_PLY_LIKES_MAP_KEY + ssbPlayListSettings.getToken();
     }
 }

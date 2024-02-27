@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
+import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.FieldErrorCustom;
 import sky.Sss.global.error.dto.Result;
@@ -28,7 +29,7 @@ public class ExUserController {
     private final MessageSource ms;
 
     @ExceptionHandler({DuplicateCheckException.class})
-    public ResponseEntity duplicateCheckExHandle(DuplicateCheckException e,
+    public ResponseEntity<ErrorResult> duplicateCheckExHandle(DuplicateCheckException e,
         HttpServletRequest request) {
         BindingResult bindingResult = e.getBindingResult();
                     bindingResult.addError(
@@ -42,7 +43,7 @@ public class ExUserController {
     }
 
     @ExceptionHandler({UserInfoNotFoundException.class, UsernameNotFoundException.class})
-    public ResponseEntity helpExHandle(RuntimeException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResult> helpExHandle(RuntimeException e, HttpServletRequest request) {
         String errorCode = null;
         try {
             ms.getMessage(e.getMessage(), null, request.getLocale());
@@ -55,9 +56,23 @@ public class ExUserController {
 
 
     @ExceptionHandler({AccessDeniedException.class})
-    public ResponseEntity accessExHandler (AccessDeniedException e,HttpServletRequest request) {
+    public ResponseEntity<ErrorGlobalResultDto> accessExHandler (AccessDeniedException e,HttpServletRequest request) {
         return new ResponseEntity(new ErrorGlobalResultDto("access.error.forbidden", ms, request.getLocale()),
             HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<ErrorResult> ioExHandler(RuntimeException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (e.getClass().equals(IllegalArgumentException.class)) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        try {
+            ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale());
+            return Result.getErrorResult(errorGlobalResultDto,status);
+        }catch (NoSuchMessageException ex) {
+            return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),status);
+        }
     }
 
 }

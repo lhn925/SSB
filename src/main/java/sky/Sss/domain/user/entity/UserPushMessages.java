@@ -3,6 +3,7 @@ package sky.Sss.domain.user.entity;
 
 import static jakarta.persistence.EnumType.STRING;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -56,20 +57,23 @@ public class UserPushMessages extends BaseTimeEntity {
      * https://soundcloud.com/사용자아이디/노래제목/comment-댓글Index
      */
     @Enumerated(STRING)
+    @Column(nullable = false)
     private PushMsgType pushMsgType;
 
     // 트랙,앨범,댓글 2차 구분값
     @Enumerated(STRING)
+    @Column(nullable = false)
     private ContentsType contentType;
 
     // 앨범,트랙,댓글 해당 ID 정보를 담을 컬럼
     private Long contentsId;
 
     // False : 읽지 않음, True: 읽음
+    @Column(nullable = false)
     private Boolean isRead;
 
 
-    public static UserPushMessages create(User toUser,User fromUser,PushMsgType pushMsgType, ContentsType contentType,long contentsId) {
+    public static UserPushMessages create(User toUser,User fromUser,PushMsgType pushMsgType, ContentsType contentType,Long contentsId) {
         UserPushMessages userPushMessages = new UserPushMessages();
         userPushMessages.setToUser(toUser);
         userPushMessages.setFromUser(fromUser);

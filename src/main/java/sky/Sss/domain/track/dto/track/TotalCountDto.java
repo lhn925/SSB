@@ -14,6 +14,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
-public class TotalLikesCountDto implements Serializable {
+public class TotalCountDto implements Serializable {
     private Integer totalCount;
 }

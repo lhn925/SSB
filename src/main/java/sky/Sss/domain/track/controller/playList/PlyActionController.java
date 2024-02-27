@@ -9,21 +9,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.track.TotalLikesCountDto;
+import sky.Sss.domain.track.dto.track.TotalCountDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.service.playList.PlyActionService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
-import sky.Sss.domain.user.dto.PushMsgDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.MsgTemplateService;
 import sky.Sss.domain.user.service.PushMsgService;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.global.redis.service.RedisCacheService;
 
 
 /**
@@ -40,8 +37,6 @@ public class PlyActionController {
     private final PlyQueryService plyQueryService;
     private final UserQueryService userQueryService;
     private final PushMsgService pushMsgService;
-    private final RedisCacheService redisCacheService;
-    private final MsgTemplateService msgTemplateService;
 
     /**
      * playList 좋아요 등록 후 총 좋아요수 반환
@@ -51,7 +46,7 @@ public class PlyActionController {
      * @return
      */
     @PostMapping("/likes/{id}")
-    public ResponseEntity<TotalLikesCountDto> saveLikes(@PathVariable Long id) {
+    public ResponseEntity<TotalCountDto> saveLikes(@PathVariable Long id) {
         if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
@@ -70,15 +65,19 @@ public class PlyActionController {
             ssbPlayListSettings.getId());
         // 현재 유저가 접속 되어 있는지 확인
 
-        pushMsgService.addUserPushMsg(userPushMessages);
 
-        // push messages
-        pushMsgService.sendOrCacheMessages(ContentsType.PLAYLIST.getUrl() + ssbPlayListSettings.getId()
-            , ssbPlayListSettings.getTitle(), toUser, userPushMessages);
+        // 같은 사용자인지 확인
+        if (!fromUser.getToken().equals(toUser.getToken())) {
+            pushMsgService.addUserPushMsg(userPushMessages);
+            // push messages
+            pushMsgService.sendOrCacheMessages(ContentsType.PLAYLIST.getUrl() + ssbPlayListSettings.getId()
+                , ssbPlayListSettings.getTitle(), toUser, userPushMessages);
+
+        }
 
         int totalLikesCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
-        return ResponseEntity.ok(new TotalLikesCountDto(totalLikesCount));
+        return ResponseEntity.ok(new TotalCountDto(totalLikesCount));
     }
 
 
@@ -90,7 +89,7 @@ public class PlyActionController {
      * @return
      */
     @DeleteMapping("/likes/{id}")
-    public ResponseEntity<TotalLikesCountDto> removeLikes(@PathVariable Long id) {
+    public ResponseEntity<TotalCountDto> removeLikes(@PathVariable Long id) {
         if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
@@ -100,7 +99,7 @@ public class PlyActionController {
 
         int totalCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
-        return ResponseEntity.ok(new TotalLikesCountDto(totalCount));
+        return ResponseEntity.ok(new TotalCountDto(totalCount));
     }
 
 }

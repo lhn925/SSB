@@ -101,6 +101,13 @@ public class UserQueryService {
         return user;
     }
 
+    public User findOne(Long uid, Enabled enabled) {
+        Optional<User> optionalUser = userQueryRepository.findByIdAndIsEnabled(uid, enabled.getValue());
+        User user = User.getOptionalUser(optionalUser);
+        return user;
+    }
+
+
     public Optional<User> findOptionalUser(String userId) {
         Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
         return optionalUser;

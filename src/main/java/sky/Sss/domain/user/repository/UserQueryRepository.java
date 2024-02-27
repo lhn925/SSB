@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Enabled;
 
 
 public interface UserQueryRepository extends JpaRepository<User, Long> {
@@ -44,6 +45,8 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     @Query("select u from User u "
         + " where u.userId =:userId and u.token = :token and u.isEnabled = true")
     Optional<User> findOne(@Param("userId") String userId, @Param("token") String token);
+
+    Optional<User> findByIdAndIsEnabled(Long uid, Boolean isEnabled);
 
 
     // 중복 값

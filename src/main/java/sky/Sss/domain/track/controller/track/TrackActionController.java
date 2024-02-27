@@ -1,30 +1,19 @@
 package sky.Sss.domain.track.controller.track;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.track.TotalLikesCountDto;
+import sky.Sss.domain.track.dto.track.TotalCountDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.track.TrackActionService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
-import sky.Sss.domain.user.dto.PushMsgCacheDto;
-import sky.Sss.domain.user.dto.PushMsgDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
@@ -33,7 +22,6 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.MsgTemplateService;
 import sky.Sss.domain.user.service.PushMsgService;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
 
@@ -51,8 +39,6 @@ public class TrackActionController {
     private final TrackQueryService trackQueryService;
     private final UserQueryService userQueryService;
     private final PushMsgService pushMsgService;
-    private final MsgTemplateService msgTemplateService;
-    private final RedisCacheService redisCacheService;
     /**
      * track 좋아요 등록
      */
@@ -62,7 +48,7 @@ public class TrackActionController {
      * @return
      */
     @PostMapping("/likes/{id}")
-    public ResponseEntity<TotalLikesCountDto> saveLikes(@PathVariable Long id) {
+    public ResponseEntity<TotalCountDto> saveLikes(@PathVariable Long id) {
         if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
@@ -83,14 +69,17 @@ public class TrackActionController {
         UserPushMessages userPushMessages = UserPushMessages.create(toUser, fromUser, PushMsgType.LIKES,
             ContentsType.TRACK, ssbTrack.getId());
 
-        // userPushMessages Table insert
-        pushMsgService.addUserPushMsg(userPushMessages);
-
-        // push messages
-        pushMsgService.sendOrCacheMessages(ContentsType.TRACK.getUrl() + ssbTrack.getId(), ssbTrack.getTitle(), toUser,
-            userPushMessages);
+        // 같은 사용자 인지 확인
+        if (!fromUser.getToken().equals(toUser.getToken())) {
+            // userPushMessages Table insert
+            pushMsgService.addUserPushMsg(userPushMessages);
+            // push messages
+            pushMsgService.sendOrCacheMessages(ContentsType.TRACK.getUrl() + ssbTrack.getId(), ssbTrack.getTitle(),
+                toUser,
+                userPushMessages);
+        }
         // Redis 알림 리스트에 추가
-        return ResponseEntity.ok(new TotalLikesCountDto(totalLikesCount));
+        return ResponseEntity.ok(new TotalCountDto(totalLikesCount));
     }
 
     /**
@@ -101,7 +90,7 @@ public class TrackActionController {
      * @return
      */
     @DeleteMapping("/likes/{id}")
-    public ResponseEntity<TotalLikesCountDto> removeLikes(@PathVariable Long id) {
+    public ResponseEntity<TotalCountDto> removeLikes(@PathVariable Long id) {
         if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
@@ -114,7 +103,7 @@ public class TrackActionController {
 
         int totalCount = trackActionService.getTotalLikesCount(ssbTrack.getToken());
 
-        return ResponseEntity.ok(new TotalLikesCountDto(totalCount));
+        return ResponseEntity.ok(new TotalCountDto(totalCount));
     }
 
     /**

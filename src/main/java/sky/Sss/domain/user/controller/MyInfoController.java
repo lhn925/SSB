@@ -84,7 +84,7 @@ public class MyInfoController {
      * @return
      */
     @GetMapping
-    public ResponseEntity userProfileForm() {
+    public ResponseEntity<?> userProfileForm() {
         // 유저 정보 조회
         UserInfoDto userInfoDto = userQueryService.getUserInfoDto();
         // 유저 정보 반환
@@ -98,7 +98,7 @@ public class MyInfoController {
      * @return
      */
     @GetMapping("/pw")
-    public ResponseEntity pwUpdateForm() {
+    public ResponseEntity<?>  pwUpdateForm() {
         // 유저 정보 조회
         userQueryService.findOne();
 
@@ -122,7 +122,7 @@ public class MyInfoController {
      * @return
      */
     @PostMapping("/userName")
-    public ResponseEntity updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
+    public ResponseEntity<?>  updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
         BindingResult bindingResult,
         HttpServletRequest request) throws DuplicateCheckException {
         if (bindingResult.hasErrors()) {
@@ -144,7 +144,7 @@ public class MyInfoController {
      * @return 파일을 업로드할때 RequestBody를 사용하면 Exception 발생
      */
     @PostMapping("/picture")
-    public ResponseEntity updateUserProfilePicture(@Validated @ModelAttribute UserPictureUpdateDto file,
+    public ResponseEntity<?>  updateUserProfilePicture(@Validated @ModelAttribute UserPictureUpdateDto file,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -162,7 +162,7 @@ public class MyInfoController {
      * @throws FileNotFoundException
      */
     @DeleteMapping("/picture")
-    public ResponseEntity deleteUserProfilePicture() throws FileNotFoundException {
+    public ResponseEntity<?>  deleteUserProfilePicture() throws FileNotFoundException {
         userMyInfoService.deletePicture();
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -179,7 +179,7 @@ public class MyInfoController {
      * @throws IOException
      */
     @PostMapping("/pw")
-    public ResponseEntity updateUserPassWord(@Validated @RequestBody UserPwUpdateFormDto userPwUpdateFormDto,
+    public ResponseEntity<?>  updateUserPassWord(@Validated @RequestBody UserPwUpdateFormDto userPwUpdateFormDto,
         BindingResult bindingResult, HttpServletRequest request) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -239,7 +239,7 @@ public class MyInfoController {
      * @return
      */
     @PostMapping("/login/status")
-    public ResponseEntity updateLoginStatus(HttpServletRequest request) {
+    public ResponseEntity<?>  updateLoginStatus(HttpServletRequest request) {
         HttpSession session = request.getSession();
 
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.REDIS_USER_KEY);
@@ -257,7 +257,7 @@ public class MyInfoController {
      * @return
      */
     @PatchMapping("/login/status")
-    public ResponseEntity logoutStatus(@Validated @RequestBody UserLoginStatusUpdateDto userLoginStatusUpdateDto,
+    public ResponseEntity<?>  logoutStatus(@Validated @RequestBody UserLoginStatusUpdateDto userLoginStatusUpdateDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -279,7 +279,7 @@ public class MyInfoController {
      * @return
      */
     @PostMapping("/block")
-    public ResponseEntity loginBlockedUpdate(@Validated @RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
+    public ResponseEntity<?>  loginBlockedUpdate(@Validated @RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
         BindingResult bindingResult,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -300,7 +300,7 @@ public class MyInfoController {
      * @return
      */
     @GetMapping("/loginDevice")
-    public ResponseEntity getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
+    public ResponseEntity<?>  getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
         @RequestParam(name = "size", defaultValue = "2", required = false) Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
 
@@ -325,7 +325,7 @@ public class MyInfoController {
      * @return
      */
     @GetMapping("/userLog")
-    public ResponseEntity getLoginLogList(
+    public ResponseEntity<?>  getLoginLogList(
         @RequestParam(value = "type", required = false) String type,
         @RequestParam(value = "startDate", required = false) String startDate,
         @RequestParam(value = "endDate", required = false) String endDate,
@@ -375,7 +375,7 @@ public class MyInfoController {
             end = LocalDate.parse(LocalDate.now().format(ISO_DATE));
         }
 
-        Page pagingLoginList;
+        Page pagingLoginList = null;
         if (type.equals("userLoginLog")) {
             pagingLoginList = userLoginLogService.getUserLoginLogList(start, end, pageRequest);
         } else {

@@ -67,6 +67,22 @@ public class RedisCacheService {
     }
 
     /**
+     * 유저의 FollowingTotal 을 가져오는 Method
+     *
+     */
+    public Integer getFollowingCount(String key, String subKey) {
+        return this.getLikeCount(key, subKey);
+    }
+
+    /**
+     * 유저의 FollowerTotal 을 가져오는 Method
+     *
+     */
+    public Integer getFollowerCount(String key, String subKey) {
+        return this.getLikeCount(key, subKey);
+    }
+
+    /**
      * map 형태로 된 cache 에 값이 존재하는 지 boolean 값으로 반환 검색
      *
      * @param user
@@ -80,7 +96,19 @@ public class RedisCacheService {
         return hashMap.containsKey(user.getUserId());
     }
 
-
+    /**
+     * map 형태로 된 cache 에 값이 존재하는 지 boolean 값으로 반환 검색
+     *
+     * @param user
+     * @param key
+     * @return
+     */
+    public boolean existsByToken(User user, String key) {
+        TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
+        };
+        Map<String, UserSimpleInfoDto> hashMap = getData(key, typeReference);
+        return hashMap.containsKey(user.getToken());
+    }
     /**
      * map 형태로 된 cache Size 반환
      *
