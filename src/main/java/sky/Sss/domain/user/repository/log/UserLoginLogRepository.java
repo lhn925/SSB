@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.user.entity.login.UserLoginLog;
 import sky.Sss.domain.user.model.LoginSuccess;
 
-public interface LoginLogRepository extends JpaRepository<UserLoginLog, Long> {
+public interface UserLoginLogRepository extends JpaRepository<UserLoginLog, Long> {
 
     //
     @Query(value = "select u from UserLoginLog u where "

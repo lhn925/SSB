@@ -1,38 +1,30 @@
-package sky.Sss.domain.user.service;
+package sky.Sss.domain.user.service.push;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.user.dto.PushMsgCacheDto;
-import sky.Sss.domain.user.dto.PushMsgDto;
+import sky.Sss.domain.user.dto.push.PushMsgCacheDto;
+import sky.Sss.domain.user.dto.push.PushMsgDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
-import sky.Sss.domain.user.repository.PushMsgRepository;
+import sky.Sss.domain.user.repository.push.UserPushMsgRepository;
+import sky.Sss.domain.user.service.MsgTemplateService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
-import sky.Sss.global.ws.dto.TestWebSocketDto;
 
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
-public class PushMsgService {
+public class UserPushMsgService {
 
     /**
      * 알림을 DB 에 저장
@@ -47,14 +39,14 @@ public class PushMsgService {
      * key + 사용자토큰 에 있는 webSocket sessionId 를 찾아서
      * 알림
      */
-    private final PushMsgRepository pushMsgRepository;
+    private final UserPushMsgRepository userPushMsgRepository;
     private final RedisCacheService redisCacheService;
     private final MsgTemplateService msgTemplateService;
 
 
     @Transactional
     public void addUserPushMsg(UserPushMessages userPushMessages) {
-        pushMsgRepository.save(userPushMessages);
+        userPushMsgRepository.save(userPushMessages);
     }
 
 

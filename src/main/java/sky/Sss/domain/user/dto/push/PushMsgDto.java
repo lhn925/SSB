@@ -1,18 +1,14 @@
-package sky.Sss.domain.user.dto;
+package sky.Sss.domain.user.dto.push;
 
 
 import java.time.LocalDateTime;
-import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.context.MessageSource;
-import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.PushMsgType;
-import sky.Sss.domain.user.service.PushMsgService;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)

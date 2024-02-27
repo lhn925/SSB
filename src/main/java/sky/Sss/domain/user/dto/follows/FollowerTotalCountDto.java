@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.dto;
+package sky.Sss.domain.user.dto.follows;
 
 
 import static lombok.AccessLevel.PROTECTED;

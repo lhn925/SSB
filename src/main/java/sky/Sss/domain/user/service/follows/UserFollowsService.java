@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.service;
+package sky.Sss.domain.user.service.follows;
 
 
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;
-import sky.Sss.domain.user.repository.UserFollowsRepository;
+import sky.Sss.domain.user.repository.follow.UserFollowsRepository;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 

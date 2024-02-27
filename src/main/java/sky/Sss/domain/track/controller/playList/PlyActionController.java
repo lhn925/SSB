@@ -19,7 +19,7 @@ import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.PushMsgService;
+import sky.Sss.domain.user.service.push.UserPushMsgService;
 import sky.Sss.domain.user.service.UserQueryService;
 
 
@@ -36,7 +36,7 @@ public class PlyActionController {
     private final PlyActionService plyActionService;
     private final PlyQueryService plyQueryService;
     private final UserQueryService userQueryService;
-    private final PushMsgService pushMsgService;
+    private final UserPushMsgService userPushMsgService;
 
     /**
      * playList 좋아요 등록 후 총 좋아요수 반환
@@ -68,9 +68,9 @@ public class PlyActionController {
 
         // 같은 사용자인지 확인
         if (!fromUser.getToken().equals(toUser.getToken())) {
-            pushMsgService.addUserPushMsg(userPushMessages);
+            userPushMsgService.addUserPushMsg(userPushMessages);
             // push messages
-            pushMsgService.sendOrCacheMessages(ContentsType.PLAYLIST.getUrl() + ssbPlayListSettings.getId()
+            userPushMsgService.sendOrCacheMessages(ContentsType.PLAYLIST.getUrl() + ssbPlayListSettings.getId()
                 , ssbPlayListSettings.getTitle(), toUser, userPushMessages);
 
         }

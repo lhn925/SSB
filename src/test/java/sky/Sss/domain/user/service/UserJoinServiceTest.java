@@ -10,14 +10,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import sky.Sss.domain.user.controller.JoinController;
-import sky.Sss.domain.user.dto.join.UserJoinAgreeDto;
+import sky.Sss.domain.user.controller.UserJoinController;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.service.join.UserJoinService;
 
 
 @SpringBootTest
-@WebMvcTest(JoinController.class)
+@WebMvcTest(UserJoinController.class)
 class UserJoinServiceTest {
 
 

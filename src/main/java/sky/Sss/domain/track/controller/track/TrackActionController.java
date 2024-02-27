@@ -19,10 +19,8 @@ import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.MsgTemplateService;
-import sky.Sss.domain.user.service.PushMsgService;
+import sky.Sss.domain.user.service.push.UserPushMsgService;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.global.redis.service.RedisCacheService;
 
 
 /**
@@ -38,7 +36,7 @@ public class TrackActionController {
     private final TrackActionService trackActionService;
     private final TrackQueryService trackQueryService;
     private final UserQueryService userQueryService;
-    private final PushMsgService pushMsgService;
+    private final UserPushMsgService userPushMsgService;
     /**
      * track 좋아요 등록
      */
@@ -72,9 +70,9 @@ public class TrackActionController {
         // 같은 사용자 인지 확인
         if (!fromUser.getToken().equals(toUser.getToken())) {
             // userPushMessages Table insert
-            pushMsgService.addUserPushMsg(userPushMessages);
+            userPushMsgService.addUserPushMsg(userPushMessages);
             // push messages
-            pushMsgService.sendOrCacheMessages(ContentsType.TRACK.getUrl() + ssbTrack.getId(), ssbTrack.getTitle(),
+            userPushMsgService.sendOrCacheMessages(ContentsType.TRACK.getUrl() + ssbTrack.getId(), ssbTrack.getTitle(),
                 toUser,
                 userPushMessages);
         }

@@ -3,17 +3,11 @@ package sky.Sss.domain.track.service.track;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.entity.UserPushMessages;
-import sky.Sss.domain.user.model.ContentsType;
-import sky.Sss.domain.user.model.PushMsgType;
-import sky.Sss.domain.user.service.PushMsgService;
-import sky.Sss.domain.user.service.UserQueryService;
 
 
 /**

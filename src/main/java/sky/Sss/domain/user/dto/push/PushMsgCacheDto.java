@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.dto;
+package sky.Sss.domain.user.dto.push;
 
 
 import java.time.LocalDateTime;

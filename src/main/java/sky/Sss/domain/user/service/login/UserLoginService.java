@@ -30,7 +30,7 @@ import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-public class LoginService {
+public class UserLoginService {
 
     private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;

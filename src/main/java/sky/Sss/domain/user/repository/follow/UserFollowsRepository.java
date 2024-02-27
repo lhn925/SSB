@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.repository;
+package sky.Sss.domain.user.repository.follow;
 
 
 import java.util.Optional;

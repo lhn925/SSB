@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.user.annotation.UserAuthorize;
-import sky.Sss.domain.user.dto.FollowerTotalCountDto;
+import sky.Sss.domain.user.dto.follows.FollowerTotalCountDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.PushMsgType;
-import sky.Sss.domain.user.service.PushMsgService;
+import sky.Sss.domain.user.service.push.UserPushMsgService;
 import sky.Sss.domain.user.service.UserActionService;
 import sky.Sss.domain.user.service.UserQueryService;
 
@@ -30,7 +30,7 @@ public class UserActionController {
 
     private final UserQueryService userQueryService;
     private final UserActionService userActionService;
-    private final PushMsgService pushMsgService;
+    private final UserPushMsgService userPushMsgService;
 
     /**
      * @param followingUid
@@ -55,8 +55,8 @@ public class UserActionController {
             ContentsType.USER, null);
 
         // pushMsg
-        pushMsgService.addUserPushMsg(userPushMessages);
-        pushMsgService.sendOrCacheMessages(ContentsType.USER.getUrl() + fromUser.getId(), fromUser.getUserName(), toUser, userPushMessages);
+        userPushMsgService.addUserPushMsg(userPushMessages);
+        userPushMsgService.sendOrCacheMessages(ContentsType.USER.getUrl() + fromUser.getId(), fromUser.getUserName(), toUser, userPushMessages);
 
         // 대상자에 follower count 검색 후 반환
         int totalFollowerCount = userActionService.getTotalFollowerCount(toUser);

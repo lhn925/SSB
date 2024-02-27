@@ -50,7 +50,7 @@ import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users/help")
-public class HelpController {
+public class UserHelpController {
 
     private final UserQueryService userQueryService;
 
@@ -70,7 +70,7 @@ public class HelpController {
      * @throws IOException
      */
     @GetMapping("/show")
-    public ResponseEntity showId(@Validated @ModelAttribute UserIdHelpReqDto userIdHelpReqDto,
+    public ResponseEntity<?> showId(@Validated @ModelAttribute UserIdHelpReqDto userIdHelpReqDto,
         BindingResult bindingResult,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -97,7 +97,7 @@ public class HelpController {
 
         UserIdHelpRepDto userIdHelpRepDto = UserIdHelpRepDto.builder().createdDateTime(findOne.getCreatedDateTime())
             .userId(findOne.getUserId()).build();
-        return new ResponseEntity(userIdHelpRepDto, HttpStatus.OK);
+        return new ResponseEntity<>(userIdHelpRepDto, HttpStatus.OK);
     }
 
     /**

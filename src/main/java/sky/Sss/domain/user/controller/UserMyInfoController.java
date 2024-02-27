@@ -67,7 +67,7 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @RequiredArgsConstructor
 @RequestMapping("/users/myInfo")
 @UserAuthorize
-public class MyInfoController {
+public class UserMyInfoController {
     private final UserQueryService userQueryService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final MessageSource ms;

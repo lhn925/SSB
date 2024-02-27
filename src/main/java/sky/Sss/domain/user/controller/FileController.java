@@ -1,4 +1,4 @@
-package sky.Sss.domain.user.api;
+package sky.Sss.domain.user.controller;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import sky.Sss.domain.user.controller.MyInfoController;
+import sky.Sss.domain.user.controller.UserMyInfoController;
 import sky.Sss.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
@@ -20,7 +20,7 @@ import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.Result;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = {MyInfoController.class})
+@RestControllerAdvice(assignableTypes = {UserMyInfoController.class})
 @RequiredArgsConstructor
 public class MyInfoExController {
 

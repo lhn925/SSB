@@ -4,7 +4,6 @@ package sky.Sss.domain.user.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.nio.file.NoSuchFileException;
-import java.util.Enumeration;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,47 +11,38 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.user.dto.login.UserLoginFailErrorDto;
 import sky.Sss.domain.user.dto.login.UserLoginFormDto;
 import sky.Sss.domain.user.exception.CaptchaMisMatchFactorException;
-import sky.Sss.domain.user.exception.LoginBlockException;
 import sky.Sss.domain.user.exception.LoginFailException;
 import sky.Sss.domain.user.exception.RefreshTokenNotFoundException;
-import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.LoginSuccess;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
-import sky.Sss.domain.user.service.login.LoginService;
+import sky.Sss.domain.user.service.login.UserLoginService;
 import sky.Sss.domain.user.utili.jwt.AccessTokenDto;
 import sky.Sss.domain.user.utili.jwt.JwtDto;
 import sky.Sss.domain.user.utili.jwt.JwtFilter;
-import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
-import sky.Sss.global.error.dto.ErrorResultDto;
-import sky.Sss.global.error.dto.Result;
 import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
 
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/login")
 @RestController
-public class LoginController {
+public class UserLoginController {
 
     private final MessageSource ms;
-    private final LoginService loginService;
+    private final UserLoginService userLoginService;
     private final UserLoginLogService userLoginLogService;
     private final TokenProvider tokenProvider;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
@@ -86,9 +76,9 @@ public class LoginController {
             failCount = userLoginLogService.getCount(userLoginFormDto.getUserId(), LoginSuccess.FAIL, Status.ON);
 
             // 2차 인증 코드 확인
-            loginService.verifyCaptchKey(userLoginFormDto, failCount, captchaKey, limit);
+            userLoginService.verifyCaptchKey(userLoginFormDto, failCount, captchaKey, limit);
 
-            JwtDto tokenDto = loginService.login(userLoginFormDto, request.getHeader("User-Agent"),
+            JwtDto tokenDto = userLoginService.login(userLoginFormDto, request.getHeader("User-Agent"),
                 session.getId(), failCount);
             loginSuccess = LoginSuccess.SUCCESS;
             return new ResponseEntity(tokenDto, HttpStatus.OK);
@@ -112,7 +102,7 @@ public class LoginController {
                 throw new BadCredentialsException("login.error");
             }
         } finally {
-            loginService.saveLoginLog(userAgent, userLoginFormDto.getUserId(), loginSuccess);
+            userLoginService.saveLoginLog(userAgent, userLoginFormDto.getUserId(), loginSuccess);
         }
     }
 

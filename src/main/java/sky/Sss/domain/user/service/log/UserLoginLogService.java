@@ -18,7 +18,7 @@ import sky.Sss.domain.user.entity.login.UserLoginLog;
 import sky.Sss.domain.user.exception.LoginBlockException;
 import sky.Sss.domain.user.model.LoginSuccess;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.repository.log.LoginLogRepository;
+import sky.Sss.domain.user.repository.log.UserLoginLogRepository;
 import sky.Sss.domain.user.repository.UserQueryRepository;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.utili.auditor.AuditorAwareImpl;
@@ -31,7 +31,7 @@ import sky.Sss.global.locationfinder.service.LocationFinderService;
 @Transactional(readOnly = true)
 public class UserLoginLogService {
 
-    private final LoginLogRepository loginLogRepository;
+    private final UserLoginLogRepository userLoginLogRepository;
     private final LocationFinderService locationFinderService;
     private final UserQueryRepository userQueryRepository;
     private final AuditorAware auditorAware;
@@ -57,7 +57,7 @@ public class UserLoginLogService {
         AuditorAwareImpl.changeUserId(auditorAware, userId);
         UserLoginLog userLoginLog = getUserLoginLog(uId, userAgent, isSuccess, isStatus);
 
-        Optional<UserLoginLog> saveLog = Optional.ofNullable(loginLogRepository.save(userLoginLog));
+        Optional<UserLoginLog> saveLog = Optional.ofNullable(userLoginLogRepository.save(userLoginLog));
         saveLog.orElseThrow(() -> new RuntimeException());
     }
 
@@ -75,7 +75,7 @@ public class UserLoginLogService {
         PageRequest pageRequest) {
 
         User user = userQueryService.findOne();
-        Page<UserLoginLogListDto> loginLogPageable = loginLogRepository.getLoginLogPageable(user.getUserId(),
+        Page<UserLoginLogListDto> loginLogPageable = userLoginLogRepository.getLoginLogPageable(user.getUserId(),
                 LoginSuccess.SUCCESS, Status.ON.getValue(), startDate, endDate, pageRequest)
             .map(UserLoginLogListDto::new);
 
@@ -85,7 +85,7 @@ public class UserLoginLogService {
 
     public Long getCount(String userId, LoginSuccess loginSuccess, Status isStatus) {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<UserLoginLog> loginLogPage = loginLogRepository.getLoginLogPageable(userId, loginSuccess,
+        Page<UserLoginLog> loginLogPage = userLoginLogRepository.getLoginLogPageable(userId, loginSuccess,
             isStatus.getValue(),
             pageRequest);
         return loginLogPage.getTotalElements();
@@ -102,22 +102,22 @@ public class UserLoginLogService {
     public Integer expireLoginLogOff(Integer month) {
         LocalDate expireDate = LocalDate.now().minusMonths(month);
 
-        Integer count = loginLogRepository.expireLoginLogCount(Status.ON.getValue(), expireDate);
+        Integer count = userLoginLogRepository.expireLoginLogCount(Status.ON.getValue(), expireDate);
         Integer result = 0;
         if (count > 0) {
-            result = loginLogRepository.expireLoginLogOff(Status.OFF.getValue(), Status.ON.getValue(), expireDate);
+            result = userLoginLogRepository.expireLoginLogOff(Status.OFF.getValue(), Status.ON.getValue(), expireDate);
         }
         return result;
     }
 
     public void delete(HttpServletRequest request, LoginSuccess isSuccess, Status isStatus) {
         String userId = request.getParameter("userId");
-        loginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
+        userLoginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
     }
 
     @Transactional
     public void delete(String userId, LoginSuccess isSuccess, Status isStatus) {
-        loginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
+        userLoginLogRepository.isStatusUpdate(userId, isSuccess, isStatus.getValue());
     }
 
     /**

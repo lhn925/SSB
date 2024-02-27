@@ -11,7 +11,6 @@ import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.repository.track.TrackLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.service.PushMsgService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 

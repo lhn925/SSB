@@ -21,7 +21,7 @@ import sky.Sss.global.redis.service.RedisQueryService;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class LogoutService {
+public class UserLogoutService {
 
 
     private final TokenProvider tokenProvider;

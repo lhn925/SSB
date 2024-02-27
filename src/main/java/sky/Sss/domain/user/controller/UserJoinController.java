@@ -6,13 +6,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +21,6 @@ import sky.Sss.domain.user.dto.join.JoinEmailDuplicateDto;
 import sky.Sss.domain.user.dto.join.JoinIdDuplicateDto;
 import sky.Sss.domain.user.dto.join.JoinUserNameDuplicateDto;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
-import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.PwSecLevel;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -39,11 +35,10 @@ import sky.Sss.global.error.dto.Result;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users/join")
-public class JoinController {
+public class UserJoinController {
 
     private final UserJoinService userJoinService;
     private final MessageSource ms;
-    private final UserQueryService userQueryService;
 
     /*  *//**
      * id:join_1

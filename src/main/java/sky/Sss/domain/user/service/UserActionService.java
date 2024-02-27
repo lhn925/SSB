@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;
+import sky.Sss.domain.user.service.follows.UserFollowsService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j

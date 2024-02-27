@@ -10,14 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import sky.Sss.domain.user.controller.LoginController;
+import sky.Sss.domain.user.controller.UserLoginController;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
-import sky.Sss.global.error.dto.ErrorResultDto;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = {LoginController.class})
+@RestControllerAdvice(assignableTypes = {UserLoginController.class})
 @RequiredArgsConstructor
 public class LoginExController {
 
@@ -25,9 +24,6 @@ public class LoginExController {
 
     @ExceptionHandler({AuthenticationException.class, UserInfoNotFoundException.class, IllegalArgumentException.class})
     public ResponseEntity<ErrorResult> loginExHandler(RuntimeException ex, HttpServletRequest request) {
-        log.info("loginExHandler = {}");
-        log.info("ex.getMessage() = {}", ex.getMessage());
-        log.info("ex.getClass() = {}", ex.getClass());
 
         String code = ex.getMessage();
 
