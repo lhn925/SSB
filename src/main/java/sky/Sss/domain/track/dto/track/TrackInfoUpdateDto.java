@@ -12,7 +12,6 @@ import sky.Sss.domain.track.model.MainGenreType;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class TrackInfoUpdateDto extends BaseTrackDto {
 
     @NotBlank

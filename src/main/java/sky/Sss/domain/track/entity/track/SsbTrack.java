@@ -166,7 +166,6 @@ public class SsbTrack extends BaseTimeEntity  {
         ssbTrack.setOriginalName(tempTrackStorage.getOriginalName());
         ssbTrack.setStoreFileName(tempTrackStorage.getStoreFileName());
 
-        tempTrackStorage.getCreatedDateTime();
     }
 
 

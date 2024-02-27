@@ -81,7 +81,7 @@ public class UserJoinController {
      * @return
      */
     @PostMapping
-    public ResponseEntity join(@Validated @RequestBody UserJoinPostDto userJoinPostDto,
+    public ResponseEntity<?> join(@Validated @RequestBody UserJoinPostDto userJoinPostDto,
         BindingResult bindingResult, HttpServletRequest request) throws DuplicateCheckException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));

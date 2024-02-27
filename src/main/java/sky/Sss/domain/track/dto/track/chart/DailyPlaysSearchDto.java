@@ -11,7 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @AllArgsConstructor
-@NoArgsConstructor
 public class DailyPlaysSearchDto {
     private Long trackId;
     private Long totalCount;

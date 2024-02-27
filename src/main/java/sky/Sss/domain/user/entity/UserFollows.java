@@ -10,12 +10,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.Sss.global.base.BaseTimeEntity;
 
-
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"follower_uid", "following_uid"})})
 @Getter
 @Setter(PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
@@ -28,12 +30,12 @@ public class UserFollows extends BaseTimeEntity {
 
     // 팔로우를 하는 사람들
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "follower_uid",nullable = false)
     private User followerUser;
 
     // 팔로우를 당하는 유저
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "following_uid",nullable = false)
     private User followingUser;
 
     public static UserFollows create (User followerUser,User followingUser) {

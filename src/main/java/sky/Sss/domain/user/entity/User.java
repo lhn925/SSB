@@ -34,7 +34,7 @@ import sky.Sss.global.file.utili.FileStore;
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
 @Entity
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@SequenceGenerator(name="userTable_id_sequence",sequenceName = "userTable_id_sequence",initialValue = 1,allocationSize = 50)
@@ -56,8 +56,11 @@ public class User extends BaseTimeEntity {
     private String userId;
     @Column(nullable = false)
     private String password;
+
+    // 사용자 이름 or 사용자 profileLink 주소
     @Column(nullable = false)
     private String userName;
+
     @Column(nullable = false)
     private String email;
 
@@ -140,8 +143,7 @@ public class User extends BaseTimeEntity {
     }
 
     public static User getOptionalUser(Optional<User> optionalUser) {
-        User user = optionalUser.orElseThrow(() -> new UserInfoNotFoundException("sky.userId.notFind"));
-        return user;
+        return optionalUser.orElseThrow(() -> new UserInfoNotFoundException("sky.userId.notFind"));
     }
 
     /**
@@ -152,10 +154,9 @@ public class User extends BaseTimeEntity {
      * @param passwordEncoder
      * @return
      */
-    public static User updatePw(User user, String password, PwSecLevel pwSecLevel, PasswordEncoder passwordEncoder) {
+    public static void updatePw(User user, String password, PwSecLevel pwSecLevel, PasswordEncoder passwordEncoder) {
         user.setPassword(passwordEncoder.encode(password));
         user.setPwSecLevel(pwSecLevel);
-        return user;
     }
 
 
@@ -181,9 +182,8 @@ public class User extends BaseTimeEntity {
         }
     }
 
-    public static User changeIsLoginBlocked(User user, UserLoginBlockUpdateDto userLoginBlockUpdateDto) {
+    public static void changeIsLoginBlocked(User user, UserLoginBlockUpdateDto userLoginBlockUpdateDto) {
         user.setIsLoginBlocked(userLoginBlockUpdateDto.getIsLoginBlocked());
-        return user;
     }
     @Override
     public String toString() {

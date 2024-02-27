@@ -11,7 +11,6 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class TrackTotalPlaysDto {
     private SsbTrack ssbTrack;
     private Long totalCount;

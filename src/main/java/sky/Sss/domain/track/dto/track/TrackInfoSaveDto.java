@@ -10,7 +10,6 @@ import sky.Sss.domain.track.dto.BaseTrackDto;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class TrackInfoSaveDto extends BaseTrackDto {
 
     @NotBlank

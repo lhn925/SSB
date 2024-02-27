@@ -12,7 +12,6 @@ import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class TrackChartSaveReqDto {
 
     @NotNull
