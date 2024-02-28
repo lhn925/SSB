@@ -34,50 +34,19 @@ import sky.Sss.domain.user.service.UserQueryService;
 public class PlyActionController {
 
     private final PlyActionService plyActionService;
-    private final PlyQueryService plyQueryService;
-    private final UserQueryService userQueryService;
-    private final UserPushMsgService userPushMsgService;
 
     /**
      * playList 좋아요 등록 후 총 좋아요수 반환
      *
      * @param id
-     *     trackId
      * @return
      */
-    @PostMapping("/likes/{id}")
-    public ResponseEntity<TotalCountRepDto> saveLikes(@PathVariable Long id) {
-        if (id == null || id == 0) {
+    @PostMapping("/likes/{id}/{token}")
+    public ResponseEntity<TotalCountRepDto> saveLikes(@PathVariable Long id, @PathVariable String token) {
+        if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        // track 검색
-        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findOneJoinUser(id, Status.ON);
-
-        // 사용자 검색
-        User fromUser = userQueryService.findOne();
-
-        User toUser = ssbPlayListSettings.getUser();
-
-        plyActionService.addLikes(ssbPlayListSettings, fromUser);
-
-        UserPushMessages userPushMessages = UserPushMessages.create(toUser, fromUser, PushMsgType.LIKES,
-            ContentsType.PLAYLIST,
-            ssbPlayListSettings.getId());
-        // 현재 유저가 접속 되어 있는지 확인
-
-
-        // 같은 사용자인지 확인
-        if (!fromUser.getToken().equals(toUser.getToken())) {
-            userPushMsgService.addUserPushMsg(userPushMessages);
-            // push messages
-            userPushMsgService.sendOrCacheMessages(ContentsType.PLAYLIST.getUrl() + ssbPlayListSettings.getId()
-                , ssbPlayListSettings.getTitle(), toUser, userPushMessages);
-
-        }
-
-        int totalLikesCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
-
-        return ResponseEntity.ok(new TotalCountRepDto(totalLikesCount));
+        return ResponseEntity.ok(plyActionService.addLikes(id, token));
     }
 
 
@@ -85,21 +54,15 @@ public class PlyActionController {
      * playList 좋아요 취소 후 총 좋아요수 반환
      *
      * @param id
-     *     trackId
      * @return
      */
-    @DeleteMapping("/likes/{id}")
-    public ResponseEntity<TotalCountRepDto> removeLikes(@PathVariable Long id) {
-        if (id == null || id == 0) {
+    @DeleteMapping("/likes/{id}/{token}")
+    public ResponseEntity<TotalCountRepDto> removeLikes(@PathVariable Long id, @PathVariable String token) {
+        if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        // track 검색
-        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findById(id, Status.ON);
-        plyActionService.cancelLikes(ssbPlayListSettings);
-
-        int totalCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
-
-        return ResponseEntity.ok(new TotalCountRepDto(totalCount));
+        return ResponseEntity.ok(plyActionService.cancelLikes(id, token));
     }
+
 
 }

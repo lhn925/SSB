@@ -33,7 +33,15 @@ public class PlyLikesService {
      * Track 좋아요 추가
      */
     @Transactional
-    public void addLike(SsbPlyLikes ssbPlyLikes) {
+    public void addLikes(SsbPlayListSettings ssbPlayListSettings,User user) {
+
+        // 좋아요가 있는지 확인
+        // 좋아요가 이미 있는 경우 예외 처리
+        boolean isLikes = existsLikes(ssbPlayListSettings, user);
+        if (isLikes) {
+            throw new IllegalArgumentException();
+        }
+        SsbPlyLikes ssbPlyLikes = SsbPlyLikes.create(user, ssbPlayListSettings);
         SsbPlyLikes save = plyLikesRepository.save(ssbPlyLikes);
         String key = getLikeKey(save.getSsbPlayListSettings());
 
@@ -46,12 +54,13 @@ public class PlyLikesService {
      * 좋아요 취소
      */
     @Transactional
-    public void cancelLike(SsbPlayListSettings playListSettings ,User user) {
-        SsbPlyLikes ssbTrackLikes = findOne(playListSettings, user);
+    public void cancelLikes(SsbPlayListSettings ssbPlayListSettings ,User user) {
+        // 좋아요가 있는지 확인
+        SsbPlyLikes ssbTrackLikes = findOne(ssbPlayListSettings, user);
 
         deleteByEntity(ssbTrackLikes);
 
-        String key = getLikeKey(playListSettings);
+        String key = getLikeKey(ssbPlayListSettings);
 
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = user.getUserId();
@@ -65,9 +74,9 @@ public class PlyLikesService {
      * @return
      */
     public SsbPlyLikes findOne (SsbPlayListSettings ssbPlayListSettings,User user) {
-        SsbPlyLikes ssbTrackLikes = plyLikesRepository.findByPlyIdAndUser(ssbPlayListSettings, user)
-            .orElseThrow(() -> new IllegalArgumentException());
-        return ssbTrackLikes;
+        return plyLikesRepository.findByPlyIdAndUser(ssbPlayListSettings, user)
+            .orElseThrow(IllegalArgumentException::new);
+
     }
     /**
      * like 취소
