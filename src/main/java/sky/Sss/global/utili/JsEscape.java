@@ -11,7 +11,7 @@ public class JsEscape {
             .replace(":", "\\u003A")
             .replace("'", "\\u0027")
             .replace("\"", "\\u0022")
-            .replace(".", "\\u002E")
+//            .replace(".", "\\u002E")
             .replace("{", "\\u007B")
             .replace("}", "\\u007D")
             .replace(",", "\\u002C")

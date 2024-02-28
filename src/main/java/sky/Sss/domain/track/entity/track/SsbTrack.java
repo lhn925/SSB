@@ -15,16 +15,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 import sky.Sss.domain.track.model.MainGenreType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
@@ -37,7 +37,7 @@ import sky.Sss.global.utili.JsEscape;
 @Setter(AccessLevel.PRIVATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SsbTrack extends BaseTimeEntity  {
+public class SsbTrack extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -67,7 +67,8 @@ public class SsbTrack extends BaseTimeEntity  {
     // track 커버
     private String coverUrl;
 
-    // 공개 여부 True 면 비공개 false 면 공개
+    // True 면 비공개
+    // false 면 공개
     @Column(nullable = false)
     private Boolean isPrivacy;
 
@@ -77,7 +78,7 @@ public class SsbTrack extends BaseTimeEntity  {
     @Column(nullable = false)
     private Integer trackLength;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String token;
 
     @Column(nullable = false)
@@ -98,18 +99,19 @@ public class SsbTrack extends BaseTimeEntity  {
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackAllPlayLogs> plays = new ArrayList<>();
 
+    @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
+    private List<SsbTrackReply> replies = new ArrayList<>();
 
 
     public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
         if (tagLinks != null && tagLinks.size() > 0) {
-            tagLinks.stream().forEach(ssbTrackTagLink ->
-                ssbTrack.tags.add(ssbTrackTagLink)
-            );
+            ssbTrack.tags.addAll(tagLinks);
         } else {
             // 아무것도 없으면 전부 삭제
             rmTagLink(ssbTrack);
         }
     }
+
     // 링크 삭제
     public static void rmTagLink(SsbTrack ssbTrack, SsbTrackTagLink tagLinks) {
         ssbTrack.getTags().remove(tagLinks);
@@ -119,13 +121,13 @@ public class SsbTrack extends BaseTimeEntity  {
         ssbTrack.tags.clear();
     }
 
-    public static SsbTrack create(TrackInfoSaveDto trackInfoSaveDto, TempTrackStorage tempTrackStorage,
+    public static SsbTrack create(TrackInfoSaveReqDto trackInfoSaveReqDto, TempTrackStorage tempTrackStorage,
         User user) {
         SsbTrack ssbTrack = new SsbTrack();
         setUploadTrackFile(tempTrackStorage, ssbTrack);
-        uploadInfo(ssbTrack, trackInfoSaveDto.getGenre(), trackInfoSaveDto.getGenreType(),
-            trackInfoSaveDto.getIsPrivacy(), trackInfoSaveDto.getIsDownload(), trackInfoSaveDto.getTitle(),
-            trackInfoSaveDto.getDesc());
+        uploadInfo(ssbTrack, trackInfoSaveReqDto.getGenre(), trackInfoSaveReqDto.getGenreType(),
+            trackInfoSaveReqDto.getIsPrivacy(), trackInfoSaveReqDto.getIsDownload(), trackInfoSaveReqDto.getTitle(),
+            trackInfoSaveReqDto.getDesc());
         ssbTrack.setUser(user);
 
         SsbTrack.changeStatus(ssbTrack, Status.ON);
@@ -145,7 +147,7 @@ public class SsbTrack extends BaseTimeEntity  {
         ssbTrack.setIsPrivacy(isPrivacy);
         ssbTrack.setIsDownload(isDownload);
         if (description.trim().length() > 1000) {
-            throw new IllegalArgumentException("track.desc.error.length");
+            throw new IllegalArgumentException("desc.error.length");
         }
 
         ssbTrack.setDescription(JsEscape.escapeJS(description));

@@ -55,7 +55,7 @@ public class WebSocketSessionHandler implements ChannelInterceptor {
              */
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String userId = userDetails.getUsername();
-            String userToken = userQueryService.getToken(userId, Enabled.ENABLED);
+            String userToken = userQueryService.findTokenByUserId(userId, Enabled.ENABLED);
             /**
              * redis cache 저장
              * RedisKeyDto.REDIS_USER_WS_LIST_SESSION_KEY + userToken

@@ -100,7 +100,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         User user) {
         SsbPlayListSettings ssbPlayListSettings = new SsbPlayListSettings();
         if (playListSettingSaveDto.getDesc().trim().length() > 1000) {
-            throw new IllegalArgumentException("track.desc.error.length");
+            throw new IllegalArgumentException("desc.error.length");
         }
         ssbPlayListSettings.setTitle(JsEscape.escapeJS(playListSettingSaveDto.getTitle()));
 
@@ -125,7 +125,7 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         ssbPlayListSettings.setPlayListType(type);
         ssbPlayListSettings.setTitle(JsEscape.escapeJS(title));
         if (desc.trim().length() > 1000) {
-            throw new IllegalArgumentException("track.desc.error.length");
+            throw new IllegalArgumentException("desc.error.length");
         }
     }
 

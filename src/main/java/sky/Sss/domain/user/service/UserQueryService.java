@@ -2,10 +2,11 @@ package sky.Sss.domain.user.service;
 
 
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +19,6 @@ import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.UserGrade;
 import sky.Sss.domain.user.repository.UserQueryRepository;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Service
@@ -46,9 +46,8 @@ public class UserQueryService {
     }
 
 
-
-//    @Cacheable(value = RedisKeyDto.REDIS_USER_CACHE_TOKEN_KEY,key = "#userId",cacheManager = "contentCacheManager")
-    public String getToken(String userId, Enabled enabled)
+    //    @Cacheable(value = RedisKeyDto.REDIS_USER_CACHE_TOKEN_KEY,key = "#userId",cacheManager = "contentCacheManager")
+    public String findTokenByUserId(String userId, Enabled enabled)
         throws UsernameNotFoundException {
         Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
         User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
@@ -65,19 +64,22 @@ public class UserQueryService {
         return UserInfoDto.createUserInfo(userDetails);
     }
 
+    public Set<User> findUsersByUserNames(Set<String> userNames,Enabled isEnabled)
+        throws UsernameNotFoundException {
+        return userQueryRepository.findAllByUserNames(userNames,isEnabled.getValue());
+    }
 
 
     public User findOne() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authorities = authentication.getAuthorities().stream().map(grantedAuthority -> grantedAuthority.getAuthority()
+        String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority
         ).findFirst().orElse(null);
-        if (authorities.equals(UserGrade.ANONYMOUS.getRole())) {
+        if (authorities == null || authorities.equals(UserGrade.ANONYMOUS.getRole())) {
             throw new UserInfoNotFoundException("sky.userId.notFind");
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> optionalUser = userQueryRepository.findByUserId(userDetails.getUsername());
-        User user = User.getOptionalUser(optionalUser);
-        return user;
+        return User.getOptionalUser(optionalUser);
     }
 
     public UserInfoDto getUserInfoDto() {
@@ -85,32 +87,27 @@ public class UserQueryService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         User user = findOne(userDetails.getUsername());
-        UserInfoDto userInfoDto = UserInfoDto.createUserInfo(user);
-        return userInfoDto;
+        return UserInfoDto.createUserInfo(user);
     }
 
     public User findOne(String userId) {
         Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
-        User user = User.getOptionalUser(optionalUser);
-        return user;
+        return User.getOptionalUser(optionalUser);
     }
 
     public User findOne(String userId, String token) {
         Optional<User> optionalUser = userQueryRepository.findOne(userId, token);
-        User user = User.getOptionalUser(optionalUser);
-        return user;
+        return User.getOptionalUser(optionalUser);
     }
 
     public User findOne(Long uid, Enabled enabled) {
         Optional<User> optionalUser = userQueryRepository.findByIdAndIsEnabled(uid, enabled.getValue());
-        User user = User.getOptionalUser(optionalUser);
-        return user;
+        return User.getOptionalUser(optionalUser);
     }
 
 
     public Optional<User> findOptionalUser(String userId) {
-        Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
-        return optionalUser;
+        return userQueryRepository.findByUserId(userId);
     }
 
 

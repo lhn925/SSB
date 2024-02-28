@@ -21,26 +21,31 @@ public class TrackQueryService {
 
     public SsbTrack findOne(Long id, String token, User user, Status isStatus) {
         return trackQueryRepository.findOne(id, user, token, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
 
     public SsbTrack findOne(Long id, String token, Status isStatus) {
         return trackQueryRepository.findOne(id, token, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
+
     public SsbTrack findById(Long id, Status isStatus) {
         return trackQueryRepository.findByIdAndIsStatus(id, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
 
 
+    public SsbTrack findOneJoinUser(Long id, String token, Status isStatus) {
+        return trackQueryRepository.findByIdJoinUser(id, token, isStatus.getValue())
+            .orElseThrow(SsbFileNotFoundException::new);
+    }
 
     public SsbTrack findOneJoinUser(Long id, Status isStatus) {
         return trackQueryRepository.findByIdJoinUser(id, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
+
     public Integer getTotalLength(User user) {
-        Integer totalTrackLength = trackQueryRepository.getTotalTrackLength(user, Status.ON.getValue());
-        return totalTrackLength;
+        return trackQueryRepository.getTotalTrackLength(user, Status.ON.getValue());
     }
 }

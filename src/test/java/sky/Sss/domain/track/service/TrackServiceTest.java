@@ -20,8 +20,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
-import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoDto;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
+import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
@@ -70,7 +70,7 @@ class TrackServiceTest {
 
         TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(temp, sessionId);
 
-        TrackInfoSaveDto trackMetaUploadDto = new TrackInfoSaveDto();
+        TrackInfoSaveReqDto trackMetaUploadDto = new TrackInfoSaveReqDto();
         Set<TrackTagsDto> tagsDtoSet = new HashSet<>();
         for (int i = 1; i<=10; i++) {
             TrackTagsDto trackTagsDto = new TrackTagsDto();
@@ -121,7 +121,7 @@ class TrackServiceTest {
         }
 //        playListSettingSaveDto.setTagSet(tagsDtoSet);
 
-        List<PlayListTrackInfoDto> list = new ArrayList<>();
+        List<PlayListTrackInfoReqDto> list = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             File file1 = new File("/Users/imhaneul/Downloads/sky.m4a");
             InputStream fileInputStream1 = new FileInputStream(file1);
@@ -136,7 +136,7 @@ class TrackServiceTest {
                 sessionId);
 
 
-            PlayListTrackInfoDto trackPlayListMetaDto = new PlayListTrackInfoDto();
+            PlayListTrackInfoReqDto trackPlayListMetaDto = new PlayListTrackInfoReqDto();
             trackPlayListMetaDto.setOrder(i+1);
             trackPlayListMetaDto.setTitle("아이유" + i);
             trackPlayListMetaDto.setDesc(playListSettingSaveDto.getDesc());

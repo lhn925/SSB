@@ -6,7 +6,7 @@ import org.bytedeco.javacpp.opencv_core.RefOrVoid.type;
  * push message 에 구분 하는 enum
  */
 public enum ContentsType {
-    TRACK("Track","/tracks/info/"),PLAYLIST("PlayList","/tracks/ply/info/"),REPLY("Reply",""),
+    TRACK("Track","/tracks/info/"),PLAYLIST("PlayList","/tracks/ply/info/"),REPLY("Reply","/tracks/reply/"),
     USER("User", "/users/info/");
 
     private final String type;

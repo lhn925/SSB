@@ -3,11 +3,11 @@ package sky.Sss.domain.track.dto.playlist;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 
 @Getter
 @Setter
-public class PlayListTrackInfoDto extends TrackInfoSaveDto {
+public class PlayListTrackInfoReqDto extends TrackInfoSaveReqDto {
     // 순서
     @NotNull
     private Integer order;

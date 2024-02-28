@@ -60,6 +60,7 @@ spring:
         jdbc:
           batch_size: 100
     open-in-view: false
+    defer-datasource-initialization: true
   thymeleaf:
     cache: false
     prefix: classpath:/templates/
@@ -70,7 +71,9 @@ spring:
       remote:
         restart:
           enabled: true
-
+  sql:
+    init:
+      mode: always
 #openapi:
 #  relaxed-binding:
 #    clientId: ${openapi.clientId}

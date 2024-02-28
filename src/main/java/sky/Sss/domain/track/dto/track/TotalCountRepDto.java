@@ -14,6 +14,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
-public class TotalCountDto implements Serializable {
+public class TotalCountRepDto implements Serializable {
     private Integer totalCount;
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.track.TotalCountDto;
+import sky.Sss.domain.track.dto.track.TotalCountRepDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.service.playList.PlyActionService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
@@ -46,7 +46,7 @@ public class PlyActionController {
      * @return
      */
     @PostMapping("/likes/{id}")
-    public ResponseEntity<TotalCountDto> saveLikes(@PathVariable Long id) {
+    public ResponseEntity<TotalCountRepDto> saveLikes(@PathVariable Long id) {
         if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
@@ -77,7 +77,7 @@ public class PlyActionController {
 
         int totalLikesCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
-        return ResponseEntity.ok(new TotalCountDto(totalLikesCount));
+        return ResponseEntity.ok(new TotalCountRepDto(totalLikesCount));
     }
 
 
@@ -89,7 +89,7 @@ public class PlyActionController {
      * @return
      */
     @DeleteMapping("/likes/{id}")
-    public ResponseEntity<TotalCountDto> removeLikes(@PathVariable Long id) {
+    public ResponseEntity<TotalCountRepDto> removeLikes(@PathVariable Long id) {
         if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
@@ -99,7 +99,7 @@ public class PlyActionController {
 
         int totalCount = plyActionService.getTotalLikesCount(ssbPlayListSettings.getToken());
 
-        return ResponseEntity.ok(new TotalCountDto(totalCount));
+        return ResponseEntity.ok(new TotalCountRepDto(totalCount));
     }
 
 }

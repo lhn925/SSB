@@ -11,6 +11,6 @@ import sky.Sss.domain.track.dto.track.BasePlayListDto;
 public class PlayListSettingSaveDto extends BasePlayListDto {
 
 
-    private List<PlayListTrackInfoDto> playListTrackInfoDtoList;
+    private List<PlayListTrackInfoReqDto> playListTrackInfoDtoList;
 
 }

@@ -2,12 +2,12 @@ package sky.Sss.domain.user.repository;
 
 
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.Enabled;
 
 
 public interface UserQueryRepository extends JpaRepository<User, Long> {
@@ -48,6 +48,10 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByIdAndIsEnabled(Long uid, Boolean isEnabled);
 
+
+
+    @Query("select u from User u where u.userName in (:userNames) and u.isEnabled = :isEnabled")
+    Set<User> findAllByUserNames(@Param("userNames") Set<String> userNames,@Param("isEnabled") Boolean isEnabled);
 
     // 중복 값
     Boolean existsBySalt(String slat);
