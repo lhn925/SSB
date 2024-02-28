@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.track;
 
 
+import java.util.HashMap;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class TrackLikesService {
         String subUserKey = ssbTrackLikes.getUser().getToken();
 
         // redis 좋아요 수 업로드
-        updateTotalCount(ssbTrack.getToken());
+//        updateTotalCount(ssbTrack.getToken());
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(ssbTrackLikes.getUser()), key, subUserKey);
     }
@@ -72,7 +73,7 @@ public class TrackLikesService {
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = user.getToken();
         // 좋아요 수 업로드
-        updateTotalCount(ssbTrack.getToken());
+//        updateTotalCount(ssbTrack.getToken());
         redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
 
@@ -116,12 +117,12 @@ public class TrackLikesService {
         }
         return trackLikesOptional.isPresent();
     }
-
-    /**
+/*
+    *//**
      *
      *
      * @param trackToken
-     */
+     *//*
     // likes Total 업데이트
     public void updateTotalCount(String trackToken) {
         // likes Size 를 구하긴 위한 key 값
@@ -130,21 +131,21 @@ public class TrackLikesService {
         String totalKey = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
 
         // redis 에서 총 size 검색
-        Integer count = redisCacheService.getRedisTotalCount(key);
+        int count = redisCacheService.getTotalCountByKey(new HashMap<>(),key);
 
-        count = count != null ? count : getCountByTrackToken(trackToken);
+        count = count != 0 ? count : getCountByTrackToken(trackToken);
         redisCacheService.upsertCacheMapValueByKey(count, totalKey, trackToken);
-    }
+    }*/
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
     public int getTotalCount(String trackToken) {
-        String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
+        String key = RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + trackToken;
         // redis 에 total 캐시가 있으면
-        Integer count = redisCacheService.getLikeCount(key, trackToken);
+        int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
 
-        count = count != null ? count : getCountByTrackToken(trackToken);
+        count = count != 0 ? count : getCountByTrackToken(trackToken);
         // redis 에 저장이 안되어 있을경우 count 후 저장
-        if (count == null) {
+        if (count == 0) {
             redisCacheService.upsertCacheMapValueByKey(count, key, trackToken);
         }
         return count;

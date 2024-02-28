@@ -1,6 +1,7 @@
 package sky.Sss.domain.user.service.follows;
 
 
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -118,7 +119,7 @@ public class UserFollowsService {
         return userFollowRepository.findByFollowingUserAndFollowerUser(followerUser, followingUser).orElse(null);
     }
 
-    // 유저의 Following Total 업데이트
+ /*   // 유저의 Following Total 업데이트
     // 유저의 follower Total 업데이트
     public void updateTotalCount(String redisKey,String totalKey, User user) {
         // likes Size 를 구하긴 위한 key 값
@@ -127,24 +128,24 @@ public class UserFollowsService {
         String key = redisKey + userToken;
 
         // redis 에서 총 size 검색
-        Integer count = redisCacheService.getRedisTotalCount(key);
+        int count = redisCacheService.getTotalCountByKey(new HashMap<>(),key);
 
-        count = count != null ? count :
+        count = count != 0 ? count :
             // redis 의 키가 followingList key와 같으면 followingCount 를 아니면 FollowerCount
             redisKey.equals(RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY) ? getFollowingCountByUser(user) : getFollowerCountByUser(user);
 
         // update
         redisCacheService.upsertCacheMapValueByKey(count, totalKey, user.getToken());
-    }
+    }*/
 
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
     public int getFollowerTotalCount(User user) {
-        String key = RedisKeyDto.REDIS_USER_FOLLOWER_TOTAL_MAP_KEY;
+        String key = RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY + user.getToken();
 
         int count = 0;
             // redis 에 total 캐시가 있으면
-        count = redisCacheService.getFollowerCount(key, user.getToken());
+        count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
 
         count = count != 0 ? count : getFollowerCountByUser(user);
         // redis 에 저장이 안되어 있을경우 count 후 저장
@@ -155,10 +156,10 @@ public class UserFollowsService {
     }
 
     public int getFollowingTotalCount(User user) {
-        String key = RedisKeyDto.REDIS_USER_FOLLOWING_TOTAL_MAP_KEY;
+        String key = RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY + user.getToken();
         // redis 에 total 캐시가 있으면
         int count = 0;
-        count = redisCacheService.getFollowingCount(key, user.getToken());
+        count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
         count = count != 0 ? count :getFollowingCountByUser(user);
         // redis 에 저장이 안되어 있을경우 count 후 저장
         if (count == 0) {

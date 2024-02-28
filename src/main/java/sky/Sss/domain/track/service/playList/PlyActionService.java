@@ -45,7 +45,7 @@ public class PlyActionService {
         plyLikesService.addLike(SsbPlyLikes.create(user,ssbPlayListSettings));
 
         // 좋아요 수 업로드
-        updateLikesCount(ssbPlayListSettings);
+//        updateLikesCount(ssbPlayListSettings);
     }
 
     /**
@@ -63,12 +63,12 @@ public class PlyActionService {
         }
         plyLikesService.cancelLike(ssbPlayListSettings, user);
         // 좋아요 수 업로드
-        updateLikesCount(ssbPlayListSettings);
+//        updateLikesCount(ssbPlayListSettings);
     }
-
+/*
     public void updateLikesCount(SsbPlayListSettings ssbPlayListSettings) {
-        plyLikesService.updateTotalCount(ssbPlayListSettings.getToken());
-    }
+//        plyLikesService.updateTotalCount(ssbPlayListSettings.getToken());
+    }*/
     public int getTotalLikesCount(String token) {
         return plyLikesService.getTotalCount(token);
     }

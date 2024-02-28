@@ -47,40 +47,40 @@ public class RedisCacheService {
         return redisQueryService.hasRedis(key);
     }
 
-    /**
-     * track,ply,reply 의 like 횟수를 가져오는 Method
-     *
-     * @param key
-     * @param token
-     * @return
-     */
-    public Integer getLikeCount(String key, String token) {
-        TypeReference<HashMap<String, Integer>> typeReference = new TypeReference<>() {
-        };
-        HashMap<String, Integer> map;
-        Integer count = null;
-        if (hasRedis(key)) {
-            map = getData(key, typeReference);
-            count = map.get(token);
-        }
-        return count;
-    }
+//    /**
+//     * track,ply,reply 의 like 횟수를 가져오는 Method
+//     *
+//     * @param key
+//     * @param token
+//     * @return
+//     */
+//    public Integer getLikeCount(String key, String token) {
+//        TypeReference<HashMap<String, Integer>> typeReference = new TypeReference<>() {
+//        };
+//        HashMap<String, Integer> map;
+//        Integer count = null;
+//        if (hasRedis(key)) {
+//            map = getData(key, typeReference);
+//            count = map.get(token);
+//        }
+//        return count;
+//    }
 
     /**
      * 유저의 FollowingTotal 을 가져오는 Method
      *
      */
-    public Integer getFollowingCount(String key, String subKey) {
-        return this.getLikeCount(key, subKey);
-    }
-
-    /**
-     * 유저의 FollowerTotal 을 가져오는 Method
-     *
-     */
-    public Integer getFollowerCount(String key, String subKey) {
-        return this.getLikeCount(key, subKey);
-    }
+//    public Integer getFollowingCount(String key, String subKey) {
+//        return this.getLikeCount(key, subKey);
+//    }
+//
+//    /**
+//     * 유저의 FollowerTotal 을 가져오는 Method
+//     *
+//     */
+//    public Integer getFollowerCount(String key, String subKey) {
+//        return this.getLikeCount(key, subKey);
+//    }
 
     /**
      * map 형태로 된 cache 에 값이 존재하는 지 boolean 값으로 반환 검색
@@ -115,15 +115,18 @@ public class RedisCacheService {
      * @param key
      * @return
      */
-    public Integer getRedisTotalCount(String key) {
-        Integer count = null;
-        TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
+    public <C> int getTotalCountByKey(C collectionType,String key) {
+        TypeReference<C> typeReference = new TypeReference<>() {
         };
-        HashMap<String, UserSimpleInfoDto> data = null;
-
+        int count = 0;
         if (hasRedis(key)) {
-            data = getData(key, typeReference);
-            count = data.size();
+            if (collectionType instanceof HashMap) {
+                HashMap<Object,Object> map = (HashMap) getData(key, typeReference);
+                count = map.size();
+            } else if (collectionType instanceof HashSet) {
+                HashSet<Object> set = (HashSet) getData(key, typeReference);
+                count = set.size();
+            }
         }
         return count;
     }

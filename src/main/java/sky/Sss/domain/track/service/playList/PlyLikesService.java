@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.playList;
 
 
+import java.util.HashMap;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,28 +99,28 @@ public class PlyLikesService {
     }
 
 
-    // likes Total 업데이트
+/*    // likes Total 업데이트
     public void updateTotalCount(String token) {
         // likes Size 를 구하긴 위한 key 값
         String key = RedisKeyDto.REDIS_PLY_LIKES_MAP_KEY + token;
 
         String totalKey = RedisKeyDto.REDIS_PLY_LIKES_TOTAL_MAP_KEY;
 
-        Integer count = redisCacheService.getRedisTotalCount(key);
+        int count = redisCacheService.getTotalCountByKey(new HashMap<>(),key);
 
-        count = count != null ? count : getPlyCount(token);
+        count = count != 0 ? count : getPlyCount(token);
         redisCacheService.upsertCacheMapValueByKey(count, totalKey, token);
-    }
+    }*/
 
     // likes Total 조회수 검색
     public int getTotalCount(String token) {
-        String key = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
+        String key = RedisKeyDto.REDIS_PLY_LIKES_MAP_KEY + token;
         // redis 에 total 캐시가 있으면
-        Integer count = redisCacheService.getLikeCount(key, token);
+        int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
 
-        count = count != null ? count : getPlyCount(token);
+        count = count != 0 ? count : getPlyCount(token);
         // redis 에 저장이 안되어 있을경우 count 후 저장
-        if (count == null) {
+        if (count == 0) {
             redisCacheService.upsertCacheMapValueByKey(count, key, token);
         }
         return count;
