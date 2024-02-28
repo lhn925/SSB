@@ -62,9 +62,6 @@ public class SsbTrackReply extends BaseTimeEntity {
     // 대댓글 순서
     private Integer replyOrder;
 
-    // 삭제 유무
-    @Column(nullable = false)
-    private Boolean isStatus;
 
     public static SsbTrackReply create(TrackReplySaveReqDto trackReplySaveReqDto, User user, SsbTrack ssbTrack) {
         SsbTrackReply ssbTrackReply = new SsbTrackReply();
@@ -79,7 +76,6 @@ public class SsbTrackReply extends BaseTimeEntity {
         }
         ssbTrackReply.setTimeLine(timeLine);
         ssbTrackReply.setContents(JsEscape.escapeJS(trackReplySaveReqDto.getContents()));
-        ssbTrackReply.setIsStatus(Status.ON.getValue());
         ssbTrackReply.setParentId(trackReplySaveReqDto.getParentId());
         return ssbTrackReply;
     }

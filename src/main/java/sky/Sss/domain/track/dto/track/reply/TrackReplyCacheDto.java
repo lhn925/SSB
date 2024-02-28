@@ -19,13 +19,11 @@ public class TrackReplyCacheDto {
     private int timeLine;
     private long parentId;
     private int replyOrder;
-    private boolean isStatus;
 
     public TrackReplyCacheDto(SsbTrackReply ssbTrackReply) {
         this.setId(ssbTrackReply.getId());
         this.setUserToken(ssbTrackReply.getUser().getToken());
         this.setContents(ssbTrackReply.getContents());
-        this.setStatus(ssbTrackReply.getIsStatus());
         this.setReplyOrder(ssbTrackReply.getReplyOrder());
         this.setParentId(ssbTrackReply.getParentId());
         this.setTimeLine(ssbTrackReply.getTimeLine());

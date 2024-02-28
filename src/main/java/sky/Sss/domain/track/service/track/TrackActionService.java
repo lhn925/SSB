@@ -165,7 +165,7 @@ public class TrackActionService {
 //            Status.ON);
         // 삭제를 요청한 사용자
         User user = userQueryService.findOne();
-        //
+        // 댓글을 가져올때 대 댓글도 모두 검색 후 반환
         List<SsbTrackReply> ssbTrackReplies = trackReplyService.findListAndSubReplies(trackReplyRmReqDto.getReplyId(),
             trackReplyRmReqDto.getReplyToken());
 
