@@ -32,13 +32,25 @@ public class TrackLikesService {
      * Track 좋아요 추가
      */
     @Transactional
-    public void addLike(SsbTrackLikes ssbTrackLikes) {
+    public void addLikes(SsbTrack ssbTrack, User user) {
+        boolean isLikes = existsLikes(ssbTrack, user);
+        if (isLikes) {
+            // 좋아요가 있는지 확인
+            // 좋아요가 이미 있는 경우 예외 처리
+            throw new IllegalArgumentException();
+        }
+        // 저장
+        SsbTrackLikes ssbTrackLikes = SsbTrackLikes.create(user, ssbTrack);
+
         SsbTrackLikes save = trackLikesRepository.save(ssbTrackLikes);
+
         String key = getLikeKey(save.getSsbTrack());
 
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = ssbTrackLikes.getUser().getToken();
 
+        // redis 좋아요 수 업로드
+        updateTotalCount(ssbTrack.getToken());
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(ssbTrackLikes.getUser()), key, subUserKey);
     }
@@ -47,8 +59,11 @@ public class TrackLikesService {
      * 좋아요 취소
      */
     @Transactional
-    public void cancelLike(SsbTrack ssbTrack ,User user) {
-        SsbTrackLikes ssbTrackLikes = findOne(ssbTrack, user);
+    public void cancelLikes(SsbTrack ssbTrack ,User user) {
+        // 사용자 검색
+        // 좋아요가 있는지 확인
+        // 좋아요가 없는데 취소하는 경우 예외 처리
+        SsbTrackLikes ssbTrackLikes = findOne(ssbTrack, user);;
 
         delete(ssbTrackLikes);
 
@@ -56,7 +71,8 @@ public class TrackLikesService {
 
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = user.getToken();
-
+        // 좋아요 수 업로드
+        updateTotalCount(ssbTrack.getToken());
         redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
 
@@ -68,10 +84,10 @@ public class TrackLikesService {
      * @return
      */
     public SsbTrackLikes findOne (SsbTrack ssbTrack,User user) {
-        SsbTrackLikes ssbTrackLikes = trackLikesRepository.findBySsbTrackAndUser(ssbTrack, user)
-            .orElseThrow(() -> new IllegalArgumentException());
-        return ssbTrackLikes;
+        return trackLikesRepository.findBySsbTrackAndUser(ssbTrack, user)
+            .orElseThrow(IllegalArgumentException::new);
     }
+
 
     /**
      * like 취소
