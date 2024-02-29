@@ -83,8 +83,6 @@ public class UserPushMsgService {
         // 현재 레디스에 있는 유저 알림 목록 반환
         String redisPushMsgListKey = RedisKeyDto.REDIS_PUSH_MSG_LIST_KEY;
 
-        log.info("redisPushMsgListKey = {}", redisPushMsgListKey);
-
         if (redisCacheService.hasRedis(redisPushMsgListKey)) { // 있는지 확인
             userPushMap = redisCacheService.getData(redisPushMsgListKey, type);
             pushMsgCacheDtoList = Optional.ofNullable(userPushMap.get(userToken)).orElse(new ArrayList<>());

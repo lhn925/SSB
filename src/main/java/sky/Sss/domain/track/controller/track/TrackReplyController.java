@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.track.reply.TrackReplyRmReqDto;
+import sky.Sss.domain.track.dto.track.reply.ReplyRmReqDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplySaveReqDto;
-import sky.Sss.domain.track.service.track.TrackActionService;
+import sky.Sss.domain.track.service.common.TrackCommonService;
+import sky.Sss.domain.user.model.ContentsType;
 
 
 @Slf4j
@@ -24,7 +25,7 @@ import sky.Sss.domain.track.service.track.TrackActionService;
 public class TrackReplyController {
 
 
-    private final TrackActionService trackActionService;
+    private final TrackCommonService trackCommonService;
 
     // 해시태그
     // userName 으로 할것인가
@@ -35,7 +36,7 @@ public class TrackReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackActionService.addReply(trackReplySaveReqDto);
+        trackCommonService.addReply(trackReplySaveReqDto, ContentsType.TRACK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -43,12 +44,12 @@ public class TrackReplyController {
     // 삭제
 
     @DeleteMapping
-    public ResponseEntity<?> removeReply(@Validated @RequestBody TrackReplyRmReqDto trackReplyRmReqDto,
+    public ResponseEntity<?> removeReply(@Validated @RequestBody ReplyRmReqDto replyRmReqDto,
         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackActionService.deleteReply(trackReplyRmReqDto);
+        trackCommonService.deleteReply(replyRmReqDto,ContentsType.TRACK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

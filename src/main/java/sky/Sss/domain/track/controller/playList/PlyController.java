@@ -53,7 +53,7 @@ public class PlyController {
      * @return
      */
     @PostMapping
-    public ResponseEntity savePly(@Validated @RequestPart PlayListSettingSaveDto playListSettingSaveDto,
+    public ResponseEntity<?> savePly(@Validated @RequestPart PlayListSettingSaveDto playListSettingSaveDto,
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -73,7 +73,7 @@ public class PlyController {
      * @return
      */
     @PutMapping
-    public ResponseEntity modifyPly(@Validated @RequestPart PlayListSettingUpdateDto playListSettingUpdateDto,
+    public ResponseEntity<?> modifyPly(@Validated @RequestPart PlayListSettingUpdateDto playListSettingUpdateDto,
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -91,7 +91,7 @@ public class PlyController {
      * @return
      */
     @DeleteMapping
-    public ResponseEntity removePly(@Validated @RequestBody PlayListTrackDeleteDto playListTrackDeleteDto,
+    public ResponseEntity<?> removePly(@Validated @RequestBody PlayListTrackDeleteDto playListTrackDeleteDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));

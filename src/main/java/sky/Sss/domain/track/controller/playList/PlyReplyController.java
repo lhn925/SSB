@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.playlist.reply.PlyReplyRmReqDto;
 import sky.Sss.domain.track.dto.playlist.reply.PlyReplySaveReqDto;
-import sky.Sss.domain.track.dto.track.reply.TrackReplyRmReqDto;
-import sky.Sss.domain.track.dto.track.reply.TrackReplySaveReqDto;
-import sky.Sss.domain.track.service.playList.PlyActionService;
-import sky.Sss.domain.track.service.track.TrackActionService;
+import sky.Sss.domain.track.dto.track.reply.ReplyRmReqDto;
+import sky.Sss.domain.track.service.common.TrackCommonService;
+import sky.Sss.domain.user.model.ContentsType;
 
 
 @Slf4j
@@ -27,7 +25,7 @@ import sky.Sss.domain.track.service.track.TrackActionService;
 public class PlyReplyController {
 
 
-    private final PlyActionService plyActionService;
+    private final TrackCommonService trackCommonService;
 
     // 해시태그
     // userName 으로 할것인가
@@ -38,20 +36,17 @@ public class PlyReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        plyActionService.addReply(plyReplySaveReqDto);
+        trackCommonService.addReply(plyReplySaveReqDto, ContentsType.PLAYLIST);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
     // 삭제
-
     @DeleteMapping
-    public ResponseEntity<?> removeReply(@Validated @RequestBody PlyReplyRmReqDto plyReplyRmReqDto,
+    public ResponseEntity<?> removeReply(@Validated @RequestBody ReplyRmReqDto replyRmReqDto,
         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        plyActionService.deleteReply(plyReplyRmReqDto);
+        trackCommonService.deleteReply(replyRmReqDto,ContentsType.PLAYLIST);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

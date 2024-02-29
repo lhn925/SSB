@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplyCacheDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 import sky.Sss.domain.track.repository.track.reply.TrackReplyRepository;
-import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
@@ -51,7 +51,6 @@ public class TrackReplyService {
         SsbTrackReply.updateToken(ssbTrackReply, replyToken);
 
         trackReplyRepository.save(ssbTrackReply);
-
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken();
 
         redisCacheService.upsertCacheMapValueByKey(new TrackReplyCacheDto(ssbTrackReply), key, replyToken);
@@ -77,15 +76,13 @@ public class TrackReplyService {
      * 대댓글 삭제
      */
     @Transactional
-    public void removeReplies(List<SsbTrackReply> ssbTrackReplies, SsbTrack ssbTrack) {
-
-        trackReplyRepository.deleteAllInBatch(ssbTrackReplies);
-
-        String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken();
-
+    public void removeReplies(List<ReplyRmInfoDto> replyRmDtoList, String trackToken) {
+        List<Long> replyIdList = replyRmDtoList.stream().map(ReplyRmInfoDto::getReplyId).toList();
+        trackReplyRepository.deleteAllByIdInBatch(replyIdList);
+        String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + trackToken;
         // 캐쉬 삭제
-        ssbTrackReplies.forEach(reply -> {
-            redisCacheService.removeCacheMapValueByKey(new TrackReplyCacheDto(), key, reply.getToken());
+        replyRmDtoList.forEach(reply -> {
+            redisCacheService.removeCacheMapValueByKey(new TrackReplyCacheDto(), key, reply.getReplyToken());
         });
     }
 
@@ -102,6 +99,15 @@ public class TrackReplyService {
             .orElseThrow(IllegalArgumentException::new);
     }
 
+
+    public List<ReplyRmInfoDto> getReplyRmInfoDtoList(long id, String token) {
+        List<ReplyRmInfoDto> listAndSubReplies = trackReplyRepository.getReplyRmInfoDtoList(id, token);
+        if (listAndSubReplies.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        return listAndSubReplies;
+    }
+
     // 그 댓글에 달린 대댓글 까지 모두 가져오는 쿼리 실행
     public List<SsbTrackReply> findListAndSubReplies(long id, String token) {
         List<SsbTrackReply> listAndSubReplies = trackReplyRepository.findListAndSubReplies(id, token);
@@ -112,4 +118,4 @@ public class TrackReplyService {
     }
 
 
-}
+    }

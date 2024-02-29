@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
 import sky.Sss.domain.track.dto.playlist.reply.PlyReplyCacheDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplyCacheDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
@@ -77,15 +78,15 @@ public class PlyReplyService {
      * 대댓글 삭제
      */
     @Transactional
-    public void removeReplies(List<SsbPlyReply> SsbPlayListSettingsReplies, SsbPlayListSettings SsbPlayListSettings) {
+    public void removeReplies(List<ReplyRmInfoDto> replyRmInfoDtoList, String settingToken) {
+        List<Long> replyIdList = replyRmInfoDtoList.stream().map(ReplyRmInfoDto::getReplyId).toList();
 
-        plyReplyRepository.deleteAllInBatch(SsbPlayListSettingsReplies);
+        plyReplyRepository.deleteAllByIdInBatch(replyIdList);
 
-        String key = RedisKeyDto.REDIS_PLY_REPLY_MAP_KEY + SsbPlayListSettings.getToken();
-
+        String key = RedisKeyDto.REDIS_PLY_REPLY_MAP_KEY + settingToken;
         // 캐쉬 삭제
-        SsbPlayListSettingsReplies.forEach(reply -> {
-            redisCacheService.removeCacheMapValueByKey(new TrackReplyCacheDto(), key, reply.getToken());
+        replyRmInfoDtoList.forEach(reply -> {
+            redisCacheService.removeCacheMapValueByKey(new TrackReplyCacheDto(), key, reply.getReplyToken());
         });
     }
 
@@ -103,13 +104,19 @@ public class PlyReplyService {
     }
 
     // 그 댓글에 달린 대댓글 까지 모두 가져오는 쿼리 실행
-    public List<SsbPlyReply> findListAndSubReplies(long id, String token) {
-        List<SsbPlyReply> listAndSubReplies = plyReplyRepository.findListAndSubReplies(id, token);
+    public List<ReplyRmInfoDto> getReplyRmInfoDtoList(long id, String token) {
+        List<ReplyRmInfoDto> listAndSubReplies = plyReplyRepository.getReplyRmInfoDtoList(id, token);
         if (listAndSubReplies.isEmpty()) {
             throw new IllegalArgumentException();
         }
         return listAndSubReplies;
     }
-
-
+//
+//    public List<SsbPlyReply> getReplyRmInfoDtoList(long id, String token) {
+//        List<SsbPlyReply> listAndSubReplies = plyReplyRepository.findListAndSubReplies(id, token);
+//        if (listAndSubReplies.isEmpty()) {
+//            throw new IllegalArgumentException();
+//        }
+//        return listAndSubReplies;
+//    }
 }
