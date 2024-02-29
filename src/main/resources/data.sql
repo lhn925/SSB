@@ -17,3 +17,16 @@ insert into ssb_track_reply (contents, created_date_time, last_modified_date_tim
 insert into ssb_track_reply (contents, created_date_time, last_modified_date_time, parent_id, reply_order, track_id, time_line, token, uid, id) values ('\\u007B\\u003C안녕하십니까\\u003E\\u007D\\u0020\\u003Ca/\\u0020url=\\u0027www.naver.com\\u0027\\u0020\\u003E', '2024-02-28 10:27:31.397483',  '2024-02-28 10:27:31.397483', 2, 1, 1, 0, 'b4f71f3f8bf7dd629b47', 1, 5);
 
 insert into ssb_track_reply (contents, created_date_time, last_modified_date_time, parent_id, reply_order, track_id, time_line, token, uid, id) values ('\\u007B\\u003C안녕하십니까\\u003E\\u007D\\u0020\\u003Ca/\\u0020url=\\u0027www.naver.com\\u0027\\u0020\\u003E', '2024-02-28 10:27:31.397483',  '2024-02-28 10:27:31.397483', 2, 2, 1, 0, 'bsf71f3f8bf7dd629b47', 1, 6);
+
+
+insert into ssb_play_list_settings (cover_url, created_date_time, description, is_download, is_privacy, is_status,
+                                    last_modified_date_time, play_list_type, title, token, uid, id) values ('cover-28a9e3db-0414-4c04-b4dd-2ef6265c5fe5.jpg', '2024-02-29 04:30:54.143601', '소갯말', 0, 0, 1, '2024-02-29 04:30:54.143601', 'ALBUM', 'playListTest', '2e705b4ef206c2cc7435', 3, 1);
+
+
+
+insert into ssb_play_list_settings (cover_url, created_date_time, description, is_download, is_privacy, is_status,
+                                    last_modified_date_time, play_list_type, title, token, uid, id) values ('cover-28a9e3db-0414-4c04-b4dd-2ef6265c5fe5.jpg', '2024-02-29 04:30:54.143601', '소갯말', 0, 0, 1, '2024-02-29 04:30:54.143601', 'ALBUM', 'playListTest', '2e705b4ef206c2cc74552', 3, 2);
+
+
+insert into ssb_play_list_settings (cover_url, created_date_time, description, is_download, is_privacy, is_status,
+                                    last_modified_date_time, play_list_type, title, token, uid, id) values ('cover-28a9e3db-0414-4c04-b4dd-2ef6265c5fe5.jpg', '2024-02-29 04:30:54.143601', '소갯말', 0, 0, 1, '2024-02-29 04:30:54.143601', 'ALBUM', 'playListTest', '2e705b4ef206c2cc74455', 3, 3);

@@ -14,9 +14,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import sky.Sss.domain.track.dto.playlist.reply.PlyReplySaveReqDto;
+import sky.Sss.domain.track.dto.track.reply.TrackReplySaveReqDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
+import sky.Sss.global.utili.JsEscape;
+
 
 @Slf4j
 @Getter
@@ -31,20 +37,20 @@ public class SsbPlyReply extends BaseTimeEntity {
 
     // 유저 정보
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "uid",nullable = false)
+    @JoinColumn(name = "uid", nullable = false)
     private User user;
+
+    @Column(nullable = false,unique = true)
+    private String token;
 
     // 트랙 정보
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "settings_id",nullable = false)
+    @JoinColumn(name = "settings_id", nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
     // 내용
     @Column(nullable = false)
     private String contents;
-
-    // 태그 (다중 태그) 유저 고유 Index 저장
-    private String hashTags;
 
     // 대댓글일 경우 댓글 id
     @Column(name = "parent_id")
@@ -53,8 +59,22 @@ public class SsbPlyReply extends BaseTimeEntity {
     // 대댓글 순서
     private Integer replyOrder;
 
-    // 삭제 유무
-    @Column(nullable = false)
-    private Boolean isStatus;
+    public static SsbPlyReply create(PlyReplySaveReqDto trackReplySaveReqDto, User user, SsbPlayListSettings ssbPlayListSettings) {
+        SsbPlyReply ssbPlyReply = new SsbPlyReply();
+        ssbPlyReply.setUser(user);
+        ssbPlyReply.setSsbPlayListSettings(ssbPlayListSettings);
+        ssbPlyReply.setContents(JsEscape.escapeJS(trackReplySaveReqDto.getContents()));
+        ssbPlyReply.setParentId(trackReplySaveReqDto.getParentId());
+        return ssbPlyReply;
+    }
 
+    public static void updateReplyOrder(SsbPlyReply ssbPlyReply, int replyOrder) {
+        ssbPlyReply.setReplyOrder(replyOrder);
+    }
+    public static void updateParentId(SsbPlyReply ssbPlyReply, long parentId) {
+        ssbPlyReply.setParentId(parentId);
+    }
+    public static void updateToken(SsbPlyReply ssbPlyReply, String token) {
+        ssbPlyReply.setToken(token);
+    }
 }

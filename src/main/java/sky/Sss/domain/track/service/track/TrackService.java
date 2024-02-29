@@ -13,6 +13,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sky.Sss.domain.track.dto.BaseTrackDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
@@ -137,8 +138,8 @@ public class TrackService {
         // ssbTrack 저장을 위한 Map 생성
         Map<Integer, SsbTrack> trackFileMap = new HashMap<>();
 
-        List<String> tokens = trackPlayListFileDtoList.stream().map(dto -> dto.getToken()).collect(Collectors.toList());
-        List<Long> ids = trackPlayListFileDtoList.stream().map(dto -> dto.getId()).collect(Collectors.toList());
+        List<String> tokens = trackPlayListFileDtoList.stream().map(BaseTrackDto::getToken).collect(Collectors.toList());
+        List<Long> ids = trackPlayListFileDtoList.stream().map(BaseTrackDto::getId).collect(Collectors.toList());
 
         List<TempTrackStorage> tempList = tempTrackStorageService.findByList(sessionId, user, tokens, ids);
 
@@ -158,7 +159,7 @@ public class TrackService {
         for (PlayListTrackInfoReqDto metaDto : trackPlayListFileDtoList) {
             TempTrackStorage tempTrack = tempList.stream().filter(temp -> temp.getToken().equals(metaDto.getToken()))
                 .findFirst()
-                .orElseThrow(() -> new SsbFileNotFoundException());
+                .orElseThrow(SsbFileNotFoundException::new);
             // ssbTrack 저장
             SsbTrack ssbTrack = createTrack(user, tempTrack, totalUploadTrackLength, totalTrackLength, metaDto,
                 ssbTrackTags);

@@ -144,7 +144,7 @@ public class TrackActionService {
         users.addAll(userQueryService.findUsersByUserNames(userTagSet, Enabled.ENABLED));
 
         String contents = ssbTrackReply.getContents();
-        String linkUrl = ContentsType.REPLY.getUrl() + trackId + "/" + ssbTrackReply.getId();
+        String linkUrl = ContentsType.TRACK.getUrl() + trackId + "/" + ssbTrackReply.getId();
         users.forEach(toUser -> {
             UserPushMessages userPushMessages = UserPushMessages.create(toUser, user, PushMsgType.REPLY,
                 ContentsType.TRACK, ssbTrackReply.getId());

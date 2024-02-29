@@ -23,6 +23,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
+import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 import sky.Sss.domain.track.model.PlayListType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
@@ -83,6 +84,8 @@ public class SsbPlayListSettings extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
     private List<SsbPlayListTracks> playListTracks = new ArrayList<>();
+    @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
+    private List<SsbPlyReply> replies = new ArrayList<>();
 
 
     public static void addAllTracks(List<SsbPlayListTracks> ssbPlayListTracks,
