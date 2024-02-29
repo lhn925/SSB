@@ -45,8 +45,8 @@ import sky.Sss.global.file.utili.FileStore;
 public class User extends BaseTimeEntity {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userTable_id_sequence")
-    @GeneratedValue
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)(strategy = GenerationType.SEQUENCE,generator = "userTable_id_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

@@ -7,6 +7,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -25,7 +26,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 public class UserFollows extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 팔로우를 하는 사람들
