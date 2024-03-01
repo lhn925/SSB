@@ -61,11 +61,6 @@ public class UserActionService {
     }
 
 
-
-
-
-
-
     public int getTotalFollowerCount(User user) {
         return userFollowsService.getFollowerTotalCount(user);
     }

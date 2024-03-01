@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
 import sky.Sss.domain.track.dto.common.ReplySaveReqDto;
 import sky.Sss.domain.track.dto.playlist.reply.PlyReplySaveReqDto;
+import sky.Sss.domain.track.dto.track.TotalCountRepDto;
 import sky.Sss.domain.track.dto.track.reply.ReplyRmReqDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplySaveReqDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
@@ -19,9 +21,13 @@ import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
+import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
+import sky.Sss.domain.track.service.playList.reply.PlyReplyLikesService;
 import sky.Sss.domain.track.service.playList.reply.PlyReplyService;
+import sky.Sss.domain.track.service.track.TrackLikesService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
+import sky.Sss.domain.track.service.track.reply.TrackReplyLikesService;
 import sky.Sss.domain.track.service.track.reply.TrackReplyService;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
@@ -40,18 +46,28 @@ import sky.Sss.domain.user.service.push.UserPushMsgService;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class TrackCommonService {
+public class ReplyCommonService {
 
 
     private final UserQueryService userQueryService;
     private final TrackQueryService trackQueryService;
     private final PlyQueryService plyQueryService;
+
     private final PlyReplyService plyReplyService;
     private final TrackReplyService trackReplyService;
-    private final UserPushMsgService userPushMsgService;
+
     // reply
+    private final UserPushMsgService userPushMsgService;
 
 
+
+
+    /**
+     *
+     * Reply 추가
+     * @param replySaveReqDto
+     * @param contentsType
+     */
     @Transactional
     public void addReply(ReplySaveReqDto replySaveReqDto, ContentsType contentsType) {
         User user = userQueryService.findOne();
@@ -116,12 +132,12 @@ public class TrackCommonService {
             .findFirst().orElseThrow(
                 IllegalArgumentException::new);
 
-        String token = replyDto.getTrackToken();
+        String token = replyDto.getTargetToken();
 
         // 요청자 아이디
         long uid = user.getId();
         // 트랙 작성 유저
-        long trackOwnerUid = replyDto.getTrackOwner();
+        long trackOwnerUid = replyDto.getTargetOwner();
 
         // 댓글 작성자 고유 아이디 추출
         long ownerUid = replyDto.getReplyOwner();

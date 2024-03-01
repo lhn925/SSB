@@ -51,6 +51,7 @@ public class RedisQueryService {
     }
 
     public Boolean delete(String key) {
+
         return redisTemplate.delete(key);
     }
 

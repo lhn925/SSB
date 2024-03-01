@@ -7,11 +7,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplyCacheDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
+import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.track.reply.TrackReplyRepository;
+import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
@@ -117,5 +120,10 @@ public class TrackReplyService {
         return listAndSubReplies;
     }
 
-
+    public LikeTargetInfoDto getLikeTargetInfoDto(long id,String token) {
+        return trackReplyRepository.getLikeTargetInfoDto(id, token)
+            .orElseThrow(SsbFileNotFoundException::new);
     }
+
+
+}

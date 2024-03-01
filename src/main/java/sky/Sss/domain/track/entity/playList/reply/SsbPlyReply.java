@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,8 @@ import sky.Sss.domain.track.dto.playlist.reply.PlyReplySaveReqDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplySaveReqDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.base.BaseTimeEntity;
@@ -78,4 +81,9 @@ public class SsbPlyReply extends BaseTimeEntity {
     public static void updateToken(SsbPlyReply ssbPlyReply, String token) {
         ssbPlyReply.setToken(token);
     }
+    @Builder
+    public SsbPlyReply(Long id) {
+        this.id = id;
+    }
+
 }

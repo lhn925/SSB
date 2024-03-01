@@ -32,13 +32,15 @@ public class PlyActionService {
 
     private final UserQueryService userQueryService;
     private final PlyLikesService plyLikesService;
-    private final UserPushMsgService userPushMsgService;
     private final PlyQueryService plyQueryService;
 
 
-    /**
+/*
+    */
+/**
      * playList 좋아요 추가 후 총 좋아요 수 반환
-     */
+     *//*
+
     @Transactional
     public TotalCountRepDto addLikes(Long id, String token) {
         // track 검색
@@ -66,7 +68,9 @@ public class PlyActionService {
         }
         return new TotalCountRepDto(getTotalLikesCount(ssbPlayListSettings.getToken()));
     }
+*/
 
+/*
 
     @Transactional
     public TotalCountRepDto cancelLikes(Long id, String token) {
@@ -81,6 +85,7 @@ public class PlyActionService {
 
         return new TotalCountRepDto(totalCount);
     }
+*/
 
 
     /**

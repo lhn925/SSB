@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.entity.track;
+package sky.Sss.domain.track.entity.track.reply;
 
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -17,16 +17,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 
 
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid", "track_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid", "reply_id"})})
 @Entity
 @Setter(value = PRIVATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SsbTrackLikes extends BaseTimeEntity implements Serializable {
+public class SsbTrackReplyLikes extends BaseTimeEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,17 +39,17 @@ public class SsbTrackLikes extends BaseTimeEntity implements Serializable {
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "track_id", nullable = false)
-    private SsbTrack ssbTrack;
+    @JoinColumn(name = "reply_id", nullable = false)
+    private SsbTrackReply ssbTrackReply;
 
-    public static SsbTrackLikes create(User user) {
-        SsbTrackLikes ssbTrackLikes = new SsbTrackLikes();
+    public static SsbTrackReplyLikes create(User user) {
+        SsbTrackReplyLikes ssbTrackLikes = new SsbTrackReplyLikes();
         ssbTrackLikes.setUser(user);
         return ssbTrackLikes;
     }
 
-    public static void updateTrack(SsbTrackLikes ssbTrackLikes,long id) {
-        SsbTrack ssbTrack = SsbTrack.builder().id(id).build();
-        ssbTrackLikes.setSsbTrack(ssbTrack);
+    public static void updateReply(SsbTrackReplyLikes ssbTrackReplyLikes,long id) {
+        SsbTrackReply ssbTrackReply = SsbTrackReply.builder().id(id).build();
+        ssbTrackReplyLikes.setSsbTrackReply(ssbTrackReply);
     }
 }

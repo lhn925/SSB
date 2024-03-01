@@ -2,6 +2,7 @@ package sky.Sss.domain.track.service.playList;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,20 +34,22 @@ public class PlyLikesService {
      * Track 좋아요 추가
      */
     @Transactional
-    public void addLikes(SsbPlayListSettings ssbPlayListSettings,User user) {
+    public void addLikes(Long id, String token, User user) {
 
         // 좋아요가 있는지 확인
         // 좋아요가 이미 있는 경우 예외 처리
-        boolean isLikes = existsLikes(ssbPlayListSettings, user);
+        boolean isLikes = existsLikes(token,id, user);
         if (isLikes) {
             throw new IllegalArgumentException();
         }
-        SsbPlyLikes ssbPlyLikes = SsbPlyLikes.create(user, ssbPlayListSettings);
-        SsbPlyLikes save = plyLikesRepository.save(ssbPlyLikes);
-        String key = getLikeKey(save.getSsbPlayListSettings());
+        SsbPlyLikes ssbPlyLikes = SsbPlyLikes.create(user);
+        SsbPlyLikes.updateSettings(ssbPlyLikes,id);
+
+        plyLikesRepository.save(ssbPlyLikes);
+        String key = getLikeKey(token);
 
         // likesMap 안에 들어갈 user 를 검색하는 key
-        String subUserKey = ssbPlyLikes.getUser().getUserId();
+        String subUserKey = ssbPlyLikes.getUser().getToken();
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(ssbPlyLikes.getUser()), key, subUserKey);
     }
 
@@ -54,37 +57,51 @@ public class PlyLikesService {
      * 좋아요 취소
      */
     @Transactional
-    public void cancelLikes(SsbPlayListSettings ssbPlayListSettings ,User user) {
+    public void cancelLikes(long plyId,String plyToken, User user) {
         // 좋아요가 있는지 확인
-        SsbPlyLikes ssbTrackLikes = findOne(ssbPlayListSettings, user);
+        SsbPlyLikes ssbTrackLikes = findOne(plyId, user);
 
         deleteByEntity(ssbTrackLikes);
 
-        String key = getLikeKey(ssbPlayListSettings);
+        String key = getLikeKey(plyToken);
 
         // likesMap 안에 들어갈 user 를 검색하는 key
-        String subUserKey = user.getUserId();
+        String subUserKey = user.getToken();
 
         redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
+
     /**
-     *
      * 없을시에 IllegalArgumentException
+     *
      * @param user
      * @return
      */
-    public SsbPlyLikes findOne (SsbPlayListSettings ssbPlayListSettings,User user) {
+    public SsbPlyLikes findOne(SsbPlayListSettings ssbPlayListSettings, User user) {
         return plyLikesRepository.findByPlyIdAndUser(ssbPlayListSettings, user)
             .orElseThrow(IllegalArgumentException::new);
 
     }
+
+    /**
+     * 없을시에 IllegalArgumentException
+     *
+     * @param user
+     * @return
+     */
+    public SsbPlyLikes findOne(long plyId, User user) {
+        return plyLikesRepository.findBySettingsIdAndUser(plyId, user)
+            .orElseThrow(IllegalArgumentException::new);
+
+    }
+
     /**
      * like 취소
      *
      * @return
      */
     @Transactional
-    public void deleteByEntity (SsbPlyLikes ssbPlyLikes) {
+    public void deleteByEntity(SsbPlyLikes ssbPlyLikes) {
         plyLikesRepository.delete(ssbPlyLikes);
 
     }
@@ -92,13 +109,13 @@ public class PlyLikesService {
     /**
      * 좋아요 눌렀는지 확인
      */
-    public boolean existsLikes(SsbPlayListSettings settings, User user) {
-        String key = getLikeKey(settings);
+    public boolean existsLikes(String token, long id, User user) {
+        String key = getLikeKey(token);
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            return redisCacheService.existsByUserId(user, key);
+            return redisCacheService.existsByToken(user, key);
         }
-        Optional<SsbPlyLikes> plyLikesOptional = plyLikesRepository.findByPlyIdAndUser(settings, user);
+        Optional<SsbPlyLikes> plyLikesOptional = plyLikesRepository.findBySettingsIdAndUser(id, user);
 
         // 만약 레디스에는 없고 디비에는 있으면
         if (plyLikesOptional.isPresent()) {
@@ -135,12 +152,16 @@ public class PlyLikesService {
         return count;
     }
 
+    public List<User> getUserList(String replyToken) {
+        return plyLikesRepository.getUserList(replyToken);
+    }
+
     private Integer getPlyCount(String token) {
         return plyLikesRepository.countByPlyToken(token);
     }
 
 
-    private String getLikeKey(SsbPlayListSettings ssbPlayListSettings) {
-        return RedisKeyDto.REDIS_PLY_LIKES_MAP_KEY + ssbPlayListSettings.getToken();
+    private String getLikeKey(String token) {
+        return RedisKeyDto.REDIS_PLY_LIKES_MAP_KEY + token;
     }
 }

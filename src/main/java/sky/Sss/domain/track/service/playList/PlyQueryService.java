@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.playList.PlyQueryRepository;
@@ -44,4 +45,8 @@ public class PlyQueryService {
             .orElseThrow(SsbFileNotFoundException::new);
     }
 
+    public LikeTargetInfoDto getLikeTargetInfoDto(long id,String token,Status isStatus) {
+        return plyQueryRepository.getLikeTargetInfoDto(id, token, isStatus.getValue())
+            .orElseThrow(SsbFileNotFoundException::new);
+    }
 }

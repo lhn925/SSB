@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -27,7 +28,11 @@ public class RedisCacheService {
     private final RedisQueryService redisQueryService;
 
     public void setData(String key, Object value) {
-        redisQueryService.setData(key, value);
+        try {
+            redisQueryService.setData(key, objectMapper.writeValueAsString(value));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -109,19 +114,20 @@ public class RedisCacheService {
         Map<String, UserSimpleInfoDto> hashMap = getData(key, typeReference);
         return hashMap.containsKey(user.getToken());
     }
+
     /**
      * map 형태로 된 cache Size 반환
      *
      * @param key
      * @return
      */
-    public <C> int getTotalCountByKey(C collectionType,String key) {
+    public <C> int getTotalCountByKey(C collectionType, String key) {
         TypeReference<C> typeReference = new TypeReference<>() {
         };
         int count = 0;
         if (hasRedis(key)) {
             if (collectionType instanceof HashMap) {
-                HashMap<Object,Object> map = (HashMap) getData(key, typeReference);
+                HashMap<Object, Object> map = (HashMap) getData(key, typeReference);
                 count = map.size();
             } else if (collectionType instanceof HashSet) {
                 HashSet<Object> set = (HashSet) getData(key, typeReference);
@@ -148,26 +154,29 @@ public class RedisCacheService {
         Map<String, T> objectMap = null;
 
         String cachingData = null;
-        try {
-            // redis 에 존재하는 경우
-            if (this.hasRedis(key)) { //
-                TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
-                };
-                objectMap = getData(key, typeReference);
-                objectMap.put(subMapKey, value);
+        // redis 에 존재하는 경우
+        if (this.hasRedis(key)) { //
+            TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
+            };
+            objectMap = getData(key, typeReference);
+            objectMap.put(subMapKey, value);
 
-            } else {
-                // redis 에 존재하지 않는 경우 새로 hashMap 생성
-                objectMap = new HashMap<>();
-                objectMap.put(subMapKey, value);
-            }
-            // hashMap -> jsonString 형태로 변환후
-            // redis 에 저장
-            cachingData = objectMapper.writeValueAsString(objectMap);
-            setData(key, cachingData);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } else {
+            // redis 에 존재하지 않는 경우 새로 hashMap 생성
+            objectMap = new HashMap<>();
+            objectMap.put(subMapKey, value);
         }
+        // hashMap -> jsonString 형태로 변환후
+        // redis 에 저장
+        setData(key, objectMap);
+
+    }
+
+
+    public void updateCacheMapValueByKey(String key, List<User> users) {
+        Map<String, UserSimpleInfoDto> dataMap = users.stream()
+            .collect(Collectors.toMap(User::getToken, UserSimpleInfoDto::new));
+        setData(key, dataMap);
     }
 
 
@@ -197,11 +206,7 @@ public class RedisCacheService {
         }
         // hashMap -> jsonString 형태로 변환후
         // redis 에 저장
-        try {
-            setData(key, objectMapper.writeValueAsString(objectList));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        setData(key, objectList);
     }
 
     /**
@@ -226,11 +231,8 @@ public class RedisCacheService {
         }
         // hashMap -> jsonString 형태로 변환후
         // redis 에 저장
-        try {
-            setData(key, objectMapper.writeValueAsString(objectList));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        setData(key, objectList);
+
 
     }
 
@@ -247,22 +249,25 @@ public class RedisCacheService {
     // redis 에 caching 데이터 찾은 후 존재하지 않을 경우 등록
     public <T> void removeCacheMapValueByKey(T o, String key, String subValueKey) {
         Map<String, T> objectMap = null;
-        String cachingData = null;
-        try {
-            // redis 에 존재하는 경우
-            if (this.hasRedis(key)) { //
-                TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
-                };
-                objectMap = getData(key, typeReference);
-                objectMap.remove(subValueKey);
-            }
-            // hashMap -> jsonString 형태로 변환후
-            // redis 에 저장
-            cachingData = objectMapper.writeValueAsString(objectMap);
-            setData(key, cachingData);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        // redis 에 존재하는 경우
+        if (hasRedis(key)) { //
+            TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
+            };
+            objectMap = getData(key, typeReference);
+            objectMap.remove(subValueKey);
         }
+        // hashMap -> jsonString 형태로 변환후
+        // redis 에 저장
+
+        // size 가 0 이면 자동으로 삭제
+        if (objectMap.size() == 0) {
+            log.info("접근 하겠습니다");
+            Boolean delete = redisQueryService.delete(key);
+            System.out.println("delete = " + delete);
+        } else {
+            setData(key, objectMap);
+        }
+
     }
 
     public boolean hasWsStatusOnUser(String userToken) {

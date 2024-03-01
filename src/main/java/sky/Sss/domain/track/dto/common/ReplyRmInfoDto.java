@@ -15,14 +15,14 @@ public class ReplyRmInfoDto {
     private Long replyId;
     private String replyToken;
     private Long replyOwner;
-    private Long trackOwner;
-    private String trackToken;
+    private Long targetOwner;
+    private String targetToken;
 
     public ReplyRmInfoDto(Long replyId, String replyToken, Long replyOwner, Long trackOwner, String trackToken) {
         this.replyId = replyId;
         this.replyToken = replyToken;
         this.replyOwner = replyOwner;
-        this.trackOwner = trackOwner;
-        this.trackToken = trackToken;
+        this.targetOwner = trackOwner;
+        this.targetToken = trackToken;
     }
 }

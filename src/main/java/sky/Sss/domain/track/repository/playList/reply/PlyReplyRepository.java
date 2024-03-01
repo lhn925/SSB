@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
@@ -36,5 +37,13 @@ public interface PlyReplyRepository extends JpaRepository<SsbPlyReply, Long> {
     @Query("select coalesce(max(r.replyOrder),0) from SsbPlyReply r where r.parentId =:parentId and r.ssbPlayListSettings =:ssbPlayListSettings ")
     Integer findMaxOrderByParentId(@Param("parentId") Long parentId,
         @Param("ssbPlayListSettings") SsbPlayListSettings ssbPlayListSettings);
+
+
+    @Query(
+        "select new sky.Sss.domain.track.dto.common.LikeTargetInfoDto(r.id,r.token,r.contents,r.user,r.ssbPlayListSettings.id) "
+            + " from SsbPlyReply r join fetch User u "
+            + " on r.user.id = u.id "
+            + " where r.id = :id and r.token =:token ")
+    Optional<LikeTargetInfoDto> getLikeTargetInfoDto(@Param("id") long id, @Param("token") String token);
 
 }

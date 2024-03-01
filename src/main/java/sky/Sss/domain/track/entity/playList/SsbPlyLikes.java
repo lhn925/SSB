@@ -41,11 +41,15 @@ public class SsbPlyLikes extends BaseTimeEntity {
     @JoinColumn(name = "setting_id", nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
-    public static SsbPlyLikes create(User user, SsbPlayListSettings playListSettings) {
+    public static SsbPlyLikes create(User user) {
         SsbPlyLikes ssbPlyLikes = new SsbPlyLikes();
         ssbPlyLikes.setUser(user);
-        ssbPlyLikes.setSsbPlayListSettings(playListSettings);
         return ssbPlyLikes;
+    }
+
+    public static void updateSettings(SsbPlyLikes ssbPlyLikes ,Long id) {
+        SsbPlayListSettings setting = SsbPlayListSettings.builder().id(id).build();
+        ssbPlyLikes.setSsbPlayListSettings(setting);
     }
 
 }

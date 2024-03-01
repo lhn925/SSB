@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
 
@@ -39,5 +40,13 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     @Query("select s from SsbTrack s join fetch s.tags where s.id =:id and s.user =:user and s.token =:token and s.isStatus =:isStatus")
     Optional<SsbTrack> findOneWithTags(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
         @Param("isStatus") Boolean isStatus);
+
+
+    @Query(
+        "select new sky.Sss.domain.track.dto.common.LikeTargetInfoDto(s.id,s.token,s.title,s.user) from SsbTrack s join fetch User u "
+            + " on s.user.id = u.id "
+            + " where s.id = :id and s.token =:token and s.isStatus =:isStatus")
+    Optional<LikeTargetInfoDto> getLikeTargetInfoDto(@Param("id") long id, @Param("token") String token,
+        @Param("isStatus") boolean isStatus);
 
 }

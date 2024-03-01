@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -150,6 +151,11 @@ public class SsbPlayListSettings extends BaseTimeEntity {
 
     public static void updateToken(String token, SsbPlayListSettings ssbPlayListSettings) {
         ssbPlayListSettings.setToken(token);
+    }
+
+    @Builder
+    public SsbPlayListSettings(long id ){
+        this.id = id;
     }
 
 }

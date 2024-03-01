@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.user.entity.User;
 
@@ -34,5 +35,11 @@ public interface PlyQueryRepository extends JpaRepository<SsbPlayListSettings, L
     Optional<SsbPlayListSettings> findOneWithTags(@Param("id") Long id, @Param("user") User user,
         @Param("token") String token,
         @Param("isStatus") Boolean isStatus);
+
+
+    @Query("select new sky.Sss.domain.track.dto.common.LikeTargetInfoDto(s.id,s.token,s.title,u) from SsbPlayListSettings s "
+        + "join fetch User u on s.user = u where s.id = :id and s.token =:token and s.isStatus =:isStatus")
+    Optional<LikeTargetInfoDto> getLikeTargetInfoDto(@Param("id") long id, @Param("token") String token,
+        @Param("isStatus") boolean isStatus);
 
 }

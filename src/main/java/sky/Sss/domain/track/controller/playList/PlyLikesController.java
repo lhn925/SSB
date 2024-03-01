@@ -10,17 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.TotalCountRepDto;
-import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
-import sky.Sss.domain.track.service.playList.PlyActionService;
-import sky.Sss.domain.track.service.playList.PlyQueryService;
+import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
-import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
-import sky.Sss.domain.user.model.PushMsgType;
-import sky.Sss.domain.user.model.Status;
-import sky.Sss.domain.user.service.push.UserPushMsgService;
-import sky.Sss.domain.user.service.UserQueryService;
 
 
 /**
@@ -28,12 +20,12 @@ import sky.Sss.domain.user.service.UserQueryService;
  */
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/tracks/ply/action")
+@RequestMapping("/tracks/ply/likes")
 @UserAuthorize
 @RestController
-public class PlyActionController {
+public class PlyLikesController {
 
-    private final PlyActionService plyActionService;
+    private final LikesCommonService likesCommonService;
 
     /**
      * playList 좋아요 등록 후 총 좋아요수 반환
@@ -41,12 +33,12 @@ public class PlyActionController {
      * @param id
      * @return
      */
-    @PostMapping("/likes/{id}/{token}")
+    @PostMapping("/{id}/{token}")
     public ResponseEntity<TotalCountRepDto> saveLikes(@PathVariable Long id, @PathVariable String token) {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(plyActionService.addLikes(id, token));
+        return ResponseEntity.ok(likesCommonService.addLikes(id, token,ContentsType.PLAYLIST));
     }
 
 
@@ -56,12 +48,37 @@ public class PlyActionController {
      * @param id
      * @return
      */
-    @DeleteMapping("/likes/{id}/{token}")
+    @DeleteMapping("/{id}/{token}")
     public ResponseEntity<TotalCountRepDto> removeLikes(@PathVariable Long id, @PathVariable String token) {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(plyActionService.cancelLikes(id, token));
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token,ContentsType.PLAYLIST));
+    }
+
+    /**
+     * @param id
+     *     trackId
+     */
+    @PostMapping("/reply/{id}/{token}")
+    public ResponseEntity<TotalCountRepDto> saveReplyLikes(@PathVariable Long id, @PathVariable String token) {
+        if (id == null || id == 0 || token == null || token.length() == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(likesCommonService.addLikes(id, token, ContentsType.REPLY_PLAYLIST));
+    }
+    /**
+     * 리플 좋아요 취소 후 총 좋아요수 반환
+     *
+     * @param id
+     *     trackId
+     */
+    @DeleteMapping("/reply/{id}/{token}")
+    public ResponseEntity<TotalCountRepDto> removeReplyLikes(@PathVariable Long id, @PathVariable String token) {
+        if (id == null || id == 0 || token == null || token.length() == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token,ContentsType.REPLY_PLAYLIST));
     }
 
 

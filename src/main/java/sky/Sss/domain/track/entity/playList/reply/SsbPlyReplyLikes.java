@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.entity.track;
+package sky.Sss.domain.track.entity.playList.reply;
 
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -17,16 +17,18 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 
 
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid", "track_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid", "reply_id"})})
 @Entity
 @Setter(value = PRIVATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SsbTrackLikes extends BaseTimeEntity implements Serializable {
+public class SsbPlyReplyLikes extends BaseTimeEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,17 +40,16 @@ public class SsbTrackLikes extends BaseTimeEntity implements Serializable {
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "track_id", nullable = false)
-    private SsbTrack ssbTrack;
+    @JoinColumn(name = "reply_id", nullable = false)
+    private SsbPlyReply ssbPlyReply;
 
-    public static SsbTrackLikes create(User user) {
-        SsbTrackLikes ssbTrackLikes = new SsbTrackLikes();
-        ssbTrackLikes.setUser(user);
-        return ssbTrackLikes;
+    public static SsbPlyReplyLikes create(User user) {
+        SsbPlyReplyLikes ssbPlyReplyLikes = new SsbPlyReplyLikes();
+        ssbPlyReplyLikes.setUser(user);
+        return ssbPlyReplyLikes;
     }
-
-    public static void updateTrack(SsbTrackLikes ssbTrackLikes,long id) {
-        SsbTrack ssbTrack = SsbTrack.builder().id(id).build();
-        ssbTrackLikes.setSsbTrack(ssbTrack);
+    public static void updateReply(SsbPlyReplyLikes ssbPlyReplyLikes,long id) {
+        SsbPlyReply ssbPlyReply = SsbPlyReply.builder().id(id).build();
+        ssbPlyReplyLikes.setSsbPlyReply(ssbPlyReply);
     }
 }

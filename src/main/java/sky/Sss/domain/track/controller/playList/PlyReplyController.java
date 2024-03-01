@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.playlist.reply.PlyReplySaveReqDto;
 import sky.Sss.domain.track.dto.track.reply.ReplyRmReqDto;
-import sky.Sss.domain.track.service.common.TrackCommonService;
+import sky.Sss.domain.track.service.common.LikesCommonService;
+import sky.Sss.domain.track.service.common.ReplyCommonService;
 import sky.Sss.domain.user.model.ContentsType;
 
 
@@ -25,7 +26,7 @@ import sky.Sss.domain.user.model.ContentsType;
 public class PlyReplyController {
 
 
-    private final TrackCommonService trackCommonService;
+    private final ReplyCommonService replyCommonService;
 
     // 해시태그
     // userName 으로 할것인가
@@ -36,7 +37,7 @@ public class PlyReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackCommonService.addReply(plyReplySaveReqDto, ContentsType.PLAYLIST);
+        replyCommonService.addReply(plyReplySaveReqDto, ContentsType.PLAYLIST);
         return new ResponseEntity<>(HttpStatus.OK);
     }
     // 삭제
@@ -46,7 +47,7 @@ public class PlyReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackCommonService.deleteReply(replyRmReqDto,ContentsType.PLAYLIST);
+        replyCommonService.deleteReply(replyRmReqDto,ContentsType.PLAYLIST);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

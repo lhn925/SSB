@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -90,5 +91,9 @@ public class SsbTrackReply extends BaseTimeEntity {
 
     public static void updateToken(SsbTrackReply ssbTrackReply, String token) {
         ssbTrackReply.setToken(token);
+    }
+    @Builder
+    public SsbTrackReply(Long id) {
+        this.id = id;
     }
 }

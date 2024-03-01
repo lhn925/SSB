@@ -11,6 +11,9 @@ public class RedisKeyDto {
     public static final String REDIS_CONTEXT_KEY = "SPRING_SECURITY_CONTEXT";
     public static final String REDIS_LOGIN_KEY = "spring:redisToken:redis:";
     public static final String REDIS_TRACK_LIKES_MAP_KEY = "spring:track:likes:";
+
+    public static final String REDIS_TRACK_REPLY_LIKES_MAP_KEY = "spring:track:reply:likes:";
+    public static final String REDIS_PLY_REPLY_LIKES_MAP_KEY = "spring:ply:reply:likes:";
     public static final String REDIS_PLY_LIKES_MAP_KEY = "spring:ply:likes:";
 
 

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.reply.ReplyRmReqDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplySaveReqDto;
-import sky.Sss.domain.track.service.common.TrackCommonService;
+import sky.Sss.domain.track.service.common.ReplyCommonService;
 import sky.Sss.domain.user.model.ContentsType;
 
 
@@ -25,7 +25,7 @@ import sky.Sss.domain.user.model.ContentsType;
 public class TrackReplyController {
 
 
-    private final TrackCommonService trackCommonService;
+    private final ReplyCommonService replyCommonService;
 
     // 해시태그
     // userName 으로 할것인가
@@ -36,7 +36,7 @@ public class TrackReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackCommonService.addReply(trackReplySaveReqDto, ContentsType.TRACK);
+        replyCommonService.addReply(trackReplySaveReqDto, ContentsType.TRACK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -49,7 +49,7 @@ public class TrackReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        trackCommonService.deleteReply(replyRmReqDto,ContentsType.TRACK);
+        replyCommonService.deleteReply(replyRmReqDto,ContentsType.TRACK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

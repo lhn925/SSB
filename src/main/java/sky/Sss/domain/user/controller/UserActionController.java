@@ -3,6 +3,7 @@ package sky.Sss.domain.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +40,7 @@ public class UserActionController {
      */
     // 팔로우
     @PostMapping("/my-following/{following-uid}")
-    public ResponseEntity<FollowerTotalCountDto> saveFollowing(@PathVariable(name = "following-uid") Long followingUid) {
+    public ResponseEntity<?> saveFollowing(@PathVariable(name = "following-uid") Long followingUid) {
         checkFollowingUid(followingUid == null || followingUid <= 0);
         // 팔로우를 신청한 사용자
         User fromUser = userQueryService.findOne();
@@ -59,9 +60,8 @@ public class UserActionController {
         userPushMsgService.sendOrCacheMessages(ContentsType.USER.getUrl() + fromUser.getId(), fromUser.getUserName(), toUser, userPushMessages);
 
         // 대상자에 follower count 검색 후 반환
-        int totalFollowerCount = userActionService.getTotalFollowerCount(toUser);
 
-        return ResponseEntity.ok(new FollowerTotalCountDto(totalFollowerCount));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 상대방 언 팔로우
@@ -84,12 +84,11 @@ public class UserActionController {
         userActionService.cancelFollows(followerUser, unFollowingUser);
 
         // 대상자에 follower count 검색 후 반환
-        int totalFollowerCount = userActionService.getTotalFollowerCount(unFollowingUser);
 
-        return ResponseEntity.ok(new FollowerTotalCountDto(totalFollowerCount));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //나의 팔로우 리스트에서 나를 팔로우 하는 사용자를 강제 언팔
+    // 나의 팔로우 리스트에서 나를 팔로우 하는 사용자를 강제 언팔
     /**
      * @param followerUid
      *     팔로우를 취소 당하는 유저 ID
@@ -105,14 +104,11 @@ public class UserActionController {
         // 사용자가 같은경우 예외 처리
         checkFollowingUid(followingUser.getId().equals(followerUid));
         // 팔로우 삭제 대상자
-        User followerUser = userQueryService.findOne(followerUid, Enabled.ENABLED);
+        User unFollowerUser = userQueryService.findOne(followerUid, Enabled.ENABLED);
 
-        userActionService.cancelFollows(followerUser, followingUser);
+        userActionService.cancelFollows(unFollowerUser, followingUser);
 
-        // 대상자에 follower count 검색 후 반환
-        int totalFollowerCount = userActionService.getTotalFollowerCount(followingUser);
-
-        return ResponseEntity.ok(new FollowerTotalCountDto(totalFollowerCount));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void checkFollowingUid(boolean followingUid) {

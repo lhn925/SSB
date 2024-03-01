@@ -2,6 +2,7 @@ package sky.Sss.domain.user.service.follows;
 
 
 import java.util.HashMap;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -140,6 +141,8 @@ public class UserFollowsService {
 
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
+
+    // 유저를 팔로우 하고 있는 count
     public int getFollowerTotalCount(User user) {
         String key = RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY + user.getToken();
 
@@ -147,26 +150,43 @@ public class UserFollowsService {
             // redis 에 total 캐시가 있으면
         count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
 
-        count = count != 0 ? count : getFollowerCountByUser(user);
-        // redis 에 저장이 안되어 있을경우 count 후 저장
         if (count == 0) {
-            redisCacheService.upsertCacheMapValueByKey(count, key, user.getToken());
+            List<User> myFollowingUsers = getMyFollowerUsers(user);
+            if (!myFollowingUsers.isEmpty()) {
+                count = myFollowingUsers.size();
+                redisCacheService.updateCacheMapValueByKey(key, myFollowingUsers);
+            }
         }
         return count;
     }
 
+    // 유저가 팔로우 하고 있는 following count
     public int getFollowingTotalCount(User user) {
-        String key = RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY + user.getToken();
+        String key = RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY + user.getToken();
         // redis 에 total 캐시가 있으면
         int count = 0;
         count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
-        count = count != 0 ? count :getFollowingCountByUser(user);
         // redis 에 저장이 안되어 있을경우 count 후 저장
         if (count == 0) {
-            redisCacheService.upsertCacheMapValueByKey(count, key, user.getToken());
+            List<User> myFollowingUsers = getMyFollowingUsers(user);
+            if (!myFollowingUsers.isEmpty()) {
+                count = myFollowingUsers.size();
+                redisCacheService.updateCacheMapValueByKey(key, myFollowingUsers);
+            }
         }
         return count;
     }
+
+
+    // 유저를 팔로우 하고 있는 총 유저 수 총합
+    public List<User> getMyFollowerUsers(User user) {
+        return userFollowRepository.getMyFollowerUsers(user);
+    }
+    // 유저가 총 팔로우 하고 있는 유저 수 총합
+    public List<User> getMyFollowingUsers(User user) {
+        return userFollowRepository.myFollowingUsers(user);
+    }
+
 
     // 유저를 팔로우 하고 있는 총 유저 수 총합
     public Integer getFollowerCountByUser(User followingUser) {
