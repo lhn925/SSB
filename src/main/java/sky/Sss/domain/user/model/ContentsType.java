@@ -1,19 +1,25 @@
 package sky.Sss.domain.user.model;
 
-import org.bytedeco.javacpp.opencv_core.RefOrVoid.type;
+import lombok.extern.slf4j.Slf4j;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 /**
  * push message 에 구분 하는 enum
  */
+@Slf4j
 public enum ContentsType {
-    TRACK("TRACK","/tracks/info/"),PLAYLIST("PLAYLIST","/tracks/ply/info/"),REPLY_TRACK("REPLY_TRACK","/tracks/info/"),REPLY_PLAYLIST("REPLY_PLAYLIST","/tracks/ply/info/"),
-    USER("USER", "/users/info/");
+    TRACK("TRACK", "/tracks/"),
+    PLAYLIST("PLAYLIST", "/tracks/ply/"),
+    REPLY_TRACK("REPLY_TRACK", "/tracks/"),
+    REPLY_PLAYLIST("REPLY_PLAYLIST", "/tracks/ply/"),
+    REPOST("REPOST", "/tracks/ply/"),
+    HASHTAG("HASHTAG", ""),
+    USER("USER", "/users/");
 
-    private final String type;
-    private final String url;
+    private String type;
+    private String url;
 
-    ContentsType(String type,String url) {
+    ContentsType(String type, String url) {
         this.type = type;
         this.url = url;
     }
@@ -27,7 +33,17 @@ public enum ContentsType {
     }
 
 
-    public String getLikeKeyByType () {
+    public String getRepostKey() {
+        String key = null;
+        switch (this) {
+            case TRACK -> key = RedisKeyDto.REDIS_TRACK_REPOST_MAP_KEY;
+            case PLAYLIST -> key = RedisKeyDto.REDIS_PLY_REPOST_MAP_KEY;
+            default -> throw new IllegalArgumentException();
+        }
+        return key;
+    }
+    
+    public String getLikeKey() {
         String key = null;
         switch (this) {
             case TRACK -> key = RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY;

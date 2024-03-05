@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
+import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
 import sky.Sss.domain.track.dto.playlist.reply.PlyReplyCacheDto;
 import sky.Sss.domain.track.dto.track.reply.TrackReplyCacheDto;
@@ -114,8 +114,8 @@ public class PlyReplyService {
         return listAndSubReplies;
     }
 
-    public LikeTargetInfoDto getLikeTargetInfoDto(long id,String token) {
-        return plyReplyRepository.getLikeTargetInfoDto(id, token)
+    public TargetInfoDto getTargetInfoDto(long id,String token) {
+        return plyReplyRepository.getTargetInfoDto(id, token)
             .orElseThrow(SsbFileNotFoundException::new);
     }
 //

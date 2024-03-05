@@ -49,7 +49,7 @@ public class TrackReplyController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-        replyCommonService.deleteReply(replyRmReqDto,ContentsType.TRACK);
+        replyCommonService.deleteReply(replyRmReqDto, ContentsType.TRACK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

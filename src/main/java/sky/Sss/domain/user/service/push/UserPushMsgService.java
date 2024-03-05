@@ -2,10 +2,13 @@ package sky.Sss.domain.user.service.push;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,8 +17,12 @@ import sky.Sss.domain.user.dto.push.PushMsgCacheDto;
 import sky.Sss.domain.user.dto.push.PushMsgDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
+import sky.Sss.domain.user.model.ContentsType;
+import sky.Sss.domain.user.model.Enabled;
+import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.repository.push.UserPushMsgRepository;
 import sky.Sss.domain.user.service.MsgTemplateService;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
@@ -42,13 +49,13 @@ public class UserPushMsgService {
     private final UserPushMsgRepository userPushMsgRepository;
     private final RedisCacheService redisCacheService;
     private final MsgTemplateService msgTemplateService;
+    private final UserQueryService userQueryService;
 
 
     @Transactional
     public void addUserPushMsg(UserPushMessages userPushMessages) {
         userPushMsgRepository.save(userPushMessages);
     }
-
 
 
     // 실시간 알림(유저가 존재하는경우) and Cache 저장
@@ -69,6 +76,37 @@ public class UserPushMsgService {
         }
         // Redis cache 알림 리스트에 추가
         this.addCachePushMsgList(userPushMessages, isPush, toUser.getToken());
+    }
+
+    @Transactional
+    public void sendPushToUserSet(Set<String> userTagSet, String contents, PushMsgType pushMsgType,
+        ContentsType contentsType,
+        User user, String linkUrl, User ownerUser, long contentsId, boolean isOwner) {
+        try {
+            if (ownerUser != null) {
+                // 작성자 태그 Set 에서 삭제
+                userTagSet.remove(ownerUser.getUserName());
+            }
+            // 자기 자신을 태그 한 경우 삭제
+            userTagSet.remove(user.getUserName());
+            Set<User> users = new HashSet<>();
+
+            // 작성자가 아닌 경우
+            if (!isOwner) {
+                //  작성자 추가
+                users.add(ownerUser);
+            }
+            users.addAll(userQueryService.findUsersByUserNames(userTagSet, Enabled.ENABLED));
+
+            users.forEach(toUser -> {
+                UserPushMessages userPushMessages =
+                    UserPushMessages.create(toUser, user, pushMsgType, contentsType, contentsId);
+                this.addUserPushMsg(userPushMessages);
+                this.sendOrCacheMessages(linkUrl, contents, toUser, userPushMessages);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // 사용자가 ws에 없을 경우 실시간 알림을 Redis 에 Cache

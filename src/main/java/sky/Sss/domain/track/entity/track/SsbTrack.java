@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -22,7 +23,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
+import sky.Sss.domain.feed.entity.SsbFeed;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
@@ -88,6 +91,11 @@ public class SsbTrack extends BaseTimeEntity {
     @Column(nullable = false)
     private String storeFileName;
 
+    // feed 에 공개가 된적 이 있는지
+    // true 면 feed 에 공개 됨, false 면 공개 된 적 없음
+    @Column(nullable = false)
+    private Boolean isRelease;
+
     // 비활성화 여부 true:활성화 ,false:비활성화x
     @Column(nullable = false)
     private Boolean isStatus;
@@ -103,7 +111,6 @@ public class SsbTrack extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackReply> replies = new ArrayList<>();
-
 
     public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
         if (tagLinks != null && tagLinks.size() > 0) {
@@ -147,6 +154,7 @@ public class SsbTrack extends BaseTimeEntity {
 
         ssbTrack.setMainGenreType(type);
         ssbTrack.setIsPrivacy(isPrivacy);
+
         ssbTrack.setIsDownload(isDownload);
         if (description.trim().length() > 1000) {
             throw new IllegalArgumentException("desc.error.length");
@@ -159,6 +167,10 @@ public class SsbTrack extends BaseTimeEntity {
         ssbTrack.setToken(token);
     }
 
+    public static void updateIsRelease(SsbTrack ssbTrack,Boolean isRelease) {
+        ssbTrack.setIsRelease(isRelease);
+
+    }
     public static void changeStatus(SsbTrack ssbTrack, Status isStatus) {
         ssbTrack.setIsStatus(isStatus.getValue());
     }

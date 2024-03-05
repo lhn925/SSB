@@ -64,7 +64,7 @@ public class UserPushMessages extends BaseTimeEntity {
     // 트랙,앨범,댓글 2차 구분값
     @Enumerated(STRING)
     @Column(nullable = false)
-    private ContentsType contentType;
+    private ContentsType contentsType;
 
     // 앨범,트랙,댓글 해당 ID 정보를 담을 컬럼
     private Long contentsId;
@@ -74,12 +74,12 @@ public class UserPushMessages extends BaseTimeEntity {
     private Boolean isRead;
 
 
-    public static UserPushMessages create(User toUser,User fromUser,PushMsgType pushMsgType, ContentsType contentType,Long contentsId) {
+    public static UserPushMessages create(User toUser,User fromUser,PushMsgType pushMsgType, ContentsType contentsType,Long contentsId) {
         UserPushMessages userPushMessages = new UserPushMessages();
         userPushMessages.setToUser(toUser);
         userPushMessages.setFromUser(fromUser);
         userPushMessages.setPushMsgType(pushMsgType);
-        userPushMessages.setContentType(contentType);
+        userPushMessages.setContentsType(contentsType);
         userPushMessages.setIsRead(false);
         userPushMessages.setContentsId(contentsId);
         return userPushMessages;

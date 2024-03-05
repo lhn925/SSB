@@ -1,12 +1,17 @@
 package sky.Sss.domain.track.service.playList;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sky.Sss.domain.feed.entity.SsbFeed;
+import sky.Sss.domain.feed.model.FeedType;
+import sky.Sss.domain.feed.service.FeedService;
 import sky.Sss.domain.track.dto.playlist.PlayListInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingUpdateDto;
@@ -18,9 +23,11 @@ import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.playList.PlySettingRepository;
+import sky.Sss.domain.track.service.common.RepostCommonService;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.track.service.track.TrackTagService;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.file.dto.UploadFileDto;
@@ -37,7 +44,8 @@ public class PlyService {
     private final UserQueryService userQueryService;
     private final TrackService trackService;
     private final TrackTagService trackTagService;
-
+    private final FeedService feedService;
+    private final RepostCommonService repostCommonService;
 
     /**
      * 플레이리스트 생성 및 트랙파일 저장
@@ -83,9 +91,22 @@ public class PlyService {
 
         trackTagService.delPlyTagLinksInBatch(removeTagLinks);
 
+        boolean modifyPrivacy = playListSettingUpdateDto.isPrivacy();
         //태그 링크 추가
         List<SsbPlayListTagLink> playListTagLinks = trackService.getPlayListTagLinks(newTagList, ssbPlayListSettings);
         SsbPlayListSettings.addTagLink(ssbPlayListSettings, playListTagLinks);
+
+        // 공개 이면서 공개 날짜 가 없을 경우
+        // 비공개 -> 공개, 배포 false -> 최초 배포
+        if (!playListSettingUpdateDto.isPrivacy() && !ssbPlayListSettings.getIsRelease()) {
+            SsbFeed ssbFeed = feedService.findOne(user,ssbPlayListSettings.getId(), ContentsType.PLAYLIST);
+            SsbFeed.updateReleaseDateTime(ssbFeed,LocalDateTime.now());
+        }
+
+        // privacy 업데이트 내용이 다를경우 Repost isPrivacy 업데이트
+        if (modifyPrivacy != ssbPlayListSettings.getIsPrivacy()) {
+            repostCommonService.privacyAllUpdate(ssbPlayListSettings.getId(),modifyPrivacy,ContentsType.PLAYLIST);
+        }
 
         // 내용 수정
         SsbPlayListSettings.updateInfo(ssbPlayListSettings, playListSettingUpdateDto.getTitle(),
@@ -94,7 +115,6 @@ public class PlyService {
 
         // 이미지 수정
         if (coverImgFile != null) {
-//            SsbPlayListSettings.deleteCoverImg(fileStore, ssbPlayListSettings);
             UploadFileDto uploadFileDto = trackService.getUploadFileDto(coverImgFile);
             SsbPlayListSettings.updateCoverImg(uploadFileDto.getStoreFileName(), ssbPlayListSettings);
         }
@@ -107,6 +127,7 @@ public class PlyService {
         //status 변경
         SsbPlayListSettings.changeStatus(ssbPlayListSettings, Status.OFF);
 
+        feedService.deleteFeed(user,ssbPlayListSettings.getId(), ContentsType.PLAYLIST);
         // coverImg 삭제
 //        SsbPlayListSettings.deleteCoverImg(fileStore, ssbPlayListSettings);
 //        // link 삭제
@@ -119,7 +140,7 @@ public class PlyService {
 
     public SsbPlayListSettings findOne(Long id, String token, User user, Status isStatus) {
         return plySettingRepository.findOne(id, token, user, isStatus.getValue())
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
     }
 
     public void filterNewTags(List<SsbTrackTags> newTagList, List<SsbPlayListTagLink> removeTagLinks,
@@ -144,18 +165,16 @@ public class PlyService {
             );
         }
         // 중복 태그 insert x
-        duplicateTags.forEach(tags -> newTagList.remove(tags));
+        duplicateTags.forEach(newTagList::remove);
     }
 
     private void changeOrders(SsbPlayListSettings ssbPlayListSettings, List<PlayListTrackUpdateDto> orderList) {
         if (orderList != null && !orderList.isEmpty()) {
             orderList.forEach(orderDto -> {
-                SsbPlayListTracks ssbPlayListTracks = ssbPlayListSettings.getPlayListTracks().stream()
-                    .filter(track -> orderDto.getId() == track.getId())
-                    .findFirst().orElse(null);
-                if (ssbPlayListTracks != null) {
-                    SsbPlayListTracks.changeOrders(ssbPlayListTracks, orderDto.getOrder());
-                }
+                ssbPlayListSettings.getPlayListTracks().stream()
+                    .filter(track -> Objects.equals(orderDto.getId(), track.getId()))
+                    .findFirst().ifPresent(
+                        ssbPlayListTracks -> SsbPlayListTracks.changeOrders(ssbPlayListTracks, orderDto.getOrder()));
             });
         }
     }

@@ -31,13 +31,7 @@ public class UserActionService {
         // 팔로우 저장
         userFollowsService.addUserFollows(userFollows);
 
-//        // followerUser 의 Following 총합 update
-//        userFollowsService.updateTotalCount(RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY,
-//            RedisKeyDto.REDIS_USER_FOLLOWING_TOTAL_MAP_KEY, followerUser);
-//
-//        // followingUser 의 followerUser 총합 update
-//        userFollowsService.updateTotalCount(RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY,
-//            RedisKeyDto.REDIS_USER_FOLLOWER_TOTAL_MAP_KEY, followingUser);
+
 
     }
 
@@ -50,13 +44,6 @@ public class UserActionService {
         }
         // 팔로우 저장
         userFollowsService.cancelFollow(userFollows);
-
-//        // followerUser 의 Following 총합 update
-//        userFollowsService.updateTotalCount(RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY,
-//            RedisKeyDto.REDIS_USER_FOLLOWING_TOTAL_MAP_KEY, followerUser);
-//        // followingUser 의 followerUser 총합 update
-//        userFollowsService.updateTotalCount(RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY,
-//            RedisKeyDto.REDIS_USER_FOLLOWER_TOTAL_MAP_KEY, followingUser);
 
     }
 

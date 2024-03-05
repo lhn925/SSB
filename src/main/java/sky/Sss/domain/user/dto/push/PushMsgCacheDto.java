@@ -42,7 +42,7 @@ public class PushMsgCacheDto {
         pushMsgCacheDto.setId(userPushMessages.getId());
         pushMsgCacheDto.setFromUid(userPushMessages.getFromUser().getId());
         pushMsgCacheDto.setContentsId(userPushMessages.getContentsId());
-        pushMsgCacheDto.setContentType(userPushMessages.getContentType());
+        pushMsgCacheDto.setContentType(userPushMessages.getContentsType());
         pushMsgCacheDto.setPushMsgType(userPushMessages.getPushMsgType());
         pushMsgCacheDto.setIsRead(userPushMessages.getIsRead());
         pushMsgCacheDto.setIsPush(isPush);

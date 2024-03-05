@@ -3,12 +3,14 @@ package sky.Sss.domain.track.service.common;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.common.LikeTargetInfoDto;
+import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.TotalCountRepDto;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
 import sky.Sss.domain.track.service.playList.reply.PlyReplyLikesService;
@@ -17,6 +19,7 @@ import sky.Sss.domain.track.service.track.TrackLikesService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.track.service.track.reply.TrackReplyLikesService;
 import sky.Sss.domain.track.service.track.reply.TrackReplyService;
+import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
@@ -65,7 +68,7 @@ public class LikesCommonService {
     @Transactional
     public TotalCountRepDto addLikes(Long id, String token, ContentsType contentsType) {
         // track 검색
-        LikeTargetInfoDto likeTargetInfoDto = getLikeTargetInfoDto(id, token, contentsType);
+        TargetInfoDto likeTargetInfoDto = getLikeTargetInfoDto(id, token, contentsType);
         // 사용자 검색
         User fromUser = userQueryService.findOne();
         // push 를 받을 사용자
@@ -115,7 +118,7 @@ public class LikesCommonService {
         // 사용자 검색
         User user = userQueryService.findOne();
         // track 검색
-        LikeTargetInfoDto targetInfoDto = getLikeTargetInfoDto(targetId, targetToken, contentsType);
+        TargetInfoDto targetInfoDto = getLikeTargetInfoDto(targetId, targetToken, contentsType);
 
         cancelLikeAndType(targetInfoDto.getTargetId(), targetInfoDto.getTargetToken(), user, contentsType);
 
@@ -138,6 +141,12 @@ public class LikesCommonService {
 
 
     private void addLikeAndType(ContentsType contentsType, User fromUser, long targetId, String targetToken) {
+        boolean isLikes = existsLikes(targetToken, targetId, fromUser, contentsType);
+        if (isLikes) {
+            // 좋아요가 있는지 확인
+            // 좋아요가 이미 있는 경우 예외 처리
+            throw new IllegalArgumentException();
+        }
         if (contentsType.equals(ContentsType.TRACK)) {
             trackLikesService.addLikes(targetId, targetToken, fromUser);
         } else if (contentsType.equals(ContentsType.PLAYLIST)) {
@@ -149,15 +158,47 @@ public class LikesCommonService {
         }
     }
 
-    private LikeTargetInfoDto getLikeTargetInfoDto(Long targetId, String targetToken, ContentsType contentsType) {
+
+    /**
+     * 좋아요 눌렀는지 확인
+     */
+    public boolean existsLikes(String targetToken, long targetId, User user, ContentsType contentsType) {
+
+        boolean isExists = false;
+        String key = contentsType.getLikeKey() + targetToken;
+        // redis 에 있는지 확인
+        if (redisCacheService.hasRedis(key)) {
+            isExists = redisCacheService.existsByToken(user, key);
+        }
+
+        if (!isExists) {
+            if (contentsType.equals(ContentsType.TRACK)) {
+                isExists = trackLikesService.findOneAsOpt(targetId, user).isPresent();
+            } else if (contentsType.equals(ContentsType.PLAYLIST)) {
+                isExists = plyLikesService.findOneAsOpt(targetId, user).isPresent();
+            } else if (contentsType.equals(ContentsType.REPLY_TRACK)) {
+                isExists = trackReplyLikesService.findOneAsOpt(targetId, user).isPresent();
+            } else {
+                isExists = plyReplyLikesService.findOneAsOpt(targetId, user).isPresent();
+            }
+            // 만약 레디스에는 없고 디비에는 있으면
+            if (isExists) {
+                redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getToken());
+            }
+        }
+        return isExists;
+    }
+
+
+    private TargetInfoDto getLikeTargetInfoDto(Long targetId, String targetToken, ContentsType contentsType) {
         if (contentsType.equals(ContentsType.TRACK)) {
-            return trackQueryService.getLikeTargetInfoDto(targetId, targetToken, Status.ON);
+            return trackQueryService.getTargetInfoDto(targetId, targetToken, Status.ON);
         } else if (contentsType.equals(ContentsType.PLAYLIST)) {
-            return plyQueryService.getLikeTargetInfoDto(targetId, targetToken, Status.ON);
+            return plyQueryService.getTargetInfoDto(targetId, targetToken, Status.ON);
         } else if (contentsType.equals(ContentsType.REPLY_TRACK)) {
-            return trackReplyService.getLikeTargetInfoDto(targetId, targetToken);
+            return trackReplyService.getTargetInfoDto(targetId, targetToken);
         } else {
-            return plyReplyService.getLikeTargetInfoDto(targetId, targetToken);
+            return plyReplyService.getTargetInfoDto(targetId, targetToken);
         }
     }
 
@@ -173,14 +214,14 @@ public class LikesCommonService {
     }
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
-    public int getTotalCount(String targetToken,ContentsType contentsType) {
-        String key = contentsType.getLikeKeyByType() + targetToken;
+    public int getTotalCount(String targetToken, ContentsType contentsType) {
+        String key = contentsType.getLikeKey() + targetToken;
         // redis 에 total 캐시가 있으면
         int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
 
         // redis 에 저장이 안되어 있을경우 count 후 저장
         if (count == 0) {
-            List<User> users = getUserList(targetToken,contentsType);
+            List<User> users = getUserList(targetToken, contentsType);
             if (!users.isEmpty()) {
                 count = users.size();
                 redisCacheService.updateCacheMapValueByKey(key, users);

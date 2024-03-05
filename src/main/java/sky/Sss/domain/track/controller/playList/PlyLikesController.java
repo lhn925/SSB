@@ -38,7 +38,7 @@ public class PlyLikesController {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.addLikes(id, token,ContentsType.PLAYLIST));
+        return ResponseEntity.ok(likesCommonService.addLikes(id, token, ContentsType.PLAYLIST));
     }
 
 
@@ -53,7 +53,7 @@ public class PlyLikesController {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token,ContentsType.PLAYLIST));
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token, ContentsType.PLAYLIST));
     }
 
     /**
@@ -78,7 +78,7 @@ public class PlyLikesController {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token,ContentsType.REPLY_PLAYLIST));
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token, ContentsType.REPLY_PLAYLIST));
     }
 
 

@@ -35,13 +35,6 @@ public class TrackLikesService {
      */
     @Transactional
     public void addLikes(long id, String token, User user) {
-        boolean isLikes = existsLikes(token, id, user);
-        if (isLikes) {
-            // 좋아요가 있는지 확인
-            // 좋아요가 이미 있는 경우 예외 처리
-            throw new IllegalArgumentException();
-        }
-
         // 저장
         SsbTrackLikes ssbTrackLikes = SsbTrackLikes.create(user);
 
@@ -100,6 +93,10 @@ public class TrackLikesService {
             .orElseThrow(IllegalArgumentException::new);
     }
 
+    public Optional<SsbTrackLikes> findOneAsOpt(long trackId, User user) {
+        return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
+    }
+
 
     /**
      * like 취소
@@ -111,42 +108,6 @@ public class TrackLikesService {
         trackLikesRepository.delete(ssbTrackLikes);
     }
 
-    /**
-     * 좋아요 눌렀는지 확인
-     */
-    public boolean existsLikes(String token, long trackId, User user) {
-        String key = getLikeKey(token);
-        // redis 에 있는지 확인
-        if (redisCacheService.hasRedis(key)) {
-            return redisCacheService.existsByToken(user, key);
-        }
-        Optional<SsbTrackLikes> trackLikesOptional = trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
-
-        // 만약 레디스에는 없고 디비에는 있으면
-        if (trackLikesOptional.isPresent()) {
-            redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getToken());
-        }
-        return trackLikesOptional.isPresent();
-    }
-    /*
-     */
-
-    /**
-     * @param trackToken
-     *//*
-    // likes Total 업데이트
-    public void updateTotalCount(String trackToken) {
-        // likes Size 를 구하긴 위한 key 값
-        String key = RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + trackToken;
-
-        String totalKey = RedisKeyDto.REDIS_TRACK_LIKES_TOTAL_MAP_KEY;
-
-        // redis 에서 총 size 검색
-        int count = redisCacheService.getTotalCountByKey(new HashMap<>(),key);
-
-        count = count != 0 ? count : getCountByTrackToken(trackToken);
-        redisCacheService.upsertCacheMapValueByKey(count, totalKey, trackToken);
-    }*/
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
     public int getTotalCount(String trackToken) {

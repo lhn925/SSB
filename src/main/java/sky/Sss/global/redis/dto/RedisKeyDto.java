@@ -17,6 +17,10 @@ public class RedisKeyDto {
     public static final String REDIS_PLY_LIKES_MAP_KEY = "spring:ply:likes:";
 
 
+    public static final String REDIS_TRACK_REPOST_MAP_KEY = "spring:track:repost:";
+    public static final String REDIS_PLY_REPOST_MAP_KEY = "spring:ply:repost:";
+
+
     public static final String REDIS_PLY_REPLY_MAP_KEY = "spring:ply:reply:";
 
     public static final String REDIS_TRACK_REPLY_MAP_KEY = "spring:track:reply:";

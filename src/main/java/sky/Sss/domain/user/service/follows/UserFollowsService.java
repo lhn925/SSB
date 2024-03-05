@@ -69,25 +69,27 @@ public class UserFollowsService {
      */
     public boolean existsFollowing(User followerUser, User followingUser) {
 
+        boolean isExists = false;
         // 팔로우 요청자의 redis Cache 를 검색 후 있는지 확인
         String key = getUserFollowingListKey(followerUser.getToken());
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            return redisCacheService.existsByToken(followingUser, key);
+            isExists =  redisCacheService.existsByToken(followingUser, key);
         }
-        UserFollows userFollows = findFollowingByFollowerUser(
-            followerUser, followingUser);
 
-        boolean isExist = userFollows != null;
-
-        // 만약 레디스에는 없고 디비에는 있으면
-        if (isExist) {
-            // 요청자의 following list 업데이트
-            addRedisUserFollowingList(followerUser,followingUser);
-            // followingUser 의 follower List 업데이트
-            addRedisUserFollowerList(followingUser,followerUser);
+        if (!isExists) {
+            UserFollows userFollows = findFollowingByFollowerUser(
+                followerUser, followingUser);
+            isExists = userFollows != null;
+            // 만약 레디스에는 없고 디비에는 있으면
+            if (isExists) {
+                // 요청자의 following list 업데이트
+                addRedisUserFollowingList(followerUser,followingUser);
+                // followingUser 의 follower List 업데이트
+                addRedisUserFollowerList(followingUser,followerUser);
+            }
         }
-        return isExist;
+        return isExists;
     }
     //delete
 
@@ -119,26 +121,6 @@ public class UserFollowsService {
     public UserFollows findFollowingByFollowerUser (User followerUser,User followingUser) {
         return userFollowRepository.findByFollowingUserAndFollowerUser(followerUser, followingUser).orElse(null);
     }
-
- /*   // 유저의 Following Total 업데이트
-    // 유저의 follower Total 업데이트
-    public void updateTotalCount(String redisKey,String totalKey, User user) {
-        // likes Size 를 구하긴 위한 key 값
-
-        String userToken = user.getToken();
-        String key = redisKey + userToken;
-
-        // redis 에서 총 size 검색
-        int count = redisCacheService.getTotalCountByKey(new HashMap<>(),key);
-
-        count = count != 0 ? count :
-            // redis 의 키가 followingList key와 같으면 followingCount 를 아니면 FollowerCount
-            redisKey.equals(RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY) ? getFollowingCountByUser(user) : getFollowerCountByUser(user);
-
-        // update
-        redisCacheService.upsertCacheMapValueByKey(count, totalKey, user.getToken());
-    }*/
-
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
 

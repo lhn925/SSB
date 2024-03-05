@@ -51,7 +51,7 @@ public class TrackLikesController {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token,ContentsType.TRACK));
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token, ContentsType.TRACK));
     }
     /**
      * @param id
@@ -75,7 +75,7 @@ public class TrackLikesController {
         if (id == null || id == 0 || token == null || token.length() == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token,ContentsType.REPLY_TRACK));
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token, ContentsType.REPLY_TRACK));
     }
 
 

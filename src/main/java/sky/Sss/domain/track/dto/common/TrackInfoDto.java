@@ -10,12 +10,12 @@ import sky.Sss.domain.user.entity.User;
 
 @NoArgsConstructor(access = PROTECTED)
 @Getter
-public class LikeTrackInfoDto extends LikeTargetInfoDto {
+public class TrackInfoDto extends TargetInfoDto {
 
     private SsbTrack ssbTrack;
-    public LikeTrackInfoDto(Long targetId, String targetToken, String targetContents,
-        User fromUser, SsbTrack ssbTrack) {
-        super(targetId, targetToken, targetContents, fromUser);
+    public TrackInfoDto(Long targetId, String targetToken, String targetContents,
+        User fromUser, SsbTrack ssbTrack,Boolean isPrivacy) {
+        super(targetId, targetToken, targetContents, fromUser,isPrivacy);
         this.ssbTrack = ssbTrack;
     }
 }

@@ -37,13 +37,6 @@ public class PlyReplyLikesService {
      */
     @Transactional
     public void addLikes(long id, String token, User user) {
-        boolean isLikes = existsLikes(token, id, user);
-        if (isLikes) {
-            // 좋아요가 있는지 확인
-            // 좋아요가 이미 있는 경우 예외 처리
-            throw new IllegalArgumentException();
-        }
-
         // 저장
         SsbPlyReplyLikes ssbPlyReplyLikes = SsbPlyReplyLikes.create(user);
 
@@ -95,11 +88,20 @@ public class PlyReplyLikesService {
      *
      * @return
      */
-    public SsbPlyReplyLikes findOne(long plyId, User user) {
-        return plyReplyLikesRepository.findBySsbPlyReplyIdAndUser(plyId, user)
+    public SsbPlyReplyLikes findOne(long replyId, User user) {
+        return plyReplyLikesRepository.findBySsbPlyReplyIdAndUser(replyId, user)
             .orElseThrow(IllegalArgumentException::new);
     }
 
+
+    /**
+     * 없을시에 IllegalArgumentException
+     *
+     * @return
+     */
+    public Optional<SsbPlyReplyLikes> findOneAsOpt(long replyId, User user) {
+        return plyReplyLikesRepository.findBySsbPlyReplyIdAndUser(replyId, user);
+    }
 
     /**
      * like 취소

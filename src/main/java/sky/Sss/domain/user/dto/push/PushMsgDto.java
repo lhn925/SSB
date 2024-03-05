@@ -48,7 +48,7 @@ public class PushMsgDto {
         PushMsgDto pushMsgDto = new PushMsgDto();
 
         PushMsgType pushMsgType = userPushMessages.getPushMsgType();
-        ContentsType contentType = userPushMessages.getContentType();
+        ContentsType contentType = userPushMessages.getContentsType();
         pushMsgDto.setPushMsgType(pushMsgType);
         pushMsgDto.setContentsType(contentType);
 

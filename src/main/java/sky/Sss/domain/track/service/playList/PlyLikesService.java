@@ -35,13 +35,6 @@ public class PlyLikesService {
      */
     @Transactional
     public void addLikes(Long id, String token, User user) {
-
-        // 좋아요가 있는지 확인
-        // 좋아요가 이미 있는 경우 예외 처리
-        boolean isLikes = existsLikes(token,id, user);
-        if (isLikes) {
-            throw new IllegalArgumentException();
-        }
         SsbPlyLikes ssbPlyLikes = SsbPlyLikes.create(user);
         SsbPlyLikes.updateSettings(ssbPlyLikes,id);
 
@@ -92,6 +85,17 @@ public class PlyLikesService {
     public SsbPlyLikes findOne(long plyId, User user) {
         return plyLikesRepository.findBySettingsIdAndUser(plyId, user)
             .orElseThrow(IllegalArgumentException::new);
+
+    }
+
+    /**
+     * 없을시에 IllegalArgumentException
+     *
+     * @param user
+     * @return
+     */
+    public Optional<SsbPlyLikes> findOneAsOpt(long plyId, User user) {
+        return plyLikesRepository.findBySettingsIdAndUser(plyId, user);
 
     }
 

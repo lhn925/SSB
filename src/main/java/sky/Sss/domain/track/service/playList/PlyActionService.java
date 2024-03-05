@@ -1,24 +1,11 @@
 package sky.Sss.domain.track.service.playList;
 
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.playlist.reply.PlyReplyRmReqDto;
-import sky.Sss.domain.track.dto.track.TotalCountRepDto;
-import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
-import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
-import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
-import sky.Sss.domain.track.service.playList.reply.PlyReplyService;
-import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.entity.UserPushMessages;
-import sky.Sss.domain.user.model.ContentsType;
-import sky.Sss.domain.user.model.PushMsgType;
-import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.domain.user.service.push.UserPushMsgService;
 
 
 /**
@@ -47,7 +34,7 @@ public class PlyActionService {
         SsbPlayListSettings ssbPlayListSettings = plyQueryService.findOneJoinUser(id, token, Status.ON);
 
         // 사용자 검색
-        User fromUser = userQueryService.findOne();
+        User fromUser = userQueryService.findOneByTrackId();
 
         User toUser = ssbPlayListSettings.getUser();
 
@@ -75,9 +62,9 @@ public class PlyActionService {
     @Transactional
     public TotalCountRepDto cancelLikes(Long id, String token) {
         // track 검색
-        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findOne(id, token, Status.ON);
+        SsbPlayListSettings ssbPlayListSettings = plyQueryService.findOneByTrackId(id, token, Status.ON);
         // 사용자 검색
-        User user = userQueryService.findOne();
+        User user = userQueryService.findOneByTrackId();
 
         plyLikesService.cancelLikes(ssbPlayListSettings, user);
 

@@ -1,7 +1,7 @@
 package sky.Sss.domain.user.model;
 
 public enum PushMsgType {
-    LIKES("LIKES"),REPLY("REPLY"),FOLLOW("FOLLOW");
+    LIKES("LIKES"),REPLY("REPLY"),FOLLOW("FOLLOW"),REPOST("REPOST");
 
     private String type;
     PushMsgType(String type) {

@@ -8,5 +8,6 @@ public class RegexPatterns {
 //    public static final String USER_NAME_REGEX = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,8}$";
     public static final String TAG_REGEX = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_]{1,25}$";
     public static final String REPLY_CONTENTS_REGEX = "^.{1,1000}$";
+    public static final String REPOST_COMMENT_REGEX = "^.{1,140}$";
     public static final String GENRE_REGEX = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_]{1,20}$";
 }

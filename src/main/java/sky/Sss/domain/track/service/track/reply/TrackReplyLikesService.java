@@ -2,7 +2,6 @@ package sky.Sss.domain.track.service.track.reply;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -30,20 +29,12 @@ public class TrackReplyLikesService {
 
     private final TrackReplyLikesRepository trackReplyLikesRepository;
     private final RedisCacheService redisCacheService;
-    private final ObjectMapper objectMapper;
 
     /**
      * Track 좋아요 추가
      */
     @Transactional
     public void addLikes(long id, String token, User user) {
-        boolean isLikes = existsLikes(token, id, user);
-        if (isLikes) {
-            // 좋아요가 있는지 확인
-            // 좋아요가 이미 있는 경우 예외 처리
-            throw new IllegalArgumentException();
-        }
-
         // 저장
         SsbTrackReplyLikes ssbTrackReplyLikes = SsbTrackReplyLikes.create(user);
 
@@ -68,7 +59,7 @@ public class TrackReplyLikesService {
     @Transactional
     public void cancelLikes(long replyId, String replyToken, User user) {
         // 사용자 검색
-        SsbTrackReplyLikes ssbTrackReplyLikes = findOne(replyId, user);
+        SsbTrackReplyLikes ssbTrackReplyLikes = findOneByTrackId(replyId, user);
         delete(ssbTrackReplyLikes);
 
         String key = getLikeKey(replyToken);
@@ -87,7 +78,7 @@ public class TrackReplyLikesService {
      * @param user
      * @return
      */
-    public SsbTrackReplyLikes findOne(SsbTrackReply ssbTrackReply, User user) {
+    public SsbTrackReplyLikes findOneByTrackId(SsbTrackReply ssbTrackReply, User user) {
         return trackReplyLikesRepository.findBySsbTrackReplyAndUser(ssbTrackReply, user)
             .orElseThrow(IllegalArgumentException::new);
     }
@@ -97,7 +88,7 @@ public class TrackReplyLikesService {
      *
      * @return
      */
-    public SsbTrackReplyLikes findOne(long trackId, User user) {
+    public SsbTrackReplyLikes findOneByTrackId(long trackId, User user) {
         return trackReplyLikesRepository.findBySsbTrackReplyIdAndUser(trackId, user)
             .orElseThrow(IllegalArgumentException::new);
     }
@@ -112,46 +103,13 @@ public class TrackReplyLikesService {
     public void delete(SsbTrackReplyLikes ssbTrackReplyLikes) {
         trackReplyLikesRepository.delete(ssbTrackReplyLikes);
     }
-
-    /**
-     * 좋아요 눌렀는지 확인
-     */
-    public boolean existsLikes(String replyToken, long replyId, User user) {
-        String key = getLikeKey(replyToken);
-        // redis 에 있는지 확인
-        if (redisCacheService.hasRedis(key)) {
-            return redisCacheService.existsByToken(user, key);
-        }
-        Optional<SsbTrackReplyLikes> replyLikesOptional = trackReplyLikesRepository.findBySsbTrackReplyIdAndUser(
+    public Optional<SsbTrackReplyLikes> findOneAsOpt(long replyId, User user) {
+        return trackReplyLikesRepository.findBySsbTrackReplyIdAndUser(
             replyId, user);
-
-        // 만약 레디스에는 없고 디비에는 있으면
-        if (replyLikesOptional.isPresent()) {
-            redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getToken());
-        }
-        return replyLikesOptional.isPresent();
     }
     /*
      */
 
-//
-//    // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
-//    public int getTotalCount(String replyToken) {
-//        String key = getLikeKey(replyToken);
-//        // redis 에 total 캐시가 있으면
-//        int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
-//
-//        // redis 에 저장이 안되어 있을경우 count 후 저장
-//        if (count == 0) {
-//            List<User> users = getUserList(replyToken);
-//            if (!users.isEmpty()) {
-//                count = users.size();
-//                redisCacheService.updateCacheMapValueByKey(key, users);
-//            }
-//        }
-//        return count;
-//    }
-//
 
 
     public List<User> getUserList(String replyToken) {

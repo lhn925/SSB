@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -23,9 +24,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.model.PlayListType;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
@@ -79,6 +82,11 @@ public class SsbPlayListSettings extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isStatus;
 
+    // feed 에 공개가 된적 이 있는지
+    // true 면 feed 에 공개 됨, false 면 공개 된 적 없음
+    @Column(nullable = false)
+    private Boolean isRelease;
+
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
     private List<SsbPlyLikes> likes = new ArrayList<>();
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
@@ -121,7 +129,9 @@ public class SsbPlayListSettings extends BaseTimeEntity {
         return ssbPlayListSettings;
     }
 
-
+    public static void updateIsRelease(SsbPlayListSettings ssbPlayListSettings,Boolean isRelease) {
+        ssbPlayListSettings.setIsRelease(isRelease);
+    }
     public static void updateInfo(SsbPlayListSettings ssbPlayListSettings, String title, String desc,
         String playListType, Boolean isDownload, Boolean isPrivacy) {
         PlayListType type = PlayListType.findByListType(playListType);
