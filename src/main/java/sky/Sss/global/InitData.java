@@ -7,9 +7,8 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
-import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.repository.track.TrackQueryRepository;
-import sky.Sss.domain.track.repository.track.TrackRepository;
+import sky.Sss.domain.track.repository.track.JdbcRepository;
 import sky.Sss.domain.user.dto.join.UserJoinPostDto;
 import sky.Sss.domain.user.service.join.UserJoinService;
 
@@ -22,19 +21,12 @@ public class InitData {
     @PostConstruct
     public void init() {
         initUserService.init();
-
-
     }
 
     @Component
     @RequiredArgsConstructor
     static class InitUserService {
         private final UserJoinService userJoinService;
-        private final TrackQueryRepository trackQueryRepository;
-        private final TrackRepository trackRepository;
-        @PersistenceContext
-        private EntityManager em;
-
         /**
          * 0dksmf071
          * 0dlagksmf2

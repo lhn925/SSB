@@ -36,7 +36,7 @@ import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.exception.checked.SsbFileLengthLimitOverException;
 import sky.Sss.domain.track.repository.playList.PlySettingRepository;
-import sky.Sss.domain.track.repository.track.TrackRepository;
+import sky.Sss.domain.track.repository.track.TrackRepositoryImpl;
 import sky.Sss.domain.track.service.common.RepostCommonService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
@@ -61,7 +61,7 @@ public class TrackService {
     private final TrackTagService trackTagService;
     private final TempTrackStorageService tempTrackStorageService;
     private final TrackQueryService trackQueryService;
-    private final TrackRepository trackRepository;
+    private final TrackRepositoryImpl trackRepositoryImpl;
     private final TrackPlayMetricsService trackPlayMetricsService;
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
@@ -100,7 +100,7 @@ public class TrackService {
         SsbTrack.updateIsRelease(ssbTrack, !ssbTrack.getIsPrivacy());
 
         // 트랙 저장
-        trackRepository.save(ssbTrack);
+        trackRepositoryImpl.save(ssbTrack);
 
         String storeFileName = null;
         if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드
@@ -223,7 +223,7 @@ public class TrackService {
         // 등록
         plySettingRepository.save(ssbPlayListSettings);
 
-        trackRepository.saveAll(savaTracks);
+        trackRepositoryImpl.saveAll(savaTracks);
         List<SsbFeed> ssbFeedList = new ArrayList<>();
 
         // 각 track 에 Feed 업로드

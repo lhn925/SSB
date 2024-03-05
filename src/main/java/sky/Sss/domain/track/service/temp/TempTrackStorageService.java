@@ -48,17 +48,14 @@ public class TempTrackStorageService {
         tempTrackStorageRepository.save(tempTrackStorage);
 
         // 구분값 추가
-        TempTrackInfoDto tempTrackInfoDto =  TempTrackInfoDto.create(tempTrackStorage.getId(), tempTrackStorage.getToken(),
+        return TempTrackInfoDto.create(tempTrackStorage.getId(), tempTrackStorage.getToken(),
             uploadTrackFileDto);
-        return tempTrackInfoDto;
     }
 
     public TempTrackStorage findOne(Long id, String sessionId, String token, User user)
         throws SsbFileNotFoundException {
-        TempTrackStorage findOne = tempTrackStorageRepository.findOne(id, token, sessionId, user).orElseThrow(
-            () -> new SsbFileNotFoundException());
-
-        return findOne;
+        return tempTrackStorageRepository.findOne(id, token, sessionId, user).orElseThrow(
+            SsbFileNotFoundException::new);
     }
 
 
@@ -67,7 +64,7 @@ public class TempTrackStorageService {
         List<TempTrackStorage> tempTrackStorageList = tempTrackStorageRepository.findBySessionId(sessionId, user,
             tokens, ids);
         if (tempTrackStorageList.isEmpty()) {
-            new SsbFileNotFoundException();
+            throw new SsbFileNotFoundException();
         }
         return tempTrackStorageList;
     }
@@ -90,7 +87,7 @@ public class TempTrackStorageService {
         User user = userQueryService.findOne();
 
         TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, sessionId, user)
-            .orElseThrow(() -> new SsbFileNotFoundException());
+            .orElseThrow(SsbFileNotFoundException::new);
 
         // 임시파일 삭제
         TempTrackStorage.deleteTempFile(tempTrackStorage, fileStore);
