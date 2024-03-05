@@ -1,4 +1,16 @@
-INSERT INTO ssb_track (cover_url, created_date_time, description, genre, is_download, is_privacy, is_status,
+
+
+
+insert into user (created_date_time, email, grade, is_enabled, is_login_blocked, last_modified_date_time, password, picture_url, pw_sec_level, salt, token, user_id, user_name, user_name_modified_date)
+values ('2024-01-16 11:11:15.583953', '02512@daum.net', 'USER', true, false, '2024-01-16 11:11:15.583953', '$2a$10$HYhTRf9W2EHdH9ZuIs/4kedfWWzL3MZc9Kd/r5upGiuux27sVLpBO', NULL,
+        NULL, 'dd9f554911dd003eb31c', '6bdc99d35100742458de10c00784019f02f8d214040bf5fa29f4d01fefdae959', '0221325', '0유입니다2', NULL);
+insert into user (created_date_time, email, grade, is_enabled, is_login_blocked, last_modified_date_time, password, picture_url, pw_sec_level, salt, token, user_id, user_name, user_name_modified_date) values ('2024-03-05 12:37:49.155734', '12512@daum.net', 'USER', 1, 0, '2024-03-05 12:37:49.155734', '$2a$10$LwxzPSUyOuaRtHdiFAmno.qmgTLHFxP5BNWHUT1aGrTdeWlgu8Nqm', null, null, '7d9145d666ce925275f2', '0dfd33a2eebbffe8d3a945cf17abe27c61dece5b827dd71dc1b1bdcebcb0b5da', '1221325', '1유입니다2', null);
+    insert into user (created_date_time, email, grade, is_enabled, is_login_blocked, last_modified_date_time, password, picture_url, pw_sec_level, salt, token, user_id, user_name, user_name_modified_date) values ('2024-03-05 12:44:45.25285', '2221325@naver.com', 'USER', 1, 0, '2024-03-05 12:44:45.25285', '$2a$10$vr8FfV6SKVueKw6xiLVYt.q9EhwXS/ta4ZA83t26ruwFwyLg6SgjS', null, null, '1fcee3babe13659c79db', 'b7c5d6fce8bc4426b2a937187c94a6c0b05d8a4df1150e57a23dd421edcd8ecb', 'lim222', '임하늘', null);
+insert into user_join_agreement (created_date_time, info_agreement, last_modified_date_time, sdd_agreement, user_id) values ('2024-01-16 11:11:15.583953', true, '2024-01-16 11:11:15.583953', true, 1);
+insert into user_join_agreement (created_date_time, info_agreement, last_modified_date_time, sdd_agreement, user_id) values ('2024-01-16 11:11:15.583953', true, '2024-01-16 11:11:15.583953', true, 2);
+insert into user_join_agreement (created_date_time, info_agreement, last_modified_date_time, sdd_agreement, user_id) values ('2024-01-16 11:11:15.583953', true, '2024-01-16 11:11:15.583953', true, 3);
+
+    INSERT INTO ssb_track (cover_url, created_date_time, description, genre, is_download, is_privacy, is_status,
                        last_modified_date_time, main_genre_type, original_name, size, store_file_name, title, token,
                        track_length, uid, id,is_release)
 VALUES (null, '2024-01-17 11:11:15.583953', null, 'piano', 0, 0, 1, '2024-01-17 11:11:15.583953', 'MUSIC',

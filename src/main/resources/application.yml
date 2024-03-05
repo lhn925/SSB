@@ -60,6 +60,7 @@ spring:
         jdbc:
           batch_size: 100
     open-in-view: false
+    #    true ddl-auto 먼저 실행되고 실행
     defer-datasource-initialization: true
   thymeleaf:
     cache: false
