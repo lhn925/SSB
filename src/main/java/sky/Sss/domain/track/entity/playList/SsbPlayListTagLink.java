@@ -26,7 +26,7 @@ import sky.Sss.global.base.BaseTimeEntity;
 @Setter(PRIVATE)
 @Entity
 @NoArgsConstructor(access = PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"setting_id", "tag_id"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"settings_id", "tag_id"}))
 public class SsbPlayListTagLink extends BaseTimeEntity {
 
     @Id
@@ -34,7 +34,7 @@ public class SsbPlayListTagLink extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "setting_id",nullable = false)
+    @JoinColumn(name = "settings_id",nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
     @ManyToOne(fetch = LAZY)

@@ -246,8 +246,7 @@ public class TrackPlayMetricsService {
         // 한시간동안의 공식 조회수 조회 후
         // SsbTrackHourlyTotalPlays List 생성
         List<SsbTrackHourlyTotalPlays> totalPlays = trackChatIncludedService.hourlyChartFindByDayTime(dayTime).stream()
-            .map(dto ->
-                SsbTrackHourlyTotalPlays.create(dto)
+            .map(SsbTrackHourlyTotalPlays::create
             ).collect(Collectors.toList());
         trackHourlyTotalPlaysService.addAll(totalPlays);
     }
@@ -294,7 +293,7 @@ public class TrackPlayMetricsService {
             pageRequest);
 
         // 현재 시간대 트랙 플레이 검색
-        List<SsbTrack> ssbTracks = hourlyPlayList.stream().map(hourlyPlaysDto -> hourlyPlaysDto.getSsbTrack())
+        List<SsbTrack> ssbTracks = hourlyPlayList.stream().map(TrackTotalPlaysDto::getSsbTrack)
             .collect(Collectors.toList());
 
         // 최근 24시간 조회수 sum

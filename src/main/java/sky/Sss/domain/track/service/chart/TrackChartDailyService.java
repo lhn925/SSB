@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.chart;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.chart.SsbChartDaily;
 import sky.Sss.domain.track.entity.chart.SsbChartHourly;
 import sky.Sss.domain.track.repository.chart.ChartDailyRepository;
+import sky.Sss.domain.track.repository.chart.ChartDailyRepositoryImpl;
 import sky.Sss.domain.track.repository.chart.ChartHourlyRepository;
 
 @Slf4j
@@ -19,6 +21,7 @@ public class TrackChartDailyService {
 
 
     private final ChartDailyRepository chartDailyRepository;
+    private final ChartDailyRepositoryImpl chartDailyRepositoryImpl;
 
 
     @Transactional
@@ -28,7 +31,7 @@ public class TrackChartDailyService {
 
     @Transactional
     public void saveAll(List<SsbChartDaily> ssbChartHourly) {
-        chartDailyRepository.saveAll(ssbChartHourly);
+        chartDailyRepositoryImpl.saveAll(ssbChartHourly, LocalDateTime.now());
     }
 
     public boolean checkChart(int dayTime) {

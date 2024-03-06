@@ -34,6 +34,7 @@ import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.exception.checked.SsbFileLengthLimitOverException;
 import sky.Sss.domain.track.repository.track.TrackRepositoryImpl;
 import sky.Sss.domain.track.service.common.RepostCommonService;
+import sky.Sss.domain.track.service.common.TagLinkCommonService;
 import sky.Sss.domain.track.service.playList.PlyTracksService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
@@ -145,7 +146,7 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public void addTrackFiles(User user, long settingsId, String coverUrl, LocalDateTime createdDateTime,
+    public List<TrackInfoRepDto> addTrackFiles(User user, long settingsId, String coverUrl, LocalDateTime createdDateTime,
         List<SsbTrackTags> ssbTrackTags,
         List<PlayListTrackInfoReqDto> trackPlayListFileDtoList, String sessionId) {
         // playList 안에 있는 Track 정보
@@ -158,6 +159,7 @@ public class TrackService {
             .toList();
         // 임시파일 id
         List<Long> tempIdList = trackPlayListFileDtoList.stream().map(BaseTrackDto::getId).toList();
+
 
         // 임시파일 리스트
         List<TempTrackStorage> tempList = tempTrackStorageService.findByList(sessionId, user, tokenList, tempIdList);
@@ -184,13 +186,13 @@ public class TrackService {
             SsbTrack ssbTrack = createTrack(user, tempTrack, totalUploadTrackLength, totalTrackLength, metaDto);
 
             SsbTrack.updateIsRelease(ssbTrack, !ssbTrack.getIsPrivacy());
-
-            tempList.add(tempTrack);
             // tag 저장
             // 순서를 키값으로 저장
             trackFileMap.put(metaDto.getOrder(), ssbTrack);
             saveTracks.add(ssbTrack);
         }
+
+        log.info("tempList size = {}", tempList.size());
         // 임시파일 DB에서 삭제
         tempTrackStorageService.deleteAllBatch(tempList);
 
@@ -217,20 +219,12 @@ public class TrackService {
             });
             tagLinkCommonService.addTrackTagLinks(trackTagLinks);
         }
-
         // 플레이 리스트 트랙 목록 save
         List<SsbPlayListTracks> ssbPlayListTrackList = SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
             ssbPlayListSettings);
-        plyTracksService.addPlayListTracks(ssbPlayListTrackList);
+        plyTracksService.addPlayListTracks(ssbPlayListTrackList,createdDateTime);
 
-        List<SsbFeed> ssbFeedList = new ArrayList<>();
-        // 각 track 에 Feed 업로드
-        saveTracks.forEach(track -> {
-            SsbFeed ssbFeed = SsbFeed.create(track.getId(), user, ContentsType.TRACK);
-            SsbFeed.updateReleaseDateTime(ssbFeed, track.getCreatedDateTime());
-            ssbFeedList.add(ssbFeed);
-        });
-        feedService.addFeedList(ssbFeedList);
+        return trackInfoList;
     }
 
     @Transactional

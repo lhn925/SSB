@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.feed.entity.SsbFeed;
 import sky.Sss.domain.feed.model.FeedType;
 import sky.Sss.domain.feed.repository.FeedRepository;
+import sky.Sss.domain.feed.repository.FeedRepositoryImpl;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 
@@ -20,17 +21,16 @@ import sky.Sss.domain.user.model.ContentsType;
 public class FeedService {
 
     private final FeedRepository feedRepository;
+    private final FeedRepositoryImpl feedRepositoryImpl;
 
 
     @Transactional
     public void addFeed(SsbFeed ssbFeed) {
-        feedRepository.save(ssbFeed);
+        feedRepositoryImpl.save(ssbFeed);
     }
-
-
     @Transactional
-    public void addFeedList(List<SsbFeed> ssbFeedList) {
-        feedRepository.saveAll(ssbFeedList);
+    public void addFeedList(List<SsbFeed> ssbFeedList,LocalDateTime createdDateTime) {
+        feedRepositoryImpl.saveAll(ssbFeedList,createdDateTime);
     }
 
     public SsbFeed findOne(User user, long contentsId, ContentsType contentsType) {

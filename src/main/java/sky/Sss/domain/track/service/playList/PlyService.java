@@ -18,6 +18,7 @@ import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingUpdateDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackDeleteDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackUpdateDto;
+import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
@@ -25,7 +26,7 @@ import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.playList.PlySettingRepository;
 import sky.Sss.domain.track.service.common.RepostCommonService;
-import sky.Sss.domain.track.service.track.TagLinkCommonService;
+import sky.Sss.domain.track.service.common.TagLinkCommonService;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.track.service.track.TrackTagService;
 import sky.Sss.domain.user.entity.User;
@@ -59,9 +60,30 @@ public class PlyService {
             coverImgFile);
 
         // 플레이 리스트에 user 추가
-        trackService.addTrackFiles(user, playListInfoDto.getId(), playListInfoDto.getCoverUrl(),
+        List<TrackInfoRepDto> trackInfoRepDtoList = trackService.addTrackFiles(user, playListInfoDto.getId(),
+            playListInfoDto.getCoverUrl(),
             playListInfoDto.getCreatedDateTime(), ssbTrackTags,
             playListSettingSaveDto.getPlayListTrackInfoDtoList(), session.getId());
+
+        List<SsbFeed> ssbFeedList = new ArrayList<>();
+
+        // playList Feed
+        SsbFeed playListFeed = SsbFeed.create(playListInfoDto.getId(), user,
+            ContentsType.PLAYLIST);
+
+        // 비공개가 아니면 peed 날짜 업로드
+        SsbFeed.updateReleaseDateTime(playListFeed, playListInfoDto.getCreatedDateTime());
+
+        // 추가
+        ssbFeedList.add(playListFeed);
+
+        // 각 track 에 Feed 업로드
+        trackInfoRepDtoList.forEach(track -> {
+            SsbFeed ssbFeed = SsbFeed.create(track.getId(), user, ContentsType.TRACK);
+            SsbFeed.updateReleaseDateTime(ssbFeed, track.getCreatedDateTime());
+            ssbFeedList.add(ssbFeed);
+        });
+        feedService.addFeedList(ssbFeedList,playListInfoDto.getCreatedDateTime());
         return playListInfoDto;
     }
 
@@ -92,19 +114,12 @@ public class PlyService {
         if (coverImgFile != null) {
             storeFileCoverName = trackService.getUploadFileDto(coverImgFile).getStoreFileName();
         }
-
-        // 등록
-        plySettingRepository.save(ssbPlayListSettings);
         // 커버 이미지 저장
         SsbPlayListSettings.updateCoverImg(storeFileCoverName, ssbPlayListSettings);
 
-        SsbFeed ssbFeed = SsbFeed.create(ssbPlayListSettings.getId(), user,
-            ContentsType.PLAYLIST);
-        // 비공개가 아니면 peed 날짜 업로드
-        SsbFeed.updateReleaseDateTime(ssbFeed, ssbPlayListSettings.getCreatedDateTime());
+        // 등록
+        plySettingRepository.save(ssbPlayListSettings);
 
-        // 피드 등록
-        feedService.addFeed(ssbFeed);
         // 앨범 태그 링크 저장
         if (ssbTrackTagsList != null && !ssbTrackTagsList.isEmpty()) {
             List<SsbPlayListTagLink> playListTagLinks = getPlayListTagLinks(ssbTrackTagsList, ssbPlayListSettings);
@@ -153,7 +168,6 @@ public class PlyService {
         // 포함되어 있지 않은 태그 링크 삭제
         filterNewTags(newTagList, removeTagLinks, existTagLinks);
 
-
         tagLinkCommonService.delPlyTagLinksInBatch(removeTagLinks);
 
         boolean modifyPrivacy = playListSettingUpdateDto.isPrivacy();
@@ -164,7 +178,6 @@ public class PlyService {
         if (playListTagLinks != null && !playListTagLinks.isEmpty()) {
             tagLinkCommonService.addPlyTagLinks(playListTagLinks);
         }
-
 
         // 공개 이면서 공개 날짜 가 없을 경우
         // 비공개 -> 공개, 배포 false -> 최초 배포
@@ -262,7 +275,8 @@ public class PlyService {
             List<SsbPlayListTracks> removeList = new ArrayList<>();
             deleteList.forEach(trackDto -> {
                 ssbPlayListSettings.getPlayListTracks().stream()
-                    .filter(track -> Objects.equals(trackDto.getId(), track.getId())).findFirst().ifPresent(removeList::add);
+                    .filter(track -> Objects.equals(trackDto.getId(), track.getId())).findFirst()
+                    .ifPresent(removeList::add);
             });
             plyTracksService.deleteTracksInBatch(removeList);
         }

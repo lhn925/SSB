@@ -21,7 +21,7 @@ import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.base.BaseTimeEntity;
 
 
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid", "setting_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"uid", "settings_id"})})
 @Entity
 @Setter(AccessLevel.PRIVATE)
 @Getter
@@ -38,7 +38,7 @@ public class SsbPlyLikes extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "setting_id", nullable = false)
+    @JoinColumn(name = "settings_id", nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
     public static SsbPlyLikes create(User user) {

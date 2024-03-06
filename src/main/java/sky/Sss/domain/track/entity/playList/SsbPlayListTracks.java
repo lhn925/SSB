@@ -30,7 +30,7 @@ public class SsbPlayListTracks extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "setting_id",nullable = false)
+    @JoinColumn(name = "settings_id",nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
     @ManyToOne(fetch = LAZY)

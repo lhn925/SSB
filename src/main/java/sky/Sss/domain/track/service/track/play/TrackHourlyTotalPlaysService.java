@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.track.play;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import sky.Sss.domain.track.dto.track.chart.TrackTotalPlaysDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.log.SsbTrackHourlyTotalPlays;
 import sky.Sss.domain.track.repository.track.play.TrackHourlyTotalPlaysRepository;
+import sky.Sss.domain.track.repository.track.play.TrackHourlyTotalPlaysRepositoryImpl;
 
 @Service
 @Slf4j
@@ -20,6 +22,7 @@ import sky.Sss.domain.track.repository.track.play.TrackHourlyTotalPlaysRepositor
 @Transactional(readOnly = true)
 public class TrackHourlyTotalPlaysService {
 
+    private final TrackHourlyTotalPlaysRepositoryImpl trackHourlyTotalPlaysRepositoryImpl;
     private final TrackHourlyTotalPlaysRepository trackHourlyTotalPlaysRepository;
 
 
@@ -32,7 +35,7 @@ public class TrackHourlyTotalPlaysService {
      */
     @Transactional
     public void addAll(List<SsbTrackHourlyTotalPlays> hourlyTotalPlays) {
-        trackHourlyTotalPlaysRepository.saveAll(hourlyTotalPlays);
+        trackHourlyTotalPlaysRepositoryImpl.saveAll(hourlyTotalPlays, LocalDateTime.now());
     }
 
     /**
