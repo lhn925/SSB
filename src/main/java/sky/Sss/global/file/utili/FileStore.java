@@ -76,8 +76,6 @@ public class FileStore {
             throw new RuntimeException(e);
         }
     }
-
-
     /**
      * 파일 폴더 + type + 파일이름  + 확장자명 생성
      */
@@ -168,13 +166,7 @@ public class FileStore {
             File file = new File(getFullPath(dirPath, storeFileName));
             multipartFile.transferTo(file);
             audioFile = AudioFileIO.read(new File(file.getPath()));
-        } catch (CannotReadException e) {
-            throw new RuntimeException(e);
-        } catch (TagException e) {
-            throw new RuntimeException(e);
-        } catch (ReadOnlyFileException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidAudioFrameException e) {
+        } catch (CannotReadException | ReadOnlyFileException | InvalidAudioFrameException | TagException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException();

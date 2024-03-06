@@ -1,13 +1,16 @@
 package sky.Sss.domain.track.dto.playlist;
 
 
+import static lombok.AccessLevel.PRIVATE;
+
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 
-@Setter
+@Setter(PRIVATE)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlayListInfoDto {
@@ -18,6 +21,7 @@ public class PlayListInfoDto {
     private String coverUrl;
     private Boolean isDownload;
     private String userName;
+    private LocalDateTime createdDateTime;
 
 
     public static PlayListInfoDto create(SsbPlayListSettings ssbPlayListSettings) {
@@ -29,6 +33,7 @@ public class PlayListInfoDto {
         playListInfoDto.setCoverUrl(ssbPlayListSettings.getCoverUrl());
         playListInfoDto.setIsDownload(ssbPlayListSettings.getIsDownload());
         playListInfoDto.setUserName(ssbPlayListSettings.getUser().getUserName());
+        playListInfoDto.setCreatedDateTime(ssbPlayListSettings.getCreatedDateTime());
 
         return playListInfoDto;
     }

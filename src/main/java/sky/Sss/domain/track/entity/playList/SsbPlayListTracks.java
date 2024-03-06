@@ -30,17 +30,17 @@ public class SsbPlayListTracks extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "setting_id")
+    @JoinColumn(name = "setting_id",nullable = false)
     private SsbPlayListSettings ssbPlayListSettings;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "track_id")
+    @JoinColumn(name = "track_id",nullable = false)
     private SsbTrack ssbTrack;
 
     @Column(nullable = false)
     private Integer orders;
 
-    public static void createSsbPlayListTrackList(Map<Integer, SsbTrack> playListMap,
+    public static List<SsbPlayListTracks> createSsbPlayListTrackList(Map<Integer, SsbTrack> playListMap,
         SsbPlayListSettings ssbPlayListSettings) {
         List<SsbPlayListTracks> ssbPlayListTracksList = new ArrayList<>();
         for (Integer key : playListMap.keySet()) {
@@ -51,7 +51,7 @@ public class SsbPlayListTracks extends BaseTimeEntity {
             ssbPlayListTracks.setOrders(key);
             ssbPlayListTracksList.add(ssbPlayListTracks);
         }
-        SsbPlayListSettings.addAllTracks(ssbPlayListTracksList, ssbPlayListSettings);
+        return ssbPlayListTracksList;
     }
 
     public static void changeOrders(SsbPlayListTracks ssbPlayListTracks, Integer orders) {

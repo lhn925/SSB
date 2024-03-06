@@ -58,7 +58,6 @@ public class SsbPlayListSettings extends BaseTimeEntity {
     private String title;
 
     //앨범 커버
-    @Column(nullable = false)
     private String coverUrl;
 
     // 타입
@@ -96,19 +95,6 @@ public class SsbPlayListSettings extends BaseTimeEntity {
     private List<SsbPlayListTracks> playListTracks = new ArrayList<>();
     @OneToMany(mappedBy = "ssbPlayListSettings", cascade = ALL)
     private List<SsbPlyReply> replies = new ArrayList<>();
-
-
-    public static void addAllTracks(List<SsbPlayListTracks> ssbPlayListTracks,
-        SsbPlayListSettings ssbPlayListSettings) {
-        ssbPlayListSettings.playListTracks.addAll(ssbPlayListTracks);
-    }
-
-    public static void addTagLink(SsbPlayListSettings ssbPlayListSettings, List<SsbPlayListTagLink> list) {
-        if (list != null && !list.isEmpty()) {
-            ssbPlayListSettings.tags.addAll(list);
-        }
-    }
-
     public static SsbPlayListSettings create(PlayListSettingSaveDto playListSettingSaveDto,
         User user) {
         SsbPlayListSettings ssbPlayListSettings = new SsbPlayListSettings();

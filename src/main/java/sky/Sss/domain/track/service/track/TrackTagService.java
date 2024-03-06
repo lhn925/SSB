@@ -1,18 +1,18 @@
 package sky.Sss.domain.track.service.track;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
-import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
+import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
-import sky.Sss.domain.track.repository.playList.PlayListTagLinkRepository;
-import sky.Sss.domain.track.repository.track.TrackTagLinkRepository;
-import sky.Sss.domain.track.repository.track.TrackTagRepository;
+import sky.Sss.domain.track.repository.track.TrackTagRepositoryImpl;
 
 
 @Slf4j
@@ -21,38 +21,48 @@ import sky.Sss.domain.track.repository.track.TrackTagRepository;
 @RequiredArgsConstructor
 public class TrackTagService {
 
-    private final TrackTagRepository trackTagRepository;
-    private final TrackTagLinkRepository trackTagLinkRepository;
-    private final PlayListTagLinkRepository playListTagLinkRepository;
-
+    private final TrackTagRepositoryImpl trackTagRepositoryImpl;
 
     //    Cache miss 로 인한 데이터 실시간성 보완을 위해 cachePut 사용
     @Transactional
     @CachePut(value = "tags", key = "#tag", cacheManager = "contentCacheManager")
     public SsbTrackTags getTagsByStr(String tag) {
-        Optional<SsbTrackTags> byTag = trackTagRepository.findByTag(tag);
+        Optional<SsbTrackTags> byTag = trackTagRepositoryImpl.findByTag(tag);
         return byTag.orElse(null);
     }
 
-    public List<SsbTrackTags> addTags(List<SsbTrackTags> tags) {
-        List<SsbTrackTags> ssbTrackTags = trackTagRepository.saveAll(tags);
-        return ssbTrackTags;
+    public List<SsbTrackTags> getTagsList(Set<String> tagList) {
+        return trackTagRepositoryImpl.findAllByTagIn(tagList);
     }
 
-    // 개별 trackLink Batch 삭제
     @Transactional
-    public void deleteTagLinksInBatch(List<SsbTrackTagLink> tagLink) {
-        if (tagLink != null && !tagLink.isEmpty()) {
-            trackTagLinkRepository.deleteAllInBatch(tagLink);
-        }
+    public void addTags(Set<String> tags) {
+        LocalDateTime now = LocalDateTime.now();
+        List<SsbTrackTags> ssbTrackTags = tags.stream().map(SsbTrackTags::createSsbTrackTag).toList();
+        trackTagRepositoryImpl.saveAll(ssbTrackTags,now);
     }
 
-    // playList trackLink Batch 삭제
+    // DB 태그 검색 후 없으면 추가
     @Transactional
-    public void delPlyTagLinksInBatch(List<SsbPlayListTagLink> tagLink) {
-        if (tagLink != null && !tagLink.isEmpty()) {
-            playListTagLinkRepository.deleteAllInBatch(tagLink);
+    public List<SsbTrackTags> getSsbTrackTags(List<TrackTagsDto> tagList) {
+        if (tagList != null && tagList.size() > 0) {
+            Set<String> findTagsSet = tagList.stream().map(TrackTagsDto::getTag).collect(Collectors.toSet());
+            List<SsbTrackTags> ssbTrackTags = getTagsList(findTagsSet);
+            // String
+            List<String> ssbTagStrList = ssbTrackTags.stream().map(SsbTrackTags::getTag).toList();
+
+            // DB에 없어서 추가 해야하는 Tags
+            Set<String> addTags = findTagsSet.stream().filter(find -> !ssbTagStrList.contains(find))
+                .collect(Collectors.toSet());
+            if (!addTags.isEmpty()) {
+                // save
+                addTags(addTags);
+                // 다시 검색 후 저장
+                ssbTrackTags.addAll(getTagsList(addTags));
+            }
+            return ssbTrackTags;
         }
+        return null;
     }
 
 

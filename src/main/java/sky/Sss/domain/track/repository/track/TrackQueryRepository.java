@@ -1,10 +1,12 @@
 package sky.Sss.domain.track.repository.track;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
+import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
 
@@ -41,6 +43,12 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     Optional<SsbTrack> findOneWithTags(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
         @Param("isStatus") Boolean isStatus);
 
+    @Query(
+        "select new sky.Sss.domain.track.dto.track.TrackInfoRepDto(s.id,s.token,s.title,s.coverUrl,u.userName,s.trackLength,s.createdDateTime) "
+            + " from SsbTrack s join fetch User u"
+            + " on s.user = u "
+            + " where s.token in (:token) and s.user =:user and s.isStatus =:isStatus")
+    List<TrackInfoRepDto> findAllByToken(@Param("token") List<String> tokenList,@Param("user") User user,@Param("isStatus") boolean isStatus);
 
     @Query(
         "select new sky.Sss.domain.track.dto.common.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "

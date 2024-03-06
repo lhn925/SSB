@@ -23,6 +23,11 @@ public class PlyTracksService {
     }
 
     @Transactional
+    public void addPlayListTracks(List<SsbPlayListTracks> tracksList) {
+        plyTracksRepository.saveAll(tracksList);
+    }
+
+    @Transactional
     public void deleteBySettingsId (Long settingsId){
         plyTracksRepository.deleteBySettingsId(settingsId);
     }

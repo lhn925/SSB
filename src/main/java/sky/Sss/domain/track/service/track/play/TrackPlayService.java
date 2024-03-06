@@ -27,8 +27,6 @@ public class TrackPlayService {
 
     private final TrackService trackService;
     private final UserQueryService userQueryService;
-    private final TrackAllPlayLogService trackAllPlayLogService;
-
     /**
      * 비공개 확인
      * 본인 여부
@@ -47,15 +45,15 @@ public class TrackPlayService {
 
         // 요청한 사용자가 비회원인지 확인 비회원이 아닐 경우
         // 해당 요청한 track 에 소유자인지 확인
-        Boolean isOwnerPost = playUser != null ? ssbTrack.getUser().equals(playUser) : false;
+        boolean isOwnerPost = ssbTrack.getUser().equals(playUser);
 
         // 요청한 사용자가 해당 track(비공개) 에 권한이 없는경우 예외 발생
         if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개 일경우
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
 
-        UrlResource ssbTrackFile = trackService.getSsbTrackFile(
+        return trackService.getSsbTrackFile(
             ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());
-        return ssbTrackFile;
     }
 }
+

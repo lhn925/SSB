@@ -6,9 +6,13 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 
-public interface TrackTagRepository extends JpaRepository<SsbTrackTags, Long> {
+public interface TrackTagJpaRepository extends JpaRepository<SsbTrackTags, Long> {
+
+
 
     Optional<SsbTrackTags> findByTag(String tag);
+    List<SsbTrackTags> findAllByTagIn(Set<String> tagsList);
+
 
     Set<SsbTrackTags> findByIdIn(Set<Long> ids);
 }

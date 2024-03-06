@@ -23,23 +23,21 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
     private final JdbcTemplate jdbcTemplate;
     @Override
     @Transactional
-    public void saveAll(List<SsbTrack> ssbTrackList) {
-
-        LocalDateTime now = LocalDateTime.now();
+    public void saveAll(List<SsbTrack> ssbTrackList,LocalDateTime createdDateTime) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO SSB_TRACK (cover_url, created_date, description, genre, is_download, is_privacy, is_status, " +
-                "last_modified_date, main_genre_type, original_name, size, store_file_name, title, token, " +
-                " track_length, uid, is_release) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO ssb_track (cover_url, created_date_time, description, genre, is_download, is_privacy, is_status, " +
+                "last_modified_date_time, main_genre_type, original_name, size, store_file_name, title, token, " +
+                "track_length, uid, is_release) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             ssbTrackList, 50,
             (PreparedStatement ps, SsbTrack ssbTrack) -> {
                 ps.setString(1, ssbTrack.getCoverUrl());
-                ps.setTimestamp(2, Timestamp.valueOf(now)); // created_date를 설정합니다.
+                ps.setTimestamp(2, Timestamp.valueOf(createdDateTime)); // created_date 설정
                 ps.setString(3, ssbTrack.getDescription());
                 ps.setString(4, ssbTrack.getGenre());
                 ps.setBoolean(5, ssbTrack.getIsDownload());
                 ps.setBoolean(6, ssbTrack.getIsPrivacy());
                 ps.setBoolean(7, ssbTrack.getIsStatus());
-                ps.setTimestamp(8, Timestamp.valueOf(now)); // last_modified_date를 설정합니다.
+                ps.setTimestamp(8, Timestamp.valueOf(createdDateTime)); // last_modified_date 설정
                 ps.setString(9, ssbTrack.getMainGenreType().toString()); // Enum 타입을 String으로 변환합니다.
                 ps.setString(10, ssbTrack.getOriginalName());
                 ps.setLong(11, ssbTrack.getSize());
@@ -55,6 +53,6 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
     @Override
     @Transactional
     public void save(SsbTrack entity) {
-//        trackJpaRepository.save(entity);
+        trackJpaRepository.save(entity);
     }
 }

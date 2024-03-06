@@ -21,23 +21,20 @@ import sky.Sss.domain.track.dto.BaseTrackDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
-import sky.Sss.domain.track.dto.playlist.PlayListInfoDto;
-import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.track.TrackInfoModifyReqDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
 import sky.Sss.domain.track.entity.TempTrackStorage;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
-import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.exception.checked.SsbFileLengthLimitOverException;
-import sky.Sss.domain.track.repository.playList.PlySettingRepository;
 import sky.Sss.domain.track.repository.track.TrackRepositoryImpl;
 import sky.Sss.domain.track.service.common.RepostCommonService;
+import sky.Sss.domain.track.service.playList.PlyTracksService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
 import sky.Sss.domain.user.entity.User;
@@ -45,7 +42,6 @@ import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
-import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.utili.FileStore;
 
@@ -57,14 +53,16 @@ public class TrackService {
 
     private final FileStore fileStore;
     private final UserQueryService userQueryService;
-    private final PlySettingRepository plySettingRepository;
     private final TrackTagService trackTagService;
+    private final TagLinkCommonService tagLinkCommonService;
     private final TempTrackStorageService tempTrackStorageService;
     private final TrackQueryService trackQueryService;
     private final TrackRepositoryImpl trackRepositoryImpl;
     private final TrackPlayMetricsService trackPlayMetricsService;
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
+
+    private final PlyTracksService plyTracksService;
 
 
     /**
@@ -89,11 +87,10 @@ public class TrackService {
         Integer totalTrackLength = getTotalLength(user);
 
         // 태그 확인
-        List<SsbTrackTags> ssbTrackTags = getSsbTrackTags(tagList);
+        List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(tagList);
         Integer totalUploadTrackLength = 0;
         SsbTrack ssbTrack = createTrack(user, tempTrackStorage, totalUploadTrackLength, totalTrackLength,
-            trackInfoSaveReqDto,
-            ssbTrackTags);
+            trackInfoSaveReqDto);
 
         // 사용자에게 한번 배포가 되었는지 확인
         // true: 배포함 ,False : 배포되지 않음
@@ -101,6 +98,12 @@ public class TrackService {
 
         // 트랙 저장
         trackRepositoryImpl.save(ssbTrack);
+
+        // 링크 연결
+        if (ssbTrackTags != null) {
+            List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
+            tagLinkCommonService.addTrackTagLinks(trackTagLinks);
+        }
 
         String storeFileName = null;
         if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드
@@ -137,32 +140,27 @@ public class TrackService {
     }
 
     /**
-     * 플레이리스트 생성
+     * 다중 Track 저장 후 tokenList 반납
      *
-     * @param playListSettingSaveDto
      * @throws IOException
      */
     @Transactional
-    public PlayListInfoDto addTrackFiles(PlayListSettingSaveDto playListSettingSaveDto, MultipartFile coverImgFile,
-        String sessionId) {
-        User user = userQueryService.findOne();
+    public void addTrackFiles(User user, long settingsId, String coverUrl, LocalDateTime createdDateTime,
+        List<SsbTrackTags> ssbTrackTags,
+        List<PlayListTrackInfoReqDto> trackPlayListFileDtoList, String sessionId) {
         // playList 안에 있는 Track 정보
-        List<PlayListTrackInfoReqDto> trackPlayListFileDtoList = playListSettingSaveDto.getPlayListTrackInfoDtoList();
-        // 플레이 리스트 저장
-        SsbPlayListSettings ssbPlayListSettings = SsbPlayListSettings.create(playListSettingSaveDto,
-            user);
-        // Token 생성
-        String playListToken = TokenUtil.getToken();
-        //playList token 저장
-        SsbPlayListSettings.updateToken(playListToken, ssbPlayListSettings);
+
         // ssbTrack 저장을 위한 Map 생성
         Map<Integer, SsbTrack> trackFileMap = new HashMap<>();
 
-        List<String> tokens = trackPlayListFileDtoList.stream().map(BaseTrackDto::getToken)
-            .collect(Collectors.toList());
-        List<Long> ids = trackPlayListFileDtoList.stream().map(BaseTrackDto::getId).collect(Collectors.toList());
+        // 트랙 토큰
+        List<String> tokenList = trackPlayListFileDtoList.stream().map(BaseTrackDto::getToken)
+            .toList();
+        // 임시파일 id
+        List<Long> tempIdList = trackPlayListFileDtoList.stream().map(BaseTrackDto::getId).toList();
 
-        List<TempTrackStorage> tempList = tempTrackStorageService.findByList(sessionId, user, tokens, ids);
+        // 임시파일 리스트
+        List<TempTrackStorage> tempList = tempTrackStorageService.findByList(sessionId, user, tokenList, tempIdList);
 
         // 사이즈가 맞지 않는 경우
         if (tempList.size() != trackPlayListFileDtoList.size()) {
@@ -171,9 +169,10 @@ public class TrackService {
 
         Integer totalTrackLength = getTotalLength(user);
         // 태그 조회
-        List<SsbTrackTags> ssbTrackTags = getSsbTrackTags(playListSettingSaveDto.getTagList());
-        //
-        List<SsbTrack> savaTracks = new ArrayList<>();
+        List<SsbTrack> saveTracks = new ArrayList<>();
+
+        // 외래키 연결을 위한 객체 생성
+        SsbPlayListSettings ssbPlayListSettings = SsbPlayListSettings.builder().id(settingsId).build();
 
         // upload 할 length 저장
         Integer totalUploadTrackLength = 0;
@@ -182,8 +181,7 @@ public class TrackService {
                 .findFirst()
                 .orElseThrow(SsbFileNotFoundException::new);
             // ssbTrack 저장
-            SsbTrack ssbTrack = createTrack(user, tempTrack, totalUploadTrackLength, totalTrackLength, metaDto,
-                ssbTrackTags);
+            SsbTrack ssbTrack = createTrack(user, tempTrack, totalUploadTrackLength, totalTrackLength, metaDto);
 
             SsbTrack.updateIsRelease(ssbTrack, !ssbTrack.getIsPrivacy());
 
@@ -191,57 +189,48 @@ public class TrackService {
             // tag 저장
             // 순서를 키값으로 저장
             trackFileMap.put(metaDto.getOrder(), ssbTrack);
-            savaTracks.add(ssbTrack);
+            saveTracks.add(ssbTrack);
         }
-
-        // 앨범 태그 저장
-        if (ssbTrackTags != null) {
-            List<SsbPlayListTagLink> playListTagLinks = getPlayListTagLinks(ssbTrackTags, ssbPlayListSettings);
-            SsbPlayListSettings.addTagLink(ssbPlayListSettings, playListTagLinks);
-        }
-        // 플레이 리스트 구성 및 순서 저장
-        SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
-            ssbPlayListSettings);
-
         // 임시파일 DB에서 삭제
         tempTrackStorageService.deleteAllBatch(tempList);
 
-        // 배포되었는지 확인
-        SsbPlayListSettings.updateIsRelease(ssbPlayListSettings, !ssbPlayListSettings.getIsPrivacy());
-
-        // 커버 이미지 업데이트
-        String storeFileCoverName = null;
-        if (coverImgFile != null) {
-            storeFileCoverName = getUploadFileDto(coverImgFile).getStoreFileName();
-        }
         for (Integer key : trackFileMap.keySet()) {
             trackFileMap.get(key);
-            SsbTrack.updateCoverImg(storeFileCoverName, trackFileMap.get(key));
+            SsbTrack.updateCoverImg(coverUrl, trackFileMap.get(key));
         }
-        SsbPlayListSettings.updateCoverImg(storeFileCoverName, ssbPlayListSettings);
+        trackRepositoryImpl.saveAll(saveTracks, createdDateTime);
 
-        // 등록
-        plySettingRepository.save(ssbPlayListSettings);
+        // save 한 track 을 select 한 후 id,createdDateTime Update
+        List<TrackInfoRepDto> trackInfoList = trackQueryService.getTrackInfoRepDto(tokenList, user, Status.ON);
+        trackInfoList.forEach(info ->
+            saveTracks.stream()
+                .filter(save -> save.getToken().equals(info.getToken()))
+                .findFirst()
+                .ifPresent(save -> save.updateTrackInfo(info.getId(), info.getCreatedDateTime()))
+        );
+        // 태그 링크 추가
+        // 태그 Link 추가
+        if (ssbTrackTags != null) {
+            List<SsbTrackTagLink> trackTagLinks = new ArrayList<>();
+            saveTracks.forEach(track -> {
+                trackTagLinks.addAll(getTrackTagLinks(ssbTrackTags, track));
+            });
+            tagLinkCommonService.addTrackTagLinks(trackTagLinks);
+        }
 
-        trackRepositoryImpl.saveAll(savaTracks);
+        // 플레이 리스트 트랙 목록 save
+        List<SsbPlayListTracks> ssbPlayListTrackList = SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
+            ssbPlayListSettings);
+        plyTracksService.addPlayListTracks(ssbPlayListTrackList);
+
         List<SsbFeed> ssbFeedList = new ArrayList<>();
-
         // 각 track 에 Feed 업로드
-        savaTracks.forEach(track -> {
+        saveTracks.forEach(track -> {
             SsbFeed ssbFeed = SsbFeed.create(track.getId(), user, ContentsType.TRACK);
             SsbFeed.updateReleaseDateTime(ssbFeed, track.getCreatedDateTime());
             ssbFeedList.add(ssbFeed);
         });
-
-
-        SsbFeed ssbFeed = SsbFeed.create(ssbPlayListSettings.getId(), user,
-            ContentsType.PLAYLIST);
-        // 비공개가 아니면 peed 날짜 업로드
-        SsbFeed.updateReleaseDateTime(ssbFeed, ssbPlayListSettings.getCreatedDateTime());
-
-        ssbFeedList.add(ssbFeed);
         feedService.addFeedList(ssbFeedList);
-        return PlayListInfoDto.create(ssbPlayListSettings);
     }
 
     @Transactional
@@ -253,7 +242,7 @@ public class TrackService {
         // 업데이트 태그에도 속하지 않는 놈은 삭제
 
         // 새로운 태그 수정
-        List<SsbTrackTags> newTagList = getSsbTrackTags(trackInfoModifyReqDto.getTagList());
+        List<SsbTrackTags> newTagList = trackTagService.getSsbTrackTags(trackInfoModifyReqDto.getTagList());
 
         // 삭제 태그 링크
         List<SsbTrackTagLink> removeTagLinks = new ArrayList<>();
@@ -265,10 +254,12 @@ public class TrackService {
         filterNewTags(newTagList, removeTagLinks, existTagLinks);
 
         // 포함되어 있지 않은 태그 링크 삭제
-        trackTagService.deleteTagLinksInBatch(removeTagLinks);
+        tagLinkCommonService.deleteTagLinksInBatch(removeTagLinks);
 
-        List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(newTagList, ssbTrack);
-        SsbTrack.addTagLink(ssbTrack, trackTagLinks);
+        if (newTagList != null) {
+            List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(newTagList, ssbTrack);
+            tagLinkCommonService.addTrackTagLinks(trackTagLinks);
+        }
 
         boolean modifyPrivacy = trackInfoModifyReqDto.getIsPrivacy();
 
@@ -278,7 +269,7 @@ public class TrackService {
         }
         // privacy 업데이트 내용이 다를경우 Repost isPrivacy 업데이트
         if (modifyPrivacy != ssbTrack.getIsPrivacy()) {
-            repostCommonService.privacyAllUpdate(ssbTrack.getId(),modifyPrivacy,ContentsType.TRACK);
+            repostCommonService.privacyAllUpdate(ssbTrack.getId(), modifyPrivacy, ContentsType.TRACK);
         }
 
         // 내용 수정
@@ -289,7 +280,6 @@ public class TrackService {
 
         if (coverImgFile != null) {
             // 기존 이미지 삭제
-//            SsbTrack.deleteCoverImg(ssbTrack, fileStore);
             UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile);
             SsbTrack.updateCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
         }
@@ -374,9 +364,7 @@ public class TrackService {
         feedService.deleteFeed(user, ssbTrack.getId(), ContentsType.TRACK);
 
         // repost 삭제
-
-
-        trackTagService.deleteTagLinksInBatch(ssbTrack.getTags());
+        tagLinkCommonService.deleteTagLinksInBatch(ssbTrack.getTags());
 
         SsbTrack.deleteTrackFile(ssbTrack, fileStore);
         SsbTrack.changeStatus(ssbTrack, Status.OFF);
@@ -395,18 +383,12 @@ public class TrackService {
 
     private SsbTrack createTrack(User user, TempTrackStorage tempTrack,
         Integer totalUploadTrackLength, Integer totalTrackLength,
-        TrackInfoSaveReqDto metaDto, List<SsbTrackTags> ssbTrackTags) {
+        TrackInfoSaveReqDto metaDto) {
 
         // ssbTrack 생성
         SsbTrack ssbTrack = SsbTrack.create(metaDto, tempTrack, user);
         // token값 저장
         SsbTrack.updateToken(tempTrack.getToken(), ssbTrack);
-
-        // 태그 Link 추가
-        if (ssbTrackTags != null) {
-            List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
-            SsbTrack.addTagLink(ssbTrack, trackTagLinks);
-        }
         // 총 파일 트랙 길이 저장
         totalUploadTrackLength += tempTrack.getTrackLength();
 
@@ -417,46 +399,9 @@ public class TrackService {
 
     // 태그 등록
     private List<SsbTrackTagLink> getTrackTagLinks(List<SsbTrackTags> tags, SsbTrack ssbTrack) {
-        if (tags != null && !tags.isEmpty()) {
-            return tags.stream().map(tag -> SsbTrackTagLink.createSsbTrackTagLink(
-                ssbTrack, tag)).collect(Collectors.toList());
-        }
-        return null;
-    }
 
-    // 태그 등록
-    public List<SsbPlayListTagLink> getPlayListTagLinks(List<SsbTrackTags> tags,
-        SsbPlayListSettings ssbPlayListSettings) {
-        if (tags != null && !tags.isEmpty()) {
-
-            return tags.stream()
-                .map(tag -> SsbPlayListTagLink.createSsbTrackTagLink(
-                    ssbPlayListSettings, tag)).collect(Collectors.toList());
-        }
-        return null;
-    }
-
-
-    // DB 태그 여부 가져오기
-    public List<SsbTrackTags> getSsbTrackTags(List<TrackTagsDto> tagList) {
-        if (tagList != null && tagList.size() > 0) {
-            List<SsbTrackTags> tags = new ArrayList<>();
-            List<SsbTrackTags> addTags = new ArrayList<>();
-            tagList.forEach(tag -> {
-                SsbTrackTags tagsByStr = trackTagService.getTagsByStr(tag.getTag());
-                if (tagsByStr != null) {
-                    tags.add(tagsByStr);
-                } else {
-                    addTags.add(SsbTrackTags.createSsbTrackTag(tag.getTag()));
-                }
-            });
-            // 기존에 없던 태그 저장 후 추가
-            if (!addTags.isEmpty()) {
-                tags.addAll(trackTagService.addTags(addTags));
-            }
-            return tags;
-        }
-        return null;
+        return tags.stream().map(tag -> SsbTrackTagLink.createSsbTrackTagLink(
+            ssbTrack, tag)).collect(Collectors.toList());
     }
 
     private void checkLimit(Integer totalTrackLength, Integer trackLength) {

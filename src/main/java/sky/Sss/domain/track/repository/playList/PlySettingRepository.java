@@ -12,5 +12,16 @@ public interface PlySettingRepository extends JpaRepository<SsbPlayListSettings,
 
     @Query("select p from SsbPlayListSettings p  where p.id= :id "
         + " and p.token = :token and p.user =:user and p.isStatus = :isStatus")
-    Optional<SsbPlayListSettings> findOne(@Param("id") Long id, @Param("token") String token, @Param("user") User user,@Param("isStatus") Boolean isStatus);
+    Optional<SsbPlayListSettings> findOne(@Param("id") Long id, @Param("token") String token, @Param("user") User user,
+        @Param("isStatus") Boolean isStatus);
+
+
+    @Query(
+        "select distinct p from SsbPlayListSettings p left join fetch p.playListTracks "
+            + " where p.id= :id "
+            + " and p.token = :token and p.user =:user and p.isStatus = :isStatus")
+    Optional<SsbPlayListSettings> findOneJoinTracks(@Param("id") Long id, @Param("token") String token,
+        @Param("user") User user, @Param("isStatus") Boolean isStatus);
+
+
 }

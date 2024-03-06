@@ -3,6 +3,7 @@ package sky.Sss.domain.track.controller.playList;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -21,13 +22,17 @@ import sky.Sss.domain.track.dto.playlist.PlayListInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingUpdateDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackDeleteDto;
+import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.service.playList.PlyService;
+import sky.Sss.domain.track.service.track.TrackService;
+import sky.Sss.domain.track.service.track.TrackTagService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
+import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.Result;
 
 /**
- *
  * playList 생성 수정 삭제
  */
 @Slf4j
@@ -36,8 +41,11 @@ import sky.Sss.global.error.dto.Result;
 @RestController
 @UserAuthorize
 public class PlyController {
+
     private final PlyService plyService;
     private final MessageSource ms;
+    private final TrackTagService trackTagService;
+    private final UserQueryService userQueryService;
     /**
      * 새로 생성
      * 트랙 추가
@@ -59,13 +67,20 @@ public class PlyController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
+        User user = userQueryService.findOne();
         HttpSession session = request.getSession();
-        PlayListInfoDto trackPlayListInfoDto = plyService.addPly(playListSettingSaveDto, coverImgFile,
-            session.getId());
-        return ResponseEntity.ok(trackPlayListInfoDto);
+        // tag 가져오기
+        List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(playListSettingSaveDto.getTagList());
+        PlayListInfoDto playListInfoDto = plyService.addPlyAndTracks(playListSettingSaveDto,
+            coverImgFile, user, session, ssbTrackTags);
+
+        return ResponseEntity.ok(playListInfoDto);
     }
+
+
     /**
      * 정보 업데이트
+     *
      * @param playListSettingUpdateDto
      * @param bindingResult
      * @param coverImgFile
@@ -79,12 +94,13 @@ public class PlyController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
-        plyService.updatePlyInfo(playListSettingUpdateDto,coverImgFile);
+        plyService.updatePlyInfo(playListSettingUpdateDto, coverImgFile);
         return ResponseEntity.ok().build();
     }
 
     /**
      * 정보 삭제
+     *
      * @param playListTrackDeleteDto
      * @param bindingResult
      * @param request
@@ -96,7 +112,7 @@ public class PlyController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
-        plyService.deletePly(playListTrackDeleteDto.getId(),playListTrackDeleteDto.getToken());
+        plyService.deletePly(playListTrackDeleteDto.getId(), playListTrackDeleteDto.getToken());
 
         return ResponseEntity.ok().build();
     }

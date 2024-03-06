@@ -112,15 +112,6 @@ public class SsbTrack extends BaseTimeEntity {
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackReply> replies = new ArrayList<>();
 
-    public static void addTagLink(SsbTrack ssbTrack, List<SsbTrackTagLink> tagLinks) {
-        if (tagLinks != null && tagLinks.size() > 0) {
-            ssbTrack.tags.addAll(tagLinks);
-        } else {
-            // 아무것도 없으면 전부 삭제
-            rmTagLink(ssbTrack);
-        }
-    }
-
     // 링크 삭제
     public static void rmTagLink(SsbTrack ssbTrack, SsbTrackTagLink tagLinks) {
         ssbTrack.getTags().remove(tagLinks);
@@ -167,12 +158,22 @@ public class SsbTrack extends BaseTimeEntity {
         ssbTrack.setToken(token);
     }
 
-    public static void updateIsRelease(SsbTrack ssbTrack,Boolean isRelease) {
+    public static void updateIsRelease(SsbTrack ssbTrack, Boolean isRelease) {
         ssbTrack.setIsRelease(isRelease);
 
     }
+
     public static void changeStatus(SsbTrack ssbTrack, Status isStatus) {
         ssbTrack.setIsStatus(isStatus.getValue());
+    }
+
+    public static void updateId(SsbTrack ssbTrack, long id) {
+        ssbTrack.setId(id);
+    }
+
+    public void updateTrackInfo(long id, LocalDateTime createdDateTime) {
+        this.setId(id);
+        this.setCreatedDateTime(createdDateTime);
     }
 
     //파일 정보 저장
@@ -183,11 +184,9 @@ public class SsbTrack extends BaseTimeEntity {
         ssbTrack.setStoreFileName(tempTrackStorage.getStoreFileName());
 
     }
-
-
     public static void deleteTrackFile(SsbTrack ssbTrack, FileStore fileStore) {
         if (StringUtils.hasText(ssbTrack.getStoreFileName())) {
-            fileStore.deleteFile(FileStore.TRACK_DIR, ssbTrack.getStoreFileName());
+            fileStore.deleteFile(FileStore.TRACK_DIR, ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());
         }
     }
 
@@ -204,8 +203,8 @@ public class SsbTrack extends BaseTimeEntity {
 
     }
 
-    public static String getSsbTrackCoverPath(FileStore fileStore, String token) {
-        return fileStore.getImageDir() + token + "/";
+    public static String getSsbTrackCoverPath(FileStore fileStore, String coverUrl) {
+        return fileStore.getImageDir() + coverUrl;
     }
 
     @Builder

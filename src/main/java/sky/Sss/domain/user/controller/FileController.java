@@ -48,7 +48,7 @@ public class FileController {
      * @throws IOException
      */
     @GetMapping("/image/{fileName}")
-    public ResponseEntity getUserProfilePicture(@PathVariable String fileName) {
+    public ResponseEntity<UrlResource> getUserProfilePicture(@PathVariable String fileName) {
         // file MediaType 확인 후 header 에 저장
         MediaType mediaType = null;
         UrlResource pictureImage = null;
@@ -75,11 +75,6 @@ public class FileController {
     @GetMapping("/track/play/{id}/{token}")
     public ResponseEntity<UrlResource> getTrackFile(@PathVariable Long id, @PathVariable String token) {
         return ResponseEntity.ok(trackPlayService.getTrackPlayFile(id, token));
-    }
-
-    @GetMapping("/image/default")
-    public ResponseEntity getTrackCoverImg(@PathVariable Long trackId, @PathVariable String userId) {
-        return null;
     }
 
 }

@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.dto.track;
 
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 
 @Setter
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class TrackInfoRepDto {
 
     private Long id;
@@ -18,7 +19,18 @@ public class TrackInfoRepDto {
     private String coverUrl;
     private String userName;
     private Integer trackLength;
+    private LocalDateTime createdDateTime;
 
+    public TrackInfoRepDto(Long id, String token, String title, String coverUrl, String userName, Integer trackLength,
+        LocalDateTime createdDateTime) {
+        this.id = id;
+        this.token = token;
+        this.title = title;
+        this.coverUrl = coverUrl;
+        this.userName = userName;
+        this.trackLength = trackLength;
+        this.createdDateTime = createdDateTime;
+    }
 
     public static TrackInfoRepDto create(SsbTrack ssbTrack) {
         TrackInfoRepDto trackInfoRepDto = new TrackInfoRepDto();
@@ -28,6 +40,7 @@ public class TrackInfoRepDto {
         trackInfoRepDto.setCoverUrl(ssbTrack.getCoverUrl());
         trackInfoRepDto.setUserName(ssbTrack.getUser().getUserName());
         trackInfoRepDto.setTrackLength(ssbTrack.getTrackLength());
+        trackInfoRepDto.setCreatedDateTime(ssbTrack.getCreatedDateTime());
         return trackInfoRepDto;
     }
 }
