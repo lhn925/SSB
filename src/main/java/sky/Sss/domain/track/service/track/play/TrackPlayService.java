@@ -41,16 +41,16 @@ public class TrackPlayService {
     public UrlResource getTrackPlayFile(Long id, String token) {
         SsbTrack ssbTrack = trackService.findOne(id, token, Status.ON);
         // getTrackPlayFile 권한이 없을 경우
-        User playUser = userQueryService.findOne(); // 요청한 유저
-
-        // 요청한 사용자가 비회원인지 확인 비회원이 아닐 경우
-        // 해당 요청한 track 에 소유자인지 확인
-        boolean isOwnerPost = ssbTrack.getUser().equals(playUser);
-
-        // 요청한 사용자가 해당 track(비공개) 에 권한이 없는경우 예외 발생
-        if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개 일경우
-            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
-        }
+//        User playUser = userQueryService.findOne(); // 요청한 유저
+//
+//        // 요청한 사용자가 비회원인지 확인 비회원이 아닐 경우
+//        // 해당 요청한 track 에 소유자인지 확인
+//        boolean isOwnerPost = ssbTrack.getUser().equals(playUser);
+//
+//        // 요청한 사용자가 해당 track(비공개) 에 권한이 없는경우 예외 발생
+//        if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개 일경우
+//            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
+//        }
 
         return trackService.getSsbTrackFile(
             ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());

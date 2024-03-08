@@ -3,6 +3,7 @@ package sky.Sss.domain.user.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
@@ -58,10 +59,10 @@ public class FileController {
                 pictureImage = fileStore.getUrlResource(fileStore.getImageDir() + fileName);
             }
         } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_TYPE, mediaType.toString())
+            .header(HttpHeaders.CONTENT_TYPE, Objects.requireNonNull(mediaType).toString())
             .body(pictureImage);
     }
 

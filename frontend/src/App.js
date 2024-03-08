@@ -118,7 +118,10 @@ function App() {
             theme="light"
         />
 
-        {/*<ReactPlayer url={process.env.PUBLIC_URL + "/users/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />*/}
+        <ReactPlayer
+            onEnded={()=>true}
+            url={process.env.PUBLIC_URL + "/users/file/track/play/6/373c76f62063e6ae84a8"} width="400px" height="300px"
+            playing={true} controls={true} />
         <div className="l-container">
           <Routes>
             <Route path="/">
