@@ -1,12 +1,12 @@
 import axios from "axios";
-import {authActions} from "store/auth/authReducers";
-import {toast} from "react-toastify";
+import {LOGIN} from"utill/api/ApiEndpoints"
+import {nonAuthApi} from "utill/api/interceptor/ApiAuthInterceptor";
 
 function LoginApi(body){
   const headers = {
     "Content-Type": "application/json;charset=UTF-8"
   };
-  return axios.post("./login", body, {headers:headers});
+  return nonAuthApi.post(LOGIN, body);
 }
 
 export default LoginApi;

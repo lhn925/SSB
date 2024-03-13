@@ -97,7 +97,7 @@ public class EmailApiController {
      * @param request
      * @return
      */
-    @PostMapping("/codeCheck")
+    @PostMapping("/code/check")
     public ResponseEntity verifyAuthCode(
         @Validated @RequestBody CodeCheckRequestDto authCode,
         BindingResult bindingResult, HttpServletRequest request) {

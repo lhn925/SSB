@@ -1,0 +1,26 @@
+
+.privacy-and-safety_title {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.nav-item {
+  margin: 0 12px -1px;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+
+.nav-tabs .nav-link:hover {
+  color: #333333;
+  border-bottom: 2px solid;
+  border-color: #ffffff #ffffff #333333;
+  cursor: default;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid;
+  border-color: #ffffff #ffffff #1aafec;
+  color: #1aafec;
+  cursor: default;
+}

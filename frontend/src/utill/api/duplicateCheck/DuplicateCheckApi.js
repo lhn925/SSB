@@ -1,11 +1,9 @@
-import {Regex} from "utill/function";
-import axios from "axios";
+import {USERS_JOIN_DUPLICATE} from "utill/api/ApiEndpoints";
+import {nonGetAuthApi} from "../interceptor/ApiAuthInterceptor";
 
 export async function DuplicateCheckApi(name,value) {
   try {
-
-    const response = await axios.get("./users/join/duplicate/"+name+"?"+name+"="+value);
-
+    const response = await nonGetAuthApi.get(USERS_JOIN_DUPLICATE+name+"?"+name+"="+value);
     return{
       code:response.status,
       data:response.data
