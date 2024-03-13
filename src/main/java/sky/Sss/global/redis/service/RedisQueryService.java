@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -65,6 +66,9 @@ public class RedisQueryService {
 
 
     public Boolean hasRedis(String key) {
+        if (!StringUtils.hasText(key)) {
+            return false;
+        }
         return redisTemplate.hasKey(key);
     }
 

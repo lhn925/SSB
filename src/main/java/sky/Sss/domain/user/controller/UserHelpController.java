@@ -141,7 +141,7 @@ public class UserHelpController {
             userHelpDto.setUserId(userId.getUserId());
             userHelpDto.setHelpType(HelpType.PW.name());
             session.setAttribute("userHelpDto", userHelpDto);
-            return new ResponseEntity(userHelpDto, HttpStatus.OK);
+            return new ResponseEntity<>(userHelpDto, HttpStatus.OK);
         } catch (IllegalStateException | UsernameNotFoundException e) {
             throw new UsernameNotFoundException("userId.notfound");
         }
@@ -158,7 +158,7 @@ public class UserHelpController {
      * @throws IOException
      */
     @GetMapping("/reset")
-    public ResponseEntity pwResetForm(@Validated @ModelAttribute UserHelpDto userHelpDto, BindingResult bindingResult,
+    public ResponseEntity<?> pwResetForm(@Validated @ModelAttribute UserHelpDto userHelpDto, BindingResult bindingResult,
         HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
@@ -193,7 +193,7 @@ public class UserHelpController {
         String resetToken = TokenUtil.hashing(userHelpDto.getUserId().getBytes(), salt);
         session.setAttribute("resetToken", salt);
         CustomCookie.addCookie("/", "resetToken", 600, response, resetToken);
-        return new ResponseEntity(userPwResetFormDto, HttpStatus.OK);
+        return new ResponseEntity<>(userPwResetFormDto, HttpStatus.OK);
     }
 
     /**
@@ -207,7 +207,7 @@ public class UserHelpController {
      * @throws IOException
      */
     @PostMapping("/reset")
-    public ResponseEntity pwReset(@Validated @RequestBody UserPwResetFormDto userPwResetFormDto,
+    public ResponseEntity<?> pwReset(@Validated @RequestBody UserPwResetFormDto userPwResetFormDto,
         BindingResult bindingResult,
         HttpServletRequest request, HttpServletResponse response)
         throws IOException {
@@ -236,7 +236,7 @@ public class UserHelpController {
         String resetToken = tokenCookie.getValue();
         String compToken = TokenUtil.hashing(userPwResetFormDto.getUserId().getBytes(),
             (String) session.getAttribute("resetToken"));
-        Boolean isMatch = resetToken.equals(compToken);
+        boolean isMatch = resetToken.equals(compToken);
 
         // token 이 맞지 않을경우 잘못 된 접근
         if (!isMatch) {
@@ -278,14 +278,14 @@ public class UserHelpController {
             // 비밀번호가 전과 같을시에 IllegalArgumentException
 
             // 로그인된 기기 로그아웃
-            userLoginStatusService.removeAllLoginStatus(userDetails.getUserId(), session.getId());
+            userLoginStatusService.removeAllStatus(userDetails.getUserId(), session.getId());
 
             //인증 이미지 삭제
             apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
 
             // resetToken 쿠키 삭제
             CustomCookie.delete(tokenCookie, response);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             setApiCaptcha(userPwResetFormDto);
             addCaptchaError(userPwResetFormDto, bindingResult);
@@ -303,8 +303,7 @@ public class UserHelpController {
             "error.captcha");
     }
 
-    private void addError(BindingResult bindingResult, String userPwResetFormDto, String field,
-        String userPwResetFormDto1, String code) {
+    private void addError(BindingResult bindingResult, String userPwResetFormDto, String field, String userPwResetFormDto1, String code) {
         bindingResult.addError(
             new FieldErrorCustom(userPwResetFormDto,
                 field, userPwResetFormDto1,
@@ -322,7 +321,6 @@ public class UserHelpController {
     }
 
     private void setApiCaptcha(UserPwResetFormDto userPwResetFormDto) throws IOException {
-        log.info("setApiCaptcha= {}", userPwResetFormDto.getImageName());
         apiExamCaptchaNkeyService.deleteImage(userPwResetFormDto.getImageName());
 
         Map<String, Object> apiExamCaptchaNkey = apiExamCaptchaNkeyService.getApiExamCaptchaNkey();

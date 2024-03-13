@@ -104,7 +104,7 @@ Email.prototype._reqEmailAuthFetch = function (clickCheck) { // 인증번호 체
     return;
   }
 
-  _fetch("POST","/email/codeCheck", {authCode: authCodeVal}).then(
+  _fetch("POST",EMAIL_CODE_CHECK, {authCode: authCodeVal}).then(
       (data) => {
         $verificationMsg.innerText = messages["auth.success"];
         $verificationMsg.className = "success-msg";

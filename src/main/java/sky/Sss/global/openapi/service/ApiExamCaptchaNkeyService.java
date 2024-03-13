@@ -79,8 +79,7 @@ public class ApiExamCaptchaNkeyService {
 
 
     private String setOpenApiConfiguration(String apiURL) {
-        String responseBody = getCode(apiURL, getRequestHeaders());
-        return responseBody;
+        return getCode(apiURL, getRequestHeaders());
     }
 
     private String getCode(String apiUrl, Map<String, String> requestHeaders) {
@@ -127,9 +126,8 @@ public class ApiExamCaptchaNkeyService {
     public void deleteImage(String filename) throws NoSuchFileException {
         int i = filename.lastIndexOf("/");
         String substring = filename.substring(i + 1);
-
-        Path filePath = Paths.get(fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), substring, "jpg"));
         try {
+            Path filePath = Paths.get(fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), substring, "jpg"));
             Files.delete(filePath);
         } catch (IOException e) {
             log.info("filename = {}", filename);
@@ -145,7 +143,7 @@ public class ApiExamCaptchaNkeyService {
         String fullName = fileStore.getFilePathAndExt(fileStore.getCaptchaImageDir(), filename, "jpg");
         File f = new File(fullName);
         try (OutputStream outputStream = new FileOutputStream(f)) {
-            f.createNewFile();
+//            f.createNewFile();
             while ((read = is.read(bytes)) != -1) {
                 outputStream.write(bytes, 0, read);
             }

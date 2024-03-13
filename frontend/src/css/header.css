@@ -73,11 +73,6 @@ content: url("./../css/image/profile2.png");
   text-decoration: none;
 }
 
-.header_font_color {
-  color: #fff;
-}
-
-
 .btn-login-open {
   line-height: 1;
 }

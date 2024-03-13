@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.model.Hour;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
 import sky.Sss.global.utili.DayTime;
-import sky.Sss.global.ws.dto.TestWebSocketDto;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -93,7 +91,7 @@ public class ChartCronService {
 //    public void test() {
 //
 //        log.info("==========테스트 중===========");
-//        TestWebSocketDto testWebSocketDto = new TestWebSocketDto("lim222", "안녕하세요","hihihi");
+//        PushWebSocketDto testWebSocketDto = new PushWebSocketDto("lim222", "안녕하세요","hihihi");
 //        messagingTemplate.convertAndSend("/topic/push/lim222",testWebSocketDto);
 //        log.info("==========테스트 중===========");
 //    }

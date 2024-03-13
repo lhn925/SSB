@@ -2,6 +2,7 @@
   "msg": {
     "join": {
       "sky.signup": "회원가입",
+      "sky.signup.process": "회원가입 진행 중...",
       "sky.checkBtn": "인증번호 확인",
       "sky.authBtn": "인증번호 전송"
     },
@@ -47,7 +48,8 @@
       "login.progress": "로그인 중...",
       "logout.progress": "로그아웃 중...",
       "login.success": "로그인 되었습니다.",
-      "logout.success": "로그아웃 되었습니다."
+      "logout.success": "로그아웃 되었습니다.",
+      "logout.request.success": "로그아웃 요청으로 인해 현재 접속하신 기기에서 로그아웃이 되었습니다."
     },
     "help": {
       "sky.idHelp": "아이디 찾기",
@@ -61,11 +63,13 @@
       "sky.idQueryForm2": "아이디가 기억나지 않는다면?",
       "sky.modal.pwUpdateForm.title": "비밀번호가 변경되었습니다.",
       "sky.modal.pwUpdateForm.logout": "모든 기기 및 브라우저에서 로그아웃",
+      "sky.modal.pwUpdateForm.logoutAll": "현재 기기를 제외한 모든 기기 및 브라우저에서 로그아웃",
       "sky.modal.pwUpdateForm.logout.content": "다른 사람이 회원님의 비밀번호를 알고 있다고 생각된다면 모든 기기에서 로그아웃 하시는 것이 안전합니다.",
+      "sky.modal.pwUpdateForm.progress": "비밀번호 변경 중...",
       "sky.modal.pwUpdateForm.logoutNone": "로그인 상태 유지",
       "sky.modal.pwUpdateForm.logoutNone.content": "회원님의 아이디로 로그인 한 목록은 보안 설정의 로그인 관리 > 로그인 목록에서 확인 가능합니다.",
       "sky.pw.change": "비밀번호 변경",
-      "pw.change":"비밀번호 변경이 완료 되었습니다. 로그인 중이던 기기에서는 로그아웃이 됩니다."
+      "pw.change":"비밀번호 변경이 완료 되었습니다.로그인 중이던 다른 기기는 로그아웃이 됩니다."
     },
     "email": {
       "sky.email.subject": "[SKYBOARD] 요청하신 인증 번호를 알려드립니다.",

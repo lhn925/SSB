@@ -2,6 +2,7 @@ package sky.Sss.domain.user.service.help;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,15 +81,10 @@ public class UserHelpService {
         boolean authMatches = passwordEncoder.matches(userPwUpdateFormDto.getPassword(), findByUser.getPassword());
         // 현재비밀번호랑 같으면 안되고
         boolean matches = passwordEncoder.matches(userPwUpdateFormDto.getNewPw(), findByUser.getPassword());
-        String code = null;
-
         if (!authMatches) {
-            code = "pw.authMatches.mismatch";
+            throw new BadCredentialsException("pw.authMatches.mismatch");
         } else if (matches) {
-            code = "pw.isPasswordSameAsNew";
-        }
-        if (code != null) {
-            throw new IllegalArgumentException(code);
+            throw new IllegalArgumentException("pw.isPasswordSameAsNew");
         }
     }
 

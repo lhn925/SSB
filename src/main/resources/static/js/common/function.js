@@ -335,11 +335,11 @@ function _captchaBtnClickAddEvent($captchaKey, $imageName) {
     let imageName = $imagePath.src;
     if (capKeyVal != "") {
       _getFetch(
-          "/Nkey/open/again?captchaKey=" + capKeyVal + "&imageName="
+          "/nkey/open/again?captchaKey=" + capKeyVal + "&imageName="
           + imageName).then()
       .then((data) => {
         $captchaKey.value = data.captchaKey;
-        $imagePath.src = "/Nkey/open/image/" + data.imageName;
+        $imagePath.src = "/nkey/open/image/" + data.imageName;
         $imageName.value = data.imageName;
 
         return;

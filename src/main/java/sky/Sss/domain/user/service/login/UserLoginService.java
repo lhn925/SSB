@@ -35,13 +35,12 @@ public class UserLoginService {
     private final UserLoginLogService userLoginLogService;
     private final ApiExamCaptchaNkeyService apiExamCaptchaNkeyService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final TokenProvider tokenProvider;
     private final UserLoginStatusService userLoginStatusService;
     private final MessageSource ms;
 
 
     @Transactional
-    public JwtDto login(UserLoginFormDto userLoginFormDto, String userAgent, String sessionId,Long failCount) {
+    public Authentication login(UserLoginFormDto userLoginFormDto, String userAgent, String sessionId, Long failCount) {
         /**
          * 유저가 로그인 버튼을 입력한 URL 저장
          */
@@ -52,29 +51,16 @@ public class UserLoginService {
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(
             userId,
             password);
-        Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(authRequest);
-
-        // 로그인이 성공 했을 경우
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
-        JwtTokenDto jwtTokenDto = tokenProvider.createToken(authenticate);
-
-        UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
-        HttpHeaders headers = new HttpHeaders();
-        if (authenticate.isAuthenticated()) {
-            headers.add(JwtFilter.AUTHORIZATION_HEADER, jwtTokenDto.getAccessToken());
-            headers.add(JwtFilter.REFRESH_AUTHORIZATION_HEADER, jwtTokenDto.getRefreshToken());
-            loginSuccess(failCount, userLoginFormDto);
-            saveLoginStatus(userAgent, jwtTokenDto, userDetails, sessionId);
-        }
         // redisToken 미포함
-        JwtDto jwtDto = new JwtDto(jwtTokenDto.getAccessToken(), jwtTokenDto.getRefreshToken());
-        return jwtDto;
+        return authenticationManagerBuilder.getObject().authenticate(authRequest);
     }
 
-    public Boolean verifyCaptchKey(UserLoginFormDto userLoginFormDto, Long failCount, String chptchaKey,Long limit) throws CaptchaMisMatchFactorException {
-        Boolean isCaptcha = false; // 인증코드 성공 여부
+
+    public boolean verifyCaptchKey(UserLoginFormDto userLoginFormDto, Long failCount, String chptchaKey, Long limit)
+        throws CaptchaMisMatchFactorException {
+        boolean isCaptcha = false; // 인증코드 성공 여부
         String captcha = userLoginFormDto.getCaptcha();
-        Boolean isFailLimit = failCount > limit;
+        boolean isFailLimit = failCount > limit;
         // 인증키도 받았고 failCount가 limt를 넘었을떄
         if (StringUtils.hasText(chptchaKey) && isFailLimit) {
 
@@ -124,22 +110,20 @@ public class UserLoginService {
 
 
     @Transactional
-    public void saveLoginLog(String userAgent, String userId, LoginSuccess success) {
+    public void saveLoginLog(String userAgent, String userId, long uid, LoginSuccess success) {
         //로그인 성공 기록 저장
-        userLoginLogService.add(userAgent, userId, success,
+        userLoginLogService.add(userAgent, userId, uid, success,
             Status.ON);
     }
 
     // 로그인 상태 저장
     @Transactional
-    public void saveLoginStatus(String userAgent, JwtTokenDto jwtTokenDto, UserDetails userDetails, String sessionId) {
+    public void saveLoginStatus(String userAgent, JwtTokenDto jwtTokenDto, long uid, String userId, String sessionId) {
         try {
-            userLoginStatusService.add(userAgent, jwtTokenDto, userDetails, sessionId);
+            userLoginStatusService.add(userAgent, jwtTokenDto, userId, uid, sessionId);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("saveLoginStatus: " + e.getMessage());
         }
     }
-
-
 }
 

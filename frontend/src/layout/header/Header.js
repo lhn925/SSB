@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import 'css/header.css'
 import {Link} from "react-router-dom";
-import Modal from "modal/Modal";
 import {useTranslation} from "react-i18next";
 import ModalContent from "modal/content/ModalContent";
 import {useDispatch, useSelector} from "react-redux";
@@ -9,21 +8,21 @@ import {modalActions} from "store/modalType/modalType";
 import {
   Dropdown,
 } from "react-bootstrap";
-import {useNavigate} from "react-router";
 import LogoutApi from "utill/api/logout/LogoutApi";
 import {persistor} from "store/store";
 import {toast} from "react-toastify";
+import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 
 function Header(props) {
   const auth = useSelector(state => state.authReducer);
-  const user = useSelector(state => state.userReducer);
+  const userInfo = useSelector(state => state.userReducer);
 
   const [modalVisible, setModalVisible] = useState(false)
   const dispatch = useDispatch();
   const {t} = useTranslation();
-
-  const navigate = useNavigate();
   const variable = useRef({isDoubleClick: false});
+
+
   const clickBtnLogout = async () => {
     if (variable.current.isDoubleClick) {
       return;
@@ -42,8 +41,9 @@ function Header(props) {
   }
 
 
+  const navigate = props.navigate;
   useEffect(() => {
-  },[user])
+  },[userInfo])
   const openModal = () => {
     dispatch(modalActions.changeType({type: "LOGIN"}));
     setModalVisible(true)
@@ -86,11 +86,13 @@ function Header(props) {
             <div>{t(`msg.common.sky.upload`)}</div>
             <div>
               {
-                user.userId !== null ? <CircularImageDropdown
+                userInfo.userId !== null ? <CircularImageDropdown
                     clickBtnLogout={clickBtnLogout}
                     navigate={navigate}
                     client={props.client}
-                    userId={user.userId}/> : <>
+                    userId={userInfo.userId}
+                    pictureUrl={userInfo.pictureUrl}
+                /> : <>
                   <button onClick={openModal} className="btn-login-open btn-blue-outline btn-outline" >
                     {t(`msg.loginForm.sky.login`)}</button>
                   <ModalContent bc={props.bc} modalVisible={modalVisible} closeModal={closeModal}/>
@@ -107,17 +109,17 @@ function Header(props) {
   )
 }
 
-function CircularImageDropdown({userId, navigate, clickBtnLogout,client}) {
-  const sendMessage = () =>{
-    if (client) {
-      client.publish({headers:{name:"lim222"},destination:"/app/push",body:JSON.stringify({userId:'lim222',message:'안녕하세요'})});
-    }
-  }
+function CircularImageDropdown({pictureUrl,userId, navigate, clickBtnLogout,client}) {
+  // const sendMessage = () =>{
+  //   if (client) {
+  //     client.publish({headers:{name:"lim222"},destination:"/app/push",body:JSON.stringify({userId:'lim222',message:'안녕하세요'})});
+  //   }
+  // }
   return (
       <>
         <Dropdown>
           <Dropdown.Toggle variant="" id="dropdown-basic">
-            <img src={"./users/file/picture/" + userId}/>
+            <img src={USERS_FILE_IMAGE + pictureUrl} />
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
@@ -125,13 +127,16 @@ function CircularImageDropdown({userId, navigate, clickBtnLogout,client}) {
                            onClick={() => navigate(`/${userId}`)}>
               <img/>Profile
             </Dropdown.Item>
-            <Dropdown.Item href="#/action-2" onClick={() => sendMessage()}>
+            <Dropdown.Item href="#/action-2">
               <img src="./../../css/image/profile2.png"/>
               Likes
             </Dropdown.Item>
             <Dropdown.Item href="#/action-3">
               <img src="./../../css/image/profile2.png"/>
               Following
+            </Dropdown.Item>
+            <Dropdown.Item className="profile" onClick={() => navigate(`/settings`)}>
+              settings
             </Dropdown.Item>
             <Dropdown.Item className="profile" onClick={clickBtnLogout}>
               <img/>logout

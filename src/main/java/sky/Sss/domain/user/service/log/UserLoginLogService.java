@@ -43,22 +43,15 @@ public class UserLoginLogService {
      * 로그인 기록 저장
      */
     @Transactional
-    public void add(String userAgent, String userId, LoginSuccess isSuccess,
+    public void add(String userAgent, String userId, long uid, LoginSuccess isSuccess,
         Status isStatus) {
 
-        Long uId = null;
-        Optional<User> findOne = userQueryRepository.findByUserId(userId);
-
-        User user = findOne.orElse(null);
-        if (user != null) {
-            uId = user.getId();
-        }
         //비 로그인으로 접근시 저장할 userId
         AuditorAwareImpl.changeUserId(auditorAware, userId);
-        UserLoginLog userLoginLog = getUserLoginLog(uId, userAgent, isSuccess, isStatus);
+        UserLoginLog userLoginLog = getUserLoginLog(uid, userAgent, isSuccess, isStatus);
 
-        Optional<UserLoginLog> saveLog = Optional.ofNullable(userLoginLogRepository.save(userLoginLog));
-        saveLog.orElseThrow(() -> new RuntimeException());
+        Optional<UserLoginLog> saveLog = Optional.of(userLoginLogRepository.save(userLoginLog));
+        saveLog.orElseThrow(RuntimeException::new);
     }
 
 
@@ -133,12 +126,11 @@ public class UserLoginLogService {
     /**
      * 해외 로그인 여부 확인
      *
-     * @param userId
+     * @param
      * @throws UsernameNotFoundException
      */
-    public void isLoginBlockChecked(String userId) throws LoginBlockException {
-        User user = userQueryService.findOptionalUser(userId).orElse(null);
-        if (user != null && user.getIsLoginBlocked()) {
+    public void isLoginBlockChecked(boolean isLoginBlock) throws LoginBlockException {
+        if (isLoginBlock) {
             UserLocationDto userLocationDto = locationFinderService.findLocation();
             if (!userLocationDto.getCountryName().equals(Locale.KOREA.getCountry())) {
                 throw new LoginBlockException("login.error.blocked");

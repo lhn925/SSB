@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestWebSocketDto {
+public class PushWebSocketDto {
     private String userId;
     private String message;
     private String sessionId;

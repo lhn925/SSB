@@ -11,15 +11,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import sky.Sss.domain.user.model.RememberCookie;
-import sky.Sss.domain.user.service.login.RedisRememberService;
-import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.utili.jwt.JwtAccessDeniedHandler;
 import sky.Sss.domain.user.utili.jwt.JwtAuthenticationEntryPoint;
 import sky.Sss.domain.user.utili.jwt.TokenProvider;
@@ -33,20 +28,18 @@ import sky.Sss.global.redis.service.RedisQueryService;
 public class SpringSecurityConfig {
 
 
-    private final RedisQueryService redisQueryService;
-    private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/Nkey/open/**", "/test/**", "/users/join",
+    private final String[] ALL_URL = {"/", "/js/**", "/css/**", "/nkey/open/**", "/test/**", "/users/join",
         "/example/city", "/email/**", "/users/help", "/users/help/**", "/users/join/**", "/users/file/**", "/app/login",
-        "/login/**", "/users/profile/**","/webSocket/**","/tracks/info"};
+        "/login/**", "/users/profile/**", "/webSocket/**", "/tracks/info"};
     private final String[] USER_URL = {"/users/logout"};
     private final String[] ADMIN_URL = {"/cron/**"};
 
 
     @Bean
-    public SecurityFilterChain webSecurityFilterChain(
+    public SecurityFilterChain webSecurityFilterChain(TokenProvider tokenProvider,
         HttpSecurity http) throws Exception {
 
         /**
@@ -101,12 +94,12 @@ public class SpringSecurityConfig {
         return new SecurityContextImpl();
     }
 
-    @Bean
+/*    @Bean
     public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,
         UserLoginStatusService userLoginStatusService) {
         return new RedisRememberService(RememberCookie.KEY.getValue(), userDetailsService, redisQueryService,
             userLoginStatusService);
-    }
+    }*/
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)

@@ -1,12 +1,9 @@
-import axios from "axios";
-import {USERS_INFO_PW} from "../../ApiEndpoints";
+import {USERS_INFO_PW} from "utill/api/ApiEndpoints";
+import {authApi} from "utill/api/interceptor/ApiAuthInterceptor";
 
 export async function PwUpdateApi (body) {
-  const headers = {
-    "Content-Type": "application/json;charset=UTF-8"
-  };
   try {
-    const response = await axios.post(USERS_INFO_PW, body, {headers: headers})
+    const response = await authApi.post(USERS_INFO_PW, body)
     return {code: response.status, data: response.data};
   } catch (error) {
     return {code: error.response.status, data: error.response.data};

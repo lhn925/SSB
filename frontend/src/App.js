@@ -6,33 +6,39 @@ import "css/bootstrap/bootstrap.min.css"
 import "css/base.css"
 import {Route, Routes, useLocation, useNavigate} from "react-router";
 import {ToastContainer} from "react-toastify";
-import {lazy, useEffect, useRef, useState} from "react";
+import {lazy, useEffect, useRef, Suspense, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import UserInfoApi from "utill/api/userInfo/UserInfoApi";
-import ReNewTokenApi from "utill/api/ReNewToken/ReNewTokenApi";
 import {userActions} from "store/userInfo/userReducers";
-import {authActions} from "store/auth/authReducers";
-import {persistor} from "store/store";
-import {Profile} from "content/profile/Profile";
 import * as StompJs from "@stomp/stompjs";
-import ReactPlayer from "react-player";
+import {authApi} from "utill/api/interceptor/ApiAuthInterceptor";
+import {USERS_INFO} from "utill/api/ApiEndpoints";
+import {persistor} from "./store/store";
+import {useTranslation} from "react-i18next";
 
-// const Feed = lazy(() => import('./routes/Feed'));
-// const Home = lazy(() => import('./routes/home'));
-// const UserId = lazy(() => import('./routes/userId'));
+// React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
+// named export 는 설정을 따로 해주어야 한다
+const Profile = lazy(() => import('./content/profile/Profile').then(module => ({
+  default: module.Profile
+})));
+const Settings = lazy(
+    () => import('./content/settings/Settings').then(module => ({
+      default: module.Settings
+    })));
 
 function App() {
   const currentAuth = useSelector((state) => state?.authReducer);
   const dispatch = useDispatch();
   const bc = new BroadcastChannel(`my_chanel`);
   const location = useLocation();
+  const navigate = useNavigate();
+  const {t} = useTranslation();
 
   //
   const client = useRef({client: null});
 
-  function connect(accessToken, userId) {
+  function connect(client, accessToken, refreshToken, userId) {
     const clientData = new StompJs.Client({
-      brokerURL: "ws://localhost:8080/webSocket",
+      brokerURL: `${process.env.REACT_APP_WS_URL}`,
       connectHeaders: {
         Authorization: accessToken,
       }, debug: function (message) {
@@ -46,6 +52,12 @@ function App() {
       // 구독
       clientData.subscribe("/topic/push/" + userId, function (message) {
         console.log("topic : " + message.body);
+      });
+      clientData.subscribe("/topic/logout/" + refreshToken, function (message) {
+        persistor.purge().then(() => {
+          alert(t(`msg.common.logout.request.success`));
+          bc.postMessage({type: "logout"})
+        });
       });
     };
     // 연결
@@ -62,49 +74,32 @@ function App() {
     }
   }
 
-  async function CheckUserInfo(accessToken, refreshToken, accessHeader,
-      refreshHeader) {
-    try {
-      if (accessToken) {
-        const response = await UserInfoApi(accessHeader);
-        if (response.code === 200) {
-          const userData = response.data;
-          dispatch(userActions.setUserId(userData));
-          dispatch(userActions.setEmail(userData));
-          dispatch(userActions.setPictureUrl(userData));
-          dispatch(userActions.setUserName(userData));
-          connect(accessToken, userData.userId);
-          return;
-        } else if (response.code === 401 && refreshToken) {
-          const renewTokenResponse = await ReNewTokenApi(refreshHeader);
-          if (renewTokenResponse.code === 200) {
-            const newAccessToken = renewTokenResponse.data;
-            dispatch(authActions.setAccess(newAccessToken));
-            dispatch(authActions.setAccessHeader());
-            // Recursive call to CheckUserInfo after token renewal
-            await CheckUserInfo(newAccessToken, refreshToken, accessHeader,
-                refreshHeader, dispatch);
-            return;
-          }
-        }
-      }
-      throw new Error();
-    } catch (error) {
+  function CheckUserInfo() {
+    authApi.get(USERS_INFO).then(data => {
+      const userData = data.data;
       if (client.current.client) {
         client.current.client.deactivate();
       }
-      persistor.purge();
-    }
+      dispatch(userActions.setUserId(userData));
+      dispatch(userActions.setEmail(userData));
+      dispatch(userActions.setPictureUrl(userData));
+      dispatch(userActions.setUserName(userData));
+      connect(client, currentAuth.access, currentAuth.refresh, userData.userId);
+    }).catch(() => {
+      if (client.current.client) {
+        persistor.purge().then(() => client.current.client.deactivate());
+      }
+    });
   }
 
   useEffect(() => {
-    CheckUserInfo(currentAuth.access, currentAuth.refresh,
-        currentAuth.accessHeader, currentAuth.refreshHeader);
-
+    if (currentAuth.access) {
+      CheckUserInfo();
+    }
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
   return (
       <div className="App">
-        <Header bc={bc} client={client.current.client}/>
+        <Header bc={bc} client={client.current.client} navigate={navigate}/>
         <ToastContainer
             position="top-right"
             autoClose={3000}
@@ -117,21 +112,33 @@ function App() {
             pauseOnHover
             theme="light"
         />
-
-        {/*<ReactPlayer url={process.env.PUBLIC_URL + "/users/file/track?id=1"} width="400px" height="300px" playing={true} controls={true} />*/}
         <div className="l-container">
-          <Routes>
-            <Route path="/">
-            </Route>
-            <Route path="/feed">
-            </Route>
-            <Route path="/:userId" element={<Profile/>}>
-            </Route>
-          </Routes>
+          <Suspense fallback="Loading...">
+            <Routes>
+              {/*<Route path="/">*/}
+              {/*</Route>*/}
+              {/*<Route path="/feed">*/}
+              {/*</Route>*/}
+              <Route path="/:userName" element={
+
+                <Profile/>
+              }>
+              </Route>
+              <Route path={"/settings/:root?"}
+                     element={
+                       <Settings navigate={navigate}
+                                 location={location}/>
+
+                     }>
+              </Route>
+            </Routes>
+          </Suspense>
         </div>
 
+
       </div>
-  );
+  )
+      ;
 }
 
 export default App;

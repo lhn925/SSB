@@ -1,7 +1,25 @@
 
-.privacy-and-safety_title {
+.settings_container {
+
+}
+
+.settings_container ul > .list-group-item{
+  border-bottom:1px solid #f2f2f2;
+}
+
+
+.settings_title {
   margin-bottom: 20px;
+  font-weight: 600;
   color: #333;
+}
+
+.settings_h3_title {
+  display: inline-block;
+  margin-right: 3px;
+  font-weight: 500;
+  color: #999;
+  font-size: 15px;
 }
 
 .nav-item {
@@ -10,6 +28,55 @@
   line-height: 1.8;
 }
 
+.settings_li_header  {
+  padding-top: 25px;
+  border-bottom: 1px solid #f2f2f2;
+  padding-bottom: 1px;
+}
+
+
+.profileImg svg{
+  background-image: url("../image/profile2.png");
+}
+.emailImg svg {
+  background-image: url("../image/mail.png");
+}
+.pwImg svg{
+  background-image: url("../image/free-icon-padlock-4503885.png");
+}
+
+.list-group-item svg {
+  content: "";
+  background-size: 20px 20px;
+  background-position: 0 6px;
+  background-repeat: no-repeat;
+  /*font-family: "Font Awesome"; !* 폰트 아이콘 라이브러리를 사용하는 경우 해당 폰트 패밀리로 변경하세요 *!*/
+  position: absolute;
+  left: 12px; /* 아이콘의 왼쪽 여백을 조정하세요 */
+  top: 38%; /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  transform: translateY(-50%); /* 아이콘을 수직 가운데로 정렬할 경우 조정하세요 */
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+}
+.list-group-item > button {
+  padding:0.105rem 0.205rem;
+}
+
+
+
+
+.earthImg svg {
+  height: 27px;
+  background-image: url("../image/globe.png");
+}
+
+.settings_li > span {
+  float: left;
+  height: 100%;
+  padding: 0 15px 10px;
+  box-sizing: border-box;
+}
 
 .nav-tabs .nav-link:hover {
   color: #333333;

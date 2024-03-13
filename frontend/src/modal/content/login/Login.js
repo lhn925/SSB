@@ -33,11 +33,11 @@ function Login(props) {
     setPassword(rmPassword);
     setCaptcha(rmCaptcha);
 
-    if (userId == "") {
+    if (userId === "") {
       setErrorMsg(t(`msg.userId.NotBlank`));
       return;
     }
-    if (password == "") {
+    if (password === "") {
       setErrorMsg(t(`msg.password.NotBlank`));
       return;
     }
@@ -72,13 +72,12 @@ function Login(props) {
 
     }).catch(error => {
       let message;
-      console.log(error)
       toast.dismiss(loading);
-      if (error.response.status == 401) {
+      if (error.response.status === 401) {
         message = error.response.data.message;
         setCaptchaKey(error.response.data.captchaKey);
         setImageName(error.response.data.imageName);
-      } else if (error.response.status != 500) {
+      } else if (error.response.status !== 500) {
         let errorDetail = error.response.data.errorDetails[0];
         message = errorDetail.message;
       } else {

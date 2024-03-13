@@ -14,6 +14,7 @@ import Show from "modal/content/help/Show";
 import IdQuery from "modal/content/help/IdQuery";
 import ResetFormApi from "utill/api/help/ResetFormApi";
 import PwResetForm from "./PwResetForm";
+import {EMAIL_FIND} from "utill/api/ApiEndpoints";
 
 function Help(props) {
   const {t} = useTranslation();
@@ -71,8 +72,7 @@ function Help(props) {
     if (props.helpType === "PW") {
       body.userId = props.userId;
     }
-    const url = "./email/find";
-    await props.ClickBtnSendCode(url,
+    await props.ClickBtnSendCode(EMAIL_FIND,
         inputs, t, setErrors, variable, body, setAuth, setTimer,
         setAuthTimeLimit
     )

@@ -30,6 +30,8 @@ public class UserPwUpdateFormDto {
     @NotBlank
     private String imageName;
 
+    private boolean logoutChk;
+
     @Builder
     public UserPwUpdateFormDto(String password, String newPw, String newPwChk, PwSecLevel pwSecLevel,
         String captcha, String captchaKey, String imageName) {

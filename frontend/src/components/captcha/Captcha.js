@@ -39,7 +39,7 @@ function LoginCaptcha(props) {
       <div className="card captchaCard">
         <div className="form-group card-body">
           <img className="captcha-img mb-3" id="imagePath"
-               src={"./Nkey/open/image/" + props.props.imageName}/>
+               src={"/nkey/open/image/" + props.props.imageName}/>
           <div className="input-group form-login form-cap">
             <input type="text" placeholder={props.props.placeholder}
                    value={props.props.captcha} onChange={(e) => {
@@ -64,7 +64,7 @@ function PwCaptcha(props) {
   return (<div className="card captchaCard">
     <div className="form-group card-body">
       <img className="captcha-img mb-3" id="imagePath"
-           src={"./Nkey/open/image/" + props.props.imageName}/>
+           src={"/nkey/open/image/" + props.props.imageName}/>
       <div className={"input-group form-login form-cap " + (props.props.error
           ? "error" : "")}>
         <input type="text" placeholder={props.props.placeholder}

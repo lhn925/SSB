@@ -92,8 +92,9 @@ public class User extends BaseTimeEntity {
 
 
     @Builder
-    private User(String token, String userId, String password, String userName, String email, String pictureUrl,
+    private User(Long id ,String token, String userId, String password, String userName, String email, String pictureUrl,
         LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled,Boolean isLoginBlocked) {
+        this.id = id;
         this.token = token;
         this.userId = userId;
         this.password = password;
@@ -107,6 +108,8 @@ public class User extends BaseTimeEntity {
         this.isEnabled = isEnabled;
         this.isLoginBlocked = isLoginBlocked;
     }
+
+
 
     // 가입할 유저 entity 생성
     public static User createJoinUser(UserJoinPostDto userJoinDto, String salt, PasswordEncoder passwordEncoder) {
@@ -127,6 +130,7 @@ public class User extends BaseTimeEntity {
     //  roles 에 권한(역할)을 넣어주고 리턴
     public static UserDetails UserBuilder(User user) {
         CustomUserDetails build = CustomUserDetails.builder().
+            uId(user.getId()).
             userId(user.getUserId()).
             username(user.getUserId()).
             token(user.getToken()).

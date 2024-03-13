@@ -1,14 +1,29 @@
 import "css/settings/settings.css"
 import {Link, useParams} from "react-router-dom";
-import {Nav} from "react-bootstrap";
 import {useEffect, useRef, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {SettingsSecurity} from "./security/SettingsSecurity";
+import {SettingsAccount} from "./account/SettingsAccount";
+import ModalContent from "modal/content/ModalContent";
+import {useTranslation} from "react-i18next";
 
-export const Security = (props) => {
+export function Settings({location, navigate}) {
   const params = useParams();
-
+  const userInfo = useSelector(state => state.userReducer);
   let root = "settings";
   if (params["root"] !== undefined) {
     root = params.root
+  }
+  const [modalVisible, setModalVisible] = useState(false)
+
+  const dispatch = useDispatch();
+  const {t} = useTranslation();
+
+  const openModal = () => {
+    setModalVisible(true)
+  }
+  const closeModal = () => {
+    setModalVisible(false)
   }
 
   return (
@@ -17,32 +32,20 @@ export const Security = (props) => {
           <div className="col-12 col-md-10">
             <h1 className="text-start settings_title">Settings</h1>
             <div className="tabs">
-              <PrivacyNav navigate={props.navigate} root={root}/>
+              <PrivacyNav navigate={navigate} root={root}/>
             </div>
-            <div className="col-12 col-md-12" id="account">
+
+            <div className="col-12 col-md-12" id="settings">
               <ul className="list-group list-group-flush">
-                <li className="settings_li_header d-flex">
-                  <h3 className="settings_h3_title ms-2">가입하신 이메일 주소</h3>
-                </li>
-                <li className="list-group-item emailImg d-flex align-items-center flex-wrap">
-                  <h6 className="mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         className="feather feather-globe mr-2 icon-inline">
-                    </svg>
-                  </h6>
-                  <span className="ms-4" >2221325@naver.com</span>
-                </li>
-                <li className="settings_li_header d-flex">
-                  <h3 className="settings_h3_title ms-2">로그인 아이디</h3>
-                </li>
-                <li className="list-group-item profileImg d-flex align-items-center flex-wrap">
-                  <h6 className="mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         className="feather feather-globe mr-2 icon-inline">
-                    </svg>
-                  </h6>
-                  <span className="ms-4" >lim222</span>
-                </li>
+                {
+                  <>
+                    <SettingsContents
+                        dispatch={dispatch}
+                        openModal={openModal} root={root} userInfo={userInfo}/>
+                    <ModalContent closeModal={closeModal}
+                                  modalVisible={modalVisible}/>
+                  </>
+                }
               </ul>
             </div>
           </div>
@@ -51,10 +54,26 @@ export const Security = (props) => {
   )
 }
 
-
-
-
-
+function SettingsContents({
+  root,
+  userInfo,
+  dispatch,
+  openModal,
+}) {
+  if (root === "security") {
+    return (
+        <>
+          <SettingsSecurity dispatch={dispatch} openModal={openModal} userInfo={userInfo}/>
+        </>
+    );
+  } else {
+    return (
+        <>
+          <SettingsAccount userInfo={userInfo}/>
+        </>
+    );
+  }
+}
 
 function PrivacyNav(props) {
   const prevRootRef = useRef({root: props.root});
@@ -64,11 +83,11 @@ function PrivacyNav(props) {
     history: "",
     notifications: ""
   });
-
   useEffect(() => {
     let prevRoot = prevRootRef.current.root;
     console.log("prevRoot : " + prevRoot)
-    setActive({...active, [prevRootRef.current.root]: "", [props.root]: "active"});
+    setActive(
+        {...active, [prevRootRef.current.root]: "", [props.root]: "active"});
     if (prevRoot !== props.root) {
       prevRootRef.current.root = props.root;
     }

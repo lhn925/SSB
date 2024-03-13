@@ -47,7 +47,7 @@ public class FileStore {
     public static final String IMAGE_DIR = "image/";
     public static final String TRACK_DIR = "track/";
     //default Image url및 사진
-    public static final String USER_DEFAULT_IMAGE_URL = "default/defaultImage.png";
+    public static final String USER_DEFAULT_IMAGE_URL = "picture-default.png";
     public static final String USER_DEFAULT_DIR = "default";
 
     public static final String PICTURE_TYPE = "picture-";

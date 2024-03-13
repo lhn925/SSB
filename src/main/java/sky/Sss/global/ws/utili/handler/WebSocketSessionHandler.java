@@ -1,5 +1,7 @@
 package sky.Sss.global.ws.utili.handler;
 
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +39,7 @@ public class WebSocketSessionHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-        SimpMessageType messageType = accessor.getCommand().getMessageType();
+        SimpMessageType messageType = Objects.requireNonNull(accessor.getCommand()).getMessageType();
         String sessionId = accessor.getSessionId();
 
         if (messageType.equals(SimpMessageType.CONNECT)) {
@@ -62,9 +64,10 @@ public class WebSocketSessionHandler implements ChannelInterceptor {
              * set 으로 저장 : {key1,key2,...}
              *
              */
-
             redisCacheService.setData(RedisKeyDto.REDIS_WS_SESSION_KEY + sessionId, sessionId);
             redisCacheService.upsertCacheSetValue(sessionId, RedisKeyDto.REDIS_USER_WS_LIST_SESSION_KEY + userToken);
+            // 없는 ws 리스트 삭제
+            redisCacheService.hasWsStatusOnUser(userToken);
 //            log.info("Received a new web socket connection. Session ID : [{}]", headerAccessor.getSessionId());
         }
         if (messageType.equals(SimpMessageType.DISCONNECT)) {

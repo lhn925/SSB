@@ -31,7 +31,7 @@
 
         <div class="card captchaCard" th:classappend="*{imageName} ? '' : 'display-none' ">
           <div class="form-group card-body">
-            <img class="captcha-img mb-3" id="imagePath" th:src="*{imageName} ? '/Nkey/open/image/'+ *{imageName} : '' "/>
+            <img class="captcha-img mb-3" id="imagePath" th:src="*{imageName} ? '/nkey/open/image/'+ *{imageName} : '' "/>
             <div class="input-group form-login form-cap">
               <input type="text" th:field="*{captcha}" class="form-control captcha" th:placeholder="#{sky.captcha}">
               <div class="input-group-append">

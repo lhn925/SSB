@@ -271,8 +271,6 @@ public class RedisCacheService {
     }
 
     public boolean hasWsStatusOnUser(String userToken) {
-
-        log.info("hasWsStatusOnUser ");
         /**
          * 만약 접속해 있지 않으면 Redis 에 저장 후
          * 로그인 시 전송
@@ -286,10 +284,9 @@ public class RedisCacheService {
             // 존재하지 않으면 redis 삭제
             Set<String> filterSet = Optional.ofNullable(sessionSet).orElseGet(Collections::emptySet).stream()
                 .filter(session -> {
-
-                    log.info("session = {}", session);
-                    Boolean isResult = this.hasRedis(RedisKeyDto.REDIS_WS_SESSION_KEY + session);
+                    boolean isResult = this.hasRedis(RedisKeyDto.REDIS_WS_SESSION_KEY + session);
                     if (!isResult) {
+                        log.info("session = {}", session);
                         this.removeCacheSetValue(session, wsTokenListKey);
                     }
                     return isResult;
@@ -299,7 +296,6 @@ public class RedisCacheService {
         } catch (IllegalArgumentException e) {
             return true;
         }
-
     }
 
 

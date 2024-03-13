@@ -7,10 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,6 +56,7 @@ import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.service.myInfo.UserMyInfoService;
 import sky.Sss.domain.user.utili.PwChecker;
 import sky.Sss.global.error.dto.ErrorResultDto;
+import sky.Sss.global.error.dto.FieldErrorCustom;
 import sky.Sss.global.error.dto.Result;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.openapi.service.ApiExamCaptchaNkeyService;
@@ -65,7 +65,7 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/myInfo")
+@RequestMapping("/users/info")
 @UserAuthorize
 public class UserMyInfoController {
     private final UserQueryService userQueryService;
@@ -89,7 +89,7 @@ public class UserMyInfoController {
         UserInfoDto userInfoDto = userQueryService.getUserInfoDto();
         // 유저 정보 반환
         UserMyInfoDto userMyInfo = UserMyInfoDto.createUseProfileDto(userInfoDto);
-        return new ResponseEntity(userMyInfo, HttpStatus.OK);
+        return new ResponseEntity<>(userMyInfo, HttpStatus.OK);
     }
 
     /**
@@ -121,7 +121,7 @@ public class UserMyInfoController {
      * @param request
      * @return
      */
-    @PostMapping("/userName")
+    @PostMapping("/username")
     public ResponseEntity<?>  updateUserName(@Validated @RequestBody UserNameUpdateDto userNameUpdateDto,
         BindingResult bindingResult,
         HttpServletRequest request) throws DuplicateCheckException {
@@ -151,7 +151,7 @@ public class UserMyInfoController {
         }
         UploadFileDto uploadFileDto = null;
         uploadFileDto = userMyInfoService.updatePicture(file.getFile());
-        return new ResponseEntity(new Result<>(uploadFileDto), HttpStatus.OK);
+        return new ResponseEntity<>(new Result<>(uploadFileDto), HttpStatus.OK);
     }
 
     /**
@@ -166,8 +166,6 @@ public class UserMyInfoController {
         userMyInfoService.deletePicture();
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-
     /**
      * 비밀번호 수정
      * id:myInfo_Api_4
@@ -180,33 +178,35 @@ public class UserMyInfoController {
      */
     @PostMapping("/pw")
     public ResponseEntity<?>  updateUserPassWord(@Validated @RequestBody UserPwUpdateFormDto userPwUpdateFormDto,
-        BindingResult bindingResult, HttpServletRequest request) throws IOException {
+        BindingResult bindingResult ,HttpServletRequest request) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-
-        //디코딩
-        byte[] dePw = Base64.getDecoder().decode(userPwUpdateFormDto.getPassword().getBytes());
-        byte[] deNewPw = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPw().getBytes());
-        byte[] deNewPwChk = Base64.getDecoder().decode(userPwUpdateFormDto.getNewPwChk().getBytes());
-
-        userPwUpdateFormDto.setPassword(new String(dePw, StandardCharsets.UTF_8));
-        userPwUpdateFormDto.setNewPw(new String(deNewPw, StandardCharsets.UTF_8));
-        userPwUpdateFormDto.setNewPwChk(new String(deNewPwChk, StandardCharsets.UTF_8));
-
         boolean isCaptcha;
-        Map result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
+        Map<String,Object> result = apiExamCaptchaNkeyService.getApiExamCaptchaNkeyResult(
             userPwUpdateFormDto.getCaptchaKey(), userPwUpdateFormDto.getCaptcha());
 
         isCaptcha = (boolean) result.get("result");
         // 비밀번호 보안 레벨 확인
         PwSecLevel pwSecLevel = PwChecker.checkPw(userPwUpdateFormDto.getNewPw());
-        try {
-            // 입력값 체크
-            valueCheck(userPwUpdateFormDto, isCaptcha, pwSecLevel);
-        } catch (IllegalArgumentException e) {
+        // 자동입력 방지 번호가 맞지 않은 경우
+        if (!isCaptcha) {
+            addError(bindingResult, "userPwUpdateFormDto", "captcha", null, "error.captcha");
+        }
+        // 확인 비밀번호가 불일치 할 경우
+        if (!userPwUpdateFormDto.getNewPw().equals(userPwUpdateFormDto.getNewPwChk())) {
+            addError(bindingResult, "userPwUpdateFormDto", "newPwChk", userPwUpdateFormDto.getNewPw(), "pw.mismatch");
+        }
+        // 비밀번호 보안 레벨 확인
+        // 비밀번호 값이 유효하지 않은 경우
+        if (pwSecLevel.equals(PwSecLevel.NOT)) {
+            addError(bindingResult, "userPwUpdateFormDto", "newPw", userPwUpdateFormDto.getNewPw(),
+                "userJoinForm.password");
+        }
+        if (bindingResult.hasErrors()) {
             setApiCaptcha(userPwUpdateFormDto);
-            throw new IllegalArgumentException(e.getMessage());
+            addCaptchaError(userPwUpdateFormDto, bindingResult);
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         // 보안레벨 저장 나중에 -> 보안 위험 표시할 떄 유용
         userPwUpdateFormDto.setPwSecLevel(pwSecLevel);
@@ -214,19 +214,33 @@ public class UserMyInfoController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-
             userHelpService.myPagePwUpdate(userPwUpdateFormDto);
             //변경로그
             userActivityLogService.add(userDetails.getUsername(), "sky.pw",
                 "sky.log.pw.update", request.getHeader("User-Agent"), ChangeSuccess.SUCCESS);
             //인증 이미지 삭제
             deleteImage(userPwUpdateFormDto);
+
+            // true 일 경우 현재 기기를 제외한 모든 세션 로그아웃
+            if (userPwUpdateFormDto.isLogoutChk()) {
+                userLoginStatusService.removeStatusNotSession
+                    (userDetails.getUsername(),request.getSession().getId());
+            }
             return ResponseEntity.ok(HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
+        } catch (BadCredentialsException | IllegalArgumentException e) {
+            setApiCaptcha(userPwUpdateFormDto);
+            addCaptchaError(userPwUpdateFormDto, bindingResult);
             userActivityLogService.add(userDetails.getUsername(), "sky.pw", "sky.log.pw.update",
                 request.getHeader("User-Agent"), ChangeSuccess.FAIL);
-            deleteImage(userPwUpdateFormDto);
-            throw new IllegalArgumentException(e.getMessage());
+            String field = "newPw";
+            String rejectValue = userPwUpdateFormDto.getNewPw();
+            // 오류가 원래 비밀번호가 맞지 않는 경우
+            if (e instanceof BadCredentialsException) {
+                field = "password";
+                rejectValue = userPwUpdateFormDto.getPassword();
+            }
+            addError(bindingResult, "userPwUpdateFormDto", field, rejectValue, e.getMessage());
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
     }
 
@@ -243,7 +257,7 @@ public class UserMyInfoController {
         HttpSession session = request.getSession();
 
         UserInfoDto userInfoDto = (UserInfoDto) session.getAttribute(RedisKeyDto.REDIS_USER_KEY);
-        userLoginStatusService.removeAllLoginStatus(userInfoDto.getUserId(), session.getId());
+        userLoginStatusService.removeAllStatus(userInfoDto.getUserId(), session.getId());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -412,6 +426,22 @@ public class UserMyInfoController {
         String apiExamCaptchaImage = apiExamCaptchaNkeyService.getApiExamCaptchaImage(key);
         userPwUpdateFormDto.setCaptchaKey(key);
         userPwUpdateFormDto.setImageName(apiExamCaptchaImage);
+    }
+
+    private void addError(BindingResult bindingResult, String userPwUpdateFormDto, String field,
+        String rejectValue, String code) {
+        bindingResult.addError(
+            new FieldErrorCustom(userPwUpdateFormDto,
+                field, rejectValue,
+                code,
+                null));
+    }
+
+    private void addCaptchaError(UserPwUpdateFormDto userPwUpdateFormDto, BindingResult bindingResult) {
+        addError(bindingResult, "userPwUpdateFormDto", "captchaKey", userPwUpdateFormDto.getCaptchaKey(),
+            "error.captcha");
+        addError(bindingResult, "imageName", "imageName", userPwUpdateFormDto.getImageName(),
+            "error.captcha");
     }
 
 }

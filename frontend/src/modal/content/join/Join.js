@@ -17,9 +17,12 @@ import {toast} from "react-toastify";
 import {EmailInput} from "components/input/EmailInput";
 import {AuthInput} from "components/input/AuthInput";
 import {Input} from "components/input/Input";
-import {PwInput} from "../../../components/input/PwInput";
-import {modalActions} from "../../../store/modalType/modalType";
+import {PwInput} from "components/input/PwInput";
+import {modalActions} from "store/modalType/modalType";
 import {useDispatch} from "react-redux";
+import {BtnOutLine} from "components/ button/BtnOutLine";
+import {LOGIN} from "modal/content/ModalContent";
+import {EMAIL_JOIN} from "utill/api/ApiEndpoints";
 
 function Join(props) {
   const {t} = useTranslation();
@@ -75,9 +78,8 @@ function Join(props) {
 
   const clickBtnSendCode = async () => {
     const body = {email: inputs.email, sendType: props.type};
-    const url = "./email/join";
     await props.ClickBtnSendCode(
-      url,
+        EMAIL_JOIN,
       inputs, t, setErrors, variable, body, setAuth, setTimer,
       setAuthTimeLimit)
   }
@@ -230,7 +232,7 @@ function Join(props) {
     }
     variable.current.isDoubleClick = true;
 
-    let loading = toast.loading("회원가입 진행중...");
+    let loading = toast.loading(t(`msg.join.sky.singup.process`));
     const body = {
       userId: inputs.userId,
       password: inputs.password,
@@ -373,10 +375,8 @@ function Join(props) {
               <button type="button" id="subBtn" onClick={submitHandler}
                       className="btn btn-primary btn-block btn-dark mt-3">가입하기
               </button>
-              <button type="button" onClick={() =>{
-                dispatch(modalActions.changeType({type: "LOGIN"}));}
-              } id="cancelBtn" className="btn btn-outline-info mt-1">{t(
-                  `msg.common.sky.cancel`)}</button>
+              <BtnOutLine id="cancelBtn" text={t(
+                  `msg.common.sky.cancel`)} event={() => dispatch(modalActions.changeType({type: LOGIN}))} />
             </div>
           </form>
         </div>

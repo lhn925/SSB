@@ -9,11 +9,14 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
+import sky.Sss.domain.user.exception.RefreshTokenNotFoundException;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
@@ -32,17 +35,17 @@ public class ExUserController {
     public ResponseEntity<ErrorResult> duplicateCheckExHandle(DuplicateCheckException e,
         HttpServletRequest request) {
         BindingResult bindingResult = e.getBindingResult();
-                    bindingResult.addError(
-                new FieldErrorCustom(
-                    "userJoinPostDto",
-                    e.getFieldName(),
-                    e.getRejectValue(),
-                    "duplication",
-                    new String[]{e.getMessage()}));
+        bindingResult.addError(
+            new FieldErrorCustom(
+                "userJoinPostDto",
+                e.getFieldName(),
+                e.getRejectValue(),
+                "duplication",
+                new String[]{e.getMessage()}));
         return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
     }
 
-    @ExceptionHandler({UserInfoNotFoundException.class, UsernameNotFoundException.class})
+    @ExceptionHandler({UserInfoNotFoundException.class, UsernameNotFoundException.class, BadCredentialsException.class})
     public ResponseEntity<ErrorResult> helpExHandle(RuntimeException e, HttpServletRequest request) {
         String errorCode = null;
         try {
@@ -55,10 +58,23 @@ public class ExUserController {
     }
 
 
+
     @ExceptionHandler({AccessDeniedException.class})
-    public ResponseEntity<ErrorGlobalResultDto> accessExHandler (AccessDeniedException e,HttpServletRequest request) {
-        return new ResponseEntity(new ErrorGlobalResultDto("access.error.forbidden", ms, request.getLocale()),
+    public ResponseEntity<ErrorGlobalResultDto> accessExHandler(AccessDeniedException e, HttpServletRequest request) {
+        return new ResponseEntity<>(new ErrorGlobalResultDto("access.error.forbidden", ms, request.getLocale()),
             HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler({AuthenticationException.class})
+    public ResponseEntity<ErrorGlobalResultDto> authExHandler(AuthenticationException e, HttpServletRequest request) {
+        return new ResponseEntity<>(new ErrorGlobalResultDto("token.error", ms, request.getLocale()),
+            HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({RefreshTokenNotFoundException.class})
+    public ResponseEntity<ErrorGlobalResultDto> refreshExHandler(RefreshTokenNotFoundException e, HttpServletRequest request) {
+        return new ResponseEntity<>(new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale()),
+            HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler({RuntimeException.class})
@@ -68,11 +84,13 @@ public class ExUserController {
             status = HttpStatus.BAD_REQUEST;
         }
         try {
-            ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale());
-            return Result.getErrorResult(errorGlobalResultDto,status);
-        }catch (NoSuchMessageException ex) {
-            return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),status);
+            ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms,
+                request.getLocale());
+            return Result.getErrorResult(errorGlobalResultDto, status);
+        } catch (NoSuchMessageException ex) {
+            return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()), status);
         }
     }
+
 
 }

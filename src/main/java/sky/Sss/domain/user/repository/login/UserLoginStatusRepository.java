@@ -47,6 +47,14 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
     Integer updateAll(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
         @Param("isStatus") Boolean isStatus);
 
+
+    @Modifying(clearAutomatically = true)
+    @Query(value =
+        "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLocationLog.isStatus = :isStatus where "
+            + "u.uid = :uid and u.sessionId <> :sessionId")
+    Integer updateAllNotSession(@Param("uid") User user, @Param("loginStatus") Boolean loginStatus,
+        @Param("isStatus") Boolean isStatus,@Param("sessionId") String sessionId);
+
     @Modifying(clearAutomatically = true)
     @Query(value =
         "update UserLoginStatus u set u.loginStatus = :loginStatus , u.defaultLocationLog.isStatus = :isStatus where "

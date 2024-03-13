@@ -1,6 +1,7 @@
 import Login from "modal/content/login/Login";
 import Join from "modal/content/join/Join";
 import Help from "modal/content/help/Help";
+import PwUpdateForm from "modal/content/settings/PwUpdateForm";
 import {
   AuthCodeCheck,
   ChangeError,
@@ -11,55 +12,69 @@ import IdQuery from "modal/content/help/IdQuery";
 import {useSelector} from "react-redux";
 import Modal from "modal/Modal";
 
-function ModalContent(props) {
+export const JOIN = "JOIN";
+export const HELP = "HELP";
+export const LOGIN = "LOGIN";
+export const SECURITY_PW_UPDATE = "SECURITY_PW_UPDATE";
+
+export const ID = "ID";
+export const PW = "PW";
+
+
+function ModalContent({closeModal,bc,modalVisible}) {
   const type = useSelector(state => state.modalType.type);
   const helpType = useSelector(state => state.helpType.helpType);
   return (
       <>
         {
-            props.modalVisible && <Modal visible={props.modalVisible}
+            modalVisible && <Modal visible={modalVisible}
                                    closable={true}
                                    maskClosable={false}
-                                   onClose={props.closeModal}>
-              <Content bc={props.bc} closeModal={props.closeModal} type={type} helpType={helpType}/>
+                                   onClose={closeModal}>
+              <Content bc={bc} closeModal={closeModal} type={type} helpType={helpType}/>
             </Modal>
         }
       </>
   )
 }
-
-function Content(props) {
-  if (props.type === "JOIN") {
+function Content({type,helpType,bc,closeModal}) {
+  if (type === JOIN) {
     return (
         <>
           <Join RegexCheck={RegexCheck} ClickBtnSendCode={ClickBtnSendCode}
                 ClickBtnAuthCodeCheck={ClickBtnAuthCodeCheck}
-                closeModal={props.closeModal} type={props.type}/>
+                closeModal={closeModal} type={type}/>
         </>
     );
-  } else if (props.type === "HELP" && props.helpType === "ID") {
+  } else if (type === SECURITY_PW_UPDATE) {
+    return (
+      <>
+        <PwUpdateForm closeModal={closeModal}/>
+      </>
+    )
+  } else if (type === HELP && helpType === ID) {
     return (
         <>
           <Help RegexCheck={RegexCheck} ClickBtnSendCode={ClickBtnSendCode}
                 ClickBtnAuthCodeCheck={ClickBtnAuthCodeCheck}
-                closeModal={props.closeModal}
-                helpType={props.helpType}/>
+                closeModal={closeModal}
+                helpType={helpType}/>
         </>
     );
-  } else if (props.type === "HELP" && props.helpType === "PW") {
+  } else if (type === HELP && helpType === PW) {
     return (
         <>
           <IdQuery RegexCheck={RegexCheck}
                    ClickBtnSendCode={ClickBtnSendCode}
                    ClickBtnAuthCodeCheck={ClickBtnAuthCodeCheck}
-                   closeModal={props.closeModal}
-                   helpType={props.helpType}/>
+                   closeModal={closeModal}
+                   helpType={helpType}/>
         </>
     );
-  } else {
+  } else if (type === LOGIN)  {
     return (
         <>
-          <Login bc={props.bc} closeModal={props.closeModal}/>
+          <Login bc={bc} closeModal={closeModal}/>
         </>
     );
   }

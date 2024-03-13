@@ -1,6 +1,6 @@
 
 
-export function Profile () {
+export function Profile ()  {
   return (
       <div className="content justify-content-center l-container l-fullwidth l-inner-fullwidth">
         <div className="profileHeader">

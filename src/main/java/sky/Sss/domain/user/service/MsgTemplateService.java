@@ -16,6 +16,9 @@ public class MsgTemplateService {
         messagingTemplate.convertAndSend(url, payload);
     }
 
+    public void convertAndSendUser(String user, String url,Object payload) {
+        messagingTemplate.convertAndSendToUser(user, url,payload);
+    }
 
 
 }
