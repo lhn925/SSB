@@ -95,10 +95,11 @@
     "loginDeviceModal": {
       "sky.os": "운영체제",
       "sky.browser": "브라우저/앱",
-      "sky.login.ip": "로그인 IP",
+      "sky.login.ip": "접속 IP",
       "sky.first.login": "최초 로그인 일시",
       "sky.inSession": "현재 접속중",
-      "sky.manage": "관리"
+      "sky.manage": "관리",
+      "sky.logout.prompt": "해당 기기의 로그아웃을 위해 비밀번호를 입력해주세요."
     },
     "auth": {
       "success": "이메일 인증이 완료 되었습니다.",

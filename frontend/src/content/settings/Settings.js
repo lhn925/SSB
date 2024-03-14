@@ -2,8 +2,8 @@ import "css/settings/settings.css"
 import {Link, useParams} from "react-router-dom";
 import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {SettingsSecurity} from "./security/SettingsSecurity";
-import {SettingsAccount} from "./account/SettingsAccount";
+import {SettingsSecurity} from "content/settings/security/SettingsSecurity";
+import {SettingsAccount} from "content/settings/account/SettingsAccount";
 import ModalContent from "modal/content/ModalContent";
 import {useTranslation} from "react-i18next";
 
@@ -39,7 +39,7 @@ export function Settings({location, navigate}) {
               <ul className="list-group list-group-flush">
                 {
                   <>
-                    <SettingsContents
+                    <SettingsContents t={t}
                         dispatch={dispatch}
                         openModal={openModal} root={root} userInfo={userInfo}/>
                     <ModalContent closeModal={closeModal}
@@ -55,6 +55,7 @@ export function Settings({location, navigate}) {
 }
 
 function SettingsContents({
+    t,
   root,
   userInfo,
   dispatch,
@@ -63,7 +64,7 @@ function SettingsContents({
   if (root === "security") {
     return (
         <>
-          <SettingsSecurity dispatch={dispatch} openModal={openModal} userInfo={userInfo}/>
+          <SettingsSecurity t={t} dispatch={dispatch} openModal={openModal} userInfo={userInfo}/>
         </>
     );
   } else {

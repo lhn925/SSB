@@ -21,6 +21,9 @@
   border: 1px solid #fff;
   color: #fff;
 }
+.bg-gray-300 {
+  background-color: #e2e8f0;
+}
 
 .btn-outline:hover {
   color: #1aafec;

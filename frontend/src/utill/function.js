@@ -29,6 +29,19 @@ export function PwSecureCheckFn(level) {
   return secureLevel;
 }
 
+export function FullDateTime (createdDateTime){
+  let language = navigator.language;
+  let timeString = new Date(createdDateTime).toLocaleTimeString(
+      language);
+  let dateString = new Date(
+      createdDateTime).toLocaleDateString().split(".").join(
+      ":").split(" ").join("");
+  dateString = dateString.slice(0, dateString.length - 1);
+  let localeString = new Date(createdDateTime).toLocaleString(
+      language, {weekday: 'short'});
+  return dateString + " " + localeString + " " + timeString;
+}
+
 export function PwSecureLevel(password) {// 패스워드 안전 강도
   // 소문자로 이루어졌는데 같은문자만 도배일경우 - 사용불가
   // 그리고 8문자이하면 사용불가 한글 사용불가

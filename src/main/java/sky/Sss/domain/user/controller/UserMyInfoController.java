@@ -77,9 +77,9 @@ public class UserMyInfoController {
     private final UserLoginStatusService userLoginStatusService;
     private final UserLoginLogService userLoginLogService;
 
+
     /**
      * id:myInfo_1
-     * 유저 profile로 이동
      *
      * @return
      */
@@ -270,7 +270,7 @@ public class UserMyInfoController {
      * @param request
      * @return
      */
-    @PatchMapping("/login/status")
+    @PatchMapping("/logout/status")
     public ResponseEntity<?>  logoutStatus(@Validated @RequestBody UserLoginStatusUpdateDto userLoginStatusUpdateDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
@@ -278,10 +278,12 @@ public class UserMyInfoController {
         }
         String sessionId = request.getSession().getId();
         // 로그인 되어 있는 디바이스 기기 로그아웃
-        userLoginStatusService.logoutDevice(userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON, sessionId);
-
+        userLoginStatusService.logoutDevice(userLoginStatusUpdateDto.getPassword(),userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON, sessionId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
+
+
 
     /**
      * id:myInfo_api_7
@@ -313,15 +315,12 @@ public class UserMyInfoController {
      * @param request
      * @return
      */
-    @GetMapping("/loginDevice")
+    @GetMapping("/login-device")
     public ResponseEntity<?>  getLoginList(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
-        @RequestParam(name = "size", defaultValue = "2", required = false) Integer size, HttpServletRequest request) {
-        PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
-
+        @RequestParam(name = "size", defaultValue = "5", required = false) Integer size, HttpServletRequest request) {
         Page<UserLoginListDto> pagingStatusList = userLoginStatusService.getUserLoginStatusList(
-            request.getSession().getId(), Status.ON,
-            pageRequest);
-        return ResponseEntity.ok(new Result<>(pagingStatusList));
+            request.getSession().getId(), Status.ON,offset,size);
+        return ResponseEntity.ok(pagingStatusList);
     }
 
 

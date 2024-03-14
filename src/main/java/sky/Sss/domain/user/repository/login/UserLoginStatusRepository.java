@@ -16,7 +16,8 @@ public interface UserLoginStatusRepository extends JpaRepository<UserLoginStatus
 
     List<UserLoginStatus> findAllByUidAndLoginStatus(User user, Boolean loginStatus);
 
-    Page<UserLoginStatus> findByUidAndLoginStatus(User user, Boolean loginStatus, Pageable pageable);
+    @Query("select s from UserLoginStatus s where s.uid=:uid and s.loginStatus =:loginStatus or (s.uid=:uid and s.loginStatus =:loginStatus and s.sessionId=:sessionId)")
+    Page<UserLoginStatus> findByUidAndLoginStatus(@Param("uid") User user, @Param("loginStatus")Boolean loginStatus,@Param("sessionId") String sessionId,Pageable pageable);
 
     @Query(value = "select u from UserLoginStatus u where u.uid = :uid and u.defaultLocationLog.userId = :userId and u.refreshToken = :refreshToken and u.loginStatus = :loginStatus and u.defaultLocationLog.isStatus = :isStatus")
     Optional<UserLoginStatus> findOne(@Param("uid") User user, @Param("userId") String userId,

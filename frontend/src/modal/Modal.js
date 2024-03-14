@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components'
 import Portal from "Portal";
 import {useEffect, useState} from "react";
+import "css/Modal.css";
 
 function Modal({
   className,
@@ -10,6 +11,7 @@ function Modal({
   closable,
   visible,
   children,
+    width,
 }) {
 
   const onMaskClick = (e) => {
@@ -40,7 +42,7 @@ function Modal({
                       onClick={maskClosable ? onMaskClick : null}
                       tabIndex={-1}
                       $visible={visible}>
-          <ModalInner tabIndex={0} className="modal-inner"> {closable &&
+          <ModalInner tabIndex={0} className={"modal-inner " +(width !== undefined && width)}> {closable &&
               <ModalClose onClick={close}>X</ModalClose>}
             {children}
           </ModalInner>
@@ -58,6 +60,8 @@ Modal.defaultProps = {
 Modal.propTypes = {
   visible: PropTypes.bool,
 }
+
+
 
 const ModalWrapper = styled.div`
   box-sizing: border-box;
@@ -85,6 +89,8 @@ const ModalOverlay = styled.div`
   z-index: 999;
 `
 
+
+
 const ModalInner = styled.div`
   box-sizing: border-box;
   position: relative;
@@ -93,7 +99,7 @@ const ModalInner = styled.div`
   border-radius: 10px;
   // width: 360px;
   // height: 100%;
-  max-width: 480px;
+  max-width: var(--size);
   top: 50%;
   transform: translateY(-50%);
   margin: 0 auto;
@@ -105,6 +111,6 @@ const ModalInner = styled.div`
 const ModalClose = styled.div`
     position: absolute;
     top: 15px;
-    left: 440px;
+    left: var(--left);
 `
 export default Modal

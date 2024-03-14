@@ -19,11 +19,8 @@ public class UserLoginListDto {
     private String countryName;
     // 로그인 날짜
     private LocalDateTime createdDateTime;
-
     // 현재 접속한 세션과 일치 여부
     private Boolean inSession;
-
-
     private String session;
     // 로그인 상태
     private Boolean loginStatus;

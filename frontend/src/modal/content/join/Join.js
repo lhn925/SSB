@@ -20,7 +20,7 @@ import {Input} from "components/input/Input";
 import {PwInput} from "components/input/PwInput";
 import {modalActions} from "store/modalType/modalType";
 import {useDispatch} from "react-redux";
-import {BtnOutLine} from "components/ button/BtnOutLine";
+import {BtnOutLine} from "components/button/BtnOutLine";
 import {LOGIN} from "modal/content/ModalContent";
 import {EMAIL_JOIN} from "utill/api/ApiEndpoints";
 

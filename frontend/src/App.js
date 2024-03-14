@@ -12,7 +12,7 @@ import {userActions} from "store/userInfo/userReducers";
 import * as StompJs from "@stomp/stompjs";
 import {authApi} from "utill/api/interceptor/ApiAuthInterceptor";
 import {USERS_INFO} from "utill/api/ApiEndpoints";
-import {persistor} from "./store/store";
+import {persistor} from "store/store";
 import {useTranslation} from "react-i18next";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에

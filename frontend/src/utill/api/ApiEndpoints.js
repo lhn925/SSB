@@ -3,10 +3,13 @@ export const USERS_INFO_PW = "/users/info/pw";
 export const USERS_LOGOUT = "/users/logout";
 export const USERS_JOIN = "/users/join";
 export const USERS_HELP_RESET = "/users/help/reset";
-export const USERS_HELP_IDQUERY = "/users/help/idQuery";
+export const USERS_HELP_IDQUERY = "/users/help/id-query";
 export const USERS_HELP_SHOW = "/users/help/show";
 export const USERS_JOIN_DUPLICATE = "/users/join/duplicate/";
 export const USERS_FILE_IMAGE = "/users/file/image/";
+
+export const USERS_INFO_LOGIN_DEVICE = "/users/info/login-device";
+export const USERS_INFO_LOGOUT_STATUS = "/users/info/logout/status";
 
 
 export const EMAIL_FIND = "/email/find";

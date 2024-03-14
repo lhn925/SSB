@@ -1,0 +1,17 @@
+
+
+:root {
+  --size:480px;
+  --left: 92%;
+}
+
+
+.some-class {
+  --size: 752px;
+  --left: 95%;
+}
+
+.another-class{
+  --size: 800px;
+  --left: 97%;
+}

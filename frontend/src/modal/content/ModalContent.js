@@ -11,11 +11,14 @@ import {
 import IdQuery from "modal/content/help/IdQuery";
 import {useSelector} from "react-redux";
 import Modal from "modal/Modal";
+import UserLoginManage from "modal/content/settings/UserLoginManage";
 
 export const JOIN = "JOIN";
 export const HELP = "HELP";
 export const LOGIN = "LOGIN";
+export const PROMPT = "PROMPT";
 export const SECURITY_PW_UPDATE = "SECURITY_PW_UPDATE";
+export const SECURITY_LOGIN_STATUS = "SECURITY_LOGIN_STATUS";
 
 export const ID = "ID";
 export const PW = "PW";
@@ -24,10 +27,16 @@ export const PW = "PW";
 function ModalContent({closeModal,bc,modalVisible}) {
   const type = useSelector(state => state.modalType.type);
   const helpType = useSelector(state => state.helpType.helpType);
+  let width;
+  if (type === SECURITY_LOGIN_STATUS) {
+    width = "some-class";
+  }
   return (
       <>
         {
-            modalVisible && <Modal visible={modalVisible}
+            modalVisible && <Modal
+            width={width}
+                visible={modalVisible}
                                    closable={true}
                                    maskClosable={false}
                                    onClose={closeModal}>
@@ -52,7 +61,13 @@ function Content({type,helpType,bc,closeModal}) {
         <PwUpdateForm closeModal={closeModal}/>
       </>
     )
-  } else if (type === HELP && helpType === ID) {
+  } else if (type === SECURITY_LOGIN_STATUS) {
+    return (
+        <>
+          <UserLoginManage closeModal={closeModal}/>
+        </>
+    )
+  }else if (type === HELP && helpType === ID) {
     return (
         <>
           <Help RegexCheck={RegexCheck} ClickBtnSendCode={ClickBtnSendCode}

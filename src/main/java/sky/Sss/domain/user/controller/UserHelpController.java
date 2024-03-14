@@ -110,7 +110,7 @@ public class UserHelpController {
      * @return
      * @throws IOException
      */
-    @GetMapping("/idQuery")
+    @GetMapping("/id-query")
     public ResponseEntity idQuery(@Validated @ModelAttribute UserIdQueryDto userId, BindingResult bindingResult,
         HttpServletRequest request, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {

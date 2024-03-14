@@ -10,9 +10,14 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -29,6 +34,7 @@ import sky.Sss.domain.user.utili.jwt.TokenProvider;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisQueryService;
+import sky.Sss.global.utili.auditor.AuditorAwareImpl;
 import sky.Sss.global.ws.dto.LogOutWebSocketDto;
 
 /**
@@ -48,6 +54,8 @@ public class UserLoginStatusService {
     private final LocationFinderService locationFinderService;
     private final RedisQueryService redisQueryService;
     private final MsgTemplateService msgTemplateService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuditorAware auditorAware;
 
     /**
      * 로그인 시
@@ -55,7 +63,7 @@ public class UserLoginStatusService {
      * 저장
      */
     @Transactional
-    public void add(String userAgent, JwtTokenDto jwtTokenDto, String userId,long uid, String sessionId) {
+    public void add(String userAgent, JwtTokenDto jwtTokenDto, String userId, long uid, String sessionId) {
 
         if (uid == 0) {
             throw new IllegalArgumentException("login.error");
@@ -72,7 +80,7 @@ public class UserLoginStatusService {
          */
         List<UserLoginStatus> findStatus = userLoginStatusRepository.
             findList(user, userId, Status.ON.getValue(), Status.ON.getValue(), sessionId);
-
+        AuditorAwareImpl.changeUserId(auditorAware, userId);
         if (findStatus.size() > 0) { // 기존에 있던 현재 세션아이디를 가진 Status 다 로그아웃
             userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), sessionId);
             for (UserLoginStatus status : findStatus) {
@@ -91,11 +99,24 @@ public class UserLoginStatusService {
      *
      * @param loginStatus
      */
-    public Page<UserLoginListDto> getUserLoginStatusList(String sessionId, Status loginStatus,
-        PageRequest pageRequest) {
+    public Page<UserLoginListDto> getUserLoginStatusList(String sessionId, Status loginStatus, int offset, int size) {
+        PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
         User user = userQueryService.findOne();
-        return userLoginStatusRepository.findByUidAndLoginStatus(user,
-            loginStatus.getValue(), pageRequest).map(u -> new UserLoginListDto(sessionId, u));
+        Page<UserLoginListDto> paging = userLoginStatusRepository.findByUidAndLoginStatus(user,
+            loginStatus.getValue(), sessionId, pageRequest).map(u -> new UserLoginListDto(sessionId, u));
+
+        boolean sizeOut = paging.getTotalPages() < offset;
+
+        // 요청한 offset total 범위를 넘었을경우
+        // offset = totalpage - 1
+        if (sizeOut && paging.getContent().isEmpty()) {
+            PageRequest newPageRequest = PageRequest.of(paging.getTotalPages() - 1, size,
+                Sort.by(Direction.DESC, "id"));
+            paging = userLoginStatusRepository.findByUidAndLoginStatus(user,
+                loginStatus.getValue(), sessionId, newPageRequest).map(u -> new UserLoginListDto(sessionId, u));
+        }
+
+        return paging;
     }
 
 
@@ -126,14 +147,20 @@ public class UserLoginStatusService {
      * @param isStatus
      */
     @Transactional
-    public void logoutDevice(String redisToken, Status loginStatus, Status isStatus, String sessionId) {
+    public void logoutDevice(String password, String logoutSessionId, Status loginStatus, Status isStatus,
+        String sessionId) {
 //        해당 세션 정보 가져옴
         User user = userQueryService.findOne();
+        boolean matches = passwordEncoder.matches(password, user.getPassword());
+        if (!matches) {
+            throw new BadCredentialsException("pw.authMatches.mismatch");
+        }
+
         List<UserLoginStatus> findStatusList = userLoginStatusRepository.findList(user,
             user.getUserId(),
-            loginStatus.getValue(), isStatus.getValue(), redisToken);
+            loginStatus.getValue(), isStatus.getValue(), logoutSessionId);
         if (findStatusList.size() > 0) {
-            userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), redisToken);
+            userLoginStatusRepository.update(user, Status.OFF.getValue(), Status.OFF.getValue(), logoutSessionId);
             removeLoginToken(findStatusList, sessionId);
         }
     }
@@ -351,6 +378,7 @@ public class UserLoginStatusService {
 
         }
     }
+
     /**
      * 특정유저의 모든 레디스 세션 삭제
      *
@@ -369,9 +397,6 @@ public class UserLoginStatusService {
         }
         msgTemplateService.convertAndSend("/topic/logout/" + userLoginStatus.getRefreshToken(),
             new LogOutWebSocketDto());
-
-//        msgTemplateService.convertAndSend("/topic/push/lim222",
-//            new LogOutWebSocketDto());
 
         redisQueryService.delete(RedisKeyDto.REDIS_SESSION_KEY + userLoginStatus.getSessionId());
     }
