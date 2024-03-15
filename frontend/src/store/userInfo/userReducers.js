@@ -5,7 +5,8 @@ const initialState = {
   userId: null,
   email: null,
   pictureUrl: null,
-  userName: null
+  userName: null,
+  isLoginBlocked:null,
 }
 const userReducers = createSlice({
   name: "user",
@@ -16,6 +17,10 @@ const userReducers = createSlice({
     },
     setUserId(state, action) {
       state.userId = action.payload.userId;
+    },
+
+    setIsLoginBlocked(state, action) {
+      state.isLoginBlocked = action.payload.isLoginBlocked;
     },
     setEmail(state, action) {
       state.email = action.payload.email;
@@ -38,6 +43,7 @@ export let userActions = {
   setEmail: userReducers.actions.setEmail,
   setPictureUrl: userReducers.actions.setPictureUrl,
   setUserName: userReducers.actions.setUserName,
+  setIsLoginBlocked: userReducers.actions.setIsLoginBlocked,
 };
 
 export default userReducers.reducer;

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.model.UserGrade;
+import sky.Sss.global.file.utili.FileStore;
 
 
 @Setter
@@ -26,7 +27,8 @@ public class UserMyInfoDto implements Serializable {
 
 
     @Builder
-    public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked, Boolean isAdmin) {
+    public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
+        Boolean isAdmin) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
@@ -35,9 +37,22 @@ public class UserMyInfoDto implements Serializable {
         this.isAdmin = isAdmin;
     }
 
+    public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
+        UserGrade userGrade) {
+        this.userId = userId;
+        this.email = email;
+        this.userName = userName;
+        this.pictureUrl = pictureUrl == null ? FileStore.USER_DEFAULT_IMAGE_URL : pictureUrl;
+        this.isLoginBlocked = isLoginBlocked;
+        this.isAdmin = userGrade.equals(UserGrade.ADMIN);
+    }
+
     public static UserMyInfoDto createUseProfileDto(UserInfoDto userInfoDto) {
         Optional<Boolean> isAdmin = userInfoDto.getGrantedAuthority().stream()
-            .map(auth -> auth.getAuthority().equals(UserGrade.ADMIN)).findFirst();
+            .map(auth -> {
+                auth.getAuthority();
+                return false;
+            }).findFirst();
         return UserMyInfoDto.builder()
             .userId(userInfoDto.getUserId())
             .email(userInfoDto.getEmail())

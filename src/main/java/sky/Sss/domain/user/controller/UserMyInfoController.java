@@ -84,12 +84,9 @@ public class UserMyInfoController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<?> userProfileForm() {
+    public ResponseEntity<UserMyInfoDto> userProfileForm() {
         // 유저 정보 조회
-        UserInfoDto userInfoDto = userQueryService.getUserInfoDto();
-        // 유저 정보 반환
-        UserMyInfoDto userMyInfo = UserMyInfoDto.createUseProfileDto(userInfoDto);
-        return new ResponseEntity<>(userMyInfo, HttpStatus.OK);
+        return new ResponseEntity<>(userQueryService.getUserMyInfoDto(), HttpStatus.OK);
     }
 
     /**
@@ -294,7 +291,7 @@ public class UserMyInfoController {
      * @param request
      * @return
      */
-    @PostMapping("/block")
+    @PostMapping("/blocked")
     public ResponseEntity<?>  loginBlockedUpdate(@Validated @RequestBody UserLoginBlockUpdateDto userLoginBlockDto,
         BindingResult bindingResult,
         HttpServletRequest request) {

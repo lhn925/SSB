@@ -3,11 +3,12 @@ import {persistor, store} from "store/store";
 import {authActions} from "store/auth/authReducers";
 import mem from "mem";
 import {LOGIN_REFRESH, USERS_INFO} from "utill/api/ApiEndpoints";
+import {toast} from "react-toastify";
 // 토큰이 불 필요한 URL
 export const nonAuthApi = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}`,
   headers: {
-    "Content-Type" : "application/json;charset=UTF-8",
+    "Content-Type": "application/json;charset=UTF-8",
   }
 });
 export const nonGetAuthApi = axios.create({
@@ -26,11 +27,12 @@ authApi.interceptors.request.use((config) => {
     config.headers.Authorization = access;
   }
   return config;
-},(error) => {
+}, (error) => {
   return Promise.reject(error);
 })
+
 export async function postRefreshToken(refreshToken) {
-  return  axios.post(LOGIN_REFRESH, {}, {
+  return axios.post(LOGIN_REFRESH, {}, {
     headers: {
       Authorization: refreshToken
     }
@@ -41,8 +43,7 @@ export async function postRefreshToken(refreshToken) {
  *  메모이제이션은 비용이 많이 드는 연산의 결과를 저장해두었다가 동일한 입력값에 대해선 저장된 결과를 바로 반환함으로써 성능을 향상시킬 수 있습니다
  */
 // refresh 중복 요청 방지를 위한 mem(memoization) library 사용
-const memoizedPostRefreshToken = mem(postRefreshToken,{maxAge: 1000});
-
+const memoizedPostRefreshToken = mem(postRefreshToken, {maxAge: 1000});
 
 authApi.interceptors.response.use(
     // 200 이 나올때 처리
@@ -70,8 +71,11 @@ authApi.interceptors.response.use(
         } catch (error) {
           await persistor.purge();
           window.location.href = "/";
+          toast.error(`errorMsg.error.token`);
           return error;
         }
+      } else if (status === 500) {
+        window.location.href = "/500";
       } else if (status === 404) {
         if (config.url === USERS_INFO) {
           return error.response;

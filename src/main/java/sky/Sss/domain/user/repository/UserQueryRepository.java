@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import sky.Sss.domain.user.dto.UserInfoDto;
+import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.entity.User;
 
 
@@ -33,6 +35,19 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndIsEnabled(String email, Boolean isEnabled);
 
     Optional<User> findByUserIdAndIsEnabled(String userId, Boolean isEnabled);
+
+
+
+
+
+    /**
+     * 탈퇴 된 회원은 검색하지 않음
+     *
+     * @param userId
+     * @return
+     */
+    @Query("select new sky.Sss.domain.user.dto.myInfo.UserMyInfoDto(u.userId,u.email,u.userName,u.pictureUrl,u.isLoginBlocked,u.grade) from User u where u.userId = :userId and u.isEnabled = true")
+    Optional<UserMyInfoDto> getUserMyInfoDto(@Param("userId") String userId);
 
 
     /**

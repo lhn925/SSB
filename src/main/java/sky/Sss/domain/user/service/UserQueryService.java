@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
+import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
+import sky.Sss.domain.user.exception.UserNotFoundException;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.UserGrade;
 import sky.Sss.domain.user.repository.UserQueryRepository;
@@ -82,12 +84,11 @@ public class UserQueryService {
         return User.getOptionalUser(optionalUser);
     }
 
-    public UserInfoDto getUserInfoDto() {
+    public UserMyInfoDto getUserMyInfoDto() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        User user = findOne(userDetails.getUsername());
-        return UserInfoDto.createUserInfo(user);
+        return userQueryRepository.getUserMyInfoDto(userDetails.getUsername())
+            .orElseThrow(UserInfoNotFoundException::new);
     }
 
     public User findOne(String userId) {

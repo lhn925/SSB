@@ -84,6 +84,7 @@ function App() {
       dispatch(userActions.setEmail(userData));
       dispatch(userActions.setPictureUrl(userData));
       dispatch(userActions.setUserName(userData));
+      dispatch(userActions.setIsLoginBlocked(userData))
       connect(client, currentAuth.access, currentAuth.refresh, userData.userId);
     }).catch(() => {
       if (client.current.client) {

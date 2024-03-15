@@ -9,6 +9,7 @@ export const USERS_JOIN_DUPLICATE = "/users/join/duplicate/";
 export const USERS_FILE_IMAGE = "/users/file/image/";
 
 export const USERS_INFO_LOGIN_DEVICE = "/users/info/login-device";
+export const USERS_INFO_BLOCKED= "/users/info/blocked";
 export const USERS_INFO_LOGOUT_STATUS = "/users/info/logout/status";
 
 

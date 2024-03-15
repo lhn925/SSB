@@ -124,12 +124,13 @@ function ManageBody({
     if (variable.current.isDoubleClick) {
       return;
     }
-    variable.current.isDoubleClick = false;
+    variable.current.isDoubleClick = true;
     let loading = toast.loading(t(`msg.common.logout.progress`));
 
     const response = await LogOutStatusApi(
         {password: password, session: session});
     toast.dismiss(loading);
+    variable.current.isDoubleClick = false;
     if (response.code === 200) {
       toast.success(t(`msg.device.logoutSuccess`))
       let value = await offSet;
@@ -152,6 +153,7 @@ function ManageBody({
     } else {
       toast.error(response.data.errorDetails[0].message);
     }
+
   }
 
   // // 현재 세션

@@ -64,8 +64,7 @@ public class UserInfoDto implements Serializable {
 
     public static UserInfoDto createUserInfo(User user) {
         UserDetails userDetails = User.UserBuilder(user);
-        UserInfoDto userInfo = UserInfoDto.createUserInfo(userDetails);
-        return userInfo;
+        return UserInfoDto.createUserInfo(userDetails);
     }
 
 }
