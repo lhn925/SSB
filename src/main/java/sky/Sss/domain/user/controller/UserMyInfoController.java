@@ -48,6 +48,7 @@ import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.model.ChangeSuccess;
 import sky.Sss.domain.user.model.PwSecLevel;
 import sky.Sss.domain.user.model.Status;
+import sky.Sss.domain.user.model.UserLogType;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.help.UserHelpService;
 import sky.Sss.domain.user.service.log.UserActivityLogService;
@@ -334,20 +335,18 @@ public class UserMyInfoController {
      * @param request
      * @return
      */
-    @GetMapping("/userLog")
+    @GetMapping("/user-log")
     public ResponseEntity<?>  getLoginLogList(
-        @RequestParam(value = "type", required = false) String type,
-        @RequestParam(value = "startDate", required = false) String startDate,
-        @RequestParam(value = "endDate", required = false) String endDate,
+        @RequestParam(name = "type") String type,
+        @RequestParam(name = "startDate", required = false) String startDate,
+        @RequestParam(name = "endDate", required = false) String endDate,
         @RequestParam(name = "offset", defaultValue = "0") Integer offset,
-        @RequestParam(name = "size", defaultValue = "2") Integer size, HttpServletRequest request) {
+        @RequestParam(name = "size", defaultValue = "5") Integer size, HttpServletRequest request) {
         PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
         LocalDate start = null;
         LocalDate end = null;
 
-        if (type == null || !StringUtils.hasText("type")) {
-            type = "userLoginLog";
-        }
+        UserLogType userLogType = UserLogType.findByType(type);
 
         // 조회 최대 날짜는 현재 날짜까지만 가능
         LocalDate maxDate = LocalDate.now();
@@ -356,7 +355,7 @@ public class UserMyInfoController {
         // userActivityLog는 6개월 전까지만 조회가능
         LocalDate minDate = null;
         int minNumber = 6;
-        if (type.equals("userLoginLog")) {
+        if (userLogType.equals(UserLogType.HISTORY_LOGIN_LOG)) {
             minNumber = 3;
         }
 
@@ -367,15 +366,16 @@ public class UserMyInfoController {
         end = LocalDate.parse(LocalDate.now().format(ISO_DATE));
 
         try {
-            if (startDate != null || !startDate.equals("")) { // 조회할려는 날짜가 없을 경우
+            if (startDate != null && !startDate.equals("")) { // 조회할려는 날짜가 없을 경우
                 start = LocalDate.parse(startDate, ISO_DATE);
             }
-            if (endDate != null || !endDate.equals("")) { // 조회할려는 날짜가 없을 경우
+            if (endDate != null && !endDate.equals("")) { // 조회할려는 날짜가 없을 경우
                 end = LocalDate.parse(endDate, ISO_DATE);
             }
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("date.error.range");
+            e.printStackTrace();
         }
+
         // maxDate가 endDate 보다 이전 날짜냐? true
         // 조회할려는 날짜가 최대 날짜 보다 크다면
         // 조회 할수 있는 최소 날짜 보다
@@ -386,13 +386,13 @@ public class UserMyInfoController {
         }
 
         Page pagingLoginList = null;
-        if (type.equals("userLoginLog")) {
+        if (userLogType.equals(UserLogType.HISTORY_LOGIN_LOG)) {
             pagingLoginList = userLoginLogService.getUserLoginLogList(start, end, pageRequest);
         } else {
             pagingLoginList = userActivityLogService.getUserActivityLogList(ChangeSuccess.SUCCESS,
                 Status.ON, start, end, pageRequest, request.getLocale());
         }
-        return ResponseEntity.ok(new Result<>(pagingLoginList));
+        return ResponseEntity.ok(pagingLoginList);
 
     }
 

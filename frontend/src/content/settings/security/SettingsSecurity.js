@@ -70,7 +70,7 @@ export function SettingsSecurity({t, userInfo, openModal, dispatch}) {
             </svg>
           </h6>
           <BtnOutLine event={() => modal(SECURITY_LOGIN_STATUS)
-          } text="로그인 기기 관리" id="loginStatusModal"/>
+          } text={t(`msg.myPage.sky.login.device.manage`)} id="loginStatusModal"/>
         </li>
         <li className="settings_li_header d-flex">
           <h3 className="settings_h3_title ms-2">{t(

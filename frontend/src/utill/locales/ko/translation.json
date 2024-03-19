@@ -87,8 +87,12 @@
       "sky.overseas.login.block": "해외 로그인 차단",
       "sky.log.manage": "이력관리",
       "sky.login.list": "로그인 관리",
+      "sky.login.device.manage": "기기 관리",
+      "sky.loginLog.list": "로그인 기록 목록",
       "sky.login.log": "로그인 기록",
       "sky.activityLog": "정보 수정 이력",
+      "sky.activity.list": "정보 수정 이력 목록",
+      "sky.log.notBlank": "조회된 데이터가 없습니다",
       "sky.userName.change": "닉네임 변경",
       "sky.userName.change.role": "(닉네임은 한달에 한번 바꿀 수 있습니다.)"
     },
@@ -144,6 +148,8 @@
       "success": "프로필 사진이 변경 되었습니다."
     },
     "blockChange": {
+      "loginBlockConfirm": "해외 로그인 차단을 하시겠습니까?",
+      "loginUnBlockConfirm": "해외 로그인 차단을 해제 하시겠습니까?",
       "loginUnblock": "해외 로그인 차단을 해제 하였습니다.",
       "loginBlock": "해외 로그인 차단을 설정하였습니다."
     },
@@ -183,7 +189,7 @@
     "server": "잘못된 요청이거나 서버 오류 입니다 잠시후 다시 시도해주세요",
     "error.picture": "jpg(jpeg),png 이미지 확장자 만 가능합니다.",
     "error.unAuth": "로그인 후 다시 이용해주세요",
-    "error.dateError": "종료 날짜가 시작 날짜보다 미래일 수 없습니다.",
+    "error.dateError": "시작 날짜가 종료 날짜보다 미래일 수 없습니다.",
     "error.authToken": "인증코드가 발급되지 않았습니다.발급 받아주세요",
     "error.agree": "이용약관에 동의해주세요.",
     "error.sbbAgreement": "SSB 이용약관에 동의해주세요.",

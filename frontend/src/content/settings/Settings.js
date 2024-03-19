@@ -6,6 +6,12 @@ import {SettingsSecurity} from "content/settings/security/SettingsSecurity";
 import {SettingsAccount} from "content/settings/account/SettingsAccount";
 import ModalContent from "modal/content/ModalContent";
 import {useTranslation} from "react-i18next";
+import {
+  URL_SETTINGS,
+  URL_SETTINGS_HISTORY, URL_SETTINGS_NOTIFICATIONS,
+  URL_SETTINGS_SECURITY
+} from "content/UrlEndpoints";
+import {SettingsHistory} from "./history/SettingsHistory";
 
 export function Settings({location, navigate}) {
   const params = useParams();
@@ -67,6 +73,12 @@ function SettingsContents({
           <SettingsSecurity t={t} dispatch={dispatch} openModal={openModal} userInfo={userInfo}/>
         </>
     );
+  } if (root === "history") {
+    return (
+        <>
+          <SettingsHistory t={t} dispatch={dispatch} openModal={openModal}/>
+        </>
+    );
   } else {
     return (
         <>
@@ -99,24 +111,24 @@ function PrivacyNav(props) {
           <li className="nav-item">
             <Link value="settings"
                   className={"nav-link link_font_color " + active.settings}
-                  to="/settings">Account</Link>
+                  to={URL_SETTINGS}>Account</Link>
           </li>
           <li className="nav-item">
             <Link value="content"
                   className={"nav-link link_font_color " + active.security}
-                  to="/settings/security">Security</Link>
+                  to={URL_SETTINGS_SECURITY}>Security</Link>
           </li>
 
           <li className="nav-item">
             <Link value="content"
                   className={"nav-link link_font_color " + active.history}
-                  to="/settings/history">Manage History</Link>
+                  to={URL_SETTINGS_HISTORY}>Manage History</Link>
           </li>
 
           <li className="nav-item">
             <Link value="content"
                   className={"nav-link link_font_color " + active.notifications}
-                  to="/settings/notifications">Notifications</Link>
+                  to={URL_SETTINGS_NOTIFICATIONS}>Notifications</Link>
           </li>
         </ul>
       </>

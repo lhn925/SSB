@@ -11,15 +11,17 @@ import {
 import IdQuery from "modal/content/help/IdQuery";
 import {useSelector} from "react-redux";
 import Modal from "modal/Modal";
-import UserLoginManage from "modal/content/settings/UserLoginManage";
+import UserSettingModal from "modal/content/settings/UserSettingModal";
 
 export const JOIN = "JOIN";
 export const HELP = "HELP";
 export const LOGIN = "LOGIN";
+
 export const PROMPT = "PROMPT";
 export const SECURITY_PW_UPDATE = "SECURITY_PW_UPDATE";
 export const SECURITY_LOGIN_STATUS = "SECURITY_LOGIN_STATUS";
-
+export const HISTORY_LOGIN_LOG = "HISTORY_LOGIN_LOG";
+export const HISTORY_ACTIVITY_LOG = "HISTORY_ACTIVITY_LOG";
 export const ID = "ID";
 export const PW = "PW";
 
@@ -28,7 +30,10 @@ function ModalContent({closeModal,bc,modalVisible}) {
   const type = useSelector(state => state.modalType.type);
   const helpType = useSelector(state => state.helpType.helpType);
   let width;
-  if (type === SECURITY_LOGIN_STATUS) {
+
+  console.log(type);
+  // class 변경
+  if (type === SECURITY_LOGIN_STATUS || type === HISTORY_LOGIN_LOG || type === HISTORY_ACTIVITY_LOG) {
     width = "some-class";
   }
   return (
@@ -61,10 +66,10 @@ function Content({type,helpType,bc,closeModal}) {
         <PwUpdateForm closeModal={closeModal}/>
       </>
     )
-  } else if (type === SECURITY_LOGIN_STATUS) {
+  } else if (type === HISTORY_LOGIN_LOG || type === HISTORY_ACTIVITY_LOG || type === SECURITY_LOGIN_STATUS) {
     return (
         <>
-          <UserLoginManage closeModal={closeModal}/>
+          <UserSettingModal type={type} closeModal={closeModal}/>
         </>
     )
   }else if (type === HELP && helpType === ID) {

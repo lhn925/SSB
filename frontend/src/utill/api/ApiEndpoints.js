@@ -11,7 +11,7 @@ export const USERS_FILE_IMAGE = "/users/file/image/";
 export const USERS_INFO_LOGIN_DEVICE = "/users/info/login-device";
 export const USERS_INFO_BLOCKED= "/users/info/blocked";
 export const USERS_INFO_LOGOUT_STATUS = "/users/info/logout/status";
-
+export const USERS_INFO_USER_LOG = "/users/info/user-log";
 
 export const EMAIL_FIND = "/email/find";
 export const EMAIL_JOIN = "/email/join";

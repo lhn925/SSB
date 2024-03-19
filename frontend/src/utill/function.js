@@ -1,5 +1,4 @@
 //패스워드 안전도 체크 함수
-import {useState} from "react";
 import {EmailApi} from "./api/email/EmailApi";
 import {CodeCheckApi} from "./api/email/CodeCheckApi";
 
@@ -29,6 +28,13 @@ export function PwSecureCheckFn(level) {
   return secureLevel;
 }
 
+export function DateToDay(date) {
+  return date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+}
+export function getMonth(date) {
+  return (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1)
+      : date.getMonth() + 1;
+}
 export function FullDateTime (createdDateTime){
   let language = navigator.language;
   let timeString = new Date(createdDateTime).toLocaleTimeString(
@@ -40,6 +46,11 @@ export function FullDateTime (createdDateTime){
   let localeString = new Date(createdDateTime).toLocaleString(
       language, {weekday: 'short'});
   return dateString + " " + localeString + " " + timeString;
+}
+export function DateFormat(date) {
+  let month = getMonth(date);
+  let day = DateToDay(date);
+  return date.getFullYear() + "-" + month + "-" + day;
 }
 
 export function PwSecureLevel(password) {// 패스워드 안전 강도

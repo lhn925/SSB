@@ -297,7 +297,6 @@ function _getDateFormat(date) {
   let getMonth = _getMonth(date);
   let getDay = _getDay(date);
   let value = date.getFullYear() + "-" + getMonth + "-" + getDay;
-
   return value;
 }
 

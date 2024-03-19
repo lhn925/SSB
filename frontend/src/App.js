@@ -14,6 +14,7 @@ import {authApi} from "utill/api/interceptor/ApiAuthInterceptor";
 import {USERS_INFO} from "utill/api/ApiEndpoints";
 import {persistor} from "store/store";
 import {useTranslation} from "react-i18next";
+import {URL_SETTINGS} from "content/UrlEndpoints";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -125,7 +126,7 @@ function App() {
                 <Profile/>
               }>
               </Route>
-              <Route path={"/settings/:root?"}
+              <Route path={ URL_SETTINGS+"/:root?"}
                      element={
                        <Settings navigate={navigate}
                                  location={location}/>

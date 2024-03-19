@@ -113,7 +113,7 @@ function Login(props) {
                        onKeyUp={(e) => {
                          let value = e.target.value;
                          setPassword(value);
-                       }} className="form-control form-control "
+                       }} className=" form-control "
                        placeholder={t(`msg.common.sky.pw`)}/>
               </div>
             </div>
