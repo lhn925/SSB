@@ -286,11 +286,9 @@ async function getContentsList(offset, type, startDateValue, endDateValue) {
     response = await UserLogApi(type, offset, startDateValue,
         endDateValue);
   }
-  let copyPageable = {};
   if (response.code === 200) {
     const values = response.data;
-    if (!values.empty) {
-      copyPageable = {
+    let copyPageable = {
         empty: values.empty,
         first: values.first,
         last: values.last,
@@ -299,7 +297,6 @@ async function getContentsList(offset, type, startDateValue, endDateValue) {
         totalElements: values.totalElements,
         totalPages: values.totalPages
       }
-    }
     return {contents: values.content, pageable: copyPageable};
   }
 }
@@ -496,9 +493,9 @@ function ManageBody({
 
 
 const updatePageable = (setPageable, newData) => {
-  setPageable(prevPageable => {
-    return {...prevPageable, ...newData}
-  })
+    setPageable((prev) =>{ return {
+      ...prev,...newData
+    }})
 }
 
 const updateContents = (setContents, newData) => {
