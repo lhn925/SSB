@@ -21,4 +21,4 @@ export const NKEY_OPEN_CAPTCHA = "/nkey/open/captcha";
 export const NKEY_OPEN_AGAIN = "/nkey/open/again";
 
 export const LOGIN_REFRESH = "/login/refresh";
-export const LOGIN="/login";
+export const API_LOGIN="/login";

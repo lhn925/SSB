@@ -23,7 +23,7 @@ const rootReducer = combineReducers({
   authReducer,
   userReducer,
   modalType,
-  helpType
+  helpType,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

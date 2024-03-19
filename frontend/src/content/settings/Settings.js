@@ -12,33 +12,32 @@ import {
   URL_SETTINGS_SECURITY
 } from "content/UrlEndpoints";
 import {SettingsHistory} from "./history/SettingsHistory";
+import Nav from "components/nav/Nav";
+import {modalActions} from "store/modalType/modalType";
 
-export function Settings({location, navigate}) {
+export function Settings({modal,dispatch,openModal,changeModalType}) {
   const params = useParams();
-  const userInfo = useSelector(state => state.userReducer);
-  let root = "settings";
-  if (params["root"] !== undefined) {
-    root = params.root
-  }
-  const [modalVisible, setModalVisible] = useState(false)
 
-  const dispatch = useDispatch();
+  const tabs = [
+    {id: "settings", title: "Account", url: URL_SETTINGS},
+    {id: "security", title: "Security", url: URL_SETTINGS_SECURITY},
+    {id: "history", title: "Manage History", url: URL_SETTINGS_HISTORY},
+    {id: "notifications", title: "Notifications", url: URL_SETTINGS_NOTIFICATIONS},
+  ];
+
+  const userInfo = useSelector(state => state.userReducer);
+
+  const root = params.root === undefined ? "settings" : params.root;
+
   const {t} = useTranslation();
 
-  const openModal = () => {
-    setModalVisible(true)
-  }
-  const closeModal = () => {
-    setModalVisible(false)
-  }
-
   return (
-      <div className="container settings_container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-10">
+        <div className="row justify-content-center settings_container ">
+          <div className="col-12 col-md-10 mt-5">
             <h1 className="text-start settings_title">Settings</h1>
             <div className="tabs">
-              <PrivacyNav navigate={navigate} root={root}/>
+              {/*<PrivacyNav navigate={navigate} root={root}/>*/}
+              <Nav currentRoot={root} tabs={tabs}/>
             </div>
 
             <div className="col-12 col-md-12" id="settings">
@@ -46,37 +45,42 @@ export function Settings({location, navigate}) {
                 {
                   <>
                     <SettingsContents t={t}
-                        dispatch={dispatch}
-                        openModal={openModal} root={root} userInfo={userInfo}/>
-                    <ModalContent closeModal={closeModal}
-                                  modalVisible={modalVisible}/>
+                                      dispatch={dispatch}
+                                      changeModalType={changeModalType}
+                                      openModal={openModal} root={root}
+                                      userInfo={userInfo}/>
                   </>
                 }
               </ul>
             </div>
           </div>
         </div>
-      </div>
   )
 }
 
 function SettingsContents({
-    t,
+  t,
   root,
   userInfo,
   dispatch,
+  changeModalType,
   openModal,
 }) {
   if (root === "security") {
     return (
         <>
-          <SettingsSecurity t={t} dispatch={dispatch} openModal={openModal} userInfo={userInfo}/>
+          <SettingsSecurity t={t}
+                            dispatch={dispatch}
+                            changeModalType={changeModalType} openModal={openModal}
+                            userInfo={userInfo}/>
         </>
     );
-  } if (root === "history") {
+  }
+  if (root === "history") {
     return (
         <>
-          <SettingsHistory t={t} dispatch={dispatch} openModal={openModal}/>
+          <SettingsHistory t={t}
+                           changeModalType={changeModalType} openModal={openModal}/>
         </>
     );
   } else {
@@ -88,8 +92,9 @@ function SettingsContents({
   }
 }
 
-function PrivacyNav(props) {
-  const prevRootRef = useRef({root: props.root});
+/*
+function PrivacyNav({root}) {
+  const prevRootRef = useRef({root: root});
   const [active, setActive] = useState({
     settings: "",
     security: "",
@@ -100,11 +105,11 @@ function PrivacyNav(props) {
     let prevRoot = prevRootRef.current.root;
     console.log("prevRoot : " + prevRoot)
     setActive(
-        {...active, [prevRootRef.current.root]: "", [props.root]: "active"});
-    if (prevRoot !== props.root) {
-      prevRootRef.current.root = props.root;
+        {...active, [prevRootRef.current.root]: "", [root]: "active"});
+    if (prevRoot !== root) {
+      prevRootRef.current.root = root;
     }
-  }, [props.root])
+  }, [root])
   return (
       <>
         <ul className="nav nav-tabs">
@@ -133,4 +138,4 @@ function PrivacyNav(props) {
         </ul>
       </>
   )
-}
+}*/

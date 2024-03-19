@@ -2,9 +2,9 @@ import {useEffect, useRef, useState} from "react";
 import 'css/header.css'
 import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import ModalContent from "modal/content/ModalContent";
-import {useDispatch, useSelector} from "react-redux";
-import {modalActions} from "store/modalType/modalType";
+import {LOGIN} from "modal/content/ModalContent";
+import {useSelector} from "react-redux";
+
 import {
   Dropdown,
 } from "react-bootstrap";
@@ -16,9 +16,6 @@ import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 function Header(props) {
   const auth = useSelector(state => state.authReducer);
   const userInfo = useSelector(state => state.userReducer);
-
-  const [modalVisible, setModalVisible] = useState(false)
-  const dispatch = useDispatch();
   const {t} = useTranslation();
   const variable = useRef({isDoubleClick: false});
 
@@ -45,11 +42,8 @@ function Header(props) {
   useEffect(() => {
   },[userInfo])
   const openModal = () => {
-    dispatch(modalActions.changeType({type: "LOGIN"}));
-    setModalVisible(true)
-  }
-  const closeModal = () => {
-    setModalVisible(false)
+    props.changeModalType(LOGIN)
+    props.openModal();
   }
   return (
       <header role="banner"
@@ -83,7 +77,10 @@ function Header(props) {
             </form>
           </div>
           <div className="header-right">
-            <div>{t(`msg.common.sky.upload`)}</div>
+            <div><Link to="/upload"
+                       className="text_none_decoration header_font_color">{t(
+                `msg.common.sky.upload`)}</Link>
+            </div>
             <div>
               {
                 userInfo.userId !== null ? <CircularImageDropdown
@@ -95,8 +92,6 @@ function Header(props) {
                 /> : <>
                   <button onClick={openModal} className="btn-login-open btn-blue-outline btn-outline" >
                     {t(`msg.loginForm.sky.login`)}</button>
-                  <ModalContent bc={props.bc} modalVisible={modalVisible} closeModal={closeModal}/>
-
                 </>
               }
             </div>

@@ -1,18 +1,13 @@
 import {BtnOutLine} from "components/button/BtnOutLine";
-import {modalActions} from "store/modalType/modalType";
 import {
   HISTORY_ACTIVITY_LOG,
   HISTORY_LOGIN_LOG
 } from "modal/content/ModalContent";
-import {useRef, useState} from "react";
 
 
-export function SettingsHistory({t, openModal, dispatch}) {
-  const variable = useRef({
-    isDoubleClick: false // 더블 클릭 방지
-  })
+export function SettingsHistory({t, openModal,changeModalType}) {
   const modal = (type) => {
-    dispatch(modalActions.changeType({type: type}))
+    changeModalType(type)
     openModal();
   }
   return (

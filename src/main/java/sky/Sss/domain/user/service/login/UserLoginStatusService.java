@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -100,7 +101,12 @@ public class UserLoginStatusService {
      * @param loginStatus
      */
     public Page<UserLoginListDto> getUserLoginStatusList(String sessionId, Status loginStatus, int offset, int size) {
-        PageRequest pageRequest = PageRequest.of(offset, size, Sort.by(Direction.DESC, "id"));
+
+        Sort sort = Sort.by(
+            Order.desc("id")
+        );
+
+        PageRequest pageRequest = PageRequest.of(offset, size,sort);
         User user = userQueryService.findOne();
         Page<UserLoginListDto> paging = userLoginStatusRepository.findByUidAndLoginStatus(user,
             loginStatus.getValue(), sessionId, pageRequest).map(u -> new UserLoginListDto(sessionId, u));
@@ -110,8 +116,7 @@ public class UserLoginStatusService {
         // 요청한 offset total 범위를 넘었을경우
         // offset = totalpage - 1
         if (sizeOut && paging.getContent().isEmpty()) {
-            PageRequest newPageRequest = PageRequest.of(paging.getTotalPages() - 1, size,
-                Sort.by(Direction.DESC, "id"));
+            PageRequest newPageRequest = PageRequest.of(paging.getTotalPages() - 1, size,sort);
             paging = userLoginStatusRepository.findByUidAndLoginStatus(user,
                 loginStatus.getValue(), sessionId, newPageRequest).map(u -> new UserLoginListDto(sessionId, u));
         }

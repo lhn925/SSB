@@ -15,6 +15,9 @@ import {USERS_INFO} from "utill/api/ApiEndpoints";
 import {persistor} from "store/store";
 import {useTranslation} from "react-i18next";
 import {URL_SETTINGS} from "content/UrlEndpoints";
+import {Upload} from "content/upload/Upload";
+import ModalContent from "modal/content/ModalContent";
+import {modalActions} from "store/modalType/modalType";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -28,6 +31,7 @@ const Settings = lazy(
 
 function App() {
   const currentAuth = useSelector((state) => state?.authReducer);
+  const modal = useSelector((state) => state?.modalType);
   const dispatch = useDispatch();
   const bc = new BroadcastChannel(`my_chanel`);
   const location = useLocation();
@@ -93,6 +97,16 @@ function App() {
       }
     });
   }
+  const closeModal = () => {
+    dispatch(modalActions.closeModal());
+  }
+
+  const openModal = () => {
+    dispatch(modalActions.openModal());
+  }
+  const changeModalType = (type) => {
+    dispatch(modalActions.changeType({type: type}));
+  }
 
   useEffect(() => {
     if (currentAuth.access) {
@@ -101,7 +115,10 @@ function App() {
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
   return (
       <div className="App">
-        <Header bc={bc} client={client.current.client} navigate={navigate}/>
+        <Header modal={modal} dispatch={dispatch}
+                openModal={openModal}
+                changeModalType={changeModalType}
+                bc={bc} client={client.current.client} navigate={navigate}/>
         <ToastContainer
             position="top-right"
             autoClose={3000}
@@ -114,7 +131,9 @@ function App() {
             pauseOnHover
             theme="light"
         />
-        <div className="l-container">
+        <div
+            className="container justify-content-center l-container">
+
           <Suspense fallback="Loading...">
             <Routes>
               {/*<Route path="/">*/}
@@ -122,22 +141,30 @@ function App() {
               {/*<Route path="/feed">*/}
               {/*</Route>*/}
               <Route path="/:userName" element={
-
                 <Profile/>
+              }>
+              </Route>
+              <Route path="/upload" element={
+                <Upload/>
               }>
               </Route>
               <Route path={ URL_SETTINGS+"/:root?"}
                      element={
-                       <Settings navigate={navigate}
+                       <Settings
+                           openModal={openModal}
+                           dispatch={dispatch}
+                           changeModalType={changeModalType}
+                           modal={modal}
+                           navigate={navigate}
                                  location={location}/>
-
                      }>
               </Route>
             </Routes>
           </Suspense>
-        </div>
+          <ModalContent bc={bc} modalVisible={modal.visible}
+                        closeModal={closeModal}/>
 
-
+          </div>
       </div>
   )
       ;

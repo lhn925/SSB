@@ -31,7 +31,6 @@ function ModalContent({closeModal,bc,modalVisible}) {
   const helpType = useSelector(state => state.helpType.helpType);
   let width;
 
-  console.log(type);
   // class 변경
   if (type === SECURITY_LOGIN_STATUS || type === HISTORY_LOGIN_LOG || type === HISTORY_ACTIVITY_LOG) {
     width = "some-class";

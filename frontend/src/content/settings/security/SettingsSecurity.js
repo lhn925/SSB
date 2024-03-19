@@ -11,7 +11,7 @@ import {
 } from "utill/api/settings/security/LoginBlockedApi";
 import {userActions} from "store/userInfo/userReducers";
 
-export function SettingsSecurity({t, userInfo, openModal, dispatch}) {
+export function SettingsSecurity({t, userInfo, openModal, dispatch,changeModalType}) {
 
   const [isLoginBlocked, setIsLoginBlocked] = useState(Boolean(userInfo.isLoginBlocked));
 
@@ -42,7 +42,7 @@ export function SettingsSecurity({t, userInfo, openModal, dispatch}) {
     }
   }
   const modal = (type) => {
-    dispatch(modalActions.changeType({type: type}))
+    changeModalType(type);
     openModal();
   }
   return (

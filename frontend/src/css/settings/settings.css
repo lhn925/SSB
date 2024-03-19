@@ -22,12 +22,6 @@
   font-size: 15px;
 }
 
-.nav-item {
-  margin: 0 12px -1px;
-  font-size: 18px;
-  line-height: 1.8;
-}
-
 .settings_li_header  {
   padding-top: 25px;
   border-bottom: 1px solid #f2f2f2;
@@ -63,9 +57,6 @@
   padding:0.105rem 0.205rem;
 }
 
-
-
-
 .earthImg svg {
   height: 27px;
   background-image: url("../image/globe.png");
@@ -78,16 +69,7 @@
   box-sizing: border-box;
 }
 
-.nav-tabs .nav-link:hover {
-  color: #333333;
-  border-bottom: 2px solid;
-  border-color: #ffffff #ffffff #333333;
-  cursor: default;
-}
-
-.nav-tabs .nav-link.active {
-  border-bottom: 2px solid;
-  border-color: #ffffff #ffffff #1aafec;
-  color: #1aafec;
-  cursor: default;
+.settings_container .nav-item {
+  font-size: 18px;
+  line-height: 1.8;
 }

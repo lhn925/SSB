@@ -97,3 +97,20 @@ h1 {
 .link_font_color {
   color: #333333;
 }
+.nav-tabs .nav-link:hover {
+  color: #333333;
+  border-bottom: 2px solid;
+  border-color: #ffffff #ffffff #333333;
+  cursor: default;
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid;
+  border-color: #ffffff #ffffff #1aafec;
+  color: #1aafec;
+  cursor: default;
+}
+
+.nav-item {
+  margin: 0 12px -1px;
+}
