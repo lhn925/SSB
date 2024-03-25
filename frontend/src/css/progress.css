@@ -1,0 +1,15 @@
+.progress-bar {
+  background-color: #1aafec;
+  color: black;
+  font-weight: bold;
+  text-align: left;
+  padding-left: 10px;
+  box-shadow: none;
+}
+
+.progress {
+  height: 10px;
+  width: 100%;
+}
+
+

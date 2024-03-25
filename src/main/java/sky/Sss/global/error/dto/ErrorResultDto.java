@@ -26,6 +26,7 @@ public class ErrorResultDto implements ErrorResult {
         errorDetails.add(new ErrorDetailDto(field, code, messageSource, locale));
     }
 
+
     public ErrorResultDto(String field, String code, MessageSource messageSource, Locale locale, Object[] args) {
         this.errorDetails = new ArrayList<>();
         errorDetails.add(new ErrorDetailDto(field, code, messageSource, locale, args));

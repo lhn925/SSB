@@ -41,7 +41,7 @@ import sky.Sss.global.file.utili.FileStore;
 @Table(uniqueConstraints = {
     @UniqueConstraint(name = "UniqueTokenAndNotification", columnNames = {"token"}),
     @UniqueConstraint(name = "UniqueEmailAndSalt", columnNames = {"email", "salt"}),
-    @UniqueConstraint(name = "UniqueUserIdAndUserName", columnNames = {"userid", "username"})})
+    @UniqueConstraint(name = "UniqueUserIdAndUserName", columnNames = {"user_id", "user_name"})})
 public class User extends BaseTimeEntity {
 
     @Id
@@ -49,19 +49,19 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "token",nullable = false)
     private String token;
 
-    @Column(nullable = false)
+    @Column(name = "user_id",nullable = false)
     private String userId;
     @Column(nullable = false)
     private String password;
 
     // 사용자 이름 or 사용자 profileLink 주소
-    @Column(nullable = false)
+    @Column(name = "user_name",nullable = false)
     private String userName;
 
-    @Column(nullable = false)
+    @Column(name = "email",nullable = false)
     private String email;
 
     // 프로필 사진
@@ -80,6 +80,7 @@ public class User extends BaseTimeEntity {
     private PwSecLevel pwSecLevel;
 
 //    @Column(nullable = false)
+    @Column(name = "salt",nullable = false)
     private String salt;
 
     // 차단: true , 차단 x : false

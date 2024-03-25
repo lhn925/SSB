@@ -50,53 +50,6 @@ function UserSettingModal({type}) {
   })
 
   function dateSettings() {
-    // let copyObject = {};
-    // if (type !== SECURITY_LOGIN_STATUS &&
-    //     (dateObject.startDate === null || dateObject.endDate === null)) {
-    //   let today = new Date();
-    //   let start = new Date(today);
-    //   let end = new Date(today);
-    //   // 최소 제한 날짜
-    //   let min = new Date(today);
-    //
-    //   let minMonthRange = 6;
-    //   // 로그인 로그 modal 일 경우 최대 3개월 까지만 볼수 있음
-    //   // 최소 제한 날짜 값 설정
-    //   if (type === HISTORY_LOGIN_LOG) {
-    //     minMonthRange = 3;
-    //   }
-    //   start.setDate(today.getDate() - 7);
-    //   // formatter 오류방지
-    //   // min.setMonth((today.getMonth()+1) - minMonthRange);
-    //
-    //   let value = (today.getMonth() + 1) - minMonthRange
-    //
-    //   min.setMonth(value === 0 ? -1 : value);
-    //
-    //   let minMonth = min.getMonth() < 10 ? "0" + (min.getMonth())
-    //       : min.getMonth() + 1;
-    //   let minDay = DateToDay(min);
-    //
-    //   let startVal = DateFormat(start);
-    //   let endVal = DateFormat(end);
-    //   let minVal = min.getFullYear() + "-" + minMonth + "-"
-    //       + minDay;
-    //   copyObject = {
-    //     ...dateObject,
-    //     startDate: start,
-    //     endDate: end,
-    //     startDateValue: startVal,
-    //     endDateValue: endVal,
-    //     maxDate: endVal,
-    //     minDate: minVal
-    //   };
-    //   setDateObject(copyObject);
-    //   // useRef 이용하여 값 초기화
-    //   setInputAttributes(endDateRef, {value: endVal, min: minVal, max: endVal});
-    //   setInputAttributes(startDateRef,
-    //       {value: startVal, min: minVal, max: endVal})
-    // }
-
     if (type !== SECURITY_LOGIN_STATUS && dateObject.startDate
         && dateObject.endDate) {
       return dateObject;

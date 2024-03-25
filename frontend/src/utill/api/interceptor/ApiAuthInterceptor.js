@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {HttpStatusCode} from "axios";
 import {persistor, store} from "store/store";
 import {authActions} from "store/auth/authReducers";
 import mem from "mem";
@@ -55,7 +55,7 @@ authApi.interceptors.response.use(
       } = error;
 
       // 토큰이 만료되었을때
-      if (status === 401) {
+      if (status === HttpStatusCode.Unauthorized) {
         const state = store.getState().authReducer;
         const refresh = state.refresh;
         const originRequest = config;
@@ -74,9 +74,9 @@ authApi.interceptors.response.use(
           toast.error(`errorMsg.error.token`);
           return error;
         }
-      } else if (status === 500) {
+      } else if (status === HttpStatusCode.InternalServerError) {
         window.location.href = "/500";
-      } else if (status === 404) {
+      } else if (status === HttpStatusCode.NotFound) {
         if (config.url === USERS_INFO) {
           return error.response;
         } else {

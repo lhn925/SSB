@@ -54,7 +54,7 @@ public class PlyService {
 
     @Transactional
     public PlayListInfoDto addPlyAndTracks(PlayListSettingSaveDto playListSettingSaveDto,
-        MultipartFile coverImgFile, User user, HttpSession session, List<SsbTrackTags> ssbTrackTags) {
+        MultipartFile coverImgFile, User user, List<SsbTrackTags> ssbTrackTags) {
         // 플레이리스트 생성
         PlayListInfoDto playListInfoDto = addPly(user, playListSettingSaveDto, ssbTrackTags,
             coverImgFile);
@@ -62,8 +62,8 @@ public class PlyService {
         // 플레이 리스트에 user 추가
         List<TrackInfoRepDto> trackInfoRepDtoList = trackService.addTrackFiles(user, playListInfoDto.getId(),
             playListInfoDto.getCoverUrl(),
-            playListInfoDto.getCreatedDateTime(), ssbTrackTags,
-            playListSettingSaveDto.getPlayListTrackInfoDtoList(), session.getId());
+            playListInfoDto.getCreatedDateTime(), ssbTrackTags,playListSettingSaveDto.isPrivacy(),true,
+            playListSettingSaveDto.getPlayListTrackInfoDtoList());
 
         List<SsbFeed> ssbFeedList = new ArrayList<>();
 

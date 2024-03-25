@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.dto.temp;
 
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,5 +13,6 @@ public class TempTrackFileUploadDto {
 
     @MultipartTrackFileValid
     private MultipartFile trackFile;
-    private Boolean isPlayList;
+    private boolean isPlayList;
+    private boolean isPrivacy;
 }

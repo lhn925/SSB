@@ -114,3 +114,65 @@ h1 {
 .nav-item {
   margin: 0 12px -1px;
 }
+.checkbox_label {
+  font: 13px / 1.4 Inter, sans-serif;
+  color: #333;
+  font-weight: 600;
+}
+
+.picture-div {
+  height: 100%;
+}
+
+.upload-btn-wrapper {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.image-background {
+  width: 240px;
+  height: 240px; /* or any other height */
+  /*background-image: url('../css/image/profile2.png'); !* path to your image *!*/
+  background-size: cover;
+  background-position: center;
+  /*border-radius: 1rem; !* Optional: for rounded corners *!*/
+}
+
+.btn-upload {
+  color: #333;
+  background-color: #ffffff;
+  background-color: hsla(0, 0%, 100%, .8);
+  font-size: 15px;
+  font-weight: bold;
+
+}
+
+.btn-upload:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Optional: for handling the display of the file input */
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+.normal_font {
+  color: #333;
+  font:14px / 1.4 Inter, sans-serif;
+  font-weight: bold;
+
+}
+.basic_font {
+  font: 12px / 1.4 Inter, sans-serif;
+}
+
+.editStatus_info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

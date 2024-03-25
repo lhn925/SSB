@@ -25,7 +25,6 @@ public class UserMyInfoDto implements Serializable {
     private Boolean isLoginBlocked;
     private Boolean isAdmin;
 
-
     @Builder
     public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
         Boolean isAdmin) {

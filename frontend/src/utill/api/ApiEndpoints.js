@@ -22,3 +22,7 @@ export const NKEY_OPEN_AGAIN = "/nkey/open/again";
 
 export const LOGIN_REFRESH = "/login/refresh";
 export const API_LOGIN="/login";
+
+
+export const TRACKS_INFO_TOTAL = "/tracks/info/total"
+export const TRACKS_TEMP_FILE_SAVE = "/tracks/temp/file"

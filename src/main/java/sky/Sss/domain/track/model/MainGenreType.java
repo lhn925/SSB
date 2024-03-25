@@ -1,5 +1,6 @@
 package sky.Sss.domain.track.model;
 
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,7 +33,7 @@ public enum MainGenreType {
     public static MainGenreType findByIndex(Integer index) {
         MainGenreType[] values = values();
         for (MainGenreType value : values) {
-            if (value.getIndex() == index) {
+            if (Objects.equals(value.getIndex(), index)) {
                 return value;
             }
         }

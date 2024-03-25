@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
-import sky.Sss.domain.track.entity.TempTrackStorage;
+import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.temp.TempTrackStorageRepository;
 import sky.Sss.domain.user.entity.User;
@@ -33,17 +33,20 @@ public class TempTrackStorageService {
      * @throws IOException
      */
     @Transactional
-    public TempTrackInfoDto saveTempTrackFile(TempTrackFileUploadDto tempTrackFileUploadDto, String sessionId) {
+    public TempTrackInfoDto saveTempTrackFile(TempTrackFileUploadDto tempTrackFileUploadDto) {
         User user = userQueryService.findOne();
         // track/{fileToken}폴더/track 이름
         // cover/fileToken/cover
         String fileToken = TokenUtil.getToken();
 
+        log.info("fileToken = {}", fileToken);
+
         UploadTrackFileDto uploadTrackFileDto = (UploadTrackFileDto) fileStore.storeTrackFileSave(
             tempTrackFileUploadDto.getTrackFile(),
             FileStore.TRACK_DIR, fileToken);
-        TempTrackStorage tempTrackStorage = TempTrackStorage.createTempTrackStorage(uploadTrackFileDto, fileToken,
-            sessionId, user, tempTrackFileUploadDto.getIsPlayList());
+        TempTrackStorage tempTrackStorage = TempTrackStorage.createTempTrackStorage(uploadTrackFileDto, fileToken, user,
+            tempTrackFileUploadDto.isPlayList(),
+            tempTrackFileUploadDto.isPrivacy());
 
         tempTrackStorageRepository.save(tempTrackStorage);
 
@@ -52,22 +55,29 @@ public class TempTrackStorageService {
             uploadTrackFileDto);
     }
 
-    public TempTrackStorage findOne(Long id, String sessionId, String token, User user)
+    public TempTrackStorage findOne(Long id, String token, User user, boolean isPrivacy, boolean isPlayList)
         throws SsbFileNotFoundException {
-        return tempTrackStorageRepository.findOne(id, token, sessionId, user).orElseThrow(
+        return tempTrackStorageRepository.findOne(id, token, user, isPrivacy, isPlayList).orElseThrow(
             SsbFileNotFoundException::new);
     }
 
 
-    public List<TempTrackStorage> findByList(String sessionId, User user, List<String> tokens, List<Long> ids)
+    public List<TempTrackStorage> findByList(User user, List<String> tokens, List<Long> ids, boolean isPrivacy,
+        boolean isPlayList)
         throws SsbFileNotFoundException {
-        List<TempTrackStorage> tempTrackStorageList = tempTrackStorageRepository.findBySessionId(sessionId, user,
-            tokens, ids);
+        List<TempTrackStorage> tempTrackStorageList = tempTrackStorageRepository.findByUid(user,
+            tokens, ids, isPrivacy, isPlayList);
         if (tempTrackStorageList.isEmpty()) {
             throw new SsbFileNotFoundException();
         }
         return tempTrackStorageList;
     }
+
+    public List<TempTrackStorage> findByUid(long uid, boolean isPrivacy, boolean isPlayList)
+        throws SsbFileNotFoundException {
+        return tempTrackStorageRepository.findByUid(uid, isPrivacy, isPlayList);
+    }
+
 
     @Transactional
     public void deleteAllBatch(List<TempTrackStorage> tempList) {
@@ -83,10 +93,10 @@ public class TempTrackStorageService {
 
 
     @Transactional
-    public void deleteAllBatch(Long id, String token, String sessionId) throws IOException {
+    public void deleteAllBatch(Long id, String token, boolean isPrivacy, boolean isPlayList) throws IOException {
         User user = userQueryService.findOne();
 
-        TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, sessionId, user)
+        TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, user, isPrivacy, isPlayList)
             .orElseThrow(SsbFileNotFoundException::new);
 
         // 임시파일 삭제

@@ -123,11 +123,11 @@ function CircularImageDropdown({pictureUrl,userId, navigate, clickBtnLogout,clie
               <img/>Profile
             </Dropdown.Item>
             <Dropdown.Item href="#/action-2">
-              <img src="./../../css/image/profile2.png"/>
+              <img src="/css/image/profile2.png"/>
               Likes
             </Dropdown.Item>
             <Dropdown.Item href="#/action-3">
-              <img src="./../../css/image/profile2.png"/>
+              <img src="/css/image/profile2.png"/>
               Following
             </Dropdown.Item>
             <Dropdown.Item className="profile" onClick={() => navigate(`/settings`)}>

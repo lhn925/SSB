@@ -17,7 +17,7 @@ public class FileUtils {
     public static final String[] IMAGE_EXT_LIST = {"image/jpg", "image/jpeg", "image/pjpeg", "image/png",
         "image/bmp", "image/x-windows-bmp"};
     public static final String[] TRACK_EXT_LIST = {"audio/mpeg"," audio/mp3", "audio/flac", "audio/ogg", "audio/mp4",
-        "audio/wav"};
+        "audio/wav","audio/x-m4a"};
 
     public static boolean validImgFile(MultipartFile multipartFile) {
         List<String> notValidTypeList = Arrays.asList(IMAGE_EXT_LIST);
@@ -33,9 +33,8 @@ public class FileUtils {
     private static boolean valid(MultipartFile multipartFile, List<String> notValidTypeList) {
         try {
             String mimeType = tika.detect(multipartFile.getInputStream());
-            boolean isValid = notValidTypeList.stream()
+            return notValidTypeList.stream()
                 .anyMatch(notValidType -> notValidType.equalsIgnoreCase(mimeType));
-            return isValid;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

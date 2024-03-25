@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.entity;
+package sky.Sss.domain.track.entity.temp;
 
 
 import static lombok.AccessLevel.PRIVATE;
@@ -34,9 +34,6 @@ public class TempTrackStorage extends BaseTimeEntity {
     @Column(nullable = false)
     private String token;
 
-    @Column(nullable = false)
-    private String sessionId;
-
     @ManyToOne
     @JoinColumn(name = "uid")
     private User user;
@@ -51,25 +48,24 @@ public class TempTrackStorage extends BaseTimeEntity {
     private String storeFileName;
     @Column(nullable = false)
     private Boolean isPlayList;
+
+    @Column(nullable = false)
+    private Boolean isPrivacy; // ture: 비공개 , false 공개
     // true playList , false : track
 
 
-    public static TempTrackStorage createTempTrackStorage(UploadTrackFileDto uploadTrackFileDto, String token,
-        String sessionId, User user, Boolean isPlayList) {
+    public static TempTrackStorage createTempTrackStorage(UploadTrackFileDto uploadTrackFileDto, String token,User user, Boolean isPlayList,boolean isPrivacy) {
         TempTrackStorage tempTrackStorage = new TempTrackStorage();
         tempTrackStorage.setSize(uploadTrackFileDto.getSize());
         tempTrackStorage.setTrackLength(uploadTrackFileDto.getTrackLength());
         tempTrackStorage.setUser(user);
-
-        tempTrackStorage.setSessionId(sessionId);
         tempTrackStorage.setToken(token);
         tempTrackStorage.setIsPlayList(isPlayList);
         tempTrackStorage.setStoreFileName(uploadTrackFileDto.getStoreFileName());
         tempTrackStorage.setOriginalName(uploadTrackFileDto.getOriginalFileName());
+        tempTrackStorage.setIsPrivacy(isPrivacy);
         return tempTrackStorage;
     }
-
-
     public static void deleteTempFile(TempTrackStorage tempTrackStorage, FileStore fileStore)
         throws SsbFileNotFoundException {
         if (StringUtils.hasText(tempTrackStorage.getStoreFileName())) {

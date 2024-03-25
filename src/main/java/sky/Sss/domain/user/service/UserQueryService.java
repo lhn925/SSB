@@ -80,6 +80,10 @@ public class UserQueryService {
             throw new UserInfoNotFoundException("sky.userId.notFind");
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // getUsername 은 여기선 UserId를 뜻함
+        // userName
+        // userId
+        // userToken
         Optional<User> optionalUser = userQueryRepository.findByUserId(userDetails.getUsername());
         return User.getOptionalUser(optionalUser);
     }

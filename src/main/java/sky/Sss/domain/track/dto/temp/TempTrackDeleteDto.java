@@ -14,5 +14,9 @@ public class TempTrackDeleteDto  {
     @NotBlank
     private String token;
 
+    @NotBlank
+    private boolean isPrivacy;
+    @NotBlank
+    private boolean isPlayList;
 
 }

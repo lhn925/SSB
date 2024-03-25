@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
 @Getter
 @NoArgsConstructor
@@ -24,6 +25,12 @@ public class ErrorGlobalResultDto implements ErrorResult {
     public ErrorGlobalResultDto(String code, MessageSource messageSource, Locale locale) {
         this.errorDetails = new ArrayList<>();
         errorDetails.add(new ErrorGlobalDetailDto(code, messageSource, locale));
+    }
+
+    public ErrorGlobalResultDto(List<FieldError> fieldErrors, MessageSource messageSource,Locale locale) {
+        errorDetails = fieldErrors.stream().map(fieldError -> new ErrorGlobalDetailDto(messageSource.getMessage(fieldError, locale)))
+            .toList();
+
     }
 
     public ErrorGlobalResultDto(String code, MessageSource messageSource, Locale locale, Object[] args) {

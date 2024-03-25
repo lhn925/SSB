@@ -24,7 +24,7 @@ import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.track.TrackInfoModifyReqDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
-import sky.Sss.domain.track.entity.TempTrackStorage;
+import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrack;
@@ -73,14 +73,13 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public TrackInfoRepDto addTrackFile(TrackInfoSaveReqDto trackInfoSaveReqDto, MultipartFile coverImgFile,
-        String sessionId) {
+    public TrackInfoRepDto addTrackFile(TrackInfoSaveReqDto trackInfoSaveReqDto, MultipartFile coverImgFile) {
         User user = userQueryService.findOne();
         // 시간제한 180분
         // 임시 디비에 있던걸
         // ssbTrack 에 옮기는 작업
-        TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackInfoSaveReqDto.getId(), sessionId,
-            trackInfoSaveReqDto.getToken(), user);
+        TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackInfoSaveReqDto.getId(),
+            trackInfoSaveReqDto.getToken(), user, trackInfoSaveReqDto.getIsPrivacy(), false);
 
         List<TrackTagsDto> tagList = trackInfoSaveReqDto.getTagList();
 
@@ -146,9 +145,10 @@ public class TrackService {
      * @throws IOException
      */
     @Transactional
-    public List<TrackInfoRepDto> addTrackFiles(User user, long settingsId, String coverUrl, LocalDateTime createdDateTime,
-        List<SsbTrackTags> ssbTrackTags,
-        List<PlayListTrackInfoReqDto> trackPlayListFileDtoList, String sessionId) {
+    public List<TrackInfoRepDto> addTrackFiles(User user, long settingsId, String coverUrl,
+        LocalDateTime createdDateTime,
+        List<SsbTrackTags> ssbTrackTags, boolean isPrivacy, boolean isPlayList,
+        List<PlayListTrackInfoReqDto> trackPlayListFileDtoList) {
         // playList 안에 있는 Track 정보
 
         // ssbTrack 저장을 위한 Map 생성
@@ -160,9 +160,9 @@ public class TrackService {
         // 임시파일 id
         List<Long> tempIdList = trackPlayListFileDtoList.stream().map(BaseTrackDto::getId).toList();
 
-
         // 임시파일 리스트
-        List<TempTrackStorage> tempList = tempTrackStorageService.findByList(sessionId, user, tokenList, tempIdList);
+        List<TempTrackStorage> tempList = tempTrackStorageService.findByList(user, tokenList, tempIdList, isPrivacy,
+            isPlayList);
 
         // 사이즈가 맞지 않는 경우
         if (tempList.size() != trackPlayListFileDtoList.size()) {
@@ -222,7 +222,7 @@ public class TrackService {
         // 플레이 리스트 트랙 목록 save
         List<SsbPlayListTracks> ssbPlayListTrackList = SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
             ssbPlayListSettings);
-        plyTracksService.addPlayListTracks(ssbPlayListTrackList,createdDateTime);
+        plyTracksService.addPlayListTracks(ssbPlayListTrackList, createdDateTime);
 
         return trackInfoList;
     }

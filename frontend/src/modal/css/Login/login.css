@@ -57,11 +57,11 @@
 }
 
 .form-id:before {
-  background-image: url("./../../../css/image/profile2.png");
+  background-image: url("../../../css/image/profile2.png");
 }
 
 .form-pw:before {
-  background-image: url("./../../../css/image/free-icon-padlock-4503885.png");
+  background-image: url("../../../css/image/free-icon-padlock-4503885.png");
 }
 
 .captcha-img {
@@ -69,7 +69,7 @@
 }
 
 .captchaBtn{
-  background-image: url(./../../../css/image/free-icon-repeating-4709823.png);
+  background-image: url(../../../css/image/free-icon-repeating-4709823.png);
   background-size: 25px 24px;
   background-position: 6px 8px;
   background-repeat: no-repeat;

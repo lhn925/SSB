@@ -102,7 +102,7 @@ public class UserMyInfoService {
             try {
                 //유저 이미지 삭제
                 User.deletePicture(user, fileStore);
-                user.updatePicture(user, null);
+                User.updatePicture(user, null);
                 UserInfoDto.createUserInfo(user);
 
             } catch (IOException e) {

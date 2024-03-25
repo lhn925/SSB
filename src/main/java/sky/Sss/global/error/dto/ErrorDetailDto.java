@@ -23,6 +23,8 @@ public class ErrorDetailDto extends ErrorDetail {
         this.field = field;
     }
 
+
+
     public ErrorDetailDto(String field, String code, MessageSource ms, Locale locale, Object[] args) {
         super(code, ms.getMessage(code, args, locale));
         this.field = field;

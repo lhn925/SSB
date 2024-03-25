@@ -65,9 +65,7 @@ public class TrackController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-
-        HttpSession session = request.getSession();
-        TrackInfoRepDto trackInfoRepDto = trackService.addTrackFile(trackInfoSaveReqDto, coverImgFile, session.getId());
+        TrackInfoRepDto trackInfoRepDto = trackService.addTrackFile(trackInfoSaveReqDto, coverImgFile);
         return ResponseEntity.ok(trackInfoRepDto);
     }
 
