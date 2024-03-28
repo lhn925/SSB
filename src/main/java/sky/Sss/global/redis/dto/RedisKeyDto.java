@@ -3,6 +3,8 @@ package sky.Sss.global.redis.dto;
 
 public class RedisKeyDto {
     public static final String REDIS_SESSION_KEY = "spring:session:sessions:";
+
+    public static final String REDIS_TAGS_KEY = "spring:tags:";
     public static final String REDIS_WS_SESSION_KEY = "spring:session:ws:sessions:";
     public static final String REDIS_USER_CACHE_TOKEN_KEY = "spring:user:cache:token";
     public static final String REDIS_USER_WS_LIST_SESSION_KEY = "spring:user:ws:list:session:";

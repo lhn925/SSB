@@ -3,7 +3,9 @@ package sky.Sss.global.utili.validation.annotation.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
+import sky.Sss.domain.track.exception.checked.SsbFileException;
 import sky.Sss.global.file.utili.FileUtils;
 import sky.Sss.global.utili.validation.annotation.MultipartTrackFileValid;
 
@@ -21,14 +23,9 @@ public class MultipartTrackFileValidator implements ConstraintValidator<Multipar
 
     @Override
     public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
-
-        log.info("value = {}", value);
-
         if (value == null) {
             return false;
         }
-
-        log.info("value.getSize() = {}", value.getSize());
         boolean isSize = value.getSize() <= FILE_SIZE;
         // 기본메세지 제거
         context.disableDefaultConstraintViolation();
@@ -37,7 +34,6 @@ public class MultipartTrackFileValidator implements ConstraintValidator<Multipar
             return false;
         }
         boolean isValid = FileUtils.validTrackFile(value);
-        log.info("isValid = {}", isValid);
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(ERROR_MESSAGE).addConstraintViolation();

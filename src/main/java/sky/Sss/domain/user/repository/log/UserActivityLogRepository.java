@@ -17,11 +17,11 @@ public interface UserActivityLogRepository extends JpaRepository<UserActivityLog
     @Query(value = "select u from UserActivityLog u where u.uId = :uid "
         + " and u.changeSuccess = :changeSuccess "
         + " and u.defaultLog.isStatus = :isStatus "
-        + " and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate")
+        + " and DATE_FORMAT(u.createdDateTime,'%Y-%m-%d') between :startDate and :endDate order by :pageable")
     Page<UserActivityLog> getPagedDataByUid(@Param("uid") User uid, @Param("changeSuccess") ChangeSuccess changeSuccess,
-        @Param("isStatus") Boolean isStatus, @Param("startDate") LocalDate startDate,
+        @Param("isStatus") boolean isStatus, @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
-        Pageable pageable);
+       Pageable pageable);
 
 
     @Query(value = "select count (u.id) from UserActivityLog u where "

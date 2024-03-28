@@ -4,7 +4,6 @@ function _onpageshow(path) { // 뒤로가기시 page 초기화 문제
       // Back Forward Cache로 브라우저가 로딩될 경우 혹은 브라우저 뒤로가기 했을 경우
       location.href = path;
     } else {
-      console.log("발생!");
     }
   }
 }
@@ -92,7 +91,6 @@ function _PwSecureLevel(password) {// 패스워드 안전 강도
   }
 
   if (regex2.test(password)) { // 대문자 검색
-    console.log("2:" + regex2.test(password))
     ++secLevel;
   }
   if (regex4.test(password)) { // 숫자 검색
@@ -389,14 +387,14 @@ function _PwSecureCheckFn($isChkPw, $password, notThymeId) {
 
   // 해당 클래스 how-secure를 제외 하고 모두 삭제
   $secureLevel.classList.forEach(str => {
-    if (str != "how-secure") {
+    if (str !== "how-secure") {
       $secureLevel.classList.remove(str);
     }
   })
 
   let input_value = $password.value; // 비밀번호 값 갖고오기
   input_value = input_value.split(" ").join("");
-  if (input_value == "") {
+  if (input_value === "") {
     $password.parentElement.classList.add("error");
     $password.classList.add("border-danger")
     $NotThymeMsg.innerText = errorsMsg["NotBlank"];
@@ -470,7 +468,7 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
   for (const element of $elements) {
     let value = _removeWhitespace(element.value);
     let $element = document.getElementById(element.id + "-msg");
-    if (value == "") {
+    if (value === "") {
       $element.innerText = messages[element.id + ".NotBlank"];
       isValChk = true;
       isClicking = false;
@@ -491,7 +489,7 @@ function _subBtnClick(isClicking, $subBtn, $elements) {
 function _PwMatchCheck($newPw, $newPwChk, $isChkNewPwChk) {
 
   let $element = document.getElementById($newPwChk.id + "-msg");
-  if ($newPw.value != "" && $newPw.value != $newPwChk.value) {
+  if ($newPw.value !== "" && $newPw.value !== $newPwChk.value) {
     $element.classList.remove(
         "display-none");
     $element.innerText =

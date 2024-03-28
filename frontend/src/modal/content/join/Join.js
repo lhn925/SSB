@@ -164,7 +164,6 @@ function Join(props) {
   const onKeyUp = async (e) => {
     const {value, name} = e.target;
     const input_value = value.split(" ").join("");
-    console.log("name:"+name)
     // 공백 체크
     setInputs((inputs) => {
       return {

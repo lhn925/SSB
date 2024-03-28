@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public enum MainGenreType {
-    CUSTOM("CUSTOM", 1), NONE("NONE", 2), AUDIO("AUDIO", 3), MUSIC("MUSIC", 4);
+    CUSTOM("Custom", 1), NONE("None", 2),
+    MUSIC("Music", 3), AUDIO("Audio", 4);
 
     private final String value;
     private final Integer index;
@@ -42,16 +43,12 @@ public enum MainGenreType {
 
     // 카테고리 하위 목록 value 값 반환
     public String getSubGenreValue(String subGenre) {
-        switch (this) {
-            case AUDIO:
-                return SubAudioGenre.findBySubGenre(subGenre).getValue();
-            case MUSIC:
-                return SubMusicGenre.findBySubGenre(subGenre).getValue();
-            case CUSTOM:
-                return subGenre;
-            default:
-                return null;
-        }
+        return switch (this) {
+            case AUDIO -> Objects.requireNonNull(SubAudioGenre.findBySubGenre(subGenre)).getValue();
+            case MUSIC -> Objects.requireNonNull(SubMusicGenre.findBySubGenre(subGenre)).getValue();
+            case CUSTOM -> subGenre;
+            default -> null;
+        };
     }
 
     // 카테고리 하위 목록 inex 값 반환

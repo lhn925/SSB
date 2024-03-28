@@ -136,7 +136,6 @@ function connect(client, accessToken, refreshToken, userId,t,bc) {
       Authorization: accessToken,
     }, debug: function (message) {
     }, onStompError: function (message) {
-      console.log("onStompError: " + message)
     },
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
@@ -144,7 +143,6 @@ function connect(client, accessToken, refreshToken, userId,t,bc) {
   clientData.onConnect = function () {
     // 구독
     clientData.subscribe("/topic/push/" + userId, function (message) {
-      console.log("topic : " + message.body);
     });
     clientData.subscribe("/topic/logout/" + refreshToken, function (message) {
       persistor.purge().then(() => {

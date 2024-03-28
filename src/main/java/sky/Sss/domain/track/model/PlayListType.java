@@ -2,7 +2,7 @@ package sky.Sss.domain.track.model;
 
 
 public enum PlayListType {
-    PLAYLIST("PLAYLIST",1), ALBUM("ALBUM",2), EP("EP",3), SINGLE("SINGLE",4), COMPILATION("COMPILATION",5);
+    PLAYLIST("Playlist",1), ALBUM("Album",2), EP("EP",3), SINGLE("Single",4), COMPILATION("Compilation",5);
 
     private final String type;
     private final Integer index;

@@ -1,6 +1,7 @@
 //패스워드 안전도 체크 함수
-import {EmailApi} from "./api/email/EmailApi";
-import {CodeCheckApi} from "./api/email/CodeCheckApi";
+import {EmailApi} from "utill/api/email/EmailApi";
+import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
+import {useState} from "react";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -219,6 +220,18 @@ export function ChangeError(setErrors, name, message, error) {
     }
   });
 }
+export const encodeFileToBase64 = (fileBlob,setCoverImg) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(fileBlob);
+
+  return new Promise((resolve) => {
+    reader.onload = () => {
+      setCoverImg(reader.result);
+      resolve();
+    };
+  });
+};
+
 
 export async function SendCode(url, body, setErrors, setAuth, setTimer,
     setAuthTimeLimit, messages) {
@@ -269,4 +282,71 @@ export async function AuthCodeCheck(setInputs,authCode, auth, setErrors, setCoun
       }
     })
   }
+}
+
+// 상태와 로직을 하나의 hook으로 추출
+export function useToggleableOptions(typeNames,initialOptions,selected) {
+  const [options] = useState(initialOptions); // 옵션은 고정값이라 상태로 관리할 필요가 없음
+  const [name,setName] = useState(typeNames); // 옵션은 고정값이라 상태로 관리할 필요가 없음
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(
+      selected === null? initialOptions[0] : selected );
+
+  const toggleOptions = () => {
+    setIsOpen(!isOpen);
+  }
+  const onOptionClicked = value => () => {
+    setSelectedOption(value);
+    setIsOpen(false);
+  };
+  return {name,options, isOpen, selectedOption,onOptionClicked,setIsOpen,toggleOptions};
+}
+
+export function RegexCheck (name, input_value, setErrors, t)  {
+  let isRegex = !Regex(name, input_value);
+  let message = Regex ? t(`msg.userJoinForm.` + name) : '';
+  ChangeError(setErrors, name, message, isRegex);
+  return isRegex;
+}
+
+export async function ClickBtnSendCode(url, inputs, t, setErrors, variable, body,
+    setAuth, setTimer, setAuthTimeLimit) {
+  let email = inputs.email;
+  if (email === "") {
+    ChangeError(setErrors, "email", t(`errorMsg.NotBlank`), true);
+    return;
+  }
+  if (!Regex("email", email)) {
+    return;
+  }
+  if (variable.current.isDoubleClick) {
+    return;
+  }
+  variable.current.isDoubleClick = true;
+  await SendCode(url,
+      body,
+      setErrors, setAuth, setTimer,
+      setAuthTimeLimit,
+      t(`errorMsg.server`));
+  variable.current.isDoubleClick = false;
+}
+
+export async function ClickBtnAuthCodeCheck(setInputs, inputs, auth, t, setErrors,
+    variable,
+    setCountDownTime,
+    setTimer, setAuthTimeLimit, setAuth, emailRef, type) {
+  const authCode = inputs.authCode;
+  if (authCode === "" || auth.authToken === "") {
+    const message = authCode === "" ? t(`msg.userJoinForm.authCode.NotBlank`)
+        : t(`errorMsg.error.authToken`);
+    ChangeError(setErrors, "authCode", message, true);
+    return;
+  }
+  if (variable.current.isDoubleClick) {
+    return;
+  }
+  variable.current.isDoubleClick = true;
+  await AuthCodeCheck(setInputs, authCode, auth, setErrors, setCountDownTime, t,
+      setTimer, setAuthTimeLimit, setAuth, emailRef, type);
+  variable.current.isDoubleClick = false;
 }

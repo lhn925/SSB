@@ -10,8 +10,11 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import sky.Sss.global.redis.service.RedisTagService;
 
 @Configuration
 @EnableRedisHttpSession
@@ -52,9 +55,10 @@ public class RedisConfig {
     public RedisTemplate<?, ?> redisTemplate() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
+        redisTemplate.setDefaultSerializer(new StringRedisSerializer());/**/
         return redisTemplate;
     }
+
     @Bean(name = "redisTemplateToken")
     public RedisTemplate<?, ?> redisTemplateToken() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();

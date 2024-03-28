@@ -100,10 +100,9 @@ public class TrackService {
         trackRepositoryImpl.save(ssbTrack);
 
         // 링크 연결
-        if (ssbTrackTags != null) {
-            List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
-            tagLinkCommonService.addTrackTagLinks(trackTagLinks);
-        }
+        List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
+        tagLinkCommonService.addTrackTagLinks(trackTagLinks);
+
 
         String storeFileName = null;
         if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드

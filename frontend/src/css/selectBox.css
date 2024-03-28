@@ -1,6 +1,7 @@
 .custom-select-container {
   position: relative;
   width: 250px;
+
 }
 
 .custom-select {
@@ -9,11 +10,17 @@
   cursor: pointer;
   font: 16px / 1.4 Inter, sans-serif;
   font-weight: 500;
+
   -webkit-appearance: none; /* 크롬/사파리에서 기본 화살표를 제거 */
   -moz-appearance: none;    /* 파이어폭스에서 기본 화살표를 제거 */
   appearance: none;         /* 기본 화살표를 제거 */
 }
-
+.custom-selected {
+  color: #1aafec;
+}
+.custom-unselected {
+  color: #333;
+}
 .custom-select:after {
   content: "";
   position: absolute;
@@ -41,20 +48,27 @@
   right: 0;
   border: 1px solid #ccc;
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 5px;
   background-color: white;
   z-index: 1000;
+  overflow: auto;
+  max-height: 500px;
+
 }
 
 .custom-select-options li {
-  padding: 2px 10px 2px 12px;
+  padding: 5px 10px 2px 12px;
   cursor: pointer;
-  color: #333;
   font: 15px / 1.4 Inter, sans-serif;
   font-weight: 500;
 }
 
 .custom-select-options li:hover {
   color: #1aafec;
+}
+
+.track_type_title {
+  margin-top: 5px;
+  padding: 8px;
+  border-bottom: solid 1px #ccc;
 }

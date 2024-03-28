@@ -23,5 +23,4 @@ public class BasePlayListDto {
     // 플레이리스트 타입
     @NotBlank
     private String playListType;
-
 }

@@ -3,9 +3,15 @@ package sky.Sss.global.redis.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Range.Bound;
+import org.springframework.data.domain.Range.RangeBuilder;
+import org.springframework.data.redis.connection.Limit;
+import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -55,6 +61,7 @@ public class RedisQueryService {
 
         return redisTemplate.delete(key);
     }
+
 
     public Boolean deleteRemember(String key) {
         return redisTemplate.delete(RedisKeyDto.REDIS_REMEMBER_KEY + key);

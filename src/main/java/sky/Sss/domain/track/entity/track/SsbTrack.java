@@ -138,12 +138,9 @@ public class SsbTrack extends BaseTimeEntity {
         MainGenreType type = MainGenreType.findByType(mainGenreType);
         String subGenreType = type.getSubGenreValue(genre);
         ssbTrack.setTitle(JsEscape.escapeJS(title));
-
         ssbTrack.setGenre(subGenreType);
-
         ssbTrack.setMainGenreType(type);
         ssbTrack.setIsPrivacy(isPrivacy);
-
         ssbTrack.setIsDownload(isDownload);
         if (description.trim().length() > 1000) {
             throw new IllegalArgumentException("desc.error.length");

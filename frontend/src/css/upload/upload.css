@@ -67,3 +67,7 @@
   display: inline-block;
   margin-left: 2px;
 }
+.track_info_form_list > .list-group-item {
+  border-top: 1px solid #e5e5e5;
+
+}

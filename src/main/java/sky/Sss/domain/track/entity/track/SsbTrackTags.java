@@ -31,4 +31,7 @@ public class SsbTrackTags extends BaseTimeEntity {
         return ssbTrackTags;
     }
 
+    public void updateId(long id) {
+        this.id = id;
+    }
 }

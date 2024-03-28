@@ -15,5 +15,4 @@ public class TrackInfoSaveReqDto extends BaseTrackDto {
     private Long trackLength;
     @NotBlank
     private String genre;
-
 }
