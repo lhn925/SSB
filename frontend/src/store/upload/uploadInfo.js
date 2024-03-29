@@ -1,4 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {
+  calculateRemovePercentage,
+  calculateUploadPercentage
+} from "utill/function";
 
 const createTrackInfo = (data) => ({
   id: data.id,
@@ -12,16 +16,16 @@ const createTrackInfo = (data) => ({
   isPlayList: data.isPlayList,
   isPrivacy: data.isPrivacy,
   tagList: [],
-  order: null,
+  order: data.order,
   uploadPercent: 0,
   coverImgFile: null,
-  isSuccess:false
+  isSuccess: false
 });
 
 const initialState = {
   isPlayList: true,
   tracks: [],
-  isSuccess:false,
+  isSuccess: false,
   uploadPercent: 0,
   playList: {
     title: {value: '', message: '', error: false},
@@ -38,13 +42,21 @@ const initialState = {
     message: null
   }
 }
-
 const uploadInfo = createSlice({
   name: "uploadInfo",
   initialState: initialState,
   reducers: {
     addTracks(state, action) {
       action.payload.tracks.forEach((value) => {
+        if (state.tracks.length > 0) {
+          const totalFiles = state.tracks.length; // 원래의 전체 파일 수
+          const completedUploads = state.tracks.filter((track)=> track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
+          state.uploadPercent = calculateUploadPercentage(totalFiles,
+              completedUploads, 0,action.payload.tracks.length);
+        } else {
+          state.uploadPercent = 0;
+        }
+        state.isSuccess = false;
         state["tracks"].push(createTrackInfo(value));
       })
     }, addTrackTagList(state, action) {
@@ -55,17 +67,49 @@ const uploadInfo = createSlice({
       })
     }, addPlayListTagList(state, action) {
       state.playList.tagList = action.payload.tags;
-    }, setUploadPercent(state, action) {
+    }, setTracksUploadPercent(state, action) {
       state.tracks.forEach(track => {
         if (track.token === action.payload.token) {
-          track.uploadPercent = action.payload.uploadPercent;
+          const trackUploadPercent = action.payload.uploadPercent;
+          const percent = 100.0 / state.tracks.length;
+
+          // 이전 percent 계산
+          const prevPercentAge = (percent * track.uploadPercent) / 100.0;
+          // 현재 percent 계산
+          const percentAge = (percent * trackUploadPercent) / 100.0;
+
+          const addAge = percentAge - prevPercentAge;
+          // 100 이거나
+
+          const totalUpdatePercent = state.uploadPercent + addAge;
+          state.uploadPercent = totalUpdatePercent > 100 ? 100 : totalUpdatePercent;
+          if (totalUpdatePercent === 100) {
+            state.isSuccess = true;
+          }
+
+          // 완료 됐으면 isSuccess true
+          if (trackUploadPercent === 100) {
+            track.isSuccess = true;
+          }
+          track.uploadPercent = trackUploadPercent;
         }
       });
     },
     removeTrack(state, action) {
+      const totalFiles = state.tracks.length; // 원래의 전체 파일 수
+      if (totalFiles > 1) {
+        const completedUploads = state.tracks.filter((track)=> track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
+        const deletedFiles = 1; // 삭제된 파일 수
+        state.uploadPercent = calculateRemovePercentage(totalFiles,
+            completedUploads, deletedFiles);
+      } else {
+        state.isSuccess = false;
+        state.uploadPercent = 0;
+      }
       const removeIndex = state.tracks.findIndex(
           (track) => track.token === action.payload.token);
       state.tracks.splice(removeIndex, 1);
+
     },
     updateTracksValue(state, action) {
       state.tracks.forEach(track => {
@@ -73,24 +117,24 @@ const uploadInfo = createSlice({
           track[action.payload.key] = action.payload.value;
         }
       });
-    },updatePlayListValue(state, action) {
+    }, updatePlayListValue(state, action) {
       state.playList[action.payload.key] = action.payload.value;
-    },updateTrackObject(state, action) {
+    }, updateTrackObject(state, action) {
       const key = action.payload.key;
       const subKey = action.payload.subKey;
       const value = action.payload.value;
       const token = action.payload.token;
       state.tracks.forEach(track => {
         if (track.token === token) {
-          track[key] = {...track[key], [subKey]:value}
+          track[key] = {...track[key], [subKey]: value}
         }
       })
-    },updatePlayListObject(state, action) {
+    }, updatePlayListObject(state, action) {
       const key = action.payload.key;
       const subKey = action.payload.subKey;
       const value = action.payload.value;
-      state.playList[key] = {...state.playList[key], [subKey]:value}
-    },changeIsPrivacy(state, action) {
+      state.playList[key] = {...state.playList[key], [subKey]: value}
+    }, changeIsPrivacy(state, action) {
       const isPrivacy = action.payload.isPrivacy;
       state.tracks.forEach((tracks) => {
         tracks.isPrivacy = isPrivacy;
@@ -112,7 +156,7 @@ export let uploadInfoActions = {
   addTracks: uploadInfo.actions.addTracks,
   updateTracksValue: uploadInfo.actions.updateTracksValue,
   updatePlayListValue: uploadInfo.actions.updatePlayListValue,
-  setUploadPercent: uploadInfo.actions.setUploadPercent,
+  setTracksUploadPercent: uploadInfo.actions.setTracksUploadPercent,
   removeTrack: uploadInfo.actions.removeTrack,
   addPlayListTagList: uploadInfo.actions.addPlayListTagList,
   addTrackTagList: uploadInfo.actions.addTrackTagList,

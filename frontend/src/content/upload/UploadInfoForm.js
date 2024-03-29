@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {memo, useCallback, useRef} from 'react';
 import {useEffect, useState} from "react";
 import {
   ChangeError,
@@ -19,30 +19,42 @@ import {
   PlyTypes, TypeNames,
 } from "content/upload/UploadTypes";
 import emojiRegex from "emoji-regex";
+import {DnDTracksBox} from "content/upload/DnDTracksBox";
+import update from 'immutability-helper';
+import {useDispatch, useSelector} from "react-redux";
+
+const style = {
+  flexWrap: "wrap"
+}
+
+const getTracks = (uploadInfo) => {
+  return uploadInfo.tracks.map((data) => {
+    return data;
+  })
+}
 
 export function UploadInfoForm({
-  uploadInfo,
   updatePlayListValue,
   updateTracksValue,
   updatePlayListObject,
   updateTracksObject,
   addPlayListTagList,
-  changeIsPrivacy
+  changeIsPrivacy,
+  uploadInfo
 }) {
-
   const [searchTagList, setSearchTagList] = useState({});
   const playListOptions = Object.values(PlyTypes);
   const genreOptions = Object.values(GenreTypes);
-
   const tabs = [
     {id: "BasicInfo", title: "Basic Info", url: URL_UPLOAD}
   ];
+
   const commonProps = {
     playListOptions,
     genreOptions,
-    uploadInfo,
     tabs,
     searchTagList,
+    uploadInfo,
     setSearchTagList,
   };
   // 플레이리스트
@@ -54,7 +66,7 @@ export function UploadInfoForm({
           addPlayListTagList={addPlayListTagList}
           updatePlayListValue={updatePlayListValue}
           changeIsPrivacy={changeIsPrivacy}
-          {...commonProps}/> : uploadInfo.tracks.map((data,index) => (
+          {...commonProps}/> : getTracks(uploadInfo).map((data, index) => (
           <InfoFormListItem
               index={index}
               updateTracksObject={updateTracksObject}
@@ -65,7 +77,7 @@ export function UploadInfoForm({
           />
       ))
     }
-  </ul>
+  </ul>;
 }
 
 function InfoFormListItem({
@@ -76,23 +88,32 @@ function InfoFormListItem({
   updateTracksValue,
   track,
   tabs,
+  uploadInfo,
   genreOptions,
   playListOptions,
-  uploadInfo, addPlayListTagList, searchTagList,
+  addPlayListTagList, searchTagList,
   setSearchTagList,
   index
 }) {
   const currentRoot = "BasicInfo";
+  const [activeTab, setActiveTab] = useState(currentRoot);
+  const acceptArray = [".jpg", ".png", ".jpeg", ".bmp"];
 
   const isPlayList = uploadInfo.isPlayList;
-  const [activeTab, setActiveTab] = useState(currentRoot);
-
-  const acceptArray = [".jpg", ".png", ".jpeg", ".bmp"];
 
   const [formValue, setFormValue] = useState(
       isPlayList ? uploadInfo.playList : track);
 
+
+
   const [coverImg, setCoverImg] = useState(profile2);
+  const [tracks, setTracks] = useState(getTracks(uploadInfo));
+
+
+  const {findCard,moveCard} = CardActions(tracks,setTracks);
+
+  const [percentAge, setPercentAge] =
+      useState(isPlayList ? uploadInfo.uploadPercent : track.uploadPercent);
 
   const [errors, setErrors] = useState({
     tags: {message: '', error: false},
@@ -126,6 +147,8 @@ function InfoFormListItem({
 
     // desc 는 emoji 체크를 안함
     const emojiCheck = name !== "desc";
+
+
 
     // 값 초기화
     if (isPlayList) {
@@ -239,29 +262,34 @@ function InfoFormListItem({
 
   useEffect(() => {
     const formValue = isPlayList ? uploadInfo.playList : track;
+    setPercentAge(isPlayList ? uploadInfo.uploadPercent : track.uploadPercent);
     setFormValue(formValue);
+    setTracks(getTracks(uploadInfo));
     if (formValue.coverImgFile !== null) {
-      encodeFileToBase64(formValue.coverImgFile[0],setCoverImg).catch(() => console.log("error"))
+      encodeFileToBase64(formValue.coverImgFile[0], setCoverImg).catch(
+          () => console.log("error"))
     } else {
       setCoverImg(profile2);
     }
-
   }, [uploadInfo])
   return <li key={!isPlayList && track.token} className="list-group-item m-1"
              onClick={() => formClickToggleClose(genreBox, plyTypeBox)}>
     <div className="editStatus_div">
       <div className="editStatus_info">
         <div className="editStatus_filename basic_font text-start">
+          {percentAge !== 100 ?
+              isPlayList ? "Uploading " + uploadInfo.tracks.length + " tracks"
+                  : track.title.value : isPlayList
+              && "Ready. Click Save to post this playlist."}
         </div>
         <div className="editStatus__text basic_font text-end">
-
-        </div>
-        <div className="editStatus__text basic_font text-end">
-          Ready. Click Save to post this track.
+          {percentAge === 100 ?
+              !isPlayList && "Ready. Click Save to post this track."
+              : percentAge.toFixed(1) + "% uploaded"}
         </div>
       </div>
       <div className="upload_progressBar">
-        <ProgressBar percentage={formValue.uploadPercent} width="100" height="5"/>
+        <ProgressBar percentage={percentAge} width="100" height="5"/>
       </div>
     </div>
     <div className="track_info_form_body">
@@ -428,6 +456,21 @@ function InfoFormListItem({
         </div>
       </div>
     </div>
+
+    {
+
+      isPlayList && tracks.map((data,index) => {
+        return <div style={style} key={data.id === 0 ? index : data.id}>
+                <DnDTracksBox
+                    id={`${data.id}`}
+                    track={data}
+                    moveCard={moveCard}
+                    findCard={findCard}/>
+                </div>;
+      })
+    }
+    {/*<Container tracks={getTracks(uploadInfo)}/>*/}
+
     <div className="upload_form_buttons">
       <div className="activeUpload__requiredText text-start"><span
           className="sc-orange sc-text-error">*</span> Required fields
@@ -435,5 +478,43 @@ function InfoFormListItem({
       <BtnOutLine text="Cancel"/>
       <Btn text="Save"/>
     </div>
+
   </li>;
+}
+
+function CardActions(cards,setCards) {
+  // Card의 id에 해당하는 Card와 인덱스 리턴
+  // {id:1, text:"duckgugong"}이 0번 인덱스면 {id: 1, text:"duckgugong"}, 0 리턴
+  const findCard = useCallback(
+      (id) => {
+        const card = cards.filter((item) => `${item.id}` === id)[0]
+        return {
+          card,
+          index: cards.indexOf(card),
+        }
+      },
+      [cards],
+  )
+  /*
+    Card의 위치 교환.
+    state에서 {id: 1,text: 'duckgugong'}가 0번째 인덱스고 {id: 2,text: 'hungry'}가 1번째 인덱스면
+    {id:1, text: 'duckgugong'}인 Card를 drag해서 {id:2, text: 'hungry'}에 hover하면
+    {id:1, text: 'duckgugong'}가 1번째 인덱스가 되고 {id:2, text: 'hungry'}가 0번째 인덱스가 된다!
+  */
+  const moveCard = useCallback(
+      (id, atIndex) => {
+        const {card, index} = findCard(id)
+        setCards(
+            update(cards, {
+              $splice: [
+                [index, 1],
+                [atIndex, 0, card],
+              ],
+            }),
+        )
+      },
+      [findCard, cards, setCards],
+  )
+
+  return {moveCard, findCard}
 }

@@ -350,3 +350,36 @@ export async function ClickBtnAuthCodeCheck(setInputs, inputs, auth, t, setError
       setTimer, setAuthTimeLimit, setAuth, emailRef, type);
   variable.current.isDoubleClick = false;
 }
+
+
+export function calculateUploadPercentage(totalFiles, completedUploads, deletedFiles, addedFiles) {
+  // 실제 업로드 대상이 되는 파일 수 계산 (추가된 파일 포함)
+  const effectiveTotal = totalFiles - deletedFiles + addedFiles;
+
+  // 모든 파일이 삭제되었거나 추가된 파일이 없다면 진행 비율을 0으로 설정
+  if (effectiveTotal <= 0) {
+    return 0;
+  }
+
+  // 업로드 진행 비율 계산 (추가된 파일도 고려)
+  const percentage = (completedUploads / effectiveTotal) * 100;
+
+  // 퍼센트 비율을 반환 (최대 100%)
+  return Math.min(percentage, 100);
+}
+
+export function calculateRemovePercentage(totalFiles, completedUploads, deletedFiles) {
+  // 실제 업로드 대상이 되는 파일 수 계산
+  const effectiveTotal = totalFiles - deletedFiles;
+
+  // 모든 파일이 삭제되었다면 진행 비율을 0으로 설정
+  if (effectiveTotal <= 0) {
+    return 0;
+  }
+
+  // 업로드 진행 비율 계산
+  const percentage = (completedUploads / effectiveTotal) * 100;
+
+  // 퍼센트 비율을 반환 (최대 100%)
+  return Math.min(percentage, 100);
+}

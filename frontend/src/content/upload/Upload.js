@@ -77,9 +77,13 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     // 스토어 트랙 정보
     const storeTracks = [];
 
+    let sum = 0;
     for (const file of files) {
       const tempToken = uuidV4();
       const filename = file.name.replace(/\.[^/.]+$/, "");
+      // 순서
+      const order = uploadInfo.tracks.length + sum++;
+
       tempTracks.push({
         id: 0,
         title: filename,
@@ -94,6 +98,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
         token: tempToken,
         isPrivacy: isPrivacy,
         isPlayList: isPlayList,
+        order:order
       });
     }
 
@@ -104,7 +109,8 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     for (const tempTrack of tempTracks) {
       // 임시토큰 발행
       const tempToken = tempTrack.token;
-      const track = await SaveTempApi(setUploadPercent, tempToken, isPrivacy,
+
+      const track = await SaveTempApi(setTracksUploadPercent, tempToken, isPrivacy,
           isPlayList, tempTrack.file);
       if (!track) { // null 일경우 errors count 증가
         errorFileCount++;
@@ -130,8 +136,8 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     }))
   }
 
-  const setUploadPercent = (token, uploadPercent) => {
-    dispatch(uploadInfoActions.setUploadPercent(
+  const setTracksUploadPercent = (token, uploadPercent) => {
+    dispatch(uploadInfoActions.setTracksUploadPercent(
         {
           token: token,
           uploadPercent: uploadPercent
@@ -201,14 +207,17 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     changeIsPrivacy(value);
   }
 
+
   useEffect(() => {
     if (uploadTotalLength === null) {
       getUploadTotalLength().then(r => r);
     }
+  }, [])
+
+  useEffect(() => {
     if (uploadInfo.tracks.length === 0) {
 
     } else {
-
     }
   }, [uploadInfo])
 
@@ -232,21 +241,21 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
                   changePlayListChkEvent={changePlayListChkEvent}
                   changePrivacyChkEvent={changePrivacyChkEvent}
               /> :<UploadInfoForm
+              uploadInfo={uploadInfo}
               updateTracksObject={updateTracksObject}
               updatePlayListObject={updatePlayListObject}
               updatePlayListValue={updatePlayListValue}
               updateTracksValue={updateTracksValue}
               addTrackTagList={addTrackTagList}
               addPlayListTagList={addPlayListTagList}
-              changeIsPrivacy={changeIsPrivacy}
-              uploadInfo={uploadInfo}/>
+              changeIsPrivacy={changeIsPrivacy}/>
           }
         </div>
       </div>
   )
 };
 
-const SaveTempApi = async (setUploadPercent, tempToken, isPrivacy,
+const SaveTempApi = async (setTracksUploadPercent, tempToken, isPrivacy,
     isPlayList,
     file) => {
   let body = {
@@ -259,7 +268,7 @@ const SaveTempApi = async (setUploadPercent, tempToken, isPrivacy,
   formData.append("isPlayList", isPlayList);
   formData.append("isPrivacy", isPrivacy);
 
-  const response = await TempSaveApi(setUploadPercent, tempToken, body);
+  const response = await TempSaveApi(setTracksUploadPercent, tempToken, body);
   const data = response.data;
   if (response.code === HttpStatusCode.Ok) {
     return {
@@ -270,7 +279,7 @@ const SaveTempApi = async (setUploadPercent, tempToken, isPrivacy,
       isPlayList: isPlayList
     };
   } else {
-    toast.error(response.data.errorDetails[0].message)
+    toast.error(data.errorDetails[0].message)
     return null;
   }
 }

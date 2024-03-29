@@ -20,6 +20,8 @@ import ModalContent from "modal/content/ModalContent";
 import {modalActions} from "store/modalType/modalType";
 import {uploadInfoActions} from "store/upload/uploadInfo";
 import "css/selectBox.css"
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -70,6 +72,7 @@ function App() {
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
   return (
       <div className="App">
+        <DndProvider backend={HTML5Backend}>
         <Header modal={modal} dispatch={dispatch}
                 openModal={openModal}
                 changeModalType={changeModalType}
@@ -124,6 +127,7 @@ function App() {
                         closeModal={closeModal}/>
 
           </div>
+        </DndProvider>
       </div>
   )
       ;
