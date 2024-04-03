@@ -52,7 +52,6 @@ public class TrackLikesService {
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, subUserKey);
     }
-
     /**
      * 좋아요 취소
      */

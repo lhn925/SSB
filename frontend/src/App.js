@@ -6,7 +6,16 @@ import "css/bootstrap/bootstrap.min.css"
 import "css/base.css"
 import {Route, Routes, useLocation, useNavigate} from "react-router";
 import {ToastContainer} from "react-toastify";
-import {lazy, useEffect, useRef, Suspense} from "react";
+import {
+  createContext,
+  lazy,
+  Suspense,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {userActions} from "store/userInfo/userReducers";
 import * as StompJs from "@stomp/stompjs";
@@ -20,8 +29,7 @@ import ModalContent from "modal/content/ModalContent";
 import {modalActions} from "store/modalType/modalType";
 import {uploadInfoActions} from "store/upload/uploadInfo";
 import "css/selectBox.css"
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
+import {createUploadActions} from "./utill/function";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -33,7 +41,19 @@ const Settings = lazy(
       default: module.Settings
     })));
 
+export const UploadValueContext = createContext();
+export const UploadActionsContext = createContext();
+
 function App() {
+  const [coverImgFiles, setCoverImgFiles] = useState({
+    tracks: [],
+    playList: null
+  });
+  // useMemo 로 감싸지 않으면 CounterProvider 가 리렌더링이 될 때마다 새로운 배열을 만들기 때문에
+  // useContext 를 사용하는 컴포넌트 쪽에서 Context 의 값이 바뀐 것으로 간주하게 되어 낭비 렌더링이 발생
+  const coverImgFileActions = useMemo(() => (
+      createUploadActions(coverImgFiles, setCoverImgFiles)
+  ), []);
 
   const currentAuth = useSelector((state) => state?.authReducer);
   const modal = useSelector((state) => state?.modalType);
@@ -67,12 +87,12 @@ function App() {
 
   useEffect(() => {
     if (currentAuth.access) {
-      CheckUserInfo(currentAuth,userActions,client,t,dispatch,bc);
+      CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);
     }
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
   return (
       <div className="App">
-        <DndProvider backend={HTML5Backend}>
+        {/*<DndProvider backend={HTML5Backend}>*/}
         <Header modal={modal} dispatch={dispatch}
                 openModal={openModal}
                 changeModalType={changeModalType}
@@ -103,14 +123,18 @@ function App() {
               }>
               </Route>
               <Route path="/upload" element={
-                <Upload
-                    dispatch={dispatch}
-                    uploadInfo={uploadInfo}
-                    uploadInfoActions={uploadInfoActions}
-                />
+                <UploadActionsContext.Provider value={coverImgFileActions}>
+                  <UploadValueContext.Provider value={coverImgFiles}>
+                    <Upload
+                        dispatch={dispatch}
+                        uploadInfo={uploadInfo}
+                        uploadInfoActions={uploadInfoActions}/>
+
+                  </UploadValueContext.Provider>
+                </UploadActionsContext.Provider>
               }>
               </Route>
-              <Route path={ URL_SETTINGS+"/:root?"}
+              <Route path={URL_SETTINGS + "/:root?"}
                      element={
                        <Settings
                            openModal={openModal}
@@ -118,7 +142,7 @@ function App() {
                            changeModalType={changeModalType}
                            modal={modal}
                            navigate={navigate}
-                                 location={location}/>
+                           location={location}/>
                      }>
               </Route>
             </Routes>
@@ -126,14 +150,14 @@ function App() {
           <ModalContent bc={bc} modalVisible={modal.visible}
                         closeModal={closeModal}/>
 
-          </div>
-        </DndProvider>
+        </div>
+        {/*</DndProvider>*/}
       </div>
   )
       ;
 }
 
-function connect(client, accessToken, refreshToken, userId,t,bc) {
+function connect(client, accessToken, refreshToken, userId, t, bc) {
   const clientData = new StompJs.Client({
     brokerURL: `${process.env.REACT_APP_WS_URL}`,
     connectHeaders: {
@@ -162,8 +186,7 @@ function connect(client, accessToken, refreshToken, userId,t,bc) {
   client.current.id = 0;
 }
 
-
-function CheckUserInfo(currentAuth,userActions,client,t,dispatch,bc) {
+function CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc) {
   authApi.get(USERS_INFO).then(data => {
     const userData = data.data;
     if (client.current.client) {
@@ -174,11 +197,26 @@ function CheckUserInfo(currentAuth,userActions,client,t,dispatch,bc) {
     dispatch(userActions.setPictureUrl(userData));
     dispatch(userActions.setUserName(userData));
     dispatch(userActions.setIsLoginBlocked(userData))
-    connect(client, currentAuth.access, currentAuth.refresh, userData.userId,t,bc);
+    connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
+        bc);
   }).catch(() => {
     if (client.current.client) {
       persistor.purge().then(() => client.current.client.deactivate());
     }
   });
 }
+
+
+export function UseUploadValue() {
+  return useContext(UploadValueContext);
+}
+
+export function UseUploadActions() {
+  const value = useContext(UploadActionsContext);
+  if (value === undefined) {
+    throw new Error('useModalActions should be used within ModalProvider');
+  }
+  return value;
+}
+
 export default App;

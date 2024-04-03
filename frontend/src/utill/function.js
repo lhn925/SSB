@@ -2,6 +2,7 @@
 import {EmailApi} from "utill/api/email/EmailApi";
 import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
 import {useState} from "react";
+import profile2 from "css/image/profile2.png";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -32,11 +33,13 @@ export function PwSecureCheckFn(level) {
 export function DateToDay(date) {
   return date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
 }
+
 export function getMonth(date) {
   return (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1)
       : date.getMonth() + 1;
 }
-export function FullDateTime (createdDateTime){
+
+export function FullDateTime(createdDateTime) {
   let language = navigator.language;
   let timeString = new Date(createdDateTime).toLocaleTimeString(
       language);
@@ -48,6 +51,7 @@ export function FullDateTime (createdDateTime){
       language, {weekday: 'short'});
   return dateString + " " + localeString + " " + timeString;
 }
+
 export function DateFormat(date) {
   let month = getMonth(date);
   let day = DateToDay(date);
@@ -220,10 +224,15 @@ export function ChangeError(setErrors, name, message, error) {
     }
   });
 }
-export const encodeFileToBase64 = (fileBlob,setCoverImg) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(fileBlob);
 
+export const encodeFileToBase64 = (fileBlob, setCoverImg) => {
+  const reader = new FileReader();
+
+  try {
+    reader.readAsDataURL(fileBlob);
+  } catch (error) {
+    setCoverImg(profile2);
+  }
   return new Promise((resolve) => {
     reader.onload = () => {
       setCoverImg(reader.result);
@@ -232,6 +241,18 @@ export const encodeFileToBase64 = (fileBlob,setCoverImg) => {
   });
 };
 
+export function convertPictureToFile(picture, filename) {
+  // picture.data는 바이너리 데이터의 배열입니다.
+  // Uint8Array로 변환합니다.
+  const byteArray = new Uint8Array(picture.data);
+
+  // Blob 객체를 생성합니다. 이 때, picture.format에 MIME 타입이 들어있습니다.
+  const blob = new Blob([byteArray], {type: picture.format});
+
+  // Blob 객체를 File 객체로 변환합니다.
+  // File 생성자는 첫 번째 인자로 Blob 배열을, 두 번째 인자로 파일 이름을 받습니다.
+  return [new File([blob], filename, {type: picture.format})];
+}
 
 export async function SendCode(url, body, setErrors, setAuth, setTimer,
     setAuthTimeLimit, messages) {
@@ -254,10 +275,11 @@ export async function SendCode(url, body, setErrors, setAuth, setTimer,
   }
 }
 
-export async function AuthCodeCheck(setInputs,authCode, auth, setErrors, setCountDownTime,
-    t, setTimer, setAuthTimeLimit, setAuth, emailRef , sendType) {
+export async function AuthCodeCheck(setInputs, authCode, auth, setErrors,
+    setCountDownTime,
+    t, setTimer, setAuthTimeLimit, setAuth, emailRef, sendType) {
   const response = await CodeCheckApi(
-      {authCode: authCode, authToken: auth.authToken, sendType:sendType});
+      {authCode: authCode, authToken: auth.authToken, sendType: sendType});
   if (response.code !== 200) {
     if (response.data.errorDetails) {
       response.data.errorDetails.map((data) => {
@@ -276,21 +298,21 @@ export async function AuthCodeCheck(setInputs,authCode, auth, setErrors, setCoun
     setAuth({...auth, success: true})
     emailRef.current.value = response.data.email;
     setInputs((inputs) => {
-      return{
+      return {
         ...inputs,
-        email:response.data.email
+        email: response.data.email
       }
     })
   }
 }
 
 // 상태와 로직을 하나의 hook으로 추출
-export function useToggleableOptions(typeNames,initialOptions,selected) {
+export function useToggleableOptions(typeNames, initialOptions, selected) {
   const [options] = useState(initialOptions); // 옵션은 고정값이라 상태로 관리할 필요가 없음
-  const [name,setName] = useState(typeNames); // 옵션은 고정값이라 상태로 관리할 필요가 없음
+  const [name, setName] = useState(typeNames); // 옵션은 고정값이라 상태로 관리할 필요가 없음
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(
-      selected === null? initialOptions[0] : selected );
+      selected === null ? initialOptions[0] : selected);
 
   const toggleOptions = () => {
     setIsOpen(!isOpen);
@@ -299,17 +321,26 @@ export function useToggleableOptions(typeNames,initialOptions,selected) {
     setSelectedOption(value);
     setIsOpen(false);
   };
-  return {name,options, isOpen, selectedOption,onOptionClicked,setIsOpen,toggleOptions};
+  return {
+    name,
+    options,
+    isOpen,
+    selectedOption,
+    onOptionClicked,
+    setIsOpen,
+    toggleOptions
+  };
 }
 
-export function RegexCheck (name, input_value, setErrors, t)  {
+export function RegexCheck(name, input_value, setErrors, t) {
   let isRegex = !Regex(name, input_value);
   let message = Regex ? t(`msg.userJoinForm.` + name) : '';
   ChangeError(setErrors, name, message, isRegex);
   return isRegex;
 }
 
-export async function ClickBtnSendCode(url, inputs, t, setErrors, variable, body,
+export async function ClickBtnSendCode(url, inputs, t, setErrors, variable,
+    body,
     setAuth, setTimer, setAuthTimeLimit) {
   let email = inputs.email;
   if (email === "") {
@@ -331,7 +362,8 @@ export async function ClickBtnSendCode(url, inputs, t, setErrors, variable, body
   variable.current.isDoubleClick = false;
 }
 
-export async function ClickBtnAuthCodeCheck(setInputs, inputs, auth, t, setErrors,
+export async function ClickBtnAuthCodeCheck(setInputs, inputs, auth, t,
+    setErrors,
     variable,
     setCountDownTime,
     setTimer, setAuthTimeLimit, setAuth, emailRef, type) {
@@ -351,8 +383,8 @@ export async function ClickBtnAuthCodeCheck(setInputs, inputs, auth, t, setError
   variable.current.isDoubleClick = false;
 }
 
-
-export function calculateUploadPercentage(totalFiles, completedUploads, deletedFiles, addedFiles) {
+export function calculateUploadPercentage(totalFiles, completedUploads,
+    deletedFiles, addedFiles) {
   // 실제 업로드 대상이 되는 파일 수 계산 (추가된 파일 포함)
   const effectiveTotal = totalFiles - deletedFiles + addedFiles;
 
@@ -368,7 +400,8 @@ export function calculateUploadPercentage(totalFiles, completedUploads, deletedF
   return Math.min(percentage, 100);
 }
 
-export function calculateRemovePercentage(totalFiles, completedUploads, deletedFiles) {
+export function calculateRemovePercentage(totalFiles, completedUploads,
+    deletedFiles) {
   // 실제 업로드 대상이 되는 파일 수 계산
   const effectiveTotal = totalFiles - deletedFiles;
 
@@ -382,4 +415,70 @@ export function calculateRemovePercentage(totalFiles, completedUploads, deletedF
 
   // 퍼센트 비율을 반환 (최대 100%)
   return Math.min(percentage, 100);
+}
+
+export function ValueEmojiCheck(emojiCheck, input_value, regex) {
+  if (emojiCheck) {
+    const matchAll = input_value.matchAll(regex);
+    for (const regex1 of matchAll) {
+      if (regex1) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function createUploadActions(coverImgFiles, setCoverImgFiles) {
+  return {
+    addContextTrack(token, file) {
+      setCoverImgFiles((prev) => (
+              {
+                ...prev,
+                tracks: [...prev.tracks, {token: token, file: file}]
+              }
+          )
+      )
+    }, updateContextPly(file) {
+      setCoverImgFiles({...coverImgFiles, playList: file})
+    }, updateContextTrackFile(token, file) {
+      setCoverImgFiles((prev) => (
+              {
+                ...prev,
+                tracks: prev.tracks.map(track =>
+                    track.token === token ? {...track, file: file} : track)
+              }
+          )
+      )
+    },
+
+    updateContextTrackToken(token, newToken) {
+      setCoverImgFiles((prev) => (
+              {
+                ...prev,
+                tracks: prev.tracks.map(track =>
+                    track.token === token ? {...track, token: newToken} : track)
+              }
+          )
+      )
+    }, removeContextTrack(token) {
+      setCoverImgFiles((prev) => (
+              {
+                ...prev,
+                tracks: prev.tracks.filter(track => track.token !== token)
+              }
+          )
+      )
+    }, getTrackFile(value, token) {
+      let file;
+      value.tracks.map((track) => {
+        if (track.token === token && track.file !== null) {
+          file = track.file;
+        }
+      })
+      return file;
+    }, getPlyFile(value) {
+      return value.playList;
+    }
+  }
 }

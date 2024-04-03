@@ -7,26 +7,35 @@ import {TempSaveApi} from "utill/api/upload/TempSaveApi";
 import {HttpStatusCode} from "axios";
 import {toast} from "react-toastify";
 import {v4 as uuidV4} from "uuid";
-
 import {UploadInfoForm} from "content/upload/UploadInfoForm";
 import {EmptyUploadInfoContent} from "content/upload/EmptyUploadInfoContent";
+import {convertPictureToFile} from "utill/function";
+import {UseUploadActions} from "App";
 
 export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
   const root = "upload";
 
+
   const acceptArray = [".mp3", ".flac", ".ogg", ".mp4", ".mpeg", ".wav",
-    ".m4a",".jpg"];
+    ".m4a"];
   const tabs = [
     {id: "upload", title: "Upload", url: URL_UPLOAD},
   ];
   // 플레이리스트 업로드 구분
   const [uploadSettings, setUploadSettings] = useState({
     isPlayList: uploadInfo.isPlayList,
-    isPrivacy: uploadInfo.isPrivacy // public
+    isPrivacy: false // public
   });
   const [uploadTotalLength, setUploadTotalLength] = useState(null);
   const [uploadLimit, setUploadLimit] = useState(180);
   const [lengthPercent, setLengthPercent] = useState(null);
+
+  const {
+    updateContextPly,
+    removeContextTrack,
+    addContextTrack,
+    updateContextTrackToken
+  } = UseUploadActions();
 
   const trackFileRef = useRef();
 
@@ -54,7 +63,6 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     trackFileRef.current.click();
   }
 
-
   // 트랙 임시저장 파일 업로드
 
   //percentAge 적용 안함
@@ -62,6 +70,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     const {files} = trackFileRef.current;
     const isPlayList = uploadSettings.isPlayList;
     const isPrivacy = uploadSettings.isPrivacy;
+
     if (files.length === 0) {
       return;
     }
@@ -70,20 +79,50 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     }
     variable.current.isDoubleClick = true;
     const tracks = [];
-    let errorFileCount = 0;
 
     // 임시 트랙정보 저장
     const tempTracks = [];
     // 스토어 트랙 정보
     const storeTracks = [];
 
-    let sum = 0;
+    let sum = 1;
+
+    // 앨범 파일 추출을 위한 라이브러리
+    const jsmediatags = window.jsmediatags;
+
+    // 해당 트랙 파일에 이미지 추출
+    const getCoverPicture = async (file) => {
+      // 새로운 프로미스를 생성하여 반환합니다.
+      return new Promise((resolve, reject) => {
+        jsmediatags.read(file, {
+          onSuccess: function (tag) {
+            if (tag.tags.picture) {
+              const coverImgFile = convertPictureToFile(tag.tags.picture,
+                  file.name);
+              // 프로미스의 resolve 함수를 호출하여 결과를 반환합니다.
+              resolve(coverImgFile);
+            } else {
+              resolve(null);
+            }
+          },
+          onError: function (error) {
+            // 에러가 발생한 경우, 프로미스의 reject 함수를 호출합니다.
+            reject(null);
+          }
+        });
+      });
+    }
+
     for (const file of files) {
       const tempToken = uuidV4();
       const filename = file.name.replace(/\.[^/.]+$/, "");
-      // 순서
-      const order = uploadInfo.tracks.length + sum++;
 
+      // 순서
+      const order = uploadInfo.tracks.length + sum;
+      sum++;
+
+
+      // 임시저장 정보
       tempTracks.push({
         id: 0,
         title: filename,
@@ -92,35 +131,59 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
         isPlayList: isPlayList,
         file: file
       });
+
+      // store 파일정보
       storeTracks.push({
         id: 0,
         title: filename,
         token: tempToken,
         isPrivacy: isPrivacy,
         isPlayList: isPlayList,
-        order:order
+        order: order - 1
       });
+      if (!isPlayList) {
+        const coverPicture = getCoverPicture(file);
+        coverPicture.then((picture) => {
+          // useContext 추가
+          addContextTrack(tempToken, picture);
+        }).catch(() => {
+          console.log("error");
+        })
+      }
+
     }
 
     // 임시파일 저장
     await addTracks(storeTracks);
     const loading = toast.loading("...track 업로드 중");
 
-    for (const tempTrack of tempTracks) {
-      // 임시토큰 발행
-      const tempToken = tempTrack.token;
+    const promises = [];
 
-      const track = await SaveTempApi(setTracksUploadPercent, tempToken, isPrivacy,
-          isPlayList, tempTrack.file);
-      if (!track) { // null 일경우 errors count 증가
-        errorFileCount++;
-        removeTrack(tempToken);
-        continue;
-      }
-      // 임시저장된 track file 서버에서 준 token 과 아이디로 변경
-      updateTracksValue("id", tempToken, track.id);
-      updateTracksValue("token", tempToken, track.token);
-    }
+    tempTracks.map((temp) => {
+      const tempToken = temp.token;
+      promises.push(
+          SaveTempApi(setTracksUploadPercent, tempToken, isPrivacy, isPlayList,
+              temp.file));
+    })
+    Promise.allSettled(promises)
+    .then((results) => {
+      results.map((result) => {
+        if (result.status === 'fulfilled') {
+          // 성공시 token 저장
+          updateTracksValue("id", result.value.tempToken, result.value.id);
+          if (!isPlayList) {
+            // 토큰 교체
+            updateContextTrackToken(result.value.tempToken, result.value.token);
+          }
+          updateTracksValue("token", result.value.tempToken,
+              result.value.token);
+
+        } else if (result.status === 'rejected') {
+          // 실패 시 삭제
+          removeTrack(result.reason.message);
+        }
+      })
+    });
 
     toast.dismiss(loading);
     if (tracks.length !== 0) {
@@ -128,7 +191,10 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
       toast.success("업로드가 완료되었습니다.")
     }
     variable.current.isDoubleClick = false;
+    trackFileRef.current.value = '';
+
   }
+
 
   const addTracks = (track) => {
     dispatch(uploadInfoActions.addTracks({
@@ -136,20 +202,25 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     }))
   }
 
-  const setTracksUploadPercent = (token, uploadPercent) => {
-    dispatch(uploadInfoActions.setTracksUploadPercent(
-        {
-          token: token,
-          uploadPercent: uploadPercent
-        }))
+  const setTracksUploadPercent = (token, uploadPercent,abortController) => {
+
+    try {
+      dispatch(uploadInfoActions.setTracksUploadPercent(
+          {
+            token: token,
+            uploadPercent: uploadPercent,
+          }))
+    } catch (error) {
+      abortController.abort();
+    }
   }
   const removeTrack = (token) => {
-    dispatch(uploadInfoActions.removeTrack({token: token}))
+
+    removeContextTrack(token);
+    dispatch(uploadInfoActions.removeTrack({token: token}));
   }
-
-
-  const addTrackTagList = (tags,token) => {
-    dispatch(uploadInfoActions.addTrackTagList({token:token, tags: tags}));
+  const addTrackTagList = (tags, token) => {
+    dispatch(uploadInfoActions.addTrackTagList({token: token, tags: tags}));
   }
   const addPlayListTagList = (tags) => {
     dispatch(uploadInfoActions.addPlayListTagList({tags: tags}));
@@ -163,24 +234,31 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
         }))
   }
 
-  const updateTracksObject = (key,subKey, token, value) => {
+  const updateTracksObject = (key, subKey, token, value) => {
     dispatch(uploadInfoActions.updateTrackObject(
         {
           key: key,
-          subKey:subKey,
+          subKey: subKey,
           token: token,
           value: value
         }))
   }
-  const updatePlayListObject = (key,subKey, value) => {
+  const updatePlayListObject = (key, subKey, value) => {
     dispatch(uploadInfoActions.updatePlayListObject(
         {
           key: key,
-          subKey:subKey,
+          subKey: subKey,
           value: value
         }))
   }
 
+  const updateOrder = (sourceIndex, destIndex) => {
+    dispatch(uploadInfoActions.updateOrder(
+        {
+          sourceIndex: sourceIndex,
+          destIndex: destIndex,
+        }))
+  }
 
   const updatePlayListValue = (key, value) => {
     dispatch(uploadInfoActions.updatePlayListValue({key: key, value: value}))
@@ -196,18 +274,19 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     dispatch(uploadInfoActions.changeIsPlayList(
         {isPlayList: value}))
   }
+
+  const cleanStore = () => {
+    dispatch(uploadInfoActions.clearStore())
+  }
   const changeIsPrivacy = (value) => {
     dispatch(uploadInfoActions.changeIsPrivacy(
         {isPrivacy: value}))
   }
-
   // privacyChk
   const changePrivacyChkEvent = (value) => {
     setUploadSettings({...uploadSettings, isPrivacy: value})
     changeIsPrivacy(value);
   }
-
-
   useEffect(() => {
     if (uploadTotalLength === null) {
       getUploadTotalLength().then(r => r);
@@ -218,6 +297,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     if (uploadInfo.tracks.length === 0) {
 
     } else {
+
     }
   }, [uploadInfo])
 
@@ -231,26 +311,37 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
 
         <div className="upload_content col-lg-8">
           {uploadInfo.tracks.length === 0 ? <EmptyUploadInfoContent
-                  lengthPercent={lengthPercent}
-                  uploadTotalLength={uploadTotalLength}
-                  clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
-                  changeTrackUploadEvent={changeTrackUploadEvent}
-                  acceptArray={acceptArray}
-                  trackFileRef={trackFileRef}
-                  uploadSettings={uploadSettings}
-                  changePlayListChkEvent={changePlayListChkEvent}
-                  changePrivacyChkEvent={changePrivacyChkEvent}
-              /> :<UploadInfoForm
+              lengthPercent={lengthPercent}
+              uploadTotalLength={uploadTotalLength}
+              clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
+              acceptArray={acceptArray}
+              trackFileRef={trackFileRef}
+              uploadSettings={uploadSettings}
+              changePlayListChkEvent={changePlayListChkEvent}
+              changePrivacyChkEvent={changePrivacyChkEvent}
+          /> : <UploadInfoForm
               uploadInfo={uploadInfo}
+              updateOrder={updateOrder}
               updateTracksObject={updateTracksObject}
               updatePlayListObject={updatePlayListObject}
               updatePlayListValue={updatePlayListValue}
+              clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
               updateTracksValue={updateTracksValue}
               addTrackTagList={addTrackTagList}
+              removeTrack={removeTrack}
+              cleanStore={cleanStore}
               addPlayListTagList={addPlayListTagList}
               changeIsPrivacy={changeIsPrivacy}/>
           }
         </div>
+        <input type="file"
+               onChange={changeTrackUploadEvent}
+               name="trackUpload"
+               multiple={true}
+               accept={acceptArray.toString()}
+               ref={trackFileRef}
+               id="trackUpload"
+               className="visually-hidden"/>
       </div>
   )
 };
@@ -263,10 +354,6 @@ const SaveTempApi = async (setTracksUploadPercent, tempToken, isPrivacy,
     isPlayList: isPlayList,
     isPrivacy: isPrivacy
   }
-  const formData = new FormData();
-  formData.append("trackFile", file);
-  formData.append("isPlayList", isPlayList);
-  formData.append("isPrivacy", isPrivacy);
 
   const response = await TempSaveApi(setTracksUploadPercent, tempToken, body);
   const data = response.data;
@@ -276,10 +363,14 @@ const SaveTempApi = async (setTracksUploadPercent, tempToken, isPrivacy,
       token: data.token,
       title: data.uploadTrackFile.originalFileName,
       isPrivacy: isPrivacy,
-      isPlayList: isPlayList
+      isPlayList: isPlayList,
+      tempToken: tempToken,
+      file: file
     };
   } else {
     toast.error(data.errorDetails[0].message)
-    return null;
+    throw new Error(tempToken);
+    // return {tempToken:tempToken};
   }
+
 }

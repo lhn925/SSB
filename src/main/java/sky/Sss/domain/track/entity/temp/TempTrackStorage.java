@@ -54,7 +54,8 @@ public class TempTrackStorage extends BaseTimeEntity {
     // true playList , false : track
 
 
-    public static TempTrackStorage createTempTrackStorage(UploadTrackFileDto uploadTrackFileDto, String token,User user, Boolean isPlayList,boolean isPrivacy) {
+    public static TempTrackStorage createTempTrackStorage(UploadTrackFileDto uploadTrackFileDto, String token,
+        User user, Boolean isPlayList, boolean isPrivacy) {
         TempTrackStorage tempTrackStorage = new TempTrackStorage();
         tempTrackStorage.setSize(uploadTrackFileDto.getSize());
         tempTrackStorage.setTrackLength(uploadTrackFileDto.getTrackLength());
@@ -66,10 +67,12 @@ public class TempTrackStorage extends BaseTimeEntity {
         tempTrackStorage.setIsPrivacy(isPrivacy);
         return tempTrackStorage;
     }
+
     public static void deleteTempFile(TempTrackStorage tempTrackStorage, FileStore fileStore)
         throws SsbFileNotFoundException {
         if (StringUtils.hasText(tempTrackStorage.getStoreFileName())) {
-            fileStore.deleteFile(FileStore.TRACK_DIR, tempTrackStorage.getStoreFileName());
+            fileStore.deleteFile(FileStore.TRACK_DIR,
+                tempTrackStorage.getToken() + "/" + tempTrackStorage.getStoreFileName());
         }
     }
 

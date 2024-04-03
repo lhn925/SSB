@@ -22,4 +22,7 @@ public interface TempTrackStorageRepository extends JpaRepository<TempTrackStora
 
     @Query("select t from TempTrackStorage t where t.user.id = :uid and t.isPrivacy =:isPrivacy and t.isPlayList =:isPlayList ")
     List<TempTrackStorage> findByUid(@Param("uid") long uid , @Param("isPrivacy")  boolean isPrivacy, @Param("isPlayList") boolean isPlayList);
+
+    @Query("select t from TempTrackStorage t where t.user.id = :uid and t.token in (:tokens) and t.id in (:ids) ")
+    List<TempTrackStorage> findAllByTokens(@Param("uid") long uid , @Param("tokens") List<String> tokens,@Param("ids") List<Long> ids);
 }

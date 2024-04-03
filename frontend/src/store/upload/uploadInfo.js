@@ -21,26 +21,27 @@ const createTrackInfo = (data) => ({
   coverImgFile: null,
   isSuccess: false
 });
+const createPlayListInfo = {
+  title: {value: '', message: '', error: false},
+  desc: {value: '', message: '', error: false},
+  playListType: null,
+  genre: null,
+  genreType: null,
+  customGenre: {value: '', message: '', error: false},
+  isPrivacy: false,
+  isDownload: false,
+  tagList: [],
+  coverImgFile: null,
+  error: false,
+  message: null
+};
 
 const initialState = {
   isPlayList: true,
   tracks: [],
   isSuccess: false,
   uploadPercent: 0,
-  playList: {
-    title: {value: '', message: '', error: false},
-    desc: {value: '', message: '', error: false},
-    playListType: null,
-    genre: null,
-    genreType: null,
-    customGenre: {value: '', message: '', error: false},
-    isPrivacy: false,
-    isDownload: false,
-    tagList: [],
-    coverImgFile: null,
-    error: false,
-    message: null
-  }
+  playList: createPlayListInfo
 }
 const uploadInfo = createSlice({
   name: "uploadInfo",
@@ -50,9 +51,10 @@ const uploadInfo = createSlice({
       action.payload.tracks.forEach((value) => {
         if (state.tracks.length > 0) {
           const totalFiles = state.tracks.length; // 원래의 전체 파일 수
-          const completedUploads = state.tracks.filter((track)=> track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
+          const completedUploads = state.tracks.filter(
+              (track) => track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
           state.uploadPercent = calculateUploadPercentage(totalFiles,
-              completedUploads, 0,action.payload.tracks.length);
+              completedUploads, 0, action.payload.tracks.length);
         } else {
           state.uploadPercent = 0;
         }
@@ -68,37 +70,46 @@ const uploadInfo = createSlice({
     }, addPlayListTagList(state, action) {
       state.playList.tagList = action.payload.tags;
     }, setTracksUploadPercent(state, action) {
-      state.tracks.forEach(track => {
-        if (track.token === action.payload.token) {
-          const trackUploadPercent = action.payload.uploadPercent;
-          const percent = 100.0 / state.tracks.length;
+      const findTracks = state.tracks.filter(
+          track => track.token === action.payload.token);
+      if (findTracks.length !== 0) {
+        const track = findTracks[0];
+        const trackUploadPercent = action.payload.uploadPercent;
+        const percent = 100.0 / state.tracks.length;
+        // 이전 percent 계산
+        const prevPercentAge = (percent * track.uploadPercent) / 100.0;
+        // 현재 percent 계산
+        const percentAge = (percent * trackUploadPercent) / 100.0;
 
-          // 이전 percent 계산
-          const prevPercentAge = (percent * track.uploadPercent) / 100.0;
-          // 현재 percent 계산
-          const percentAge = (percent * trackUploadPercent) / 100.0;
+        const addAge = percentAge - prevPercentAge;
+        // 100 이거나
 
-          const addAge = percentAge - prevPercentAge;
-          // 100 이거나
-
-          const totalUpdatePercent = state.uploadPercent + addAge;
-          state.uploadPercent = totalUpdatePercent > 100 ? 100 : totalUpdatePercent;
-          if (totalUpdatePercent === 100) {
-            state.isSuccess = true;
-          }
-
-          // 완료 됐으면 isSuccess true
-          if (trackUploadPercent === 100) {
-            track.isSuccess = true;
-          }
-          track.uploadPercent = trackUploadPercent;
+        const totalUpdatePercent = state.uploadPercent + addAge;
+        state.uploadPercent = totalUpdatePercent > 100 ? 100
+            : totalUpdatePercent;
+        if (totalUpdatePercent === 100) {
+          state.isSuccess = true;
         }
-      });
-    },
-    removeTrack(state, action) {
+        // 완료 됐으면 isSuccess true
+        if (trackUploadPercent === 100) {
+          track.isSuccess = true;
+        }
+        track.uploadPercent = trackUploadPercent;
+      } else {
+        throw new Error();
+      }
+    }, clearStore(state) {
+      state.tracks = [];
+      Object.assign(state.playList, createPlayListInfo);
+    }, removeTrack(state, action) {
+      if (action.payload.token === undefined) {
+        return;
+      }
       const totalFiles = state.tracks.length; // 원래의 전체 파일 수
+      // 삭제 시 to
       if (totalFiles > 1) {
-        const completedUploads = state.tracks.filter((track)=> track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
+        const completedUploads = state.tracks.filter(
+            (track) => track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
         const deletedFiles = 1; // 삭제된 파일 수
         state.uploadPercent = calculateRemovePercentage(totalFiles,
             completedUploads, deletedFiles);
@@ -106,10 +117,16 @@ const uploadInfo = createSlice({
         state.isSuccess = false;
         state.uploadPercent = 0;
       }
-      const removeIndex = state.tracks.findIndex(
-          (track) => track.token === action.payload.token);
-      state.tracks.splice(removeIndex, 1);
+      state.tracks = state.tracks.filter(
+          value => action.payload.token !== value.token);
 
+    }, updateOrder(state, action) {
+      const items = Array.from(state.tracks);
+      const sourceIndex = action.payload.sourceIndex;
+      const destinationIndex = action.payload.destIndex;
+      const [reorderedItem] = items.splice(sourceIndex, 1);
+      items.splice(destinationIndex, 0, reorderedItem);
+      state.tracks = items;
     },
     updateTracksValue(state, action) {
       state.tracks.forEach(track => {
@@ -161,6 +178,8 @@ export let uploadInfoActions = {
   addPlayListTagList: uploadInfo.actions.addPlayListTagList,
   addTrackTagList: uploadInfo.actions.addTrackTagList,
   updateTrackObject: uploadInfo.actions.updateTrackObject,
-  updatePlayListObject: uploadInfo.actions.updatePlayListObject
+  updatePlayListObject: uploadInfo.actions.updatePlayListObject,
+  updateOrder: uploadInfo.actions.updateOrder,
+  clearStore: uploadInfo.actions.clearStore
 };
 export default uploadInfo.reducer;

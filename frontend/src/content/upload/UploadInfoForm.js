@@ -1,9 +1,7 @@
-import React, {memo, useCallback, useRef} from 'react';
-import {useEffect, useState} from "react";
+import React, {useContext, useRef, useState, useEffect} from 'react';
 import {
-  ChangeError,
   encodeFileToBase64,
-  useToggleableOptions
+  useToggleableOptions, ValueEmojiCheck
 } from "utill/function";
 import {URL_UPLOAD} from "content/UrlEndpoints";
 import {ProgressBar} from "components/progressBar/ProgressBar";
@@ -15,32 +13,25 @@ import {CustomTagMention} from "components/mention/CustomTagMention";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {Btn} from "components/button/Btn";
 import {
-  GenreTypes,
-  PlyTypes, TypeNames,
+  GenreTypes, PlyTypes, TypeNames,
 } from "content/upload/UploadTypes";
 import emojiRegex from "emoji-regex";
-import {DnDTracksBox} from "content/upload/DnDTracksBox";
-import update from 'immutability-helper';
-import {useDispatch, useSelector} from "react-redux";
-
-const style = {
-  flexWrap: "wrap"
-}
-
-const getTracks = (uploadInfo) => {
-  return uploadInfo.tracks.map((data) => {
-    return data;
-  })
-}
+import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
+import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
+import {UseUploadActions, UseUploadValue} from "App";
 
 export function UploadInfoForm({
+  updateOrder,
   updatePlayListValue,
   updateTracksValue,
+  clickTrackUploadBtnEvent,
   updatePlayListObject,
   updateTracksObject,
   addPlayListTagList,
   changeIsPrivacy,
-  uploadInfo
+  uploadInfo,
+  removeTrack,
+  cleanStore
 }) {
   const [searchTagList, setSearchTagList] = useState({});
   const playListOptions = Object.values(PlyTypes);
@@ -56,20 +47,24 @@ export function UploadInfoForm({
     searchTagList,
     uploadInfo,
     setSearchTagList,
+    updateTracksObject,
+    removeTrack,
+    cleanStore
   };
   // 플레이리스트
   return <ul className="track_info_form_list list-group">
     {
       uploadInfo.isPlayList ? <InfoFormListItem
           index={0}
+          updateOrder={updateOrder}
           updatePlayListObject={updatePlayListObject}
           addPlayListTagList={addPlayListTagList}
           updatePlayListValue={updatePlayListValue}
+          clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
           changeIsPrivacy={changeIsPrivacy}
           {...commonProps}/> : getTracks(uploadInfo).map((data, index) => (
           <InfoFormListItem
               index={index}
-              updateTracksObject={updateTracksObject}
               updateTracksValue={updateTracksValue}
               track={data}
               key={data.token}
@@ -81,6 +76,8 @@ export function UploadInfoForm({
 }
 
 function InfoFormListItem({
+  cleanStore,
+  updateOrder,
   changeIsPrivacy,
   updatePlayListObject,
   updateTracksObject,
@@ -93,24 +90,35 @@ function InfoFormListItem({
   playListOptions,
   addPlayListTagList, searchTagList,
   setSearchTagList,
-  index
+  index,
+  removeTrack,
+  clickTrackUploadBtnEvent,
 }) {
+  const regex = emojiRegex();
   const currentRoot = "BasicInfo";
+
   const [activeTab, setActiveTab] = useState(currentRoot);
   const acceptArray = [".jpg", ".png", ".jpeg", ".bmp"];
 
-  const isPlayList = uploadInfo.isPlayList;
+  const [isPlayList, setIsPlayList] = useState(uploadInfo.isPlayList);
 
   const [formValue, setFormValue] = useState(
       isPlayList ? uploadInfo.playList : track);
 
+  // const coverImgFile = uploadInfo.isPlayList ?
 
+  const {
+    updateContextPly,
+    updateContextTrackFile,
+    getTrackFile,
+    getPlyFile
+  } = UseUploadActions();
+
+  const contextValue = UseUploadValue();
 
   const [coverImg, setCoverImg] = useState(profile2);
+
   const [tracks, setTracks] = useState(getTracks(uploadInfo));
-
-
-  const {findCard,moveCard} = CardActions(tracks,setTracks);
 
   const [percentAge, setPercentAge] =
       useState(isPlayList ? uploadInfo.uploadPercent : track.uploadPercent);
@@ -127,9 +135,95 @@ function InfoFormListItem({
       updatePlayListObject(name, "error", isError);
       updatePlayListObject(name, "message", message);
     } else {
-      updateTracksObject(name, "error", track.token, isError);
-      updateTracksObject(name, "message", track.token, message);
+      updateTrackError(name, track.token, isError, message);
     }
+  }
+
+  const updateTrackError = (name, token, isError, message) => {
+    updateTracksObject(name, "error", token, isError);
+    updateTracksObject(name, "message", token, message);
+  }
+
+  const removeTrackHandler = (token) => {
+    try {
+      // length 가 0 이면 초기화
+      if (uploadInfo.tracks.length === 1) {
+        updateContextPly(null);
+        cleanStore();
+      }
+      removeTrack(token);
+    } catch (error) {
+      console.error("removeTrackHandler")
+    }
+  }
+
+  // 삭제 이벤트
+  const removeTrackBtnClickEvent = (token, id) => {
+    const isConfirm = window.confirm("업로드를 중지하시겠습니까? 저장되지 않은 변경사항은 모두 손실됩니다.");
+    if (isConfirm) {
+      removeTrackHandler(token);
+      if (id !== 0) {
+        const body = {tempTrackDeleteList: [{id: id, token: token}]};
+        const response = TempRemoveApiHandler(body);
+        if (response.code !== 200) {
+          console.log(response.code);
+        }
+      }
+    }
+  }
+  // 플레이 리스트 삭제 이벤트
+  const cancelPlyBtnClickEvent = () => {
+    const isConfirm = window.confirm("업로드를 중지하시겠습니까? 저장되지 않은 변경사항은 모두 손실됩니다.");
+    if (isPlayList && isConfirm) {
+      const tracks = uploadInfo.tracks;
+      cleanStore();
+      const removeList = tracks.filter((track) => track.id !== 0);
+      // context 초기화
+      updateContextPly(null);
+      const body = {tempTrackDeleteList: removeList};
+      if (removeList.length > 0) {
+        const response = TempRemoveApiHandler(body);
+        if (response.code !== 200) {
+          console.log(response.code);
+        }
+      }
+    }
+  }
+
+  const TempRemoveApiHandler = (body) => {
+    return TempRemoveApi(body);
+  }
+  const onBlurPlyTitle = async (e) => {
+    const {value, name, dataset} = e.target;
+    const input_value = value.split(" ").join("");
+    const lengthLimit = 100;
+    const emptyCheck = input_value === "";
+    const token = dataset.id;
+
+    const lengthCheck = input_value.length > lengthLimit;
+    // desc 는 emoji 체크를 안함
+    const emojiCheck = name !== "desc";
+
+    updateTracksObject(name, "value", token, value);
+    if (emptyCheck) {
+
+      updateTrackError(name, token, true, "title은 필수 정보입니다.")
+      return false;
+    }
+    // 길이제한
+    if (!emptyCheck && lengthCheck) {
+      updateTrackError(name, token, true, lengthLimit + "자 이하로 작성해주세요.")
+      return false;
+    }
+
+    const check = ValueEmojiCheck(emojiCheck, input_value, regex);
+    // 이모지 체크후 있으면 error
+    if (!check) {
+      updateTrackError(name, token, true, "이모지는 안돼요!");
+    }
+
+    // error 가 없으면 false
+    updateTrackError(name, token, false, "");
   }
 
   const onBlur = async (e) => {
@@ -148,8 +242,6 @@ function InfoFormListItem({
     // desc 는 emoji 체크를 안함
     const emojiCheck = name !== "desc";
 
-
-
     // 값 초기화
     if (isPlayList) {
       updatePlayListObject(name, "value", value);
@@ -157,7 +249,6 @@ function InfoFormListItem({
       updateTracksObject(name, "value", track.token, value);
     }
 
-    const regex = emojiRegex();
     // title 은 빈공백 x
     if (name === "title" && emptyCheck) {
       changeStoreError(name, isPlayList, "title은 필수 입력 값입니다", true);
@@ -170,24 +261,16 @@ function InfoFormListItem({
       return;
     }
 
-    if (emojiCheck) {
-      const matchAll = input_value.matchAll(regex);
-      for (const regex1 of matchAll) {
-        if (regex1) {
-          changeStoreError(name, isPlayList, "이모지는 안돼요!", true);
-          return;
-        }
-      }
+    const check = ValueEmojiCheck(emojiCheck, input_value, regex);
+    // 이모지 체크후 있으면 error
+    if (!check) {
+      changeStoreError(name, isPlayList, "이모지는 안돼요!", true);
     }
-
     // error 가 없으면 false
     changeStoreError(name, isPlayList, "", false);
   }
 
   const genreSelected = !isPlayList ? track.genre : uploadInfo.playList.genre;
-  useEffect(() => {
-    setActiveTab(currentRoot);
-  }, [currentRoot]);
   // 재생 목록 유형 선택을 위한 커스텀 훅 사용
   const plyTypeBox = useToggleableOptions(TypeNames.PlyTypes,
       playListOptions, uploadInfo.playList.playListType);
@@ -219,7 +302,7 @@ function InfoFormListItem({
       updateTracksValue("isPrivacy", formValue.token, value)
     }
   }
-  const changeIsDownload = (e) => {
+  const changeIsDownloadEvent = (e) => {
     const checked = e.target.checked
     if (isPlayList) {
       updatePlayListValue("isDownload", checked);
@@ -228,26 +311,29 @@ function InfoFormListItem({
     }
   }
 
+  useEffect(() => {
+    setActiveTab(currentRoot);
+  }, [currentRoot]);
+
   // 파일 btn event
   const clickImgUploadBtnEvent = () => {
     coverImgFileRef.current.click();
   }
-
   const changeCoverImgUploadEvent = () => {
     const {files} = coverImgFileRef.current;
     if (files.length === 0) {
       return;
     }
     encodeFileToBase64(files[0], setCoverImg).catch(() => {
-      console.error("error!!")
+      setCoverImg(profile2);
     })
+
     if (isPlayList) {
-      updatePlayListValue("coverImgFile", files);
+      updateContextPly(files);
     } else {
-      updateTracksValue("coverImgFile", track.token, files);
+      updateContextTrackFile(track.token, files);
     }
   }
-
   useEffect(() => {
     if (isPlayList) {
       updatePlayListValue(plyTypeBox.name, plyTypeBox.selectedOption);
@@ -261,17 +347,24 @@ function InfoFormListItem({
   }, [genreBox.selectedOption, plyTypeBox.selectedOption])
 
   useEffect(() => {
+    setIsPlayList(uploadInfo.isPlayList);
     const formValue = isPlayList ? uploadInfo.playList : track;
     setPercentAge(isPlayList ? uploadInfo.uploadPercent : track.uploadPercent);
     setFormValue(formValue);
     setTracks(getTracks(uploadInfo));
-    if (formValue.coverImgFile !== null) {
-      encodeFileToBase64(formValue.coverImgFile[0], setCoverImg).catch(
+
+  }, [uploadInfo])
+  useEffect(() => {
+    const coverImgFile = uploadInfo.isPlayList ? getPlyFile(contextValue)
+        : getTrackFile(contextValue, track.token);
+    if (coverImgFile !== null && coverImgFile !== undefined) {
+      encodeFileToBase64(coverImgFile[0], setCoverImg).catch(
           () => console.log("error"))
     } else {
       setCoverImg(profile2);
     }
-  }, [uploadInfo])
+  }, [contextValue])
+
   return <li key={!isPlayList && track.token} className="list-group-item m-1"
              onClick={() => formClickToggleClose(genreBox, plyTypeBox)}>
     <div className="editStatus_div">
@@ -279,7 +372,7 @@ function InfoFormListItem({
         <div className="editStatus_filename basic_font text-start">
           {percentAge !== 100 ?
               isPlayList ? "Uploading " + uploadInfo.tracks.length + " tracks"
-                  : track.title.value : isPlayList
+                  : formValue.title.value : isPlayList
               && "Ready. Click Save to post this playlist."}
         </div>
         <div className="editStatus__text basic_font text-end">
@@ -336,7 +429,9 @@ function InfoFormListItem({
             className="track_info_form d-flex flex-column col-lg-8 text-start">
           <div className="form-group mb-2">
             <span className="normal_font required_fields">Title</span>
-            <input type="text" onBlur={onBlur} className="form-control"
+            <input type="text" onBlur={onBlur}
+                   className={"form-control " + (formValue.title.error
+                       && "border-danger")}
                    name="title"
                    defaultValue={formValue.title.value}
                    placeholder="Name your Title"/>
@@ -367,7 +462,9 @@ function InfoFormListItem({
                   <input
                       onBlur={onBlur}
                       defaultValue={formValue.customGenre.value}
-                      type="text" className="form-control "
+                      type="text"
+                      className={"form-control " + (formValue.customGenre.error
+                          && "border-danger")}
                       name="customGenre"/>
                   <div className="form-text text-danger">
                     <small>{formValue.customGenre.error
@@ -392,7 +489,8 @@ function InfoFormListItem({
           </div>
           <div className="form-group mb-2">
             <span className="normal_font">Description</span>
-            <textarea className="desc form-control"
+            <textarea className={"desc form-control " + (formValue.desc.error
+                && " border-danger")}
                       name="desc"
                       defaultValue={formValue.desc.value}
                       onBlur={onBlur}
@@ -436,7 +534,7 @@ function InfoFormListItem({
             <label>
               <input type="checkbox"
                      checked={formValue.isDownload}
-                     onClick={changeIsDownload}
+                     onClick={changeIsDownloadEvent}
                      name="isDownload"
                      className="form-check-input me-1"
                      readOnly/>
@@ -458,63 +556,83 @@ function InfoFormListItem({
     </div>
 
     {
-
-      isPlayList && tracks.map((data,index) => {
-        return <div style={style} key={data.id === 0 ? index : data.id}>
-                <DnDTracksBox
-                    id={`${data.id}`}
-                    track={data}
-                    moveCard={moveCard}
-                    findCard={findCard}/>
-                </div>;
-      })
+        isPlayList && <DragDropContext
+            onDragEnd={(e) => handleOnDragEnd(e, updateOrder)}>
+          <Droppable droppableId="droppable-songs">
+            {(provided) => getDragAndDrop(provided, tracks, onBlurPlyTitle,
+                removeTrackBtnClickEvent)}
+          </Droppable>
+        </DragDropContext>
     }
-    {/*<Container tracks={getTracks(uploadInfo)}/>*/}
 
+    {isPlayList && <div className="upload_form_add_buttons">
+      <BtnOutLine event={clickTrackUploadBtnEvent} text="Add more tracks"/>
+    </div>
+    }
     <div className="upload_form_buttons">
       <div className="activeUpload__requiredText text-start"><span
           className="sc-orange sc-text-error">*</span> Required fields
       </div>
-      <BtnOutLine text="Cancel"/>
+      <BtnOutLine event={() => !isPlayList ?
+          removeTrackBtnClickEvent(track.token, track.id)
+          : cancelPlyBtnClickEvent()}
+                  text="Cancel"/>
       <Btn text="Save"/>
     </div>
 
   </li>;
 }
 
-function CardActions(cards,setCards) {
-  // Card의 id에 해당하는 Card와 인덱스 리턴
-  // {id:1, text:"duckgugong"}이 0번 인덱스면 {id: 1, text:"duckgugong"}, 0 리턴
-  const findCard = useCallback(
-      (id) => {
-        const card = cards.filter((item) => `${item.id}` === id)[0]
-        return {
-          card,
-          index: cards.indexOf(card),
-        }
-      },
-      [cards],
-  )
-  /*
-    Card의 위치 교환.
-    state에서 {id: 1,text: 'duckgugong'}가 0번째 인덱스고 {id: 2,text: 'hungry'}가 1번째 인덱스면
-    {id:1, text: 'duckgugong'}인 Card를 drag해서 {id:2, text: 'hungry'}에 hover하면
-    {id:1, text: 'duckgugong'}가 1번째 인덱스가 되고 {id:2, text: 'hungry'}가 0번째 인덱스가 된다!
-  */
-  const moveCard = useCallback(
-      (id, atIndex) => {
-        const {card, index} = findCard(id)
-        setCards(
-            update(cards, {
-              $splice: [
-                [index, 1],
-                [atIndex, 0, card],
-              ],
-            }),
-        )
-      },
-      [findCard, cards, setCards],
-  )
+function getDragAndDrop(provided, tracks, onBlurPlyTitle,
+    removeTrackBtnClickEvent) {
+  return <div {...provided.droppableProps} className="mt-3"
+              ref={provided.innerRef}>
+    {tracks.map((track, index) => (
+        <Draggable key={track.token}
+                   draggableId={track.token} index={index}>
+          {(provided) => (
+              <>
+                <div ref={provided.innerRef}{...provided.draggableProps}
+                     className="playlist-item">
+                  <ProgressBar height={3} width={100}
+                               percentage={track.uploadPercent}/>
+                  <div className="track-content" {...provided.dragHandleProps}>
+                    <span {...provided.dragHandleProps}
+                          className="drag-handle">:::</span>
+                    <input data-id={track.token} type="text"
+                           name="title"
+                           onBlur={onBlurPlyTitle}
+                           className={"form-control track-title "
+                               + (track.title.error && " border-danger")}
+                           defaultValue={track.title.value}/>
+                    <BtnOutLine
+                        event={() => removeTrackBtnClickEvent(track.token,
+                            track.id)}
+                        text={"x"}/>
+                  </div>
+                  <div className="ply_title_error text-start text-danger">
+                    <small>
+                      {track.title.error && track.title.message}
+                    </small>
+                  </div>
+                </div>
+              </>
+          )}
+        </Draggable>
+    ))}
+    {provided.placeholder}
+  </div>;
+}
 
-  return {moveCard, findCard}
+function handleOnDragEnd(result, updateOrder) {
+  if (!result.destination) {
+    return;
+  }
+  updateOrder(result.source.index, result.destination.index);
+}
+
+const getTracks = (uploadInfo) => {
+  return uploadInfo.tracks.map((data) => {
+    return data;
+  })
 }

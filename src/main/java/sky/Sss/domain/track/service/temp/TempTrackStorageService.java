@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.temp.TempTrackDeleteDto;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
+import sky.Sss.domain.track.dto.temp.TempTracksDeleteDto;
 import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.temp.TempTrackStorageRepository;
@@ -91,19 +93,23 @@ public class TempTrackStorageService {
         tempTrackStorageRepository.delete(tempTrackStorage);
     }
 
-
     @Transactional
-    public void deleteAllBatch(Long id, String token, boolean isPrivacy, boolean isPlayList) throws IOException {
+    public void deleteAll(List<TempTrackDeleteDto> tempTrackDeleteDtoList) {
         User user = userQueryService.findOne();
 
-        TempTrackStorage tempTrackStorage = tempTrackStorageRepository.findOne(id, token, user, isPrivacy, isPlayList)
-            .orElseThrow(SsbFileNotFoundException::new);
+        List<Long> ids = tempTrackDeleteDtoList.stream().map(TempTrackDeleteDto::getId).toList();
+        List<String> tokens = tempTrackDeleteDtoList.stream().map(TempTrackDeleteDto::getToken).toList();
 
-        // 임시파일 삭제
-        TempTrackStorage.deleteTempFile(tempTrackStorage, fileStore);
-
+        List<TempTrackStorage> tempTrackStorageList = tempTrackStorageRepository.findAllByTokens(user.getId(),tokens,ids);
+        try {
+            tempTrackStorageList.forEach(temp -> {
+                TempTrackStorage.deleteTempFile(temp, fileStore);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // DB에서 삭제
-        delete(tempTrackStorage);
+        deleteAllBatch(tempTrackStorageList);
     }
 
 }

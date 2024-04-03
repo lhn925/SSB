@@ -3,8 +3,7 @@ import {BtnOutLine} from "components/button/BtnOutLine";
 import {Btn} from "components/button/Btn";
 
 export function EmptyUploadInfoContent({lengthPercent, uploadTotalLength,
-    clickTrackUploadBtnEvent,
-    changeTrackUploadEvent, acceptArray, trackFileRef, uploadSettings,
+    clickTrackUploadBtnEvent, uploadSettings,
     changePlayListChkEvent, changePrivacyChkEvent}) {
   return <>
     <div className="upload_header card mt-5">
@@ -34,14 +33,6 @@ export function EmptyUploadInfoContent({lengthPercent, uploadTotalLength,
                text="or choose files to upload" width={40}
                name="trackUploadBtn"
                id="trackUploadBtn"/>
-          <input type="file"
-                 onChange={changeTrackUploadEvent}
-                 name="trackUpload"
-                 multiple={true}
-                 accept={acceptArray.toString()}
-                 ref={trackFileRef}
-                 id="trackUpload"
-                 className="visually-hidden"/>
         </div>
         <div className="form-group mt-1">
           <label>
@@ -60,13 +51,14 @@ export function EmptyUploadInfoContent({lengthPercent, uploadTotalLength,
             <input type="radio" name="privacyChk" id="publicChk"
                    className="me-1"
                    onClick={() => changePrivacyChkEvent(false)}
-                   checked={!uploadSettings.isPrivacy}
+                   defaultChecked={!uploadSettings.isPrivacy}
                    readOnly/>
             <span className="checkbox_label me-2">Public</span>
           </label>
           <label className="mb-2">
             <input type="radio" name="privacyChk" id="privateChk"
                    onClick={() => changePrivacyChkEvent(true)}
+                   defaultChecked={uploadSettings.isPrivacy}
                    className="me-1" readOnly/>
             <span className="checkbox_label">Private</span>
           </label>

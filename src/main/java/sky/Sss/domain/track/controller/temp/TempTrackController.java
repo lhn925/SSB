@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.temp.TempTrackDeleteDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
+import sky.Sss.domain.track.dto.temp.TempTracksDeleteDto;
 import sky.Sss.domain.track.exception.checked.SsbFileException;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
@@ -68,21 +69,19 @@ public class TempTrackController {
 
         return ResponseEntity.ok(tempTrackInfoDto);
     }
-
     /**
-     * 임시파일 삭제
+     * 임시파일 all 삭제
      *
      * @param request
      * @return
      */
     @DeleteMapping
-    public ResponseEntity<?> removeTempFile(@Validated @ModelAttribute TempTrackDeleteDto tempTrackDeleteDto,
+    public ResponseEntity<?> cancelTempFile(@Validated @RequestBody TempTracksDeleteDto tempTracksDeleteDto,
         BindingResult bindingResult, HttpServletRequest request) throws IOException {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
         }
-        tempTrackStorageService.deleteAllBatch(tempTrackDeleteDto.getId(), tempTrackDeleteDto.getToken(),
-            tempTrackDeleteDto.isPrivacy(), tempTrackDeleteDto.isPlayList());
+        tempTrackStorageService.deleteAll(tempTracksDeleteDto.getTempTrackDeleteList());
         return ResponseEntity.ok().build();
     }
 
