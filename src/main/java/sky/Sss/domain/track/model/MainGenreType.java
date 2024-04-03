@@ -25,7 +25,7 @@ public enum MainGenreType {
     public static MainGenreType findByType(String type) {
         MainGenreType[] values = values();
         for (MainGenreType value : values) {
-            if (value.getValue().equals(type)) {
+            if (value.name().equals(type)) {
                 return value;
             }
         }

@@ -15,10 +15,11 @@ import sky.Sss.global.utili.validation.regex.RegexPatterns;
 public class BasePlayListDto {
     @Pattern(regexp = RegexPatterns.TRACK_TITLE_REGEX, message = "track.title.regex")
     protected String title;
-    @NotNull
+    @Pattern(regexp = RegexPatterns.TRACK_DESC_REGEX, message = "desc.error.length")
     protected String desc;
     protected boolean isDownload;
     protected boolean isPrivacy;
+    @NotNull
     protected List<TrackTagsDto> tagList;
     // 플레이리스트 타입
     @NotBlank

@@ -3,6 +3,7 @@ import {EmailApi} from "utill/api/email/EmailApi";
 import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
 import {useState} from "react";
 import profile2 from "css/image/profile2.png";
+import {GenreTypes} from "../content/upload/UploadTypes";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -480,5 +481,21 @@ export function createUploadActions(coverImgFiles, setCoverImgFiles) {
     }, getPlyFile(value) {
       return value.playList;
     }
+  }
+}
+
+
+export function CreateTrackBody(track) {
+  return  {
+    id:track.id,
+    token:track.token,
+    title:track.title.value,
+    genreType:track.genreType,
+    genre: track.genreType !== GenreTypes.CUSTOM.name ? track.genre.value : track.customGenre.value,
+    tagList:track.tagList, // <
+    // tagList:[{id:0,tag:"임하늘"}], // <
+    desc:track.desc.value,
+    isPrivacy:track.isPrivacy,
+    isDownload:track.isDownload
   }
 }

@@ -47,7 +47,6 @@ export function CustomTagMention({
         return;
       }
     }
-
     const newTagsList = extractTagsAndIds(value);
 
     const uniqueTags = new Set();
@@ -60,7 +59,7 @@ export function CustomTagMention({
     });
     // 30개 제한
     if (uniqueArray.length > LIMIT) {
-      ChangeError(setErrors, "tags", "총 태그는 30개 제한입니다", true);
+      ChangeError(setErrors, "tags", "태그는 30개 제한입니다", true);
       return;
     }
     ChangeError(setErrors, "tags", "", false);
@@ -78,8 +77,6 @@ export function CustomTagMention({
             endIndex);
       }
     });
-
-
     setValue(value);
   }
 
@@ -128,7 +125,6 @@ export function CustomTagMention({
               trigger="#"
               data={debouncedFetchTagsSuggestions}
               renderSuggestion={(suggestion, search, highlightedDisplay) => (
-
                   <div className="user">{highlightedDisplay}</div>
               )}
               appendSpaceOnAdd={true}

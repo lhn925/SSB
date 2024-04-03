@@ -74,20 +74,23 @@ public class TrackService {
      */
     @Transactional
     public TrackInfoRepDto addTrackFile(TrackInfoSaveReqDto trackInfoSaveReqDto, MultipartFile coverImgFile) {
+        if (trackInfoSaveReqDto.getTagList().size() > 30) {
+            throw new IllegalArgumentException("track.tag.size");
+        }
+
         User user = userQueryService.findOne();
         // 시간제한 180분
         // 임시 디비에 있던걸
         // ssbTrack 에 옮기는 작업
         TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackInfoSaveReqDto.getId(),
-            trackInfoSaveReqDto.getToken(), user, trackInfoSaveReqDto.getIsPrivacy(), false);
+            trackInfoSaveReqDto.getToken(), user, trackInfoSaveReqDto.isPrivacy(), false);
 
-        List<TrackTagsDto> tagList = trackInfoSaveReqDto.getTagList();
+
 
         // 현재 ssbTrack 에 저장되어 있는 track
         Integer totalTrackLength = getTotalLength(user);
 
-        // 태그 확인
-        List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(tagList);
+
         Integer totalUploadTrackLength = 0;
         SsbTrack ssbTrack = createTrack(user, tempTrackStorage, totalUploadTrackLength, totalTrackLength,
             trackInfoSaveReqDto);
@@ -99,11 +102,15 @@ public class TrackService {
         // 트랙 저장
         trackRepositoryImpl.save(ssbTrack);
 
-        // 링크 연결
-        List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
-        tagLinkCommonService.addTrackTagLinks(trackTagLinks);
+        List<TrackTagsDto> tagList = trackInfoSaveReqDto.getTagList();
 
-
+        if (!tagList.isEmpty()) {
+            // 태그 확인
+            List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(tagList);
+            // 링크 연결
+            List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
+            tagLinkCommonService.addTrackTagLinks(trackTagLinks);
+        }
         String storeFileName = null;
         if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드
             storeFileName = getUploadFileDto(coverImgFile).getStoreFileName();
@@ -228,6 +235,10 @@ public class TrackService {
 
     @Transactional
     public void updateTrackInfo(TrackInfoModifyReqDto trackInfoModifyReqDto, MultipartFile coverImgFile) {
+        if (trackInfoModifyReqDto.getTagList().size() > 30) {
+            throw new IllegalArgumentException("track.tag.size");
+        }
+
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = findOne(trackInfoModifyReqDto.getId(), trackInfoModifyReqDto.getToken(),
             user, Status.ON);
@@ -254,7 +265,7 @@ public class TrackService {
             tagLinkCommonService.addTrackTagLinks(trackTagLinks);
         }
 
-        boolean modifyPrivacy = trackInfoModifyReqDto.getIsPrivacy();
+        boolean modifyPrivacy = trackInfoModifyReqDto.isPrivacy();
 
         // 비공개 -> 공개, 배포 false -> 최초 배포 일 경우에 Update 날짜 변경
         if (!modifyPrivacy && !ssbTrack.getIsRelease()) {
@@ -267,7 +278,7 @@ public class TrackService {
 
         // 내용 수정
         SsbTrack.uploadInfo(ssbTrack, trackInfoModifyReqDto.getGenre(), trackInfoModifyReqDto.getGenreType(),
-            trackInfoModifyReqDto.getIsPrivacy(), trackInfoModifyReqDto.getIsDownload(),
+            trackInfoModifyReqDto.isPrivacy(), trackInfoModifyReqDto.isDownload(),
             trackInfoModifyReqDto.getTitle(),
             trackInfoModifyReqDto.getDesc());
 

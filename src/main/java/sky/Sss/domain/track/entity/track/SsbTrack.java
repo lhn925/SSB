@@ -124,7 +124,7 @@ public class SsbTrack extends BaseTimeEntity {
         SsbTrack ssbTrack = new SsbTrack();
         setUploadTrackFile(tempTrackStorage, ssbTrack);
         uploadInfo(ssbTrack, trackInfoSaveReqDto.getGenre(), trackInfoSaveReqDto.getGenreType(),
-            trackInfoSaveReqDto.getIsPrivacy(), trackInfoSaveReqDto.getIsDownload(), trackInfoSaveReqDto.getTitle(),
+            trackInfoSaveReqDto.isPrivacy(), trackInfoSaveReqDto.isDownload(), trackInfoSaveReqDto.getTitle(),
             trackInfoSaveReqDto.getDesc());
         ssbTrack.setUser(user);
 

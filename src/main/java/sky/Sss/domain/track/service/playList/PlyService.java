@@ -142,6 +142,9 @@ public class PlyService {
 
     @Transactional
     public void updatePlyInfo(PlayListSettingUpdateDto playListSettingUpdateDto, MultipartFile coverImgFile) {
+        if (playListSettingUpdateDto.getTagList().size() > 30) {
+            throw new IllegalArgumentException("track.tag.size");
+        }
         User user = userQueryService.findOne();
         SsbPlayListSettings ssbPlayListSettings = findOneJoinTracks(playListSettingUpdateDto.getId(),
             playListSettingUpdateDto.getToken(), user, Status.ON);

@@ -19,7 +19,8 @@ const createTrackInfo = (data) => ({
   order: data.order,
   uploadPercent: 0,
   coverImgFile: null,
-  isSuccess: false
+  isSuccess: false,
+  isSave:false // 사용자가 save 버튼을 눌렀을 경우 업데이트
 });
 const createPlayListInfo = {
   title: {value: '', message: '', error: false},
@@ -33,7 +34,8 @@ const createPlayListInfo = {
   tagList: [],
   coverImgFile: null,
   error: false,
-  message: null
+  message: null,
+  isSave:false // 사용자가 save 버튼을 눌렀을 경우 업데이트
 };
 
 const initialState = {
@@ -87,13 +89,10 @@ const uploadInfo = createSlice({
         const totalUpdatePercent = state.uploadPercent + addAge;
         state.uploadPercent = totalUpdatePercent > 100 ? 100
             : totalUpdatePercent;
-        if (totalUpdatePercent === 100) {
-          state.isSuccess = true;
-        }
+        state.isSuccess = totalUpdatePercent === 100;
         // 완료 됐으면 isSuccess true
-        if (trackUploadPercent === 100) {
-          track.isSuccess = true;
-        }
+        track.isSuccess = trackUploadPercent === 100;
+
         track.uploadPercent = trackUploadPercent;
       } else {
         throw new Error();

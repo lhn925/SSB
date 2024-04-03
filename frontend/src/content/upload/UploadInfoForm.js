@@ -1,5 +1,6 @@
 import React, {useContext, useRef, useState, useEffect} from 'react';
 import {
+  ChangeError, CreateTrackBody,
   encodeFileToBase64,
   useToggleableOptions, ValueEmojiCheck
 } from "utill/function";
@@ -13,12 +14,14 @@ import {CustomTagMention} from "components/mention/CustomTagMention";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {Btn} from "components/button/Btn";
 import {
-  GenreTypes, PlyTypes, TypeNames,
+  genreOptions,
+  GenreTypes, playListOptions, PlyTypes, TypeNames,
 } from "content/upload/UploadTypes";
 import emojiRegex from "emoji-regex";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
 import {UseUploadActions, UseUploadValue} from "App";
+import {TrackSaveApi} from "utill/api/upload/TrackSaveApi";
 
 export function UploadInfoForm({
   updateOrder,
@@ -27,43 +30,40 @@ export function UploadInfoForm({
   clickTrackUploadBtnEvent,
   updatePlayListObject,
   updateTracksObject,
-  addPlayListTagList,
+  addTagListEvent,
   changeIsPrivacy,
   uploadInfo,
   removeTrack,
   cleanStore
 }) {
   const [searchTagList, setSearchTagList] = useState({});
-  const playListOptions = Object.values(PlyTypes);
-  const genreOptions = Object.values(GenreTypes);
+
   const tabs = [
     {id: "BasicInfo", title: "Basic Info", url: URL_UPLOAD}
   ];
 
   const commonProps = {
-    playListOptions,
-    genreOptions,
     tabs,
     searchTagList,
     uploadInfo,
     setSearchTagList,
     updateTracksObject,
     removeTrack,
+    addTagListEvent,
     cleanStore
   };
   // 플레이리스트
   return <ul className="track_info_form_list list-group">
     {
-      uploadInfo.isPlayList ? <InfoFormListItem
+      uploadInfo.isPlayList ? !uploadInfo.isPlayList.isSave && <InfoFormListItem
           index={0}
           updateOrder={updateOrder}
           updatePlayListObject={updatePlayListObject}
-          addPlayListTagList={addPlayListTagList}
           updatePlayListValue={updatePlayListValue}
           clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
           changeIsPrivacy={changeIsPrivacy}
           {...commonProps}/> : getTracks(uploadInfo).map((data, index) => (
-          <InfoFormListItem
+          !data.isSave && <InfoFormListItem
               index={index}
               updateTracksValue={updateTracksValue}
               track={data}
@@ -86,9 +86,7 @@ function InfoFormListItem({
   track,
   tabs,
   uploadInfo,
-  genreOptions,
-  playListOptions,
-  addPlayListTagList, searchTagList,
+  addTagListEvent, searchTagList,
   setSearchTagList,
   index,
   removeTrack,
@@ -121,7 +119,7 @@ function InfoFormListItem({
   const [tracks, setTracks] = useState(getTracks(uploadInfo));
 
   const [percentAge, setPercentAge] =
-      useState(isPlayList ? uploadInfo.uploadPercent : track.uploadPercent);
+      useState(isPlayList ? uploadInfo.uploadPercent : formValue.uploadPercent);
 
   const [errors, setErrors] = useState({
     tags: {message: '', error: false},
@@ -135,7 +133,7 @@ function InfoFormListItem({
       updatePlayListObject(name, "error", isError);
       updatePlayListObject(name, "message", message);
     } else {
-      updateTrackError(name, track.token, isError, message);
+      updateTrackError(name, formValue.token, isError, message);
     }
   }
 
@@ -226,6 +224,50 @@ function InfoFormListItem({
     updateTrackError(name, token, false, "");
   }
 
+  const saveBtnClickEvent = () => {
+    const title = formValue.title;
+    const tagList = formValue.tagList;
+    const genre = formValue.genre;
+    const genreType = formValue.genreType;
+    const customGenre = formValue.customGenre;
+    const desc = formValue.desc;
+    const coverImgFile = getTrackFile(contextValue,formValue.token);
+    const isPrivacy = formValue.isPrivacy;
+    const isDownload = formValue.isDownload;
+
+
+    // 공통적인 값 체크
+    if (errors.tags.error || tagList.length > 30) {
+      ChangeError(setErrors, "tags", "태그는 30개 제한입니다", true);
+      return;
+    }
+    // 값 체크
+    if ((genreType === GenreTypes.CUSTOM.name && customGenre.error) || desc.error || title.error) {
+      return;
+    }
+    if (isPlayList) {
+
+    } else {
+      if (formValue.id !== 0 && formValue.isSuccess) {
+        const body = CreateTrackBody(formValue);
+
+        const form = new FormData();
+
+        const trackFile = getTrackFile(contextValue,formValue.token);
+
+        form.append("trackInfoSaveReqDto", new Blob([JSON.stringify(body)],{type:"application/json"}));
+        form.append("coverImgFile", trackFile[0]);
+
+        const response = TrackSaveApi(form);
+
+        console.log(response.code);
+        console.log(response.data);
+      } else {
+
+      }
+
+    }
+  }
   const onBlur = async (e) => {
     const {value, name} = e.target;
 
@@ -246,7 +288,7 @@ function InfoFormListItem({
     if (isPlayList) {
       updatePlayListObject(name, "value", value);
     } else {
-      updateTracksObject(name, "value", track.token, value);
+      updateTracksObject(name, "value", formValue.token, value);
     }
 
     // title 은 빈공백 x
@@ -331,7 +373,7 @@ function InfoFormListItem({
     if (isPlayList) {
       updateContextPly(files);
     } else {
-      updateContextTrackFile(track.token, files);
+      updateContextTrackFile(formValue.token, files);
     }
   }
   useEffect(() => {
@@ -340,8 +382,8 @@ function InfoFormListItem({
       updatePlayListValue(genreBox.name, genreBox.selectedOption);
       updatePlayListValue(TypeNames.GenreType, genreBox.selectedOption.name);
     } else {
-      updateTracksValue(genreBox.name, track.token, genreBox.selectedOption);
-      updateTracksValue(TypeNames.GenreType, track.token,
+      updateTracksValue(genreBox.name, formValue.token, genreBox.selectedOption);
+      updateTracksValue(TypeNames.GenreType, formValue.token,
           genreBox.selectedOption.name);
     }
   }, [genreBox.selectedOption, plyTypeBox.selectedOption])
@@ -356,7 +398,7 @@ function InfoFormListItem({
   }, [uploadInfo])
   useEffect(() => {
     const coverImgFile = uploadInfo.isPlayList ? getPlyFile(contextValue)
-        : getTrackFile(contextValue, track.token);
+        : getTrackFile(contextValue, formValue.token);
     if (coverImgFile !== null && coverImgFile !== undefined) {
       encodeFileToBase64(coverImgFile[0], setCoverImg).catch(
           () => console.log("error"))
@@ -365,7 +407,7 @@ function InfoFormListItem({
     }
   }, [contextValue])
 
-  return <li key={!isPlayList && track.token} className="list-group-item m-1"
+  return <li key={!isPlayList && formValue.token} className="list-group-item m-1"
              onClick={() => formClickToggleClose(genreBox, plyTypeBox)}>
     <div className="editStatus_div">
       <div className="editStatus_info">
@@ -478,11 +520,12 @@ function InfoFormListItem({
             <span className="normal_font">Additional tags</span>
             <CustomTagMention
                 playListType={plyTypeBox}
-                addTagListEvent={addPlayListTagList}
+                addTagListEvent={addTagListEvent}
                 searchTagList={searchTagList}
                 setSearchTagList={setSearchTagList}
                 setErrors={setErrors}
-                storeTagList={uploadInfo.playList.tagList}/>
+                token={!isPlayList && formValue.token}
+                storeTagList={formValue.tagList}/>
             <div className="form-text text-danger">
               <small>{errors.tags.error && errors.tags.message}</small>
             </div>
@@ -574,10 +617,10 @@ function InfoFormListItem({
           className="sc-orange sc-text-error">*</span> Required fields
       </div>
       <BtnOutLine event={() => !isPlayList ?
-          removeTrackBtnClickEvent(track.token, track.id)
+          removeTrackBtnClickEvent(formValue.token, formValue.id)
           : cancelPlyBtnClickEvent()}
                   text="Cancel"/>
-      <Btn text="Save"/>
+      <Btn text="Save" event={saveBtnClickEvent}/>
     </div>
 
   </li>;

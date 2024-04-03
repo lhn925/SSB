@@ -20,13 +20,12 @@ public class BaseTrackDto {
     @Pattern(regexp = RegexPatterns.TRACK_TITLE_REGEX, message = "track.title.regex")
     protected String title;
 
-    @NotNull
+    @Pattern(regexp = RegexPatterns.TRACK_DESC_REGEX, message = "desc.error.length")
     protected String desc;
 
+    protected boolean isDownload;
+    protected boolean isPrivacy;
     @NotNull
-    protected Boolean isDownload;
-    @NotNull
-    protected Boolean isPrivacy;
     protected List<TrackTagsDto> tagList;
 
 }

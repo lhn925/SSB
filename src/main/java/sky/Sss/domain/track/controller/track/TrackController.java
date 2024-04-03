@@ -62,13 +62,15 @@ public class TrackController {
         BindingResult bindingResult,
         @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
+
+        log.info("coverImgFile = {}", coverImgFile);
+
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         TrackInfoRepDto trackInfoRepDto = trackService.addTrackFile(trackInfoSaveReqDto, coverImgFile);
         return ResponseEntity.ok(trackInfoRepDto);
     }
-
     /**
      * 트랙정보 업데이트
      *
@@ -84,7 +86,6 @@ public class TrackController {
         trackService.updateTrackInfo(trackInfoModifyReqDto, coverImgFile);
         return ResponseEntity.ok().build();
     }
-
     /**
      * 트랙 파일 삭제
      */

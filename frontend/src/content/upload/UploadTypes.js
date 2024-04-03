@@ -1,3 +1,4 @@
+
 export const TypeNames = {
   PlyTypes: "playListType", MusicTypes: "genre", GenreType: "genreType"
 };
@@ -80,3 +81,6 @@ export const GenreTypes = {
     subTypes: Object.values(SubAudioTypes)
   },
 };
+
+export const playListOptions = Object.values(PlyTypes);
+export const genreOptions = Object.values(GenreTypes);

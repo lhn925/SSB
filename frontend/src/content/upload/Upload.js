@@ -327,10 +327,9 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
               updatePlayListValue={updatePlayListValue}
               clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
               updateTracksValue={updateTracksValue}
-              addTrackTagList={addTrackTagList}
+              addTagListEvent={uploadSettings.isPlayList ? addPlayListTagList:addTrackTagList}
               removeTrack={removeTrack}
               cleanStore={cleanStore}
-              addPlayListTagList={addPlayListTagList}
               changeIsPrivacy={changeIsPrivacy}/>
           }
         </div>

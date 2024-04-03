@@ -91,7 +91,11 @@ public class TrackTagService {
     // DB 태그 검색 후 없으면 추가
     @Transactional
     public List<SsbTrackTags> getSsbTrackTags(List<TrackTagsDto> tagList) {
-        if (tagList != null && tagList.size() > 0) {
+        if (tagList.size() > 30) {
+            throw new IllegalArgumentException("track.tag.size");
+        }
+
+        if (tagList.size() > 0) {
             Set<String> findTagsSet = tagList.stream().map(TrackTagsDto::getTag).collect(Collectors.toSet());
             List<SsbTrackTags> ssbTrackTags = getTagsList(findTagsSet);
             // String
