@@ -58,7 +58,7 @@ export function UploadInfoForm({
   // 플레이리스트
   return <ul className="track_info_form_list list-group">
     {
-      uploadInfo.isPlayList ? !uploadInfo.isPlayList.isSave && <InfoFormListItem
+      uploadInfo.isPlayList ? !uploadInfo.playList.isSave && <InfoFormListItem
           index={0}
           updateOrder={updateOrder}
           updatePlayListObject={updatePlayListObject}
@@ -273,8 +273,12 @@ function InfoFormListItem({
         }
         // 플레이리스트 일부 정보를 해당 플레이리스트에 삽입
         trackInfoList.push(CreateTrackBody({
-          ...track, genreType: genreType, genre: genre,
-          isDownload: formValue.isDownload, order: index
+          ...track,
+          genreType: genreType,
+          genre: genre,
+          customGenre: customGenre,
+          isDownload: formValue.isDownload,
+          order: index
         }));
       })
 
@@ -293,55 +297,8 @@ function InfoFormListItem({
       toast.dismiss(loading);
       const data = response.data;
       const code = response.code;
-
-      if (code === HttpStatusCode.Ok) {
-        updatePlayListValue("isSave", true);
-        return;
-      }
-      console.log(data);
-      const errorDetails = data.errorDetails;
-
-      // 저장할려는 파일 존재하지 않는 경우
-      if (code === HttpStatusCode.Forbidden) {
-        // 웹에 있는 트랙 정보 삭제
-        cleanStore();
-        toast.error(errorDetails[0].message);
-        return;
-      }
-      if (code === HttpStatusCode.BadRequest) {
-        errorDetails.map(error => {
-          const field = error.field;
-
-          if (field === undefined) {
-            toast.error(error.message);
-            return;
-          }
-          // playList 에 Info 오류 일 경우
-          if (field === "title" || field === "genre" || field === "desc") {
-            const name = field === "genre" ? "customGenre" : field;
-            updatePlayListObject(name, "error", true);
-            updatePlayListObject(name, "message", error.message);
-            return;
-          }
-          const fieldDto = field.slice(0, 24);
-          // track 리스트에 에러 일 경우
-          if (fieldDto === "playListTrackInfoDtoList") {
-            const firstIndex = field.indexOf("[") + 1;
-            const lastIndex = field.indexOf("]") + 1;
-            // Error Type 추출
-            const errorType = field.slice(lastIndex + 1);
-            // 배열 인덱스 추출
-            const index = Number.parseInt(
-                field.slice(firstIndex, firstIndex + 1)); // 배열 인덱스 추출;
-            const trackInfo = playListBody.playListTrackInfoDtoList[index];
-            if (errorType === "title") {
-              updateTrackError(errorType, trackInfo.token, true, error.message);
-            }
-          }
-        })
-      }
+      TrackCommonErrorTry(code, data, isPlayList, data.errorDetails, playListBody);
       return;
-
     } else if (!isPlayList && formValue.id !== 0 && formValue.isSuccess) {
       const body = CreateTrackBody(formValue);
 
@@ -355,43 +312,19 @@ function InfoFormListItem({
       toast.dismiss(loading);
       const data = response.data;
       const code = response.code;
-      if (code === HttpStatusCode.Ok) {
-        updateTracksValue("isSave", formValue.token, true);
-        return;
-      }
-
+      TrackCommonErrorTry(code, data, isPlayList, data.errorDetails);
       // 입력할 파일이 없는 경우 403
       // 임시파일이 존재하지 않는 경우
-
-      const errorDetail = data.errorDetails[0];
-
-      if (code === HttpStatusCode.Forbidden) {
-        // 웹에 있는 트랙 정보 삭제
-        removeTrackHandler(formValue.token);
-        toast.error(errorDetail.message);
-        return;
-      }
-
-      if (code === HttpStatusCode.BadRequest) {
-        if (errorDetail.field === undefined) {
-          toast.error(errorDetail.message);
-        } else {
-          let name = errorDetail.field;
-          if (name === "genre") {
-            name = "customGenre";
-          }
-          updateTrackError(name, formValue.token, true, errorDetail.message);
-        }
-      }
-      // title 및 desc,customGenre,tag 에러
       return;
+
     }
     toast.error("파일을 업로드 후 저장버튼을 눌러주세요");
     toast.dismiss(loading);
 
   }
 
-  function TrackCommonErrorTry (code,data,isPlayList,errorDetails,playListBody) {
+  function TrackCommonErrorTry(code, data, isPlayList, errorDetails,
+      playListBody) {
 
     if (code === HttpStatusCode.Ok) {
       if (isPlayList) {
@@ -462,8 +395,6 @@ function InfoFormListItem({
       }
     }
   }
-
-
 
   const onBlur = async (e) => {
     const {value, name} = e.target;

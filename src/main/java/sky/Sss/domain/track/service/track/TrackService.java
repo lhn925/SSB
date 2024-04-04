@@ -87,8 +87,11 @@ public class TrackService {
         // 현재 ssbTrack 에 저장되어 있는 track
         Integer totalTrackLength = getTotalLength(user);
 
-        Integer totalUploadTrackLength = 0;
-        SsbTrack ssbTrack = createTrack(user, tempTrackStorage, totalUploadTrackLength, totalTrackLength,
+        Integer totalUploadTrackLength = tempTrackStorage.getTrackLength();
+
+        checkLimit(totalTrackLength, totalUploadTrackLength);
+
+        SsbTrack ssbTrack = createTrack(user, tempTrackStorage,
             trackInfoSaveReqDto);
 
         // 사용자에게 한번 배포가 되었는지 확인
@@ -170,6 +173,7 @@ public class TrackService {
             throw new SsbFileNotFoundException();
         }
 
+        // 현재 유저가 업로드한 트랙 길이
         Integer totalTrackLength = getTotalLength(user);
         // 태그 조회
         List<SsbTrack> saveTracks = new ArrayList<>();
@@ -178,13 +182,23 @@ public class TrackService {
         SsbPlayListSettings ssbPlayListSettings = SsbPlayListSettings.builder().id(settingsId).build();
 
         // upload 할 length 저장
-        Integer totalUploadTrackLength = 0;
+        int totalUploadTrackLength = 0;
+
+
+        // temp TotalLength 전부 더하기
+        totalUploadTrackLength = tempList.stream().map(TempTrackStorage::getTrackLength).toList().stream()
+            .mapToInt(Integer::intValue).sum();
+
+        checkLimit(totalTrackLength, totalUploadTrackLength);
+
         for (PlayListTrackInfoReqDto metaDto : trackPlayListFileDtoList) {
             TempTrackStorage tempTrack = tempList.stream().filter(temp -> temp.getToken().equals(metaDto.getToken()))
                 .findFirst()
                 .orElseThrow(SsbFileNotFoundException::new);
             // ssbTrack 저장
-            SsbTrack ssbTrack = createTrack(user, tempTrack, totalUploadTrackLength, totalTrackLength, metaDto);
+
+
+            SsbTrack ssbTrack = createTrack(user, tempTrack, metaDto);
 
             SsbTrack.updateIsRelease(ssbTrack, !ssbTrack.getIsPrivacy());
             // tag 저장
@@ -379,7 +393,6 @@ public class TrackService {
     }
 
     private SsbTrack createTrack(User user, TempTrackStorage tempTrack,
-        Integer totalUploadTrackLength, Integer totalTrackLength,
         TrackInfoSaveReqDto metaDto) {
 
         // ssbTrack 생성
@@ -387,10 +400,6 @@ public class TrackService {
         // token값 저장
         SsbTrack.updateToken(tempTrack.getToken(), ssbTrack);
         // 총 파일 트랙 길이 저장
-        totalUploadTrackLength += tempTrack.getTrackLength();
-
-        // 총업로드 제한 180분 이 넘는지 확인
-        checkLimit(totalTrackLength, totalUploadTrackLength);
         return ssbTrack;
     }
 
@@ -404,8 +413,8 @@ public class TrackService {
         return new ArrayList<>();
     }
 
-    private void checkLimit(Integer totalTrackLength, Integer trackLength) {
-        boolean isLengthOver = (totalTrackLength + trackLength) > FileStore.TRACK_UPLOAD_LIMIT;
+    private void checkLimit(Integer totalTrackLength, Integer totalUploadTrackLength) {
+        boolean isLengthOver = (totalTrackLength + totalUploadTrackLength) > FileStore.TRACK_UPLOAD_LIMIT;
         if (isLengthOver) {
             throw new SsbFileLengthLimitOverException();
         }

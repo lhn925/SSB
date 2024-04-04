@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {
   calculateRemovePercentage,
-  calculateUploadPercentage
+  calculateUploadPercentage, recalculateTotalUploadPercent
 } from "utill/function";
 
 const createTrackInfo = (data) => ({
@@ -55,13 +55,14 @@ const uploadInfo = createSlice({
           const totalFiles = state.tracks.length; // 원래의 전체 파일 수
           const completedUploads = state.tracks.filter(
               (track) => track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
-          state.uploadPercent = calculateUploadPercentage(totalFiles,
-              completedUploads, 0, action.payload.tracks.length);
+          // state.uploadPercent = calculateUploadPercentage(totalFiles,
+          //     completedUploads, 0, action.payload.tracks.length);
         } else {
           state.uploadPercent = 0;
         }
-        state.isSuccess = false;
+        // state.isSuccess = false;
         state["tracks"].push(createTrackInfo(value));
+        // state.uploadPercent = recalculateTotalUploadPercent(state.tracks);
       })
     }, addTrackTagList(state, action) {
       state.tracks.forEach((track) => {
@@ -77,23 +78,26 @@ const uploadInfo = createSlice({
       if (findTracks.length !== 0) {
         const track = findTracks[0];
         const trackUploadPercent = action.payload.uploadPercent;
-        const percent = 100.0 / state.tracks.length;
+        // const percent = 100.0 / state.tracks.length;
         // 이전 percent 계산
-        const prevPercentAge = (percent * track.uploadPercent) / 100.0;
-        // 현재 percent 계산
-        const percentAge = (percent * trackUploadPercent) / 100.0;
+        // const prevPercentAge = (percent * track.uploadPercent) / 100.0;
+        // // 현재 percent 계산
+        // const percentAge = (percent * trackUploadPercent) / 100.0;
 
-        const addAge = percentAge - prevPercentAge;
+        // const addAge = percentAge - prevPercentAge;
         // 100 이거나
 
-        const totalUpdatePercent = state.uploadPercent + addAge;
-        state.uploadPercent = totalUpdatePercent > 100 ? 100
-            : totalUpdatePercent;
-        state.isSuccess = totalUpdatePercent === 100;
+        // const totalUpdatePercent = state.uploadPercent + addAge;
+        // state.uploadPercent = totalUpdatePercent > 100 ? 100
+        //     : totalUpdatePercent;
+        // state.isSuccess = totalUpdatePercent >= 99.9;
+
         // 완료 됐으면 isSuccess true
         track.isSuccess = trackUploadPercent === 100;
-
         track.uploadPercent = trackUploadPercent;
+        state.uploadPercent = recalculateTotalUploadPercent(state.tracks);
+        state.isSuccess = state.tracks.every(track => track.uploadPercent === 100);
+
       } else {
         throw new Error();
       }
@@ -110,15 +114,16 @@ const uploadInfo = createSlice({
         const completedUploads = state.tracks.filter(
             (track) => track.isSuccess).length; // 현재까지 업로드 완료된 파일 수
         const deletedFiles = 1; // 삭제된 파일 수
-        state.uploadPercent = calculateRemovePercentage(totalFiles,
-            completedUploads, deletedFiles);
+        // state.uploadPercent = calculateRemovePercentage(totalFiles,
+        //     completedUploads, deletedFiles);
+        // 파일 비율로 Percent
       } else {
         state.isSuccess = false;
         state.uploadPercent = 0;
       }
       state.tracks = state.tracks.filter(
           value => action.payload.token !== value.token);
-
+      state.uploadPercent = recalculateTotalUploadPercent(state.tracks);
     }, updateOrder(state, action) {
       const items = Array.from(state.tracks);
       const sourceIndex = action.payload.sourceIndex;

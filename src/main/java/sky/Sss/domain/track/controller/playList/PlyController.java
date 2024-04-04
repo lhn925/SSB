@@ -68,11 +68,10 @@ public class PlyController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
-        User user = userQueryService.findOne();
         // tag 가져오기
         List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(playListSettingSaveDto.getTagList());
         PlayListInfoDto playListInfoDto = plyService.addPlyAndTracks(playListSettingSaveDto,
-            coverImgFile, user, ssbTrackTags);
+            coverImgFile, ssbTrackTags);
 
         return ResponseEntity.ok(playListInfoDto);
     }

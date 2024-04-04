@@ -54,7 +54,8 @@ public class PlyService {
 
     @Transactional
     public PlayListInfoDto addPlyAndTracks(PlayListSettingSaveDto playListSettingSaveDto,
-        MultipartFile coverImgFile, User user, List<SsbTrackTags> ssbTrackTags) {
+        MultipartFile coverImgFile, List<SsbTrackTags> ssbTrackTags) {
+        User user = userQueryService.findOne();
         // 플레이리스트 생성
         PlayListInfoDto playListInfoDto = addPly(user, playListSettingSaveDto, ssbTrackTags,
             coverImgFile);

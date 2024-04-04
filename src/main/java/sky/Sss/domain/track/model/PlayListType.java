@@ -14,7 +14,7 @@ public enum PlayListType {
     public static PlayListType findByListType(String type) {
         PlayListType[] values = values();
         for (PlayListType value : values) {
-            if (value.name().equals(type)) {
+            if (value.type.equals(type)) {
                 return value;
             }
         }
