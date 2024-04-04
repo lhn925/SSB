@@ -253,7 +253,6 @@ public class EmailApiController {
      * @return
      */
     private String getHashing(CodeCheckRequestDto authCode) {
-        log.info("authCode.getSendType() = {}", authCode.getSendType());
         String salt = getTokeKey(authCode.getSendType());
         String authToken = authCode.getAuthToken();
         String hashingToken = TokenUtil.hashing(authToken.getBytes(), salt);

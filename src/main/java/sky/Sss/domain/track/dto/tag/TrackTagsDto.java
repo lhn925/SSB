@@ -12,7 +12,7 @@ import sky.Sss.global.utili.validation.regex.RegexPatterns;
 @NoArgsConstructor
 public class TrackTagsDto {
     private Long id;
-    @Pattern(regexp = RegexPatterns.TAG_REGEX)
+
     private String tag;
 
     public TrackTagsDto(Long id, String tag) {

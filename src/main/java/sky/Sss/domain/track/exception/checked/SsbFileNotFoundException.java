@@ -15,6 +15,6 @@ public class SsbFileNotFoundException extends SsbFileException {
 
 
     public SsbFileNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "file.error.notFind");
+        super(HttpStatus.FORBIDDEN, "file.error.notFind");
     }
 }

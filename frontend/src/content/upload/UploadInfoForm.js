@@ -1,6 +1,6 @@
 import React, {useContext, useRef, useState, useEffect} from 'react';
 import {
-  ChangeError, CreateTrackBody,
+  ChangeError, CreatePlayListBody, CreateTrackBody,
   encodeFileToBase64,
   useToggleableOptions, ValueEmojiCheck
 } from "utill/function";
@@ -22,6 +22,9 @@ import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
 import {UseUploadActions, UseUploadValue} from "App";
 import {TrackSaveApi} from "utill/api/upload/TrackSaveApi";
+import {toast} from "react-toastify";
+import {HttpStatusCode} from "axios";
+import {PlayListSaveApi} from "../../utill/api/upload/PlayListSaveApi";
 
 export function UploadInfoForm({
   updateOrder,
@@ -224,50 +227,244 @@ function InfoFormListItem({
     updateTrackError(name, token, false, "");
   }
 
-  const saveBtnClickEvent = () => {
+  const saveBtnClickEvent = async () => {
     const title = formValue.title;
     const tagList = formValue.tagList;
-    const genre = formValue.genre;
     const genreType = formValue.genreType;
+    const genre = formValue.genre;
     const customGenre = formValue.customGenre;
     const desc = formValue.desc;
-    const coverImgFile = getTrackFile(contextValue,formValue.token);
-    const isPrivacy = formValue.isPrivacy;
-    const isDownload = formValue.isDownload;
-
 
     // 공통적인 값 체크
     if (errors.tags.error || tagList.length > 30) {
       ChangeError(setErrors, "tags", "태그는 30개 제한입니다", true);
       return;
     }
-    // 값 체크
-    if ((genreType === GenreTypes.CUSTOM.name && customGenre.error) || desc.error || title.error) {
+    if (formValue.title.value === "") {
+      changeStoreError("title", isPlayList, "필수 입력 값 입니다.", true);
       return;
     }
-    if (isPlayList) {
 
-    } else {
-      if (formValue.id !== 0 && formValue.isSuccess) {
-        const body = CreateTrackBody(formValue);
+    // 값 체크
+    if ((genreType === GenreTypes.CUSTOM.name && customGenre.error)
+        || desc.error || title.error) {
+      return;
+    }
 
-        const form = new FormData();
+    const loading = toast.loading("...트랙 저장 중");
+    const form = new FormData();
 
-        const trackFile = getTrackFile(contextValue,formValue.token);
+    const coverImgFile = isPlayList ? getPlyFile(contextValue) : getTrackFile(
+        contextValue, formValue.token);
 
-        form.append("trackInfoSaveReqDto", new Blob([JSON.stringify(body)],{type:"application/json"}));
-        form.append("coverImgFile", trackFile[0]);
+    if (isPlayList && uploadInfo.isSuccess) {
+      const trackInfoList = [];
+      uploadInfo.tracks.map((track, index) => {
+        if (track.id === 0) {
+          // 만약 isSuccess 인데 track id가 0인 경우가 있을 경우
+          toast.dismiss(loading);
+          toast.error("파일을 업로드 중 입니다. 잠시만 기다려주세요.");
+          return;
+        }
+        // 필수 정보 확인
+        if (track.title.error) {
+          toast.dismiss(loading);
+          return;
+        }
+        // 플레이리스트 일부 정보를 해당 플레이리스트에 삽입
+        trackInfoList.push(CreateTrackBody({
+          ...track, genreType: genreType, genre: genre,
+          isDownload: formValue.isDownload, order: index
+        }));
+      })
 
-        const response = TrackSaveApi(form);
+      const playListBody = CreatePlayListBody(formValue);
 
-        console.log(response.code);
-        console.log(response.data);
-      } else {
+      playListBody.playListTrackInfoDtoList = trackInfoList;
 
+      form.append("playListSettingSaveDto",
+          new Blob([JSON.stringify(playListBody)], {type: "application/json"}));
+
+      if (coverImgFile) {
+        form.append("coverImgFile", coverImgFile[0]);
       }
 
+      const response = await PlayListSaveApi(form);
+      toast.dismiss(loading);
+      const data = response.data;
+      const code = response.code;
+
+      if (code === HttpStatusCode.Ok) {
+        updatePlayListValue("isSave", true);
+        return;
+      }
+      console.log(data);
+      const errorDetails = data.errorDetails;
+
+      // 저장할려는 파일 존재하지 않는 경우
+      if (code === HttpStatusCode.Forbidden) {
+        // 웹에 있는 트랙 정보 삭제
+        cleanStore();
+        toast.error(errorDetails[0].message);
+        return;
+      }
+      if (code === HttpStatusCode.BadRequest) {
+        errorDetails.map(error => {
+          const field = error.field;
+
+          if (field === undefined) {
+            toast.error(error.message);
+            return;
+          }
+          // playList 에 Info 오류 일 경우
+          if (field === "title" || field === "genre" || field === "desc") {
+            const name = field === "genre" ? "customGenre" : field;
+            updatePlayListObject(name, "error", true);
+            updatePlayListObject(name, "message", error.message);
+            return;
+          }
+          const fieldDto = field.slice(0, 24);
+          // track 리스트에 에러 일 경우
+          if (fieldDto === "playListTrackInfoDtoList") {
+            const firstIndex = field.indexOf("[") + 1;
+            const lastIndex = field.indexOf("]") + 1;
+            // Error Type 추출
+            const errorType = field.slice(lastIndex + 1);
+            // 배열 인덱스 추출
+            const index = Number.parseInt(
+                field.slice(firstIndex, firstIndex + 1)); // 배열 인덱스 추출;
+            const trackInfo = playListBody.playListTrackInfoDtoList[index];
+            if (errorType === "title") {
+              updateTrackError(errorType, trackInfo.token, true, error.message);
+            }
+          }
+        })
+      }
+      return;
+
+    } else if (!isPlayList && formValue.id !== 0 && formValue.isSuccess) {
+      const body = CreateTrackBody(formValue);
+
+      if (coverImgFile !== undefined) {
+        form.append("coverImgFile", coverImgFile[0]);
+      }
+      form.append("trackInfoSaveReqDto",
+          new Blob([JSON.stringify(body)], {type: "application/json"}));
+      const response = await TrackSaveApi(form);
+
+      toast.dismiss(loading);
+      const data = response.data;
+      const code = response.code;
+      if (code === HttpStatusCode.Ok) {
+        updateTracksValue("isSave", formValue.token, true);
+        return;
+      }
+
+      // 입력할 파일이 없는 경우 403
+      // 임시파일이 존재하지 않는 경우
+
+      const errorDetail = data.errorDetails[0];
+
+      if (code === HttpStatusCode.Forbidden) {
+        // 웹에 있는 트랙 정보 삭제
+        removeTrackHandler(formValue.token);
+        toast.error(errorDetail.message);
+        return;
+      }
+
+      if (code === HttpStatusCode.BadRequest) {
+        if (errorDetail.field === undefined) {
+          toast.error(errorDetail.message);
+        } else {
+          let name = errorDetail.field;
+          if (name === "genre") {
+            name = "customGenre";
+          }
+          updateTrackError(name, formValue.token, true, errorDetail.message);
+        }
+      }
+      // title 및 desc,customGenre,tag 에러
+      return;
+    }
+    toast.error("파일을 업로드 후 저장버튼을 눌러주세요");
+    toast.dismiss(loading);
+
+  }
+
+  function TrackCommonErrorTry (code,data,isPlayList,errorDetails,playListBody) {
+
+    if (code === HttpStatusCode.Ok) {
+      if (isPlayList) {
+        updatePlayListValue("isSave", true);
+        return;
+      }
+      updateTracksValue("isSave", formValue.token, true);
+      return;
+    }
+
+    // 파일이 없는 경우
+    if (code === HttpStatusCode.Forbidden) {
+      if (isPlayList) {
+        // 웹에 있는 store 정보 전부 삭제
+        cleanStore();
+        toast.error(errorDetails[0].message);
+        return;
+
+      }
+      // 웹에 있는 트랙 정보 삭제
+      removeTrackHandler(formValue.token);
+      toast.error(errorDetails[0].message);
+      return;
+    }
+
+    if (code === HttpStatusCode.BadRequest) {
+      if (isPlayList) {
+        errorDetails.map(error => {
+          const field = error.field;
+
+          if (field === undefined) {
+            toast.error(error.message);
+            return;
+          }
+          // playList 에 Info 오류 일 경우
+          if (field === "title" || field === "genre" || field === "desc") {
+            const name = field === "genre" ? "customGenre" : field;
+            updatePlayListObject(name, "error", true);
+            updatePlayListObject(name, "message", error.message);
+            return;
+          }
+          const fieldDto = field.slice(0, 24);
+          // track 리스트에 에러 일 경우
+          if (fieldDto === "playListTrackInfoDtoList") {
+            const firstIndex = field.indexOf("[") + 1;
+            const lastIndex = field.indexOf("]") + 1;
+            // Error Type 추출
+            const errorType = field.slice(lastIndex + 1);
+            // 배열 인덱스 추출
+            const index = Number.parseInt(
+                field.slice(firstIndex, firstIndex + 1)); // 배열 인덱스 추출;
+            const trackInfo = playListBody.playListTrackInfoDtoList[index];
+            if (errorType === "title") {
+              updateTrackError(errorType, trackInfo.token, true, error.message);
+            }
+          }
+        })
+        return;
+      }
+      if (errorDetails[0].field === undefined) {
+        toast.error(errorDetails[0].message);
+      } else {
+        let name = errorDetails[0].field;
+        if (name === "genre") {
+          name = "customGenre";
+        }
+        updateTrackError(name, formValue.token, true, errorDetails[0].message);
+      }
     }
   }
+
+
+
   const onBlur = async (e) => {
     const {value, name} = e.target;
 
@@ -293,7 +490,7 @@ function InfoFormListItem({
 
     // title 은 빈공백 x
     if (name === "title" && emptyCheck) {
-      changeStoreError(name, isPlayList, "title은 필수 입력 값입니다", true);
+      changeStoreError(name, isPlayList, "필수 입력 값 입니다.", true);
       return;
     }
 
@@ -307,6 +504,7 @@ function InfoFormListItem({
     // 이모지 체크후 있으면 error
     if (!check) {
       changeStoreError(name, isPlayList, "이모지는 안돼요!", true);
+      return;
     }
     // error 가 없으면 false
     changeStoreError(name, isPlayList, "", false);
@@ -382,7 +580,8 @@ function InfoFormListItem({
       updatePlayListValue(genreBox.name, genreBox.selectedOption);
       updatePlayListValue(TypeNames.GenreType, genreBox.selectedOption.name);
     } else {
-      updateTracksValue(genreBox.name, formValue.token, genreBox.selectedOption);
+      updateTracksValue(genreBox.name, formValue.token,
+          genreBox.selectedOption);
       updateTracksValue(TypeNames.GenreType, formValue.token,
           genreBox.selectedOption.name);
     }
@@ -407,7 +606,8 @@ function InfoFormListItem({
     }
   }, [contextValue])
 
-  return <li key={!isPlayList && formValue.token} className="list-group-item m-1"
+  return <li key={!isPlayList && formValue.token}
+             className="list-group-item m-1"
              onClick={() => formClickToggleClose(genreBox, plyTypeBox)}>
     <div className="editStatus_div">
       <div className="editStatus_info">

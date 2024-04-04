@@ -348,13 +348,17 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
 const SaveTempApi = async (setTracksUploadPercent, tempToken, isPrivacy,
     isPlayList,
     file) => {
-  let body = {
-    trackFile: file,
-    isPlayList: isPlayList,
-    isPrivacy: isPrivacy
-  }
 
-  const response = await TempSaveApi(setTracksUploadPercent, tempToken, body);
+  let playListJson = {isPlayList: 1}
+  let privacyJson = {isPrivacy: 1}
+
+  const formData = new FormData();
+  formData.append("trackFile", file);
+  formData.append("playList", isPlayList);
+  formData.append("privacy", isPrivacy);
+
+
+  const response = await TempSaveApi(setTracksUploadPercent, tempToken, formData);
   const data = response.data;
   if (response.code === HttpStatusCode.Ok) {
     return {

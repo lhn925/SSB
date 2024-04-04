@@ -53,6 +53,6 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
     @Override
     @Transactional
     public void save(SsbTrack entity) {
-        trackJpaRepository.save(entity);
+        trackJpaRepository.saveAndFlush(entity);
     }
 }

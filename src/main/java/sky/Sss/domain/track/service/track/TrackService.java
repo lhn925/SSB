@@ -45,6 +45,8 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.utili.FileStore;
+import sky.Sss.global.redis.service.RedisCacheService;
+import sky.Sss.global.redis.service.RedisTagService;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -74,9 +76,6 @@ public class TrackService {
      */
     @Transactional
     public TrackInfoRepDto addTrackFile(TrackInfoSaveReqDto trackInfoSaveReqDto, MultipartFile coverImgFile) {
-        if (trackInfoSaveReqDto.getTagList().size() > 30) {
-            throw new IllegalArgumentException("track.tag.size");
-        }
 
         User user = userQueryService.findOne();
         // 시간제한 180분
@@ -85,11 +84,8 @@ public class TrackService {
         TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackInfoSaveReqDto.getId(),
             trackInfoSaveReqDto.getToken(), user, trackInfoSaveReqDto.isPrivacy(), false);
 
-
-
         // 현재 ssbTrack 에 저장되어 있는 track
         Integer totalTrackLength = getTotalLength(user);
-
 
         Integer totalUploadTrackLength = 0;
         SsbTrack ssbTrack = createTrack(user, tempTrackStorage, totalUploadTrackLength, totalTrackLength,
@@ -99,24 +95,23 @@ public class TrackService {
         // true: 배포함 ,False : 배포되지 않음
         SsbTrack.updateIsRelease(ssbTrack, !ssbTrack.getIsPrivacy());
 
+        String storeFileName = null;
+        if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드
+
+            storeFileName = getUploadFileDto(coverImgFile).getStoreFileName();
+        }
+        SsbTrack.updateCoverImg(storeFileName, ssbTrack);
+
         // 트랙 저장
         trackRepositoryImpl.save(ssbTrack);
 
         List<TrackTagsDto> tagList = trackInfoSaveReqDto.getTagList();
+        // 태그 확인
+        List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(tagList);
+        // 링크 연결
+        List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
+        tagLinkCommonService.addTrackTagLinks(trackTagLinks);
 
-        if (!tagList.isEmpty()) {
-            // 태그 확인
-            List<SsbTrackTags> ssbTrackTags = trackTagService.getSsbTrackTags(tagList);
-            // 링크 연결
-            List<SsbTrackTagLink> trackTagLinks = getTrackTagLinks(ssbTrackTags, ssbTrack);
-            tagLinkCommonService.addTrackTagLinks(trackTagLinks);
-        }
-        String storeFileName = null;
-        if (coverImgFile != null) { // 저장할 이미지가 있으면 업로드
-            storeFileName = getUploadFileDto(coverImgFile).getStoreFileName();
-        }
-
-        SsbTrack.updateCoverImg(storeFileName, ssbTrack);
         tempTrackStorageService.delete(tempTrackStorage);
 
         SsbFeed ssbFeed = SsbFeed.create(ssbTrack.getId(), user, ContentsType.TRACK);
@@ -197,8 +192,6 @@ public class TrackService {
             trackFileMap.put(metaDto.getOrder(), ssbTrack);
             saveTracks.add(ssbTrack);
         }
-
-        log.info("tempList size = {}", tempList.size());
         // 임시파일 DB에서 삭제
         tempTrackStorageService.deleteAllBatch(tempList);
 
@@ -403,9 +396,12 @@ public class TrackService {
 
     // 태그 등록
     private List<SsbTrackTagLink> getTrackTagLinks(List<SsbTrackTags> tags, SsbTrack ssbTrack) {
+        if (!tags.isEmpty()) {
+            return tags.stream().map(tag -> SsbTrackTagLink.createSsbTrackTagLink(
+                ssbTrack, tag)).collect(Collectors.toList());
+        }
 
-        return tags.stream().map(tag -> SsbTrackTagLink.createSsbTrackTagLink(
-            ssbTrack, tag)).collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     private void checkLimit(Integer totalTrackLength, Integer trackLength) {

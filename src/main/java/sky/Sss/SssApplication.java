@@ -29,7 +29,7 @@ public class SssApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SssApplication.class, args);
-        log.info("이건 main 입니다");
+
         /*1.
             우선 엔티티를 DTO로 변환하는 방법을 선택한다.
             2. 필요하면 페치 조인으로 성능을 최적화 한다. 대부분의 성능 이슈가 해결된다.

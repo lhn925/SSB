@@ -83,14 +83,16 @@ public class TrackTagService {
         trackTagRepositoryImpl.saveAll(ssbTrackTags, now);
         // cache 추가
         ssbTrackTags.forEach((tag) -> {
-                log.info("tag.getId() = {}", tag.getId());
-                redisTagService.addRedisTag(tag.getTag(), 0);}
+                redisTagService.addRedisTag(tag.getTag(), 0);
+            }
         );
     }
 
     // DB 태그 검색 후 없으면 추가
     @Transactional
     public List<SsbTrackTags> getSsbTrackTags(List<TrackTagsDto> tagList) {
+
+        // TagList 는 최대 까지 제한
         if (tagList.size() > 30) {
             throw new IllegalArgumentException("track.tag.size");
         }
@@ -110,8 +112,10 @@ public class TrackTagService {
                 ssbTrackTags.addAll(getTagsList(addTags));
             }
             return ssbTrackTags;
+
+
         }
-        return null;
+        return new ArrayList<>();
     }
 
 

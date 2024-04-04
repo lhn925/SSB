@@ -14,6 +14,6 @@ public class TrackInfoSaveReqDto extends BaseTrackDto {
 
     @NotBlank
     private String genreType;
-    @Pattern(regexp = RegexPatterns.GENRE_REGEX, message = "track.genre.regex")
+    @Pattern(regexp = RegexPatterns.GENRE_REGEX, message = "{track.genre.regex}")
     private String genre;
 }

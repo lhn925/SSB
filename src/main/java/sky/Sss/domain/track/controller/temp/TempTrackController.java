@@ -52,8 +52,6 @@ public class TempTrackController {
      * 삭제
      *
      */
-
-
     /*
 
         json 형식으로 나가지 않는 형상 해결 해야됨
@@ -65,6 +63,8 @@ public class TempTrackController {
         if (bindingResult.hasErrors()) {
             return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult.getFieldErrors(),ms,request.getLocale()));
         }
+
+        log.info("tempTrackFileUploadDto.isPlayList() = {}", tempTrackFileUploadDto.isPlayList());
         TempTrackInfoDto tempTrackInfoDto = tempTrackStorageService.saveTempTrackFile(tempTrackFileUploadDto);
 
         return ResponseEntity.ok(tempTrackInfoDto);

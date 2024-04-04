@@ -4,6 +4,8 @@ import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
 import {useState} from "react";
 import profile2 from "css/image/profile2.png";
 import {GenreTypes} from "../content/upload/UploadTypes";
+import {HttpStatusCode} from "axios";
+import {toast} from "react-toastify";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -496,6 +498,21 @@ export function CreateTrackBody(track) {
     // tagList:[{id:0,tag:"임하늘"}], // <
     desc:track.desc.value,
     isPrivacy:track.isPrivacy,
-    isDownload:track.isDownload
+    isDownload:track.isDownload,
+    order:track.order
   }
 }
+
+
+export function CreatePlayListBody(playList) {
+  return  {
+    title:playList.title.value,
+    playListType:playList.playListType.value,
+    tagList:playList.tagList,
+    desc:playList.desc.value,
+    isPrivacy:playList.isPrivacy,
+    isDownload:playList.isDownload,
+  }
+}
+
+

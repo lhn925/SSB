@@ -30,6 +30,7 @@ import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
+import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.Result;
 
 /**
@@ -65,7 +66,7 @@ public class PlyController {
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         User user = userQueryService.findOne();
         // tag 가져오기

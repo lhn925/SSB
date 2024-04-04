@@ -69,13 +69,14 @@ public class FileStore {
     }
 
     public void deleteFile(String dirType, String filename) {
-        Path filePath = Paths.get(getFileDir() + dirType +  "/" + filename);
+        Path filePath = Paths.get(getFileDir() + dirType + "/" + filename);
         try {
             Files.delete(filePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * 파일 폴더 + type + 파일이름  + 확장자명 생성
      */
@@ -95,20 +96,20 @@ public class FileStore {
         if (multipartFile.isEmpty()) {
             return null;
         }
-        fileExtConstraint(multipartFile, this.imageDir);
+        fileExtConstraint(multipartFile, imageDir);
         multipartFile.getOriginalFilename();
-        
+
         // 확장자 jpeg 로 통일
-        // 사진 이미지는 전부다 랜덤아이디로
+        // 사진 이미지의 파일명은 전부다 랜덤아이디로
         String fileFormatName = "jpeg";
 
-        String originalFilename = UUID.randomUUID() + ".jpeg";
+        String originalFilename = UUID.randomUUID() + "." + fileFormatName;
         String storeFileName = imageType + originalFilename;
 
         // 유저 프로필 사진
         try {
             MultipartFile resizingFile = resizeImage(targetWidth, multipartFile, fileFormatName, originalFilename);
-            resizingFile.transferTo(new File(getFullPath(fileDir + this.imageDir, storeFileName)));
+            resizingFile.transferTo(new File(getFullPath(fileDir + imageDir, storeFileName)));
             return new UploadFileDto(originalFilename, storeFileName, null);
         } catch (IOException e) {
             throw new RuntimeException();

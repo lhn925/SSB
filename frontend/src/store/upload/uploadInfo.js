@@ -152,14 +152,14 @@ const uploadInfo = createSlice({
       state.playList[key] = {...state.playList[key], [subKey]: value}
     }, changeIsPrivacy(state, action) {
       const isPrivacy = action.payload.isPrivacy;
-      state.tracks.forEach((tracks) => {
-        tracks.isPrivacy = isPrivacy;
+      state.tracks.forEach((track) => {
+        track.isPrivacy = isPrivacy;
       })
       state.playList.isPrivacy = isPrivacy;
     }, changeIsPlayList(state, action) {
       const isPlayList = action.payload.isPlayList;
-      state.tracks.forEach(tracks => {
-        tracks.isPlayList = isPlayList;
+      state.tracks.forEach(track => {
+        track.isPlayList = isPlayList;
       })
       state.isPlayList = isPlayList;
     }

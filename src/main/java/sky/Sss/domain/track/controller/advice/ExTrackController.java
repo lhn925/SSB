@@ -35,6 +35,7 @@ public class ExTrackController {
         return Result.getErrorResult(new ErrorGlobalResultDto(e.getCode(), ms, request.getLocale()), e.getHttpStatus());
     }
 
+    // track error 422
     @ExceptionHandler({SsbPlayIncompleteException.class})
     public ResponseEntity<ErrorResult> playIncompleteExHandler(SsbPlayIncompleteException e,
         HttpServletRequest request) {
@@ -47,6 +48,7 @@ public class ExTrackController {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (e.getClass().equals(IllegalArgumentException.class)) {
             status = HttpStatus.BAD_REQUEST;
+
         }
         try {
             ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale());

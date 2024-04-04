@@ -13,6 +13,8 @@ public class TempTrackFileUploadDto {
 
     @MultipartTrackFileValid
     private MultipartFile trackFile;
-    private boolean isPlayList;
-    private boolean isPrivacy;
+    private boolean playList;
+    private boolean privacy;
+
+
 }

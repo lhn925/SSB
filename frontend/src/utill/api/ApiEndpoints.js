@@ -26,6 +26,7 @@ export const API_LOGIN="/login";
 
 export const TRACKS_INFO_TOTAL = "/tracks/info/total"
 export const TRACKS_SAVE = "/tracks"
+export const TRACKS_PLY_SAVE = "/tracks/ply"
 export const TRACKS_TEMP_FILE_SAVE = "/tracks/temp/file"
 export const TRACKS_TEMP_FILE_SAVE_LIST = "/tracks/temp/file"
 
