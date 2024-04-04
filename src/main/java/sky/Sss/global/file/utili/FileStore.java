@@ -96,9 +96,15 @@ public class FileStore {
             return null;
         }
         fileExtConstraint(multipartFile, this.imageDir);
-        String originalFilename = multipartFile.getOriginalFilename(); // 원본 파일명 (확장자포함)
-        String storeFileName = imageType + createStoreFileName(originalFilename); // 서버 업로드 파일명 (imageType,확장자 포함)
-        String fileFormatName = extractExt(originalFilename); // 확장자 추출
+        multipartFile.getOriginalFilename();
+        
+        // 확장자 jpeg 로 통일
+        // 사진 이미지는 전부다 랜덤아이디로
+        String fileFormatName = "jpeg";
+
+        String originalFilename = UUID.randomUUID() + ".jpeg";
+        String storeFileName = imageType + originalFilename;
+
         // 유저 프로필 사진
         try {
             MultipartFile resizingFile = resizeImage(targetWidth, multipartFile, fileFormatName, originalFilename);
@@ -123,6 +129,7 @@ public class FileStore {
         }
         fileExtConstraint(multipartFile, fileDir);
         String originalFilename = multipartFile.getOriginalFilename(); // 원본 파일명 (확장자포함)
+
         String storeFileName = createStoreFileName(originalFilename); // 서버 업로드 파일명 (확장자 포함)
         String dirPath = createDir(fileDir + token); // 유저 폴더 경로 생성
         // 유저 프로필 사진
