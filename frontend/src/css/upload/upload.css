@@ -109,5 +109,83 @@
 .ply_title_error {
   margin-top: -5px;
   margin-left: 31px;
+}
 
+
+
+
+
+
+
+
+
+
+.activeUpload_saved_container > div {
+  overflow: hidden;
+}
+
+.activeUpload_saved_container {
+  padding: 10px;
+  border-radius: 10px;
+}
+.activeUpload_savedUserName ,.activeUpload_savedTitle > span{
+  text-overflow: ellipsis;
+  font-weight: 460;
+}
+
+.activeUpload_savedTags {
+  max-width: 250px;
+  overflow: hidden;
+
+}
+.activeUpload_savedFields > div{
+  margin-bottom: 3px;
+}
+
+.activeUpload_savedTags  a {
+  height: 16px;
+  background-color: #999999;
+  border: 1px solid #999;
+  border-radius: 10px;
+  padding: 0 5px;
+  line-height: 16px;
+  /*font-size: 14px;*/
+  color: #ffffff;
+}
+
+.activeUpload_savedTags  a:hover {
+  background-color: #888787;
+}
+
+.tagContent {
+  max-width: 120px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: normal;
+}
+
+.activeUpload_savedPrivacy > span {
+  color: #ffffff;
+  border-radius: 5px;
+  line-height: 10px;
+  padding: 3px 10px;
+  font-size: 13px;
+}
+
+.activeUpload_savedLink span,.activeUpload_savedComplete span {
+  font-size: 15px;
+  font-weight: 500;
+}
+.activeUpload_savedLink span:hover {
+  color: #333333;
+}
+
+.activeUpload_saveTracks {
+  width: 100%;
+  border-top: solid 1px #e5e5e5;
+
+}
+.activeUpload_saveTracks span {
+  margin: 5px 5px 0 0;
 }

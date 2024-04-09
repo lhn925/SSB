@@ -16,8 +16,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.global.base.BaseTimeEntity;
+
+
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
@@ -37,8 +40,16 @@ public class SsbPlayListTracks extends BaseTimeEntity {
     @JoinColumn(name = "track_id",nullable = false)
     private SsbTrack ssbTrack;
 
+
+    // 앞에 순서의 Id 를 나타냄 맨 앞일 경우 0
+    private Long parentId;
+
+    // 뒤 순서의 Id를 나타냄  맨 뒤 순서 일 경우 0
+    private Long childId;
+
+    // 현재 위치
     @Column(nullable = false)
-    private Integer orders;
+    private Integer position;
 
     public static List<SsbPlayListTracks> createSsbPlayListTrackList(Map<Integer, SsbTrack> playListMap,
         SsbPlayListSettings ssbPlayListSettings) {
@@ -48,14 +59,22 @@ public class SsbPlayListTracks extends BaseTimeEntity {
             SsbTrack ssbTrack = playListMap.get(key);
             ssbPlayListTracks.setSsbTrack(ssbTrack);
             ssbPlayListTracks.setSsbPlayListSettings(ssbPlayListSettings);
-            ssbPlayListTracks.setOrders(key);
+            ssbPlayListTracks.setPosition(key);
             ssbPlayListTracksList.add(ssbPlayListTracks);
         }
         return ssbPlayListTracksList;
     }
 
-    public static void changeOrders(SsbPlayListTracks ssbPlayListTracks, Integer orders) {
-        ssbPlayListTracks.setOrders(orders);
+    public static void changePosition(SsbPlayListTracks ssbPlayListTracks, Integer position) {
+        ssbPlayListTracks.setPosition(position);
     }
 
+
+    public static void changeParentId(SsbPlayListTracks ssbPlayListTracks, Long parentId) {
+        ssbPlayListTracks.setParentId(parentId);
+    }
+
+    public static void changeChildId(SsbPlayListTracks ssbPlayListTracks, Long childId) {
+        ssbPlayListTracks.setChildId(childId);
+    }
 }

@@ -19,6 +19,12 @@ public class PlayListSettingUpdateDto extends BasePlayListDto {
     private Long id;
     @NotBlank
     private String token;
+
+
+    // order update 를 했는지 여부 확인
+    private Boolean isOrder;
+
+
     private List<PlayListTrackUpdateDto> trackUpdateDtoList;
     private List<PlayListTrackDeleteDto> trackDeleteDtoList;
 

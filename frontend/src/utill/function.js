@@ -519,7 +519,5 @@ export function CreatePlayListBody(playList) {
 
 export function recalculateTotalUploadPercent(tracks) {
   const totalPercent = tracks.reduce((acc, track) => acc + track.uploadPercent, 0);
-
-  console.log("totalPercent:" + totalPercent);
   return Math.min(100, totalPercent / tracks.length);
 }

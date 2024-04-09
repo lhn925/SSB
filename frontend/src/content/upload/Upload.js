@@ -201,6 +201,11 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
       tracks: track
     }))
   }
+  const addSaves = (data) => {
+    dispatch(uploadInfoActions.addSaves({
+      data: data
+    }))
+  }
 
   const setTracksUploadPercent = (token, uploadPercent,abortController) => {
 
@@ -276,7 +281,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
   }
 
   const cleanStore = () => {
-    dispatch(uploadInfoActions.clearStore())
+    dispatch(uploadInfoActions.cleanStore())
   }
   const changeIsPrivacy = (value) => {
     dispatch(uploadInfoActions.changeIsPrivacy(
@@ -310,7 +315,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
         </div>
 
         <div className="upload_content col-lg-8">
-          {uploadInfo.tracks.length === 0 ? <EmptyUploadInfoContent
+          {uploadInfo.tracks.length === 0 && uploadInfo.saves.length === 0 ? <EmptyUploadInfoContent
               lengthPercent={lengthPercent}
               uploadTotalLength={uploadTotalLength}
               clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
@@ -322,6 +327,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
           /> : <UploadInfoForm
               uploadInfo={uploadInfo}
               updateOrder={updateOrder}
+              addSaves={addSaves}
               updateTracksObject={updateTracksObject}
               updatePlayListObject={updatePlayListObject}
               updatePlayListValue={updatePlayListValue}
@@ -349,8 +355,6 @@ const SaveTempApi = async (setTracksUploadPercent, tempToken, isPrivacy,
     isPlayList,
     file) => {
 
-  let playListJson = {isPlayList: 1}
-  let privacyJson = {isPrivacy: 1}
 
   const formData = new FormData();
   formData.append("trackFile", file);
@@ -373,7 +377,6 @@ const SaveTempApi = async (setTracksUploadPercent, tempToken, isPrivacy,
   } else {
     toast.error(data.errorDetails[0].message)
     throw new Error(tempToken);
-    // return {tempToken:tempToken};
   }
 
 }

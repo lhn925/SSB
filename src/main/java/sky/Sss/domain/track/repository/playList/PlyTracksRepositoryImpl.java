@@ -29,13 +29,13 @@ public class PlyTracksRepositoryImpl implements JdbcRepository<SsbPlayListTracks
     public void saveAll(List<SsbPlayListTracks> ssbPlayListTracksList, LocalDateTime createdDateTime) {
         jdbcTemplate.batchUpdate(
             "INSERT INTO ssb_play_list_tracks "
-                + "(settings_id, track_id, orders , created_date_time , last_modified_date_time) "
+                + "(settings_id, track_id, position , created_date_time , last_modified_date_time) "
                 + "VALUES (?, ?, ?,?,?)",
             ssbPlayListTracksList, 50,
             (PreparedStatement ps, SsbPlayListTracks ssbPlayListTracks) -> {
                 ps.setLong(1, ssbPlayListTracks.getSsbPlayListSettings().getId());
                 ps.setLong(2, ssbPlayListTracks.getSsbTrack().getId());
-                ps.setInt(3, ssbPlayListTracks.getOrders());
+                ps.setInt(3, ssbPlayListTracks.getPosition());
                 ps.setTimestamp(4, Timestamp.valueOf(createdDateTime));
                 ps.setTimestamp(5, Timestamp.valueOf(createdDateTime));
             });
@@ -44,5 +44,6 @@ public class PlyTracksRepositoryImpl implements JdbcRepository<SsbPlayListTracks
     @Override
     @Transactional
     public void save(SsbPlayListTracks entity) {
+
     }
 }

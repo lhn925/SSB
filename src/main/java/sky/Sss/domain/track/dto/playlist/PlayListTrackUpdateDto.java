@@ -15,6 +15,10 @@ public class PlayListTrackUpdateDto {
     private Long trackId;
 
     // 순서
-    @NotNull
-    private Integer order;
+    private Long parentId;
+
+    private Long childId;
+
+    private Integer position;
+
 }

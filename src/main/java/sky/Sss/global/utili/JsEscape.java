@@ -6,7 +6,11 @@ public class JsEscape {
         if (text == null || text.length() == 0) {
             return null;
         }
-        return text.replace("<", "\\u003C")
+
+        return text;
+
+        // 주석처리
+/*        return text.replace("<", "\\u003C")
             .replace(">", "\\u003E")
             .replace(":", "\\u003A")
             .replace("'", "\\u0027")
@@ -16,6 +20,6 @@ public class JsEscape {
             .replace("}", "\\u007D")
             .replace(",", "\\u002C")
             .replace("\n", "\\u000A")
-            .replace(" ", "\\u0020");
+            .replace(" ", "\\u0020");*/
     }
 }

@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -184,7 +186,6 @@ public class TrackService {
         // upload 할 length 저장
         int totalUploadTrackLength = 0;
 
-
         // temp TotalLength 전부 더하기
         totalUploadTrackLength = tempList.stream().map(TempTrackStorage::getTrackLength).toList().stream()
             .mapToInt(Integer::intValue).sum();
@@ -196,7 +197,6 @@ public class TrackService {
                 .findFirst()
                 .orElseThrow(SsbFileNotFoundException::new);
             // ssbTrack 저장
-
 
             SsbTrack ssbTrack = createTrack(user, tempTrack, metaDto);
 
@@ -236,6 +236,28 @@ public class TrackService {
         List<SsbPlayListTracks> ssbPlayListTrackList = SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
             ssbPlayListSettings);
         plyTracksService.addPlayListTracks(ssbPlayListTrackList, createdDateTime);
+
+        // 링크드 연결 처리를 위해 다시 search
+        // 전체 리스트가 1보다 클 경우
+        if (ssbPlayListTrackList.size() > 1) {
+            List<SsbPlayListTracks> savedPlyTracks = plyTracksService.findByPlyTracks(ssbPlayListSettings.getId(),
+                Sort.by(Order.asc("position")));
+
+            for (SsbPlayListTracks plyTrack : savedPlyTracks) {
+                // parentId 저장
+                if (plyTrack.getPosition() != 0) {
+                    savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() - 1)).
+                        findFirst().ifPresent(find -> SsbPlayListTracks.changeParentId(plyTrack, find.getId()));
+                }
+                // 포지션이 전체 size 보다 크지 않을경우에만
+                if ((plyTrack.getPosition() + 1) != savedPlyTracks.size()) {
+                    savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() + 1)).
+                        findFirst().ifPresent(find -> SsbPlayListTracks.changeChildId(plyTrack, find.getId()));
+                }
+            }
+        }
+
+
 
         return trackInfoList;
     }

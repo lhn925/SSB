@@ -91,7 +91,7 @@ public class PlyController {
         BindingResult bindingResult, @RequestPart(required = false) MultipartFile coverImgFile,
         HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            return Result.getErrorResult(new ErrorGlobalResultDto(bindingResult, ms, request.getLocale()));
+            return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         plyService.updatePlyInfo(playListSettingUpdateDto, coverImgFile);
         return ResponseEntity.ok().build();

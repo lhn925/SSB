@@ -6,8 +6,9 @@ import {
 } from "utill/function";
 import {URL_UPLOAD} from "content/UrlEndpoints";
 import {ProgressBar} from "components/progressBar/ProgressBar";
-import {Link} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import profile2 from "css/image/profile2.png";
+import iu from "css/image/iu.jpg"
 import "css/mention.css";
 import {CustomSelect} from "components/customSelect/CustomSelect";
 import {CustomTagMention} from "components/mention/CustomTagMention";
@@ -25,9 +26,11 @@ import {TrackSaveApi} from "utill/api/upload/TrackSaveApi";
 import {toast} from "react-toastify";
 import {HttpStatusCode} from "axios";
 import {PlayListSaveApi} from "../../utill/api/upload/PlayListSaveApi";
+import {useNavigate} from "react-router";
 
 export function UploadInfoForm({
   updateOrder,
+  addSaves,
   updatePlayListValue,
   updateTracksValue,
   clickTrackUploadBtnEvent,
@@ -45,6 +48,8 @@ export function UploadInfoForm({
     {id: "BasicInfo", title: "Basic Info", url: URL_UPLOAD}
   ];
 
+  const navigate = useNavigate();
+
   const commonProps = {
     tabs,
     searchTagList,
@@ -53,12 +58,13 @@ export function UploadInfoForm({
     updateTracksObject,
     removeTrack,
     addTagListEvent,
-    cleanStore
+    cleanStore,
+    addSaves
   };
   // 플레이리스트
   return <ul className="track_info_form_list list-group">
     {
-      uploadInfo.isPlayList ? !uploadInfo.playList.isSave && <InfoFormListItem
+      uploadInfo.isPlayList ? uploadInfo.tracks.length > 0 && <InfoFormListItem
           index={0}
           updateOrder={updateOrder}
           updatePlayListObject={updatePlayListObject}
@@ -66,7 +72,7 @@ export function UploadInfoForm({
           clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
           changeIsPrivacy={changeIsPrivacy}
           {...commonProps}/> : getTracks(uploadInfo).map((data, index) => (
-          !data.isSave && <InfoFormListItem
+          <InfoFormListItem
               index={index}
               updateTracksValue={updateTracksValue}
               track={data}
@@ -75,6 +81,75 @@ export function UploadInfoForm({
           />
       ))
     }
+
+    {
+      uploadInfo.saves.map(save => (
+          <li key={save.token} className="list-group-item m-1">
+            <div className="row activeUpload_saved_container">
+              <div className="col-2 ms-2 activeUpload_image">
+                <div className="image-background_small"
+                     style={{backgroundImage: `url(${save.coverImgFile === undefined ? profile2 : save.coverImgFile})`}}></div>
+              </div>
+              <div className="text-start ms-3 col-4 activeUpload_savedFields">
+                <div className="activeUpload_savedTitle">
+                  <span>{save.title}</span>
+                </div>
+                <div className="activeUpload_savedUserName">
+                  <span className="form-text">{save.userName}</span>
+                </div>
+                <div className="activeUpload_savedTags">
+                  <div>
+                    {
+                        save.tagList !== null && save.tagList.map(
+                            (tag, index) => (
+                                <>
+                                  <NavLink key={index}
+                                           className="normal_font me-2 text-decoration-none"
+                                           to={`/tags/` + tag.tag}>
+                                    <span className="tagContent">{`#`
+                                        + tag.tag}</span>
+                                  </NavLink>
+                                </>
+                            ))
+                    }
+                  </div>
+                </div>
+                <div className="activeUpload_savedDesc">
+                  {save.desc}
+                </div>
+                <div className="activeUpload_savedPrivacy">
+                  <span className="mainBg">
+                  {save.isPrivacy ? "private" : "public"}
+                  </span>
+                </div>
+                <div className="activeUpload_savedComplete">
+                  <span className="form-text">Upload complete.</span>
+                </div>
+                <div className="activeUpload_savedLink">
+                  <NavLink className="mainColor me-2 text-decoration-none"
+                           to={`/` + save.userName + (save.isPlayList && "/sets") + "/" + save.id}>
+                    <span>{save.isPlayList ? "Go to your playlist"  :"Go to your track"}</span>
+                  </NavLink>
+                </div>
+              </div>
+              <div>
+                {
+                    save.isPlayList && save.tracks.map((track,index) => (
+                        <div key={index} className="activeUpload_saveTracks">
+                          <div className="track-content">
+                            <span>{track.value}</span>
+                          </div>
+                        </div>
+                    ))
+                }
+              </div>
+
+            </div>
+          </li>
+      ))
+    }
+
+
   </ul>;
 }
 
@@ -94,6 +169,7 @@ function InfoFormListItem({
   index,
   removeTrack,
   clickTrackUploadBtnEvent,
+  addSaves,
 }) {
   const regex = emojiRegex();
   const currentRoot = "BasicInfo";
@@ -297,7 +373,8 @@ function InfoFormListItem({
       toast.dismiss(loading);
       const data = response.data;
       const code = response.code;
-      TrackCommonErrorTry(code, data, isPlayList, data.errorDetails, playListBody);
+      TrackCommonErrorTry(code, data, isPlayList, data.errorDetails,
+          playListBody);
       return;
     } else if (!isPlayList && formValue.id !== 0 && formValue.isSuccess) {
       const body = CreateTrackBody(formValue);
@@ -327,11 +404,18 @@ function InfoFormListItem({
       playListBody) {
 
     if (code === HttpStatusCode.Ok) {
+      data.isPrivacy = formValue.isPrivacy;
+      data.isPlayList = isPlayList;
+      data.tagList = formValue.tagList;
+      data.desc = formValue.desc.value;
+
       if (isPlayList) {
-        updatePlayListValue("isSave", true);
-        return;
+        data.tracks = uploadInfo.tracks.map(track => track.title);
+        cleanStore();
+      } else {
+        removeTrackHandler(formValue.token);
       }
-      updateTracksValue("isSave", formValue.token, true);
+      addSaves(data);
       return;
     }
 
@@ -524,7 +608,6 @@ function InfoFormListItem({
     setPercentAge(isPlayList ? uploadInfo.uploadPercent : track.uploadPercent);
     setFormValue(formValue);
     setTracks(getTracks(uploadInfo));
-
   }, [uploadInfo])
   useEffect(() => {
     const coverImgFile = uploadInfo.isPlayList ? getPlyFile(contextValue)

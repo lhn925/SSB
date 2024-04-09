@@ -16,6 +16,9 @@
 .mainLogo,.mainColor {
   color: #1aafec;
 }
+.mainBg {
+  background-color: #1aafec;
+}
 
 .btn-blue-outline {
   border: 1px solid #fff;
@@ -139,6 +142,15 @@ h1 {
   /*border-radius: 1rem; !* Optional: for rounded corners *!*/
 }
 
+.image-background_small {
+  width: 120px;
+  height: 120px; /* or any other height */
+  /*background-image: url('../css/image/profile2.png'); !* path to your image *!*/
+  background-size: cover;
+  background-position: center;
+  /*border-radius: 1rem; !* Optional: for rounded corners *!*/
+}
+
 .btn-upload {
   color: #333;
   background-color: #ffffff;
@@ -169,7 +181,6 @@ h1 {
 .basic_font {
   font: 12px / 1.4 Inter, sans-serif;
 }
-
 .editStatus_info {
   display: flex;
   flex-direction: row;
