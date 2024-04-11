@@ -2,6 +2,7 @@ package sky.Sss.domain.track.service.playList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingUpdateDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackDeleteDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackUpdateDto;
+import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
@@ -37,6 +39,8 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.file.dto.UploadFileDto;
+import sky.Sss.global.redis.dto.RedisKeyDto;
+import sky.Sss.global.redis.service.RedisCacheService;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -53,6 +57,7 @@ public class PlyService {
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
     private final TagLinkCommonService tagLinkCommonService;
+    private final RedisCacheService redisCacheService;
     private final int PLY_TRACK_LIMIT = 500;
 
     @Transactional
@@ -70,7 +75,7 @@ public class PlyService {
         // 플레이 리스트에 user 추가
         List<TrackInfoRepDto> trackInfoRepDtoList = trackService.addTrackFiles(user, playListInfoDto.getId(),
             playListInfoDto.getCoverUrl(),
-            playListInfoDto.getCreatedDateTime(), ssbTrackTags, playListSettingSaveDto.isPrivacy(), true,
+            playListInfoDto.getCreatedDateTime(), ssbTrackTags, playListInfoDto.getToken(), true,
             playListSettingSaveDto.getPlayListTrackInfoDtoList());
 
         List<SsbFeed> ssbFeedList = new ArrayList<>();
@@ -226,6 +231,20 @@ public class PlyService {
             UploadFileDto uploadFileDto = trackService.getUploadFileDto(coverImgFile);
             SsbPlayListSettings.updateCoverImg(uploadFileDto.getStoreFileName(), ssbPlayListSettings);
         }
+        // redis playList update
+        if (!updateList.isEmpty() || !deleteList.isEmpty()) {
+            SsbPlayListTracks startValue = playListTracks.stream().filter(track -> track.getParentId() == 0)
+                .findFirst().orElse(null);
+            if (startValue != null) {
+                String key = RedisKeyDto.REDIS_PLY_POSITION_MAP_KEY;
+                Map<Long, SsbPlayListTracks> tracksMap = playListTracks.stream()
+                    .collect(Collectors.toMap(SsbPlayListTracks::getId, track -> track));
+                Map<Integer, PlyTracksPositionRedisDto> positionMap = new HashMap<>();
+                getPlyPositionRedisDto(startValue, tracksMap, positionMap);
+                redisCacheService.upsertCacheMapValueByKey(positionMap,
+                    key, ssbPlayListSettings.getToken());
+            }
+        }
     }
 
     @Transactional
@@ -324,7 +343,6 @@ public class PlyService {
                 throw new RuntimeException();
             }
 
-
             changeChildId(trackMap, prevParentId, prevChildId);
             changeParentId(trackMap, prevChildId, prevParentId);
 
@@ -382,9 +400,7 @@ public class PlyService {
     // parentId 와 childId
     @Transactional
     public void deleteLinkTracks(List<SsbPlayListTracks> playListTracks, List<PlayListTrackDeleteDto> deleteList) {
-        if (deleteList == null || deleteList.isEmpty()) {
-            return;
-        }
+
         List<SsbPlayListTracks> removeList = new ArrayList<>();
 
         Map<Long, SsbPlayListTracks> trackMap = playListTracks.stream()
@@ -474,7 +490,7 @@ public class PlyService {
         return null;
     }
 
-    private static void addSortedList(SsbPlayListTracks startValue, Map<Long, SsbPlayListTracks> map,
+    private void addSortedList(SsbPlayListTracks startValue, Map<Long, SsbPlayListTracks> map,
         List<SsbPlayListTracks> sortedList) {
         SsbPlayListTracks currentValue = startValue;
         int index = 0;
@@ -484,9 +500,39 @@ public class PlyService {
             currentValue = map.get(currentValue.getChildId());
             if (index > map.size()) { // 무한 루프 방지용
                 throw new RuntimeException();
-
             }
-
         }
     }
+
+
+    private void getPlyPositionRedisDto(SsbPlayListTracks startValue, Map<Long, SsbPlayListTracks> map,
+        Map<Integer, PlyTracksPositionRedisDto> sortedMap) {
+        SsbPlayListTracks currentValue = startValue;
+        int position = 0;
+        while (currentValue != null) {
+            sortedMap.put(position, new PlyTracksPositionRedisDto(currentValue));
+            position++;
+            currentValue = map.get(currentValue.getChildId());
+            if (position > map.size()) { // 무한 루프 방지용
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    private void addSortedMap(SsbPlayListTracks startValue, Map<Long, SsbPlayListTracks> map,
+        Map<Integer, SsbPlayListTracks> sortedMap) {
+        SsbPlayListTracks currentValue = startValue;
+        int position = 0;
+        while (currentValue != null) {
+            sortedMap.put(position, currentValue);
+            position++;
+            currentValue = map.get(currentValue.getChildId());
+            if (position > map.size()) { // 무한 루프 방지용
+                throw new RuntimeException();
+            }
+        }
+    }
+
+
+
 }

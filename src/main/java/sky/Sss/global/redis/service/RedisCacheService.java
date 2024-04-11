@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.redis.dto.RedisKeyDto;
@@ -179,10 +180,9 @@ public class RedisCacheService {
         setData(key, dataMap);
     }
 
-
     /**
      * key(String)
-     * value(hashMap)
+     * value(HashSet)
      * 형태로 Redis 에 저장
      * upsert는 "update"와 "insert"를 결합한 용어
      *
@@ -260,8 +260,7 @@ public class RedisCacheService {
         // redis 에 저장
 
         // size 가 0 이면 자동으로 삭제
-        if (objectMap.size() == 0) {
-            log.info("접근 하겠습니다");
+        if ( objectMap != null && !objectMap.isEmpty()) {
             Boolean delete = redisQueryService.delete(key);
             System.out.println("delete = " + delete);
         } else {
@@ -286,7 +285,6 @@ public class RedisCacheService {
                 .filter(session -> {
                     boolean isResult = this.hasRedis(RedisKeyDto.REDIS_WS_SESSION_KEY + session);
                     if (!isResult) {
-                        log.info("session = {}", session);
                         this.removeCacheSetValue(session, wsTokenListKey);
                     }
                     return isResult;

@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.track;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import sky.Sss.domain.feed.entity.SsbFeed;
 import sky.Sss.domain.feed.service.FeedService;
 import sky.Sss.domain.track.dto.BaseTrackDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
+import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
@@ -41,6 +43,7 @@ import sky.Sss.domain.track.service.common.TagLinkCommonService;
 import sky.Sss.domain.track.service.playList.PlyTracksService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
+import sky.Sss.domain.user.dto.push.PushMsgCacheDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.ContentsType;
@@ -48,6 +51,7 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.utili.FileStore;
+import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 import sky.Sss.global.redis.service.RedisTagService;
 
@@ -69,6 +73,7 @@ public class TrackService {
     private final RepostCommonService repostCommonService;
 
     private final PlyTracksService plyTracksService;
+    private final RedisCacheService redisCacheService;
 
 
     /**
@@ -157,7 +162,7 @@ public class TrackService {
     @Transactional
     public List<TrackInfoRepDto> addTrackFiles(User user, long settingsId, String coverUrl,
         LocalDateTime createdDateTime,
-        List<SsbTrackTags> ssbTrackTags, boolean isPrivacy, boolean isPlayList,
+        List<SsbTrackTags> ssbTrackTags, String plyToken, boolean isPlayList,
         List<PlayListTrackInfoReqDto> trackPlayListFileDtoList) {
         // playList 안에 있는 Track 정보
 
@@ -265,7 +270,7 @@ public class TrackService {
             tagLinkCommonService.addTrackTagLinks(trackTagLinks);
         }
         // 플레이 리스트 트랙 목록 save
-        
+
         List<SsbPlayListTracks> ssbPlayListTrackList = SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
             ssbPlayListSettings);
 
@@ -273,15 +278,19 @@ public class TrackService {
 
         // 링크드 연결 처리를 위해 다시 search
         // 전체 리스트가 1보다 클 경우
-        if (ssbPlayListTrackList.size() > 1) {
+        Map<Integer, PlyTracksPositionRedisDto> redisDtoMap = new HashMap<>();
+
+        String key = RedisKeyDto.REDIS_PLY_POSITION_MAP_KEY;
+        if (ssbPlayListTrackList.size() > 0) {
             List<SsbPlayListTracks> savedPlyTracks = plyTracksService.findByPlyTracks(ssbPlayListSettings.getId(),
                 Sort.by(Order.asc("position")));
             Map<Integer, SsbPlayListTracks> savePlyTrackMap = savedPlyTracks.stream()
                 .collect(Collectors.toMap(SsbPlayListTracks::getPosition, save -> save));
+
             for (SsbPlayListTracks plyTrack : savedPlyTracks) {
                 // parentId 저장
-                savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() - 1)).
-                    findFirst().ifPresent(find -> SsbPlayListTracks.changeParentId(plyTrack, find.getId()));
+//                savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() - 1)).
+//                    findFirst().ifPresent(find -> SsbPlayListTracks.changeParentId(plyTrack, find.getId()));
                 Long findParentId = 0L;
                 if (plyTrack.getPosition() != 0) {
                     findParentId = savePlyTrackMap.get(plyTrack.getPosition() - 1).getId();
@@ -294,11 +303,12 @@ public class TrackService {
                 }
                 // 포지션이 전체 size 보다 크지 않을경우에만
                 SsbPlayListTracks.changeChildId(plyTrack, findChildId);
+
+                // redis 추가
+                redisDtoMap.put(plyTrack.getPosition(), new PlyTracksPositionRedisDto(plyTrack));
             }
+            redisCacheService.upsertCacheMapValueByKey(redisDtoMap, key, plyToken);
         }
-
-        
-
         return trackInfoList;
     }
 
