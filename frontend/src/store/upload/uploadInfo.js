@@ -71,8 +71,6 @@ const uploadInfo = createSlice({
         state.tracks.push(createTrackInfo(value));
       })
     }, addSaves(state, action) {
-      console.log(action.payload.data.tracks)
-
       const saveInfo = createSaveInfo(action.payload.data);
       state.saves.push(saveInfo);
     }, addTrackTagList(state, action) {

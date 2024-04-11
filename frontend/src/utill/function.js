@@ -3,9 +3,8 @@ import {EmailApi} from "utill/api/email/EmailApi";
 import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
 import {useState} from "react";
 import profile2 from "css/image/profile2.png";
-import {GenreTypes} from "../content/upload/UploadTypes";
-import {HttpStatusCode} from "axios";
-import {toast} from "react-toastify";
+import {GenreTypes} from "content/upload/UploadTypes";
+
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -521,3 +520,4 @@ export function recalculateTotalUploadPercent(tracks) {
   const totalPercent = tracks.reduce((acc, track) => acc + track.uploadPercent, 0);
   return Math.min(100, totalPercent / tracks.length);
 }
+

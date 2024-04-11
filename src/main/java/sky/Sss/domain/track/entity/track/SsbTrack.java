@@ -110,15 +110,6 @@ public class SsbTrack extends BaseTimeEntity {
     @OneToMany(mappedBy = "ssbTrack", cascade = ALL)
     private List<SsbTrackReply> replies = new ArrayList<>();
 
-    // 링크 삭제
-    public static void rmTagLink(SsbTrack ssbTrack, SsbTrackTagLink tagLinks) {
-        ssbTrack.getTags().remove(tagLinks);
-    }
-
-    public static void rmTagLink(SsbTrack ssbTrack) {
-        ssbTrack.tags.clear();
-    }
-
     public static SsbTrack create(TrackInfoSaveReqDto trackInfoSaveReqDto, TempTrackStorage tempTrackStorage,
         User user) {
         SsbTrack ssbTrack = new SsbTrack();

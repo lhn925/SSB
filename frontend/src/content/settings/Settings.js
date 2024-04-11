@@ -1,10 +1,8 @@
 import "css/settings/settings.css"
 import {Link, useParams} from "react-router-dom";
-import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {SettingsSecurity} from "content/settings/security/SettingsSecurity";
 import {SettingsAccount} from "content/settings/account/SettingsAccount";
-import ModalContent from "modal/content/ModalContent";
 import {useTranslation} from "react-i18next";
 import {
   URL_SETTINGS,
@@ -13,9 +11,8 @@ import {
 } from "content/UrlEndpoints";
 import {SettingsHistory} from "./history/SettingsHistory";
 import Nav from "components/nav/Nav";
-import {modalActions} from "store/modalType/modalType";
 
-export function Settings({modal,dispatch,openModal,changeModalType}) {
+export function Settings({dispatch,openModal,changeModalType}) {
   const params = useParams();
 
   const tabs = [

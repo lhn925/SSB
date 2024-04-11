@@ -75,12 +75,11 @@ public class UserActivityLogService {
         LocalDate startDate, LocalDate endDate,
         PageRequest pageRequest, Locale locale) {
         User user = userQueryService.findOne();
-        Page<UserActivityLogListDto> userActivityLogListDtoPage = userActivityLogRepository.getPagedDataByUid(user,
+
+        return userActivityLogRepository.getPagedDataByUid(user,
             changeSuccess,
             isStatus.getValue(), startDate,
             endDate, pageRequest).map(u -> new UserActivityLogListDto(ms, locale, u));
-
-        return userActivityLogListDtoPage;
     }
 
     /**

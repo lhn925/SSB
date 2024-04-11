@@ -28,7 +28,7 @@ public class UserLogoutController {
 
     @UserAuthorize
     @PostMapping
-    public ResponseEntity logout(HttpServletRequest request) {
+    public ResponseEntity<?> logout(HttpServletRequest request) {
 
         try {
             String accessToken = tokenProvider.resolveToken(request.getHeader(JwtFilter.AUTHORIZATION_HEADER));
@@ -41,10 +41,10 @@ public class UserLogoutController {
                 session.invalidate();
             }
         } catch (AuthenticationException e) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

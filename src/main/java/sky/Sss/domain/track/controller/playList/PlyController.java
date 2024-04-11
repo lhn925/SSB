@@ -46,7 +46,6 @@ public class PlyController {
     private final PlyService plyService;
     private final MessageSource ms;
     private final TrackTagService trackTagService;
-    private final UserQueryService userQueryService;
     /**
      * 새로 생성
      * 트랙 추가

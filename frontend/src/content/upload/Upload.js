@@ -1,7 +1,7 @@
 import "css/upload/upload.css"
 import {URL_UPLOAD} from "content/UrlEndpoints";
 import Nav from "components/nav/Nav";
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {TotalLengthApi} from "utill/api/totalLength/TotalLengthApi";
 import {TempSaveApi} from "utill/api/upload/TempSaveApi";
 import {HttpStatusCode} from "axios";
@@ -11,9 +11,12 @@ import {UploadInfoForm} from "content/upload/UploadInfoForm";
 import {EmptyUploadInfoContent} from "content/upload/EmptyUploadInfoContent";
 import {convertPictureToFile} from "utill/function";
 import {UseUploadActions} from "App";
+import {useTranslation} from "react-i18next";
 
 export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
   const root = "upload";
+
+  const {t} = useTranslation();
 
 
   const acceptArray = [".mp3", ".flac", ".ogg", ".mp4", ".mpeg", ".wav",
@@ -28,10 +31,9 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
   });
   const [uploadTotalLength, setUploadTotalLength] = useState(null);
   const [uploadLimit, setUploadLimit] = useState(180);
-  const [lengthPercent, setLengthPercent] = useState(null);
+  const [lengthPercent, setLengthPercent] = useState(0);
 
   const {
-    updateContextPly,
     removeContextTrack,
     addContextTrack,
     updateContextTrackToken
@@ -113,6 +115,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
       });
     }
 
+
     for (const file of files) {
       const tempToken = uuidV4();
       const filename = file.name.replace(/\.[^/.]+$/, "");
@@ -120,7 +123,6 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
       // 순서
       const order = uploadInfo.tracks.length + sum;
       sum++;
-
 
       // 임시저장 정보
       tempTracks.push({
@@ -147,7 +149,6 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
           // useContext 추가
           addContextTrack(tempToken, picture);
         }).catch(() => {
-          console.log("error");
         })
       }
 
@@ -155,7 +156,8 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
 
     // 임시파일 저장
     await addTracks(storeTracks);
-    const loading = toast.loading("...track 업로드 중");
+    const loading = toast.loading(t(`msg.common.track.upload`));
+
 
     const promises = [];
 
@@ -188,7 +190,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     toast.dismiss(loading);
     if (tracks.length !== 0) {
       addTracks({tracks: tracks})
-      toast.success("업로드가 완료되었습니다.")
+      toast.success(t(`msg.common.upload.success`))
     }
     variable.current.isDoubleClick = false;
     trackFileRef.current.value = '';
@@ -317,6 +319,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
         <div className="upload_content col-lg-8">
           {uploadInfo.tracks.length === 0 && uploadInfo.saves.length === 0 ? <EmptyUploadInfoContent
               lengthPercent={lengthPercent}
+              t={t}
               uploadTotalLength={uploadTotalLength}
               clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
               acceptArray={acceptArray}
@@ -325,8 +328,10 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
               changePlayListChkEvent={changePlayListChkEvent}
               changePrivacyChkEvent={changePrivacyChkEvent}
           /> : <UploadInfoForm
+              t={t}
               uploadInfo={uploadInfo}
               updateOrder={updateOrder}
+              changePlayListChkEvent={changePlayListChkEvent}
               addSaves={addSaves}
               updateTracksObject={updateTracksObject}
               updatePlayListObject={updatePlayListObject}

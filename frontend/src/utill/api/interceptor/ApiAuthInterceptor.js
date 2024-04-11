@@ -75,7 +75,7 @@ authApi.interceptors.response.use(
           return error;
         }
       } else if (status === HttpStatusCode.InternalServerError) {
-        window.location.href = "/500";
+        // window.location.href = "/500";
       } else if (status === HttpStatusCode.NotFound) {
         if (config.url === USERS_INFO) {
           return error.response;

@@ -2,22 +2,26 @@ import {ProgressBar} from "components/progressBar/ProgressBar";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {Btn} from "components/button/Btn";
 
-export function EmptyUploadInfoContent({lengthPercent, uploadTotalLength,
-    clickTrackUploadBtnEvent, uploadSettings,
-    changePlayListChkEvent, changePrivacyChkEvent}) {
+export function EmptyUploadInfoContent({
+  lengthPercent, uploadTotalLength,
+  clickTrackUploadBtnEvent, uploadSettings,
+  changePlayListChkEvent, changePrivacyChkEvent, t
+}) {
+  const percent = {
+    percent: lengthPercent,
+    totalLength: uploadTotalLength ? uploadTotalLength : 0
+  };
   return <>
     <div className="upload_header card mt-5">
       <div className="card-body row">
         <div className="col-9">
           <div className="text-start mb-1">
-            <small>{lengthPercent ? lengthPercent : 0}% of free uploads
-              used</small>
+            <small>{t(`msg.track.upload.limit.used.text1`, {percent})}</small>
           </div>
           <ProgressBar percentage={lengthPercent} width={92}
                        height={6}/>
           <div className="text-start form-text">
-            <small>{uploadTotalLength ? uploadTotalLength : 0} of 180
-              minutes (0%) used.</small></div>
+            <small>{t(`msg.track.upload.limit.used.text2`, {percent})}</small></div>
         </div>
         <div className="col-3 mt-2">
           <BtnOutLine text="Try Next Pro"/>
@@ -26,11 +30,9 @@ export function EmptyUploadInfoContent({lengthPercent, uploadTotalLength,
     </div>
     <div className="upload_body card mt-2">
       <div className="card-body">
-        <h1 className="upload_body_title">Drag and drop your tracks &
-          albums here</h1>
         <div className="mt-3">
           <Btn event={clickTrackUploadBtnEvent}
-               text="or choose files to upload" width={40}
+               text={t(`msg.track.upload.choose.btn`)} width={40}
                name="trackUploadBtn"
                id="trackUploadBtn"/>
         </div>
@@ -42,25 +44,26 @@ export function EmptyUploadInfoContent({lengthPercent, uploadTotalLength,
                    name="isPlayListChk" id="isPlayListChk"
                    className="form-check-input agreeCheck me-1"
                    readOnly/>
-            <span className="checkbox_label">Make a playlist when multiple files are selected</span>
+            <span className="checkbox_label">
+              {t(`msg.track.upload.make.playlist.selected`)}</span>
           </label>
         </div>
         <div className="form-group">
-          <span className="checkbox_label me-1">Privacy:</span>
+          <span className="checkbox_label me-1">{t(`msg.track.upload.privacy`)}</span>
           <label className="mb-2">
             <input type="radio" name="privacyChk" id="publicChk"
                    className="me-1"
                    onClick={() => changePrivacyChkEvent(false)}
                    defaultChecked={!uploadSettings.isPrivacy}
                    readOnly/>
-            <span className="checkbox_label me-2">Public</span>
+            <span className="checkbox_label me-2">{t(`msg.track.upload.privacy.public`)}</span>
           </label>
           <label className="mb-2">
             <input type="radio" name="privacyChk" id="privateChk"
                    onClick={() => changePrivacyChkEvent(true)}
                    defaultChecked={uploadSettings.isPrivacy}
                    className="me-1" readOnly/>
-            <span className="checkbox_label">Private</span>
+            <span className="checkbox_label">{t(`msg.track.upload.privacy.private`)}</span>
           </label>
         </div>
       </div>

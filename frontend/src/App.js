@@ -18,7 +18,6 @@ import {
 } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {userActions} from "store/userInfo/userReducers";
-import * as StompJs from "@stomp/stompjs";
 import {authApi} from "utill/api/interceptor/ApiAuthInterceptor";
 import {USERS_INFO} from "utill/api/ApiEndpoints";
 import {persistor} from "store/store";
@@ -29,10 +28,14 @@ import ModalContent from "modal/content/ModalContent";
 import {modalActions} from "store/modalType/modalType";
 import {uploadInfoActions} from "store/upload/uploadInfo";
 import "css/selectBox.css"
-import {createUploadActions} from "./utill/function";
+import {createUploadActions} from "utill/function";
+import * as StompJs from "@stomp/stompjs";
+import {TempRemoveApi} from "./utill/api/upload/TempRemoveApi";
+import CaptchaApi from "./utill/api/captcha/CaptchaApi";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
+
 const Profile = lazy(() => import('./content/profile/Profile').then(module => ({
   default: module.Profile
 })));
@@ -63,12 +66,13 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const {t} = useTranslation();
-
   const client = useRef({client: null});
 
   bc.onmessage = (e) => {
     let data = e.data;
+
     if (data.type === "logout") {
+      dispatch(uploadInfoActions.cleanStore());
       window.location.replace("/")
     } else {
       window.location.replace(location.pathname);
@@ -85,11 +89,52 @@ function App() {
     dispatch(modalActions.changeType({type: type}));
   }
 
+  // webSocket disConnect 시
+  // 발생할 이벤트
+  const disConnectEvent = async (uploadInfo) => {
+    // 임시 트랙 삭제
+    if (uploadInfo.tracks.length > 0) {
+      const tracks = uploadInfo.tracks;
+      const removeList = tracks.filter((track) => track.id !== 0);
+      const body = {tempTrackDeleteList: removeList};
+      if (removeList.length > 0) {
+        const response = await TempRemoveApi(body);
+        if (response.code !== 200) {
+        }
+      }
+    }
+
+  }
+
+  BeforeUnload(t, uploadInfo, client.current.client);
+
+  useEffect(() => {
+    const currentClient = client.current.client;
+    const handleWebSocketClose = () => {
+      // 여기서 uploadInfoRef.current는 항상 최신 상태의 uploadInfo를 가리킵니다.
+      disConnectEvent(uploadInfo).then(() => {
+        console.log("삭제");
+      })
+    };
+    if (currentClient !== null && uploadInfo.tracks.length > 0) {
+      console.log(uploadInfo.tracks);
+      currentClient.onWebSocketClose = handleWebSocketClose;
+    }
+    return () => {
+      if (currentClient !== null && uploadInfo.tracks.length === 0) {
+        console.log("close");
+        // 연결 종료 시에 적절한 이벤트 핸들러 정리 로직을 추가
+        currentClient.offWebSocketClose = handleWebSocketClose;
+      }
+    }
+  }, [client.current.client, uploadInfo.tracks])
+
   useEffect(() => {
     if (currentAuth.access) {
       CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);
     }
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
+
   return (
       <div className="App">
         {/*<DndProvider backend={HTML5Backend}>*/}
@@ -157,35 +202,6 @@ function App() {
       ;
 }
 
-function connect(client, accessToken, refreshToken, userId, t, bc) {
-  const clientData = new StompJs.Client({
-    brokerURL: `${process.env.REACT_APP_WS_URL}`,
-    connectHeaders: {
-      Authorization: accessToken,
-    }, debug: function (message) {
-    }, onStompError: function (message) {
-    },
-    heartbeatIncoming: 4000,
-    heartbeatOutgoing: 4000,
-  })
-  clientData.onConnect = function () {
-    // 구독
-    clientData.subscribe("/topic/push/" + userId, function (message) {
-    });
-    clientData.subscribe("/topic/logout/" + refreshToken, function (message) {
-      persistor.purge().then(() => {
-        alert(t(`msg.common.logout.request.success`));
-        bc.postMessage({type: "logout"})
-      });
-    });
-  };
-  // 연결
-  clientData.activate();
-  client.current.client = clientData;
-
-  client.current.id = 0;
-}
-
 function CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc) {
   authApi.get(USERS_INFO).then(data => {
     const userData = data.data;
@@ -197,15 +213,77 @@ function CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc) {
     dispatch(userActions.setPictureUrl(userData));
     dispatch(userActions.setUserName(userData));
     dispatch(userActions.setIsLoginBlocked(userData))
-    connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
+    Connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
         bc);
   }).catch(() => {
     if (client.current.client) {
-      persistor.purge().then(() => client.current.client.deactivate());
+      persistor.purge().then(() => {
+        client.current.client.deactivate()
+      });
     }
   });
 }
 
+function Connect(client, accessToken, refreshToken, userId, t, bc) {
+  const clientData = new StompJs.Client({
+    brokerURL: `${process.env.REACT_APP_WS_URL}`,
+    connectHeaders: {
+      Authorization: accessToken,
+    }, debug: function (message) {
+    }, onStompError: function (message) {
+      console.log("")
+    },
+    heartbeatIncoming: 4000,
+    heartbeatOutgoing: 4000,
+  })
+
+  clientData.onConnect = function () {
+    //  구독
+    clientData.subscribe("/topic/push/" + userId, function (message) {
+    });
+    clientData.subscribe("/topic/logout/" + refreshToken, function (message) {
+      persistor.purge().then(() => {
+
+        alert(t(`msg.common.logout.request.success`));
+        bc.postMessage({type: "logout"})
+      });
+    });
+  };
+  // 연결
+  clientData.activate();
+  client.current.client = clientData;
+  // client.current.id = 0;
+}
+
+function BeforeUnload(t, uploadInfo, client) {
+  const handleBeforeUnload = (event) => {
+    event.preventDefault();
+    const message = t(`msg.common.beforeunload`);
+    event.returnValue = message;
+    return message;
+  };
+
+  const handleUnload = (event) => {
+    event.preventDefault();
+    const message = t(`msg.common.beforeunload`);
+    event.returnValue = message;
+    // webSocket 강제 종료
+    client.deactivate();
+    return message;
+  };
+
+  useEffect(() => {
+    // 업로드중인 track 이 있으면 Event 발생
+    if (uploadInfo.tracks.length > 0 && client !== null) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('unload', handleUnload);
+    }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('unload', handleUnload);
+    };
+  }, [uploadInfo]);
+}
 
 export function UseUploadValue() {
   return useContext(UploadValueContext);

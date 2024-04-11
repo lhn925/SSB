@@ -9,6 +9,7 @@ import emojiRegex from "emoji-regex";
 import {ChangeError} from "../../utill/function";
 
 export function CustomTagMention({
+    t,
   setSearchTagList,
   searchTagList,
   storeTagList,
@@ -59,7 +60,7 @@ export function CustomTagMention({
     });
     // 30개 제한
     if (uniqueArray.length > LIMIT) {
-      ChangeError(setErrors, "tags", "태그는 30개 제한입니다", true);
+      ChangeError(setErrors, "tags", t(`msg.track.upload.tag.limit`), true);
       return;
     }
     ChangeError(setErrors, "tags", "", false);
@@ -116,7 +117,7 @@ export function CustomTagMention({
             name="tags"
             onChange={onTagChangeEvent}
             style={style}
-            placeholder="Add tags to describe the genre and mood of your track"
+            placeholder={t(`msg.track.upload.tags.describe`)}
             a11ySuggestionsListLabel={'Suggested mentions'}
         >
           <Mention

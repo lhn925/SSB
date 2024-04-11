@@ -2,9 +2,11 @@ package sky.Sss.domain.track.service.playList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,7 @@ import sky.Sss.global.file.dto.UploadFileDto;
 @RequiredArgsConstructor
 public class PlyService {
 
+
     private final PlySettingRepository plySettingRepository;
     private final PlyTracksService plyTracksService;
     private final UserQueryService userQueryService;
@@ -50,11 +53,15 @@ public class PlyService {
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
     private final TagLinkCommonService tagLinkCommonService;
-
+    private final int PLY_TRACK_LIMIT = 500;
 
     @Transactional
     public PlayListInfoDto addPlyAndTracks(PlayListSettingSaveDto playListSettingSaveDto,
         MultipartFile coverImgFile, List<SsbTrackTags> ssbTrackTags) {
+        // 플레이리스트 사이즈 제한 500
+        if (playListSettingSaveDto.getPlayListTrackInfoDtoList().size() > PLY_TRACK_LIMIT) {
+            throw new IllegalArgumentException("ply.limit.error");
+        }
         User user = userQueryService.findOne();
         // 플레이리스트 생성
         PlayListInfoDto playListInfoDto = addPly(user, playListSettingSaveDto, ssbTrackTags,
@@ -277,20 +284,13 @@ public class PlyService {
 
     }
 
-/*
-
-    private void changeOrders(SsbPlayListSettings ssbPlayListSettings, List<PlayListTrackUpdateDto> orderList) {
-        if (orderList != null && !orderList.isEmpty()) {
-            orderList.forEach(orderDto -> {
-                ssbPlayListSettings.getPlayListTracks().stream()
-                    .filter(track -> Objects.equals(orderDto.getId(), track.getId()))
-                    .findFirst().ifPresent(
-                        ssbPlayListTracks -> SsbPlayListTracks.changePosition(ssbPlayListTracks, orderDto.getOrder()));
-            });
-        }
-    }
-*/
-
+    /**
+     * track linked 업데이트
+     *
+     * @param playListTracks
+     * @param updateList
+     * @return
+     */
     @Transactional
     public List<SsbPlayListTracks> updateTrackLinked(List<SsbPlayListTracks> playListTracks,
         List<PlayListTrackUpdateDto> updateList) {
@@ -313,8 +313,18 @@ public class PlyService {
             // 현재 위치에 앞(child) 뒤(parent) 값 업데이트
             // 값이 같지 않다면
             // 이전 위치의 부모와 자식 업데이트
+
             Long prevParentId = updateLink.getParentId();
             Long prevChildId = updateLink.getChildId();
+
+            // 예를 들어 업데이트할 LinkedId 와 PrevLinkId가 둘다 똑같다면?
+            // 순환 반복 문제 발생
+            // currentParentId == prevChildId
+            if (prevChildId.equals(currentParentId) && prevParentId.equals(currentChildId)) {
+                throw new RuntimeException();
+            }
+
+
             changeChildId(trackMap, prevParentId, prevChildId);
             changeParentId(trackMap, prevChildId, prevParentId);
 
@@ -332,10 +342,10 @@ public class PlyService {
         }
         List<SsbPlayListTracks> sortedList = new ArrayList<>();
         // 첫 번째 배열 구하기
-        SsbPlayListTracks value = playListTracks.stream().filter(ply -> ply.getParentId() == null)
+        SsbPlayListTracks firstValue = playListTracks.stream().filter(ply -> ply.getParentId() == null)
             .findFirst().orElse(null);
         // 정렬 후
-        addSortedList(value, trackMap, sortedList);
+        addSortedList(firstValue, trackMap, sortedList);
         // 사이즈가 똑같지 않으면 error
         // 기초 포지션대로 정렬
         if (sortedList.size() != playListTracks.size()) {
@@ -376,25 +386,31 @@ public class PlyService {
             return;
         }
         List<SsbPlayListTracks> removeList = new ArrayList<>();
-        deleteList.forEach(trackDto -> {
-            playListTracks.stream()
-                .filter(track -> Objects.equals(trackDto.getId(), track.getId())).findFirst()
-                .ifPresent(removeList::add);
-        });
 
-        List<Long> parentSearchIds = new ArrayList<>();
-        List<Long> childSearchIds = new ArrayList<>();
+        Map<Long, SsbPlayListTracks> trackMap = playListTracks.stream()
+            .collect(Collectors.toMap(SsbPlayListTracks::getId, track -> track));
+        deleteList.forEach(delete ->
+            {
+                SsbPlayListTracks ssbPlayListTracks = trackMap.get(delete.getId());
+                if (ssbPlayListTracks != null) {
+                    removeList.add(ssbPlayListTracks);
+                }
+            }
+        );
+
+        Set<Long> parentSearchIds = new HashSet<>();
+        Set<Long> childSearchIds = new HashSet<>();
         // removeList 중에서 연속된 링크드 리스트가 있는지 확인
         for (SsbPlayListTracks findRemove : removeList) {
             playListTracks.remove(findRemove);
 
             // parentId 가 null 이 아닌 경우
 
-            // 연속된 링크 데이터중 가장 상위 객체 없으면 자기 자신
-            SsbPlayListTracks parentTrack = findParentTrack(removeList, findRemove, parentSearchIds);
+            // 연속된 링크 데이터중 가장 상위 객체 단일 노드 삭제인 경우 자기 자신
+            SsbPlayListTracks highestParent = findParentTrack(removeList, findRemove, parentSearchIds);
 
-            // 연속된 링크 데이터중 가장 하위 객체 없으면 자기 자신
-            SsbPlayListTracks childTrack = findChildTrack(removeList, findRemove, childSearchIds);
+            // 연속된 링크 데이터중 가장 하위 객체 단일 노드 삭제인 경우 자기 자신
+            SsbPlayListTracks lowestChild = findChildTrack(removeList, findRemove, childSearchIds);
 
             // 삭제 할려는 마지막 객체의 parent 객체값
             // 예시
@@ -403,69 +419,74 @@ public class PlyService {
             // 만약에 둘다 없어졌을 경우를 생각해본다면
             // 2가 1을 가리키고 있는 포인터 값을 4에게 주입
             // 3이 4를 가리키고 있는 포인터 값을 1에게 주입
-            if (childTrack != null && parentTrack != null) {
+
+            if (lowestChild != null && highestParent != null) {
                 // 가장 상위 객체에게 가장 하위 객체 id값
-                playListTracks.stream().filter(findParent -> Objects.equals(
-                        findParent.getId(), parentTrack.getParentId())).findFirst()
-                    .ifPresent(find -> SsbPlayListTracks.changeChildId(find, childTrack.getChildId()));
-                // 가장 하위 객체에게 가장 상위 객체의 id 값
-                playListTracks.stream().filter(findChild -> Objects.equals(
-                        findChild.getId(), childTrack.getChildId())).findFirst()
-                    .ifPresent(find -> SsbPlayListTracks.changeParentId(find, parentTrack.getParentId()));
+                SsbPlayListTracks parentValue = trackMap.get(highestParent.getParentId());
+                if (parentValue != null) {
+                    SsbPlayListTracks.changeChildId(parentValue, lowestChild.getChildId());
+                }
+                SsbPlayListTracks childValue = trackMap.get(lowestChild.getChildId());
+
+                if (childValue != null) {
+                    SsbPlayListTracks.changeParentId(childValue, highestParent.getParentId());
+                }
+
             }
         }
         plyTracksService.deleteTracksInBatch(removeList);
 
     }
 
-    // 상위 링크드 리스트 연결 확인
     private SsbPlayListTracks findParentTrack(List<SsbPlayListTracks> removeList, SsbPlayListTracks findRemove,
-        List<Long> searchIds) {
-        // 중복검색 방지를 위해 아이디값이 있으면 null 반환
-        if (searchIds.contains(findRemove.getId())) {
-            return null;
+        Set<Long> searchIds) {
+        SsbPlayListTracks currentTrack = findRemove;
+        while (currentTrack != null && !searchIds.contains(currentTrack.getId())) {
+            searchIds.add(currentTrack.getId());
+            SsbPlayListTracks finalCurrentTrack = currentTrack; // Java lambda final or effectively final constraint
+            currentTrack = removeList.stream()
+                .filter(remove -> Objects.equals(remove.getChildId(), finalCurrentTrack.getId()))
+                .findFirst()
+                .orElse(null);
+            if (currentTrack == null) {
+                return finalCurrentTrack;
+            }
         }
-        // 삭제할 Id 값에 parentId 객체도 삭제하는지 조회
-        SsbPlayListTracks parentTrack = removeList.stream()
-            .filter(remove -> Objects.equals(remove.getChildId(), findRemove.getId())).findFirst().orElse(null);
-        searchIds.add(findRemove.getId());
-        if (parentTrack != null) {
-            return findParentTrack(removeList, parentTrack, searchIds);
-            // 연결이 끊겼거나 끝 혹은 없을 경우
-        } else {
-            // 자신을 참조하고 있는 링크가 포함되어있지 않으면 Id 값 반환
-            return findRemove;
-        }
+        return null;
     }
 
-    // 하위 링크드 리스트 연결 확인
+
     private SsbPlayListTracks findChildTrack(List<SsbPlayListTracks> removeList, SsbPlayListTracks findRemove,
-        List<Long> searchIds) {
-        // 중복검색 방지를 위해 아이디값이 있으면 null 반환
-        if (searchIds.contains(findRemove.getId())) {
-            return null;
+        Set<Long> searchIds) {
+        SsbPlayListTracks currentTrack = findRemove;
+        while (currentTrack != null && !searchIds.contains(currentTrack.getId())) {
+            searchIds.add(currentTrack.getId());
+            SsbPlayListTracks lastValidTrack = currentTrack; // 검사 하기 전 마지막 트랙
+            currentTrack = removeList.stream()
+                .filter(remove -> Objects.equals(remove.getParentId(), lastValidTrack.getId()))
+                .findFirst()
+                .orElse(null);
+            if (currentTrack == null) {
+                return lastValidTrack;
+            }
         }
-        // 삭제할 Id 값에 parentId 객체도 삭제하는지 조회
-        SsbPlayListTracks childTrack = removeList.stream()
-            .filter(remove -> Objects.equals(remove.getParentId(), findRemove.getId())).findFirst().orElse(null);
-        searchIds.add(findRemove.getId());
 
-        if (childTrack != null) {
-            return findChildTrack(removeList, childTrack, searchIds);
-            // 연결이 끊겼거나 끝 혹은 없을 경우
-        } else {
-            // 자신을 참조하고 있는 링크가 포함되어있지 않으면 Id 값 반환
-            return findRemove;
-        }
+        return null;
     }
 
-    // add 후 정렬
-    private static void addSortedList(SsbPlayListTracks value, Map<Long, SsbPlayListTracks> map,
+    private static void addSortedList(SsbPlayListTracks startValue, Map<Long, SsbPlayListTracks> map,
         List<SsbPlayListTracks> sortedList) {
-        if (value != null) {
-            map.get(value.getId());
-            sortedList.add(value);
-            addSortedList(map.get(value.getChildId()), map, sortedList);
+        SsbPlayListTracks currentValue = startValue;
+        int index = 0;
+        while (currentValue != null) {
+            index++;
+            sortedList.add(currentValue);
+            currentValue = map.get(currentValue.getChildId());
+            if (index > map.size()) { // 무한 루프 방지용
+                throw new RuntimeException();
+
+            }
+
         }
     }
 }

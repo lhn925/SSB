@@ -66,13 +66,11 @@ public class UserLoginLogService {
     public Page<UserLoginLogListDto> getUserLoginLogList(LocalDate startDate,
         LocalDate endDate,
         PageRequest pageRequest) {
-
         User user = userQueryService.findOne();
-        Page<UserLoginLogListDto> loginLogPageable = userLoginLogRepository.getLoginLogPageable(user.getUserId(),
+
+        return userLoginLogRepository.getLoginLogPageable(user.getUserId(),
                 LoginSuccess.SUCCESS, Status.ON.getValue(), startDate, endDate, pageRequest)
             .map(UserLoginLogListDto::new);
-
-        return loginLogPageable;
     }
 
 

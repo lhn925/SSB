@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -242,22 +243,27 @@ public class TrackService {
         if (ssbPlayListTrackList.size() > 1) {
             List<SsbPlayListTracks> savedPlyTracks = plyTracksService.findByPlyTracks(ssbPlayListSettings.getId(),
                 Sort.by(Order.asc("position")));
-
+            Map<Integer, SsbPlayListTracks> savePlyTrackMap = savedPlyTracks.stream()
+                .collect(Collectors.toMap(SsbPlayListTracks::getPosition, save -> save));
             for (SsbPlayListTracks plyTrack : savedPlyTracks) {
                 // parentId 저장
+                savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() - 1)).
+                    findFirst().ifPresent(find -> SsbPlayListTracks.changeParentId(plyTrack, find.getId()));
+                Long findParentId = 0L;
                 if (plyTrack.getPosition() != 0) {
-                    savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() - 1)).
-                        findFirst().ifPresent(find -> SsbPlayListTracks.changeParentId(plyTrack, find.getId()));
+                    findParentId = savePlyTrackMap.get(plyTrack.getPosition() - 1).getId();
+                }
+                SsbPlayListTracks.changeParentId(plyTrack, findParentId);
+
+                Long findChildId = 0L;
+                if ((plyTrack.getPosition() + 1) != savedPlyTracks.size()) {
+                    findChildId = savePlyTrackMap.get(plyTrack.getPosition() + 1).getId();
                 }
                 // 포지션이 전체 size 보다 크지 않을경우에만
-                if ((plyTrack.getPosition() + 1) != savedPlyTracks.size()) {
-                    savedPlyTracks.stream().filter(data -> data.getPosition() == (plyTrack.getPosition() + 1)).
-                        findFirst().ifPresent(find -> SsbPlayListTracks.changeChildId(plyTrack, find.getId()));
-                }
+                SsbPlayListTracks.changeChildId(plyTrack, findChildId);
+
             }
         }
-
-
 
         return trackInfoList;
     }

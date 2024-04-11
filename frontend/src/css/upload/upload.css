@@ -189,3 +189,21 @@
 .activeUpload_saveTracks span {
   margin: 5px 5px 0 0;
 }
+
+.border-dashed {
+  border: 3px dashed #ccc;
+  transition: border-color 0.3s;
+}
+
+.border-dashed:hover {
+  border-color: #999;
+}
+
+.file-upload {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}

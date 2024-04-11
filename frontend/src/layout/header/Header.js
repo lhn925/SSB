@@ -36,8 +36,6 @@ function Header(props) {
       toast.error(t("errorMsg.server"));
     })
   }
-
-
   const navigate = props.navigate;
   useEffect(() => {
   },[userInfo])
