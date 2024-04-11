@@ -3,7 +3,6 @@ HELP.md
 build/
 src/main/generated/
 src/main/resources/env
-src/test
 logs
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
