@@ -33,7 +33,6 @@ public class TagController {
      */
     @GetMapping("/search/{tags}")
     public ResponseEntity<?> getSearchTags(@PathVariable String tags) {
-        log.info("tags = {}", tags);
 
         List<TrackTagsDto> tagsDtoList = new ArrayList<>();
         TrackTagsDto trackTagsDto = redisTagService.searchTagsDto(tags);
@@ -56,8 +55,6 @@ public class TagController {
      */
     @PostMapping("/{tags}")
     public ResponseEntity<?> addTags(@PathVariable String tags) {
-        log.info("tags = {}", tags);
-
         Set<String> hashSet = new HashSet<>();
 
         hashSet.add(tags);
