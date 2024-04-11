@@ -85,7 +85,7 @@ public class TrackService {
         // 임시 디비에 있던걸
         // ssbTrack 에 옮기는 작업
         TempTrackStorage tempTrackStorage = tempTrackStorageService.findOne(trackInfoSaveReqDto.getId(),
-            trackInfoSaveReqDto.getToken(), user, trackInfoSaveReqDto.isPrivacy(), false);
+            trackInfoSaveReqDto.getToken(), user, false);
 
         // 현재 ssbTrack 에 저장되어 있는 track
         Integer totalTrackLength = getTotalLength(user);
@@ -171,7 +171,7 @@ public class TrackService {
         List<Long> tempIdList = trackPlayListFileDtoList.stream().map(BaseTrackDto::getId).toList();
 
         // 임시파일 리스트
-        List<TempTrackStorage> tempList = tempTrackStorageService.findByList(user, tokenList, tempIdList, isPrivacy,
+        List<TempTrackStorage> tempList = tempTrackStorageService.findByList(user, tokenList, tempIdList,
             isPlayList);
 
         // 사이즈가 맞지 않는 경우
@@ -196,11 +196,6 @@ public class TrackService {
         int totalUploadTrackLength = 0;
 
         // temp TotalLength 전부 더하기
-
-        // temp TotalLength 전부 더하기
-
-
-
         boolean isDelete = false;
         Map<Integer, PlayListTrackInfoReqDto> dtoMap = trackPlayListFileDtoList.stream()
             .collect(Collectors.toMap(PlayListTrackInfoReqDto::getOrder, dto -> dto));
@@ -209,7 +204,7 @@ public class TrackService {
             .collect(Collectors.toMap(TempTrackStorage::getToken, temp -> temp));
 
         int size = dtoMap.size();
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             PlayListTrackInfoReqDto playListTrackInfoReqDto = dtoMap.get(i);
             totalUploadTrackLength += tempMap.get(playListTrackInfoReqDto.getToken()).getTrackLength();
             try {
@@ -301,6 +296,8 @@ public class TrackService {
                 SsbPlayListTracks.changeChildId(plyTrack, findChildId);
             }
         }
+
+        
 
         return trackInfoList;
     }

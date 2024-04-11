@@ -57,18 +57,18 @@ public class TempTrackStorageService {
             uploadTrackFileDto);
     }
 
-    public TempTrackStorage findOne(Long id, String token, User user, boolean isPrivacy, boolean isPlayList)
+    public TempTrackStorage findOne(Long id, String token, User user, boolean isPlayList)
         throws SsbFileNotFoundException {
-        return tempTrackStorageRepository.findOne(id, token, user, isPrivacy, isPlayList).orElseThrow(
+        return tempTrackStorageRepository.findOne(id, token, user, isPlayList).orElseThrow(
             SsbFileNotFoundException::new);
     }
 
 
-    public List<TempTrackStorage> findByList(User user, List<String> tokens, List<Long> ids, boolean isPrivacy,
+    public List<TempTrackStorage> findByList(User user, List<String> tokens, List<Long> ids,
         boolean isPlayList)
         throws SsbFileNotFoundException {
         List<TempTrackStorage> tempTrackStorageList = tempTrackStorageRepository.findByUid(user,
-            tokens, ids, isPrivacy, isPlayList);
+            tokens, ids, isPlayList);
         if (tempTrackStorageList.isEmpty()) {
             throw new SsbFileNotFoundException();
         }
