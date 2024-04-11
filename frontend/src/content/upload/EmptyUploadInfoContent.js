@@ -3,10 +3,12 @@ import {BtnOutLine} from "components/button/BtnOutLine";
 import {Btn} from "components/button/Btn";
 
 export function EmptyUploadInfoContent({
-  lengthPercent, uploadTotalLength,
+  lengthPercent, uploadTotalLength,uploadLimit,
   clickTrackUploadBtnEvent, uploadSettings,
   changePlayListChkEvent, changePrivacyChkEvent, t
 }) {
+
+  const isReached = uploadLimit < uploadTotalLength;
   const percent = {
     percent: lengthPercent,
     totalLength: uploadTotalLength ? uploadTotalLength : 0
@@ -16,7 +18,7 @@ export function EmptyUploadInfoContent({
       <div className="card-body row">
         <div className="col-9">
           <div className="text-start mb-1">
-            <small>{t(`msg.track.upload.limit.used.text1`, {percent})}</small>
+            <small>{isReached ? t(`msg.track.upload.limit.reached`): t(`msg.track.upload.limit.used.text1`, {percent})}</small>
           </div>
           <ProgressBar percentage={lengthPercent} width={92}
                        height={6}/>

@@ -62,6 +62,12 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
 
   // 파일 btn event
   const clickTrackUploadBtnEvent = () => {
+
+    if (uploadTotalLength > uploadLimit) {
+      toast.error(t(`msg.track.upload.limit.reached.text`))
+      return;
+    }
+
     trackFileRef.current.click();
   }
 
@@ -319,6 +325,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
         <div className="upload_content col-lg-8">
           {uploadInfo.tracks.length === 0 && uploadInfo.saves.length === 0 ? <EmptyUploadInfoContent
               lengthPercent={lengthPercent}
+              uploadLimit={uploadLimit}
               t={t}
               uploadTotalLength={uploadTotalLength}
               clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
@@ -344,14 +351,14 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
               changeIsPrivacy={changeIsPrivacy}/>
           }
         </div>
-        <input type="file"
+        {  uploadTotalLength < uploadLimit && <input type="file"
                onChange={changeTrackUploadEvent}
                name="trackUpload"
                multiple={true}
                accept={acceptArray.toString()}
                ref={trackFileRef}
                id="trackUpload"
-               className="visually-hidden"/>
+               className="visually-hidden"/>}
       </div>
   )
 };

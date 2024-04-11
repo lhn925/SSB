@@ -90,6 +90,9 @@ public class TrackService {
         // 현재 ssbTrack 에 저장되어 있는 track
         Integer totalTrackLength = getTotalLength(user);
 
+        // 업로드 하기전 check
+        checkLimit(totalTrackLength, 0);
+
         Integer totalUploadTrackLength = tempTrackStorage.getTrackLength();
 
         checkLimit(totalTrackLength, totalUploadTrackLength);
@@ -178,6 +181,11 @@ public class TrackService {
 
         // 현재 유저가 업로드한 트랙 길이
         Integer totalTrackLength = getTotalLength(user);
+
+        // 다른 트랙파일을 업로드하기전에 이미 업로드된 Track File  확인 후
+        // 초과면 error
+        checkLimit(totalTrackLength, 0);
+
         // 태그 조회
         List<SsbTrack> saveTracks = new ArrayList<>();
 
@@ -188,17 +196,45 @@ public class TrackService {
         int totalUploadTrackLength = 0;
 
         // temp TotalLength 전부 더하기
-        totalUploadTrackLength = tempList.stream().map(TempTrackStorage::getTrackLength).toList().stream()
-            .mapToInt(Integer::intValue).sum();
 
-        checkLimit(totalTrackLength, totalUploadTrackLength);
+        // temp TotalLength 전부 더하기
 
-        for (PlayListTrackInfoReqDto metaDto : trackPlayListFileDtoList) {
-            TempTrackStorage tempTrack = tempList.stream().filter(temp -> temp.getToken().equals(metaDto.getToken()))
-                .findFirst()
-                .orElseThrow(SsbFileNotFoundException::new);
+
+
+        boolean isDelete = false;
+        Map<Integer, PlayListTrackInfoReqDto> dtoMap = trackPlayListFileDtoList.stream()
+            .collect(Collectors.toMap(PlayListTrackInfoReqDto::getOrder, dto -> dto));
+
+        Map<String, TempTrackStorage> tempMap = tempList.stream()
+            .collect(Collectors.toMap(TempTrackStorage::getToken, temp -> temp));
+
+        int size = dtoMap.size();
+        for (int i = 0; i < size; i ++) {
+            PlayListTrackInfoReqDto playListTrackInfoReqDto = dtoMap.get(i);
+            totalUploadTrackLength += tempMap.get(playListTrackInfoReqDto.getToken()).getTrackLength();
+            try {
+                // 180분을 정확히 채우는건 힘드니 조금 넘겨서 업로드
+                checkLimit(totalTrackLength, totalUploadTrackLength);
+            } catch (SsbFileLengthLimitOverException e) {
+                // isDelete 를 true 로 변경 뒤 남은 Track 은 전부 다 삭제
+                // 총 길이가 220 분을 넘는 하나당 22분을 짜리의  트랙이  10개가 있다고 치면
+                // 9개만 허용해서 총 길이 198분만 업로드
+                if (isDelete) {
+                    dtoMap.remove(i);
+                } else {
+                    isDelete = true;
+                }
+            }
+        }
+        for (int order : dtoMap.keySet()) {
+            PlayListTrackInfoReqDto metaDto = dtoMap.get(order);
+
+            TempTrackStorage tempTrack = tempMap.get(metaDto.getToken());
+
+            if (tempTrack == null) {
+                throw new SsbFileNotFoundException();
+            }
             // ssbTrack 저장
-
             SsbTrack ssbTrack = createTrack(user, tempTrack, metaDto);
 
             SsbTrack.updateIsRelease(ssbTrack, !ssbTrack.getIsPrivacy());
@@ -234,8 +270,10 @@ public class TrackService {
             tagLinkCommonService.addTrackTagLinks(trackTagLinks);
         }
         // 플레이 리스트 트랙 목록 save
+        
         List<SsbPlayListTracks> ssbPlayListTrackList = SsbPlayListTracks.createSsbPlayListTrackList(trackFileMap,
             ssbPlayListSettings);
+
         plyTracksService.addPlayListTracks(ssbPlayListTrackList, createdDateTime);
 
         // 링크드 연결 처리를 위해 다시 search
@@ -261,7 +299,6 @@ public class TrackService {
                 }
                 // 포지션이 전체 size 보다 크지 않을경우에만
                 SsbPlayListTracks.changeChildId(plyTrack, findChildId);
-
             }
         }
 

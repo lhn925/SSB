@@ -113,16 +113,13 @@ function App() {
     const handleWebSocketClose = () => {
       // 여기서 uploadInfoRef.current는 항상 최신 상태의 uploadInfo를 가리킵니다.
       disConnectEvent(uploadInfo).then(() => {
-        console.log("삭제");
       })
     };
-    if (currentClient !== null && uploadInfo.tracks.length > 0) {
-      console.log(uploadInfo.tracks);
+    if (currentClient !== null && currentClient.active && uploadInfo.tracks.length > 0) {
       currentClient.onWebSocketClose = handleWebSocketClose;
     }
     return () => {
       if (currentClient !== null && uploadInfo.tracks.length === 0) {
-        console.log("close");
         // 연결 종료 시에 적절한 이벤트 핸들러 정리 로직을 추가
         currentClient.offWebSocketClose = handleWebSocketClose;
       }

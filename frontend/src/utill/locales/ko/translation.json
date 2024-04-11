@@ -30,7 +30,9 @@
       "add.more": "트랙 추가 업로드",
       "name.your.title" : "제목을 입력해주세요.",
       "describe.track" : "자세한 정보를 입력해주세요.",
-      "tags.describe" :"트랙의 장르와 분위기를 설명하는 태그를 추가하세요"
+      "tags.describe" :"트랙의 장르와 분위기를 설명하는 태그를 추가하세요",
+      "limit.reached": "귀하의 요금제의 업로드 한도에 도달했습니다.",
+      "limit.reached.text": "180분이 넘어 업로드 할수 없습니다. 파일을 삭제하세요."
     },
     "join": {
       "sky.signup": "회원가입",
