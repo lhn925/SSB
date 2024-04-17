@@ -2,10 +2,13 @@ package sky.Sss.domain.track.service.track.play;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
+import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.repository.track.play.TrackAllPlayLogRepository;
@@ -44,11 +47,20 @@ public class TrackAllPlayLogService {
     }
 
     public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token, ChartStatus chartStatus) {
-        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack, chartStatus).orElseThrow(() -> new IllegalArgumentException());
+        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack, chartStatus)
+            .orElseThrow(IllegalArgumentException::new);
     }
+
     public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token, PlayStatus playStatus) {
-        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack,playStatus).orElseThrow(() -> new IllegalArgumentException());
+        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack, playStatus)
+            .orElseThrow(IllegalArgumentException::new);
     }
+
+    public SsbTrackAllPlayLogs findOne(long trackId, String playToken) {
+        return trackAllPlayLogRepository.findOne(trackId, playToken)
+            .orElseThrow(() -> new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN));
+    }
+
 
 }
 

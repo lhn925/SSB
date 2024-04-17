@@ -44,7 +44,7 @@ export function UploadInfoForm({
     t
   };
   // 플레이리스트
-  return <ul className="track_info_form_list list-group">
+  return <ul className="ul_basic track_info_form_list list-group">
     {
       uploadInfo.isPlayList ? uploadInfo.tracks.length > 0 && <InfoFormListItem
           index={0}
@@ -72,9 +72,6 @@ export function UploadInfoForm({
     }
   </ul>;
 }
-
-
-
 
 
 

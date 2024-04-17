@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
 
@@ -29,6 +30,14 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     Optional<SsbTrack> findOne(@Param("id") Long id, @Param("token") String token,
         @Param("isStatus") Boolean isStatus);
 
+
+    @Query(
+        "select new sky.Sss.domain.track.dto.track.TrackInfoSimpleDto(s.id,s.token,s.title,u.userName,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"
+            + " from SsbTrack s join fetch User u on s.user = u where s.id =:id and s.isStatus =:isStatus")
+    Optional<TrackInfoSimpleDto> getTrackInfoSimpleDto(@Param("id") Long id,
+        @Param("isStatus") Boolean isStatus);
+
+
     Optional<SsbTrack> findByIdAndIsStatus(Long id, Boolean isStatus);
 
     @Query("select s from SsbTrack s join fetch s.user where s.id = :id and s.isStatus =:isStatus and s.token=:token")
@@ -48,7 +57,8 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
             + " from SsbTrack s join fetch User u"
             + " on s.user = u "
             + " where s.token in (:token) and s.user =:user and s.isStatus =:isStatus")
-    List<TrackInfoRepDto> findAllByToken(@Param("token") List<String> tokenList,@Param("user") User user,@Param("isStatus") boolean isStatus);
+    List<TrackInfoRepDto> findAllByToken(@Param("token") List<String> tokenList, @Param("user") User user,
+        @Param("isStatus") boolean isStatus);
 
     @Query(
         "select new sky.Sss.domain.track.dto.common.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "

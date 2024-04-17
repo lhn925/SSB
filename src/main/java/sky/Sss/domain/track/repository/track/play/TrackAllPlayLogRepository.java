@@ -18,15 +18,22 @@ public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlay
         + "and s.user =:user "
         + "and s.ssbTrack =:ssbTrack "
         + "and s.chartStatus = :chartStatus")
-    Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id,@Param("token") String token,@Param("user") User user,@Param("ssbTrack")
-        SsbTrack ssbTrack,@Param("chartStatus")ChartStatus chartStatus);
+    Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id, @Param("token") String token, @Param("user") User user,
+        @Param("ssbTrack")
+        SsbTrack ssbTrack, @Param("chartStatus") ChartStatus chartStatus);
 
     @Query("select s from SsbTrackAllPlayLogs s where s.id = :id and s.token =:token "
         + "and s.user =:user "
         + "and s.ssbTrack =:ssbTrack "
         + "and s.playStatus =:playStatus "
     )
-    Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id,@Param("token") String token,@Param("user") User user,@Param("ssbTrack")
-    SsbTrack ssbTrack,@Param("playStatus")PlayStatus playStatus);
+    Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id, @Param("token") String token, @Param("user") User user,
+        @Param("ssbTrack")
+        SsbTrack ssbTrack, @Param("playStatus") PlayStatus playStatus);
+
+    @Query(
+        "select s from SsbTrackAllPlayLogs s join fetch SsbTrack t where s.ssbTrack.id = :trackId  and s.token =:playToken ")
+    Optional<SsbTrackAllPlayLogs> findOne(@Param("trackId") long trackId, @Param("playToken") String playToken);
+
 
 }

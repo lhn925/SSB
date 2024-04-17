@@ -13,6 +13,9 @@ import {
 import modalType from "store/modalType/modalType";
 import helpType from "store/helpType/helpType";
 import uploadInfo from "store/upload/uploadInfo";
+import playingReducer from "store/play/playingReducer";
+import currentTrack from "store/play/currentTrack";
+import playerSettings from "store/play/playerSettings";
 const persistConfig = {
   key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
   version: 1,
@@ -26,7 +29,11 @@ const rootReducer = combineReducers({
   modalType,
   helpType,
   uploadInfo,
+  playingReducer,
+  currentTrack,
+  playerSettings
 })
+
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 export const store = configureStore({
@@ -37,6 +44,8 @@ export const store = configureStore({
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
       }),
-})
+}
+)
+
 export const persistor = persistStore(store);
 export default store;

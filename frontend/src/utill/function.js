@@ -4,7 +4,7 @@ import {CodeCheckApi} from "utill/api/email/CodeCheckApi";
 import {useState} from "react";
 import profile2 from "css/image/profile2.png";
 import {GenreTypes} from "content/upload/UploadTypes";
-
+import {useLocation, useNavigate} from "react-router";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -385,40 +385,6 @@ export async function ClickBtnAuthCodeCheck(setInputs, inputs, auth, t,
   variable.current.isDoubleClick = false;
 }
 
-export function calculateUploadPercentage(totalFiles, completedUploads,
-    deletedFiles, addedFiles) {
-  // 실제 업로드 대상이 되는 파일 수 계산 (추가된 파일 포함)
-  const effectiveTotal = totalFiles - deletedFiles + addedFiles;
-
-  // 모든 파일이 삭제되었거나 추가된 파일이 없다면 진행 비율을 0으로 설정
-  if (effectiveTotal <= 0) {
-    return 0;
-  }
-
-  // 업로드 진행 비율 계산 (추가된 파일도 고려)
-  const percentage = (completedUploads / effectiveTotal) * 100;
-
-  // 퍼센트 비율을 반환 (최대 100%)
-  return Math.min(percentage, 100);
-}
-
-export function calculateRemovePercentage(totalFiles, completedUploads,
-    deletedFiles) {
-  // 실제 업로드 대상이 되는 파일 수 계산
-  const effectiveTotal = totalFiles - deletedFiles;
-
-  // 모든 파일이 삭제되었다면 진행 비율을 0으로 설정
-  if (effectiveTotal <= 0) {
-    return 0;
-  }
-
-  // 업로드 진행 비율 계산
-  const percentage = (completedUploads / effectiveTotal) * 100;
-
-  // 퍼센트 비율을 반환 (최대 100%)
-  return Math.min(percentage, 100);
-}
-
 export function ValueEmojiCheck(emojiCheck, input_value, regex) {
   if (emojiCheck) {
     const matchAll = input_value.matchAll(regex);
@@ -501,8 +467,6 @@ export function CreateTrackBody(track) {
     order:track.order
   }
 }
-
-
 export function CreatePlayListBody(playList) {
   return  {
     title:playList.title.value,
@@ -514,10 +478,72 @@ export function CreatePlayListBody(playList) {
   }
 }
 
-
-
 export function recalculateTotalUploadPercent(tracks) {
   const totalPercent = tracks.reduce((acc, track) => acc + track.uploadPercent, 0);
   return Math.min(100, totalPercent / tracks.length);
+}
+
+export function saveToLocalStorage(state) {
+  try {
+    const serializedState = JSON.stringify(state.item);
+    localStorage.setItem(state.key, serializedState);
+  } catch (e) {
+    console.error('Could not save state', e);
+  }
+}
+
+export function loadFromLocalStorage(key) {
+  try {
+    const serializedState = localStorage.getItem(key);
+    if (serializedState === null) return undefined;
+    return JSON.parse(serializedState);
+  } catch (e) {
+    console.error('Could not load state', e);
+    return undefined;
+  }
+}
+
+export function removeFromLocalStorage(key) {
+  try {
+    localStorage.removeItem(key)
+  } catch (e) {
+    console.error('Could not load state', e);
+    return undefined;
+  }
+}
+
+
+export function useQueryParams() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const setSearchParams = (params) => {
+    const searchParams = new URLSearchParams(location.search);
+    for (const key in params) {
+      searchParams.set(key, params[key]);
+    }
+    navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
+  };
+
+  const getSearchParams = () => {
+    return new URLSearchParams(location.search);
+  };
+
+  return { setSearchParams, getSearchParams };
+}
+export function durationTime (trackLength)  {
+  return secondsToTime(trackLength)
+}
+
+
+export function secondsToTime(seconds){
+  if (!seconds) {
+    seconds=0;
+  }
+
+  let duration = new Date(null);
+  duration.setSeconds(seconds);
+  // 시작 인덱스 14, 끝 인덱스는 14+5=19
+  return duration.toISOString().substring(14, 19);
 }
 

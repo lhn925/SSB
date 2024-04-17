@@ -14,7 +14,7 @@
 Version: Java 17
 IDE: inellij
 Framework : SpringBoot 2.7.11
-ORM : JPA,JDBCTEMPLATE
+ORM : JPA,JDBC TEMPLATE
 
 
 

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.user.entity.User;
@@ -27,6 +28,7 @@ public class TrackPlayService {
 
     private final TrackService trackService;
     private final UserQueryService userQueryService;
+    private final TrackAllPlayLogService trackAllPlayLogService;
     /**
      * 비공개 확인
      * 본인 여부
@@ -38,19 +40,31 @@ public class TrackPlayService {
      *     trackId
      * @return
      */
-    public UrlResource getTrackPlayFile(Long id, String token) {
-        SsbTrack ssbTrack = trackService.findOne(id, token, Status.ON);
+    @Transactional
+    public UrlResource getTrackPlayFile(Long id, String playToken) {
+        SsbTrackAllPlayLogs playLogs = trackAllPlayLogService.findOne(id, playToken);
+
+        SsbTrack ssbTrack = playLogs.getSsbTrack();
+        if (playLogs.getIsValid()) {
+            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
+        }
+
+        // 플레이 여부 업데이트
+        SsbTrackAllPlayLogs.updateIsValid(playLogs, true);
+
+
+//        SsbTrack ssbTrack = trackService.findOne(id, Status.ON);
         // getTrackPlayFile 권한이 없을 경우
-        User playUser = userQueryService.findOne(); // 요청한 유저
+//        User playUser = userQueryService.findOne(); // 요청한 유저
 
         // 요청한 사용자가 비회원인지 확인 비회원이 아닐 경우
         // 해당 요청한 track 에 소유자인지 확인
-        boolean isOwnerPost = ssbTrack.getUser().equals(playUser);
+//        boolean isOwnerPost = ssbTrack.getUser().equals(playUser);
 
         // 요청한 사용자가 해당 track(비공개) 에 권한이 없는경우 예외 발생
-        if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개 일경우
-            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
-        }
+//        if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개 일경우
+//            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
+//        }
 
         return trackService.getSsbTrackFile(
             ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());

@@ -2,6 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import {
   recalculateTotalUploadPercent
 } from "utill/function";
+import {disConnectEvent} from "utill/app/functions";
 
 const createTrackInfo = (data) => ({
   id: data.id,
@@ -40,7 +41,7 @@ const createPlayListInfo = {
 const createSaveInfo = (data) => ({
       id: data.id,
       token: data.token,
-      userName:data.userName,
+      userName: data.userName,
       title: data.title,
       desc: data.desc,
       coverUrl: data.coverUrl,
@@ -175,6 +176,6 @@ export let uploadInfoActions = {
   updatePlayListObject: uploadInfo.actions.updatePlayListObject,
   updateOrder: uploadInfo.actions.updateOrder,
   cleanStore: uploadInfo.actions.cleanStore,
-  addSaves: uploadInfo.actions.addSaves
+  addSaves: uploadInfo.actions.addSaves,
 };
 export default uploadInfo.reducer;

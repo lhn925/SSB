@@ -77,6 +77,15 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     @Column(nullable = false)
     @Enumerated(value = STRING)
     private ChartStatus chartStatus;
+
+
+    // 해당 컬럼이 false 면은
+    // 플레이 가능 상태
+    // true 면 플레이 불가능 상태
+    // 유저가 track play 시 true 면은 재생 불가능
+    @Column(nullable = false)
+    private Boolean isValid;
+
 //
 //    @OneToOne(mappedBy = "ssbTrackAllPlayLogs",cascade = ALL,fetch = LAZY)
 //    private SsbChartIncludedPlays ssbChartIncludedPlays;
@@ -96,6 +105,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setDefaultLocationLog(defaultLocationLog);
         ssbTrackAllPlayLogs.setDeviceDetails(deviceDetails);
         ssbTrackAllPlayLogs.setStartTime(removeMillis(startTime));
+        ssbTrackAllPlayLogs.setIsValid(false);
 
         Integer trackMiniNum = TrackMinimumPlayTime.MINI_NUM_SECOND.getSeconds();
 
@@ -130,6 +140,10 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
 
     public static void updateCloseTime(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, Long closeTime) {
         ssbTrackAllPlayLogs.setCloseTime(removeMillis(closeTime));
+    }
+
+    public static void updateIsValid(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, boolean isValid) {
+        ssbTrackAllPlayLogs.setIsValid(isValid);
     }
 
     public static long removeMillis (Long millisSeconds) {

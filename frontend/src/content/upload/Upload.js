@@ -10,7 +10,7 @@ import {v4 as uuidV4} from "uuid";
 import {UploadInfoForm} from "content/upload/UploadInfoForm";
 import {EmptyUploadInfoContent} from "content/upload/EmptyUploadInfoContent";
 import {convertPictureToFile} from "utill/function";
-import {UseUploadActions} from "App";
+import {UseUploadActions} from "utill/app/functions";
 import {useTranslation} from "react-i18next";
 
 export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
@@ -295,6 +295,13 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     dispatch(uploadInfoActions.changeIsPrivacy(
         {isPrivacy: value}))
   }
+
+
+
+
+
+
+
   // privacyChk
   const changePrivacyChkEvent = (value) => {
     setUploadSettings({...uploadSettings, isPrivacy: value})

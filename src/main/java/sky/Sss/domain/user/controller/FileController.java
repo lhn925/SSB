@@ -1,8 +1,10 @@
 package sky.Sss.domain.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
@@ -14,8 +16,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.service.track.play.TrackPlayService;
+import sky.Sss.domain.user.utili.jwt.JwtFilter;
+import sky.Sss.domain.user.utili.jwt.JwtTokenDto;
 import sky.Sss.global.file.utili.FileStore;
 
 @Slf4j
@@ -72,9 +77,9 @@ public class FileController {
      */
     // 한시간에 한번만 플레이 인정
     // track file 출력
-    @GetMapping("/track/play/{id}/{token}")
-    public ResponseEntity<UrlResource> getTrackFile(@PathVariable Long id, @PathVariable String token) {
-        return ResponseEntity.ok(trackPlayService.getTrackPlayFile(id, token));
+    @GetMapping("/track/play/{id}/{playToken}")
+    public ResponseEntity<UrlResource> getTrackFile(@PathVariable Long id, @PathVariable String playToken) {
+        return ResponseEntity.ok(trackPlayService.getTrackPlayFile(id, playToken));
     }
 
 }

@@ -4,6 +4,7 @@ import {authActions} from "store/auth/authReducers";
 import mem from "mem";
 import {LOGIN_REFRESH, USERS_INFO} from "utill/api/ApiEndpoints";
 import {toast} from "react-toastify";
+import {useTranslation} from "react-i18next";
 // 토큰이 불 필요한 URL
 export const nonAuthApi = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -19,6 +20,7 @@ export const nonGetAuthApi = axios.create({
 export const authApi = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}`,
 });
+
 authApi.interceptors.request.use((config) => {
   const state = store.getState().authReducer;
   const access = state.access;
@@ -54,6 +56,7 @@ authApi.interceptors.response.use(
         config, response: {status},
       } = error;
 
+      // const {t} = useTranslation();
       // 토큰이 만료되었을때
       if (status === HttpStatusCode.Unauthorized) {
         const state = store.getState().authReducer;
@@ -71,7 +74,7 @@ authApi.interceptors.response.use(
         } catch (error) {
           await persistor.purge();
           window.location.href = "/";
-          toast.error(`errorMsg.error.token`);
+          // toast.error(t(`errorMsg.error.token`));
           return error;
         }
       } else if (status === HttpStatusCode.InternalServerError) {
@@ -81,6 +84,59 @@ authApi.interceptors.response.use(
           return error.response;
         } else {
           window.location.href = "/404";
+        }
+      } else {
+        return error.response;
+      }
+    }
+)
+
+export const authTrackApi = axios.create({
+  baseURL: `${process.env.REACT_APP_API_URL}`,
+});
+
+authTrackApi.interceptors.request.use((config) => {
+  const state = store.getState().authReducer;
+  const access = state.access;
+
+  if (access) {
+    config.headers.Authorization = access;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+})
+
+
+authTrackApi.interceptors.response.use(
+    // 200 이 나올때 처리
+    (response) => {
+      return response;
+    }, async (error) => {
+      const {
+        config, response: {status},
+      } = error;
+
+      // const {t} = useTranslation();
+      // 토큰이 만료되었을때
+      if (status === HttpStatusCode.Unauthorized) {
+        const state = store.getState().authReducer;
+        const refresh = state.refresh;
+        const originRequest = config;
+        try {
+          const response = await memoizedPostRefreshToken(refresh);
+          const newAccessToken = response.data;
+          // accessToken 저장
+          store.dispatch(authActions.setAccess(newAccessToken));
+          store.dispatch(authActions.setAccessHeader());
+          originRequest.headers.Authorization = newAccessToken;
+          // 재요청
+          return axios(originRequest);
+        } catch (error) {
+          await persistor.purge();
+          // window.location.href = "/";
+          // toast.error(t(`errorMsg.error.token`));
+          return error;
         }
       } else {
         return error.response;

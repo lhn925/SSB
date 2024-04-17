@@ -1,7 +1,6 @@
 package sky.Sss.domain.track.service.track;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +26,13 @@ import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.track.TrackInfoModifyReqDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
 import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
@@ -43,7 +43,6 @@ import sky.Sss.domain.track.service.common.TagLinkCommonService;
 import sky.Sss.domain.track.service.playList.PlyTracksService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
-import sky.Sss.domain.user.dto.push.PushMsgCacheDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.ContentsType;
@@ -53,7 +52,6 @@ import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.utili.FileStore;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
-import sky.Sss.global.redis.service.RedisTagService;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -69,6 +67,7 @@ public class TrackService {
     private final TrackQueryService trackQueryService;
     private final TrackRepositoryImpl trackRepositoryImpl;
     private final TrackPlayMetricsService trackPlayMetricsService;
+    private final TrackLikesService trackLikesService;
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
 
@@ -413,35 +412,82 @@ public class TrackService {
         try {
             user = userQueryService.findOne();
         } catch (UserInfoNotFoundException e) {
-            // 비회원인지 확인
-            isMember = false;
+            return null;
         }
-        boolean isOwnerPost = isMember && ssbTrack.getUser().equals(user); // 작성자인지 확인
+
+        boolean isOwnerPost = ssbTrack.getUser().getToken().equals(user.getToken()); // 작성자인지 확인
         // 파일에 권한이 있는지 없는지 확인
         // isPrivacy : true 비공개 ,false 공개
         // isOwnerPost : true 사용자 자신의 게시물 , false 사용자 자신의 게시물 x
-        if (ssbTrack.getIsPrivacy()) {// 비공개일 경우 재생권한이 있는지 확인
-            trackPlayRepDto = isOwnerPost ? TrackPlayRepDto.create(ssbTrack) : null;
-        } else { // 비공개가 아닐경우
-            trackPlayRepDto = TrackPlayRepDto.create(ssbTrack);
+        // 비공개인데 자신의 권한이 없을 경우
+        if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개일 경우 재생권한이 있는지 확인
+            return null;
         }
+        trackPlayRepDto = TrackPlayRepDto.create(ssbTrack);
 
-        // 비회원 조회수 측정 x
-        // 자신의 track은 자신이 플레이를 해도 측정 x
-        // 해당 트랙에 접근 권한이 없을 경우 x
-        if (isMember && !isOwnerPost && trackPlayRepDto != null) {
-            trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
-        }
+        // 비회원 플레이 X
+        // 해당 트랙에 접근 권한이 없을 경우 플레이 x
+        trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
+
+        //
+        updateIsOwnerAndIsLike(trackPlayRepDto, user, isMember, isOwnerPost);
+
         return trackPlayRepDto;
     }
 
+
+    public TrackInfoSimpleDto getTrackInfoSimpleDto(long id) {
+        TrackInfoSimpleDto trackInfoSimpleDto = trackQueryService.getTrackInfoSimpleDto(id, Status.ON);
+        User user = null;
+        boolean isMember = true;
+        try {
+            user = userQueryService.findOne();
+        } catch (UserInfoNotFoundException e) {
+            // 비회원인지 확인
+            isMember = false;
+        }
+
+        Boolean isPrivacy = trackInfoSimpleDto.getIsPrivacy();
+
+        // 비공개인데 비회원일경우
+        if (isPrivacy && !isMember) {
+            return null;
+        }
+        boolean isOwnerPost = isMember && trackInfoSimpleDto.getUserName().equals(user.getUserName());
+        // 비공개인데 자신의 것이 아닌 경우
+        if (isPrivacy && !isOwnerPost) {
+            return null;
+        }
+
+        updateIsOwnerAndIsLike(trackInfoSimpleDto, user, isMember, isOwnerPost);
+        return trackInfoSimpleDto;
+    }
+
+    private void updateIsOwnerAndIsLike(TrackInfoSimpleDto trackInfoSimpleDto, User user, boolean isMember, boolean isOwnerPost) {
+
+        // coverUrl이 없을 경우 user 프로필 사진으로 대체
+        if (trackInfoSimpleDto.getCoverUrl() == null) {
+            TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto,user.getPictureUrl());
+        }
+        TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwnerPost);
+        // 자신의 트랙이 아닐 경우
+        // token null
+        if (!isOwnerPost) {
+            TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, null);
+        }
+
+        // 회원일 경우 like 조회
+        if (isMember) {
+            SsbTrackLikes ssbTrackLikes = trackLikesService.findOneAsOpt(trackInfoSimpleDto.getId(), user).orElse(null);
+            boolean isLike = ssbTrackLikes != null;
+            TrackInfoSimpleDto.updateIsLike(trackInfoSimpleDto, isLike);
+        }
+    }
     @Transactional
     public void deleteTrack(Long id, String token) {
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = findOne(id, token, user, Status.ON);
 
-        // 커버이미지 삭제
-//        SsbTrack.deleteCoverImg(ssbTrack, fileStore);
 
         // Feed 삭제
         feedService.deleteFeed(user, ssbTrack.getId(), ContentsType.TRACK);

@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.TotalLengthRepDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.track.TrackService;
@@ -28,23 +30,23 @@ import sky.Sss.global.file.utili.FileStore;
 public class TrackInfoController {
     private final TrackService trackService;
     private final UserQueryService userQueryService;
+
     /**
-     * 재생할 트랙 정보 출력
+     * TrackInfoSimpleDto 출력
      *
      * @param id track Id
-     * @param request
      * @return
      * @throws SsbTrackAccessDeniedException
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<TrackPlayRepDto> getTrackInfo(@PathVariable Long id, HttpServletRequest request) throws SsbTrackAccessDeniedException {
-        TrackPlayRepDto trackPlayDto = trackService.getAuthorizedTrackInfo(id, Status.ON,
-            request.getHeader("User-Agent"));
-        if (trackPlayDto == null) {
+    @GetMapping("/search/{id}")
+    public ResponseEntity<TrackInfoSimpleDto> searchTrackInfo(@PathVariable Long id) throws SsbTrackAccessDeniedException {
+        TrackInfoSimpleDto trackInfoSimpleDto = trackService.getTrackInfoSimpleDto(id);
+        if (trackInfoSimpleDto == null) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok(trackPlayDto);
+        return ResponseEntity.ok(trackInfoSimpleDto);
     }
+
 
     /**
      * 업로드한 track 시간 총합

@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.controller.track;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,16 +10,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
 import sky.Sss.domain.track.dto.track.chart.TrackChartSaveReqDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogModifyReqDto;
 import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
+import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
+import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
+import sky.Sss.domain.user.model.Status;
 
 /**
  * 트랙에 조회수 관련 api 호출 controller
@@ -30,6 +36,7 @@ import sky.Sss.domain.user.annotation.UserAuthorize;
 @UserAuthorize
 public class TrackLogController {
     private final TrackPlayMetricsService trackPlayMetricsService;
+    private final TrackService trackService;
     // 조회수
 
     // 정지
@@ -78,6 +85,24 @@ public class TrackLogController {
         }
         trackPlayMetricsService.modifyPlayLog(trackPlayLogModifyReqDto);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 재생할 트랙 정보 및 Url 출력
+     * 재생 로그 등록
+     * @param id track Id
+     * @param request
+     * @return
+     * @throws SsbTrackAccessDeniedException
+     */
+    @PostMapping("/{id}")
+    public ResponseEntity<TrackPlayRepDto> getTrackInfo(@PathVariable Long id, HttpServletRequest request) throws SsbTrackAccessDeniedException {
+        TrackPlayRepDto trackPlayDto = trackService.getAuthorizedTrackInfo(id, Status.ON,
+            request.getHeader("User-Agent"));
+        if (trackPlayDto == null) {
+            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
+        }
+        return ResponseEntity.ok(trackPlayDto);
     }
 
 }

@@ -61,8 +61,8 @@ public class UserActivityLog extends BaseTimeEntity {
     @Embedded
     private DefaultLocationLog defaultLog;
 
-    @LastModifiedBy
-    private String modifiedByUserId;
+//    @LastModifiedBy
+//    private String modifiedByUserId;
 
     @Builder
     public UserActivityLog(

@@ -7,6 +7,7 @@ export const USERS_HELP_IDQUERY = "/users/help/id-query";
 export const USERS_HELP_SHOW = "/users/help/show";
 export const USERS_JOIN_DUPLICATE = "/users/join/duplicate/";
 export const USERS_FILE_IMAGE = "/users/file/image/";
+export const USERS_FILE_TRACK_PLAY = "/users/file/track/play/";
 
 export const USERS_INFO_LOGIN_DEVICE = "/users/info/login-device";
 export const USERS_INFO_BLOCKED= "/users/info/blocked";
@@ -32,3 +33,5 @@ export const TRACKS_TEMP_FILE_SAVE_LIST = "/tracks/temp/file"
 
 
 export const TRACKS_TAGS_SEARCH = "/tracks/tags/search/"
+export const TRACKS_INFO_SEARCH_ID = "/tracks/info/search/"
+export const TRACKS_LOG_ID = "/tracks/log/"

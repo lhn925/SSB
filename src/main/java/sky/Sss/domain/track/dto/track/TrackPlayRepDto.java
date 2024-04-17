@@ -3,7 +3,9 @@ package sky.Sss.domain.track.dto.track;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,26 +15,22 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 @Getter
 @Setter(PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TrackPlayRepDto implements Serializable {
+public class TrackPlayRepDto extends TrackInfoSimpleDto implements Serializable {
 
-    private Long id;
-    private String token;
-    private String title;
-    private String userName;
-    private Integer trackLength;
     private TrackPlayLogRepDto trackPlayLogRepDto;
 
-    public static TrackPlayRepDto create(SsbTrack ssbTrack) {
-        TrackPlayRepDto trackPlayDto = new TrackPlayRepDto();
-        trackPlayDto.setId(ssbTrack.getId());
-        trackPlayDto.setToken(ssbTrack.getToken());
-        trackPlayDto.setTitle(ssbTrack.getTitle());
-        trackPlayDto.setUserName(ssbTrack.getUser().getUserName());
-        trackPlayDto.setTrackLength(ssbTrack.getTrackLength());
-        // 서버 호출 시간
 
-        return trackPlayDto;
+
+    @Builder
+    private TrackPlayRepDto(SsbTrack ssbTrack) {
+        super(ssbTrack.getId(),ssbTrack.getToken(),ssbTrack.getTitle(),ssbTrack.getUser().getUserName(),ssbTrack.getTrackLength(),ssbTrack.getCoverUrl(),ssbTrack.getIsPrivacy(),ssbTrack.getCreatedDateTime());
     }
+
+    public static TrackPlayRepDto create(SsbTrack ssbTrack) {
+        // 서버 호출 시간
+        return TrackPlayRepDto.builder().ssbTrack(ssbTrack).build();
+    }
+
 
     public static void updateTrackPlayLogRepDto(TrackPlayRepDto trackPlayRepDto ,TrackPlayLogRepDto trackPlayLogRepDto ) {
         // 조회수 측정 정보

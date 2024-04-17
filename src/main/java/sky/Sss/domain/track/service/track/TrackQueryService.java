@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
+import sky.Sss.domain.track.dto.common.TrackInfoDto;
 import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
+import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.track.TrackQueryRepository;
@@ -45,6 +47,12 @@ public class TrackQueryService {
         return trackQueryRepository.findByIdAndIsStatus(id, isStatus.getValue())
             .orElseThrow(SsbFileNotFoundException::new);
     }
+
+    public TrackInfoSimpleDto getTrackInfoSimpleDto(Long id, Status isStatus) {
+        return  trackQueryRepository.getTrackInfoSimpleDto(id, isStatus.getValue())
+            .orElseThrow(SsbFileNotFoundException::new);
+    }
+
 
 
     public SsbTrack findOneJoinUser(Long id, String token, Status isStatus) {
