@@ -159,7 +159,6 @@ public class TrackPlayMetricsService {
 
         long exCloseTime = DayTime.localDateTimeToEpochMillis(closeDateTime).toEpochMilli();
 
-
         // 예상 closeTime 저장
         SsbTrackAllPlayLogs.updateCloseTime(ssbTrackAllPlayLogs, exCloseTime);
         // 자신의 트랙이 아닐 경우에만 차트반영

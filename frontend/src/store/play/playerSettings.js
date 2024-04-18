@@ -1,8 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {AUTO_PLAY} from "utill/enum/PlaybackTypes";
-import {loadFromLocalStorage, saveToLocalStorage} from "../../utill/function";
+import {loadFromLocalStorage, saveToLocalStorage} from "utill/function";
+import {LOCAL_PLAYER_SETTINGS} from "utill/enum/localKeyEnum";
 
 const settings = {
+  index: 0, // 재생위치정보
   volume: 0.8,
   muted: false,
   played: 0,
@@ -15,7 +17,7 @@ const settings = {
 };
 
 const initialState = {
-  key: "local:playerSettings",
+  key: LOCAL_PLAYER_SETTINGS,
   item: settings
 }
 const playerSettings = createSlice({
@@ -42,10 +44,10 @@ const playerSettings = createSlice({
     }, updateSettings(state, action) {
       const key = action.payload.key;
       state.item[key] = action.payload.value;
-      if (key === "muted" || key === "volume" || key === "playBackType") {
+      if (key === "muted" || key === "volume" || key === "playBackType" || key === "index") {
         const localStorage = loadFromLocalStorage(state.key);
         localStorage[key] = action.payload.value;
-        saveToLocalStorage({key: state.key,item:localStorage});
+        saveToLocalStorage({key: state.key, item: localStorage});
       }
     }
   }

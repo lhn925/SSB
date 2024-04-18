@@ -12,10 +12,12 @@ import LogoutApi from "utill/api/logout/LogoutApi";
 import {persistor} from "store/store";
 import {toast} from "react-toastify";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
+import {removeFromLocalStorage} from "utill/function";
+import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 
 function Header(props) {
-  const auth = useSelector(state => state.authReducer);
-  const userInfo = useSelector(state => state.userReducer);
+  const auth = useSelector(state => state?.authReducer);
+  const userInfo = useSelector(state => state?.userReducer);
   const {t} = useTranslation();
   const variable = useRef({isDoubleClick: false});
 
@@ -29,6 +31,7 @@ function Header(props) {
     LogoutApi({Authorization: auth.access, RefreshAuth: auth.refresh})
     .then(() => {
       persistor.purge();
+      removeFromLocalStorage(LOCAL_PLY_KEY);
       props.bc.postMessage({type: "logout"});
       toast.dismiss(loading);
       toast.success(t(`msg.common.logout.success`));

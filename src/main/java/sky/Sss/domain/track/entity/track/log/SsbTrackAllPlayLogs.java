@@ -129,8 +129,8 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, 0);
 
 
-        // 제한 시간 설정
-        Instant zoneInstant = DayTime.localDateTimeToEpochMillis(createdDateTime.plusHours(1));
+        // 제한 시간 설정 1시간
+        Instant zoneInstant = DayTime.localDateTimeToEpochMillis(createdDateTime.plusHours(DayTime.EXPIRE_FILE_HOUR_TIME));
         ssbTrackAllPlayLogs.setExpireTime(zoneInstant.toEpochMilli());
 
         return ssbTrackAllPlayLogs;

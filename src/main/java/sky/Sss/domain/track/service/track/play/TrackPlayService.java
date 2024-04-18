@@ -45,14 +45,12 @@ public class TrackPlayService {
     @Transactional
     public UrlResource getTrackPlayFile(Long id, String playToken) {
         SsbTrackAllPlayLogs playLogs = trackAllPlayLogService.findOne(id, playToken);
-        long nowMillis = DayTime.localDateTimeToEpochMillis(LocalDateTime.now()).getEpochSecond();
+        // 요청시간 서버 기준 으로
+        long nowMillis = DayTime.localDateTimeToEpochMillis(LocalDateTime.now()).toEpochMilli();
         SsbTrack ssbTrack = playLogs.getSsbTrack();
         // 제한시간 지났는지에 대한 여부
-        if (playLogs.getIsValid()) {
-            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
-        }
         if (nowMillis > playLogs.getExpireTime()) {
-            SsbTrackAllPlayLogs.updateIsValid(playLogs, true);
+            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
 
         return trackService.getSsbTrackFile(

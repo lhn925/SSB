@@ -5,6 +5,8 @@ import mem from "mem";
 import {LOGIN_REFRESH, USERS_INFO} from "utill/api/ApiEndpoints";
 import {toast} from "react-toastify";
 import {useTranslation} from "react-i18next";
+import {removeFromLocalStorage} from "utill/function";
+import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 // 토큰이 불 필요한 URL
 export const nonAuthApi = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -72,6 +74,7 @@ authApi.interceptors.response.use(
           // 재요청
           return axios(originRequest);
         } catch (error) {
+          removeFromLocalStorage(LOCAL_PLY_KEY);
           await persistor.purge();
           window.location.href = "/";
           // toast.error(t(`errorMsg.error.token`));

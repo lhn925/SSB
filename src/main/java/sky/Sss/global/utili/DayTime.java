@@ -9,7 +9,10 @@ import sky.Sss.domain.track.model.Hour;
 
 public class DayTime {
 
-    public static String DAY_TIME_FORMAT = "YYYYMMddHH";
+    public final static String DAY_TIME_FORMAT = "YYYYMMddHH";
+
+    // 파일 제한 시간
+    public final static int EXPIRE_FILE_HOUR_TIME = 1;
 
     public static int getDayTime(LocalDateTime playDateTime) {
         return Integer.parseInt(playDateTime.format(DateTimeFormatter.ofPattern(DAY_TIME_FORMAT)));

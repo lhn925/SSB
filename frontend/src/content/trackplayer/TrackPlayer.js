@@ -37,7 +37,10 @@ export const TrackPlayer = ({
   currentTrack,
   updateCurrentTrack,
   playerSettings,
-  updateSettings
+  updateSettings,
+  localPly,
+  localPlyAddTracks,
+  createCurrentTrack
 }) => {
   const playerRef = useRef();
   // 현재 재생목록
@@ -55,6 +58,7 @@ export const TrackPlayer = ({
   const [settingsInfo, setSettingsInfo] = useState(
       playerSettings.item);
 
+  const [localPlyInfo, setLocalPlyInfo] = useState(localPly.item);
   // 플레이 시간
   const [url, setUrl] = useState(null);
 
@@ -71,9 +75,24 @@ export const TrackPlayer = ({
     }
   }, [currentTrack]);
   useEffect(() => {
+    setLocalPlyInfo(localPly.item);
+  }, [localPly.item]);
+
+  useEffect(() => {
     setIsPlaying(playing.item.playing);
     setSettingsInfo(playerSettings.item);
-  }, [playing.item.playing, playerSettings.item]);
+
+  }, [playing.item.playing, playerSettings.item, localPlyInfo]);
+
+  useEffect(() => {
+    if (localPlyInfo.length > 0) {
+      if (playing.item.playing) {
+        updateCurrentTrack(localPlyInfo[playerSettings.item.index].id);
+        return;
+      }
+      createCurrentTrack(localPlyInfo[playerSettings.item.index]);
+    }
+  }, [playerSettings.item.index, localPlyInfo]);
 
   // 일시정지,플레이버튼
   const playPause = (e) => {
@@ -99,8 +118,6 @@ export const TrackPlayer = ({
   let linkToTrack;
   let linkToUploader;
 
-  // const [percentage, setPercentage] = useState(0);
-
   let likeButton = 'liked-button-t';
   let followButton = 'liked-button-t';
   const toggleLike = function (id, e) {
@@ -108,7 +125,7 @@ export const TrackPlayer = ({
   }
 
   const onReady = function (e) {
-
+    console.log("hi");
   }
   // 재생이 제일 먼저 시작될때
   const onStart = function (e) {
@@ -123,7 +140,8 @@ export const TrackPlayer = ({
   const onProgress = (e) => {
     if (!seeking) {
       updateSettings("playedSeconds", e.playedSeconds);
-      updateSettings("played",Number.parseInt(e.played * 100));
+      updateSettings("played", Number.parseInt(e.played * 100));
+      updateSettings("loaded", Number.parseInt(e.loaded * 100));
     }
   }
 
@@ -135,6 +153,7 @@ export const TrackPlayer = ({
   }
 
   const onError = (e) => {
+    console.log("error")
     updateCurrentTrack(trackInfo.id);
   }
   const getPlayButton = (playing) => {
@@ -183,17 +202,49 @@ export const TrackPlayer = ({
     updateSettings("playedSeconds", seekToSeconds);
     updateSettings("played", percent);
   }
+  const preBtnOnClick = () => {
+    const localLength = localPlyInfo.length;
+
+    const maxIndex = localLength === 0 ? localLength : localLength - 1;
+
+    const prevIndex = settingsInfo.index - 1;
+
+    const changeIndex = prevIndex < 0 ? maxIndex : prevIndex;
+
+
+    if (playerRef.current) {
+      playerRef.current.seekTo(0, "seconds");
+    }
+    // 5초보다 크다면 이전곡이 아닌 0초부터 시작
+    if (settingsInfo.playedSeconds > 5) {
+      updateSettings("playedSeconds", 0);
+      updateCurrentTrack(trackInfo.id);
+      return;
+    }
+    // const prevTrack = localPly.item(changeIndex);
+    // updateCurrentTrack(prevTrack.id);
+    updateSettings("index", changeIndex);
+  }
+  const nextBtnOnClick = (event) => {
+    localPlyAddTracks(1);
+    localPlyAddTracks(2);
+    localPlyAddTracks(3);
+    localPlyAddTracks(4);
+    localPlyAddTracks(5);
+  }
+
   return (
       <div id='track-player-bar'>
         <div id='track-player-container'>
           <div id='tp-controller'>
             <div id='previous-btn'
-                 className='controller-btn '></div>
+                 className='controller-btn' onClick={preBtnOnClick}></div>
             <div id={getPlayButton(isPlaying)}
                  data-id={trackInfo.id}
                  className='controller-btn'
                  onClick={(e) => playPause(e)}></div>
-            <div id='next-btn' className='controller-btn '></div>
+            <div id='next-btn' className='controller-btn'
+                 onClick={nextBtnOnClick}></div>
             <div className='shuffle-btn controller-btn'></div>
             <div id="loop-btn-active"
                  className='loop-btn controller-btn'></div>
@@ -206,8 +257,10 @@ export const TrackPlayer = ({
                  onMouseUp={onMouseUp} id='tp-scrubbar'
                  data-seconds={settingsInfo.played}>
               <div id='scrub-bg'></div>
-              <div id='scrub-progress' style={{width: settingsInfo.played + `%`}}></div>
-              <div id='scrup-handle' style={{left: settingsInfo.played  + `%`}}></div>
+              <div id='scrub-progress'
+                   style={{width: settingsInfo.played + `%`}}></div>
+              <div id='scrup-handle'
+                   style={{left: settingsInfo.played + `%`}}></div>
             </div>
             <div id='tp-duration'>{durationTime(trackInfo.trackLength)}</div>
           </div>

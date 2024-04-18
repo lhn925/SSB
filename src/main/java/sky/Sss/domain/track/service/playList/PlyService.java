@@ -41,6 +41,7 @@ import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
+import sky.Sss.global.utili.DayTime;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -58,7 +59,7 @@ public class PlyService {
     private final RepostCommonService repostCommonService;
     private final TagLinkCommonService tagLinkCommonService;
     private final RedisCacheService redisCacheService;
-    private final int PLY_TRACK_LIMIT = 500;
+    public final static int PLY_TRACK_LIMIT = 500;
 
     @Transactional
     public PlayListInfoDto addPlyAndTracks(PlayListSettingSaveDto playListSettingSaveDto,

@@ -1,5 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {removeFromLocalStorage, saveToLocalStorage} from "utill/function";
+import {LOCAL_INST_} from "utill/enum/localKeyEnum";
 const initialState = {
   key: null,
   item:{playing:false}
@@ -10,7 +11,7 @@ const playingReducer = createSlice({
   reducers: {
     changePlaying(state, action) {
       if (state.key === null) {
-        state.key = "local::inst_" + new Date().getTime();
+        state.key = LOCAL_INST_+ new Date().getTime();
       }
       state.item.playing = !state.item.playing;
       saveToLocalStorage(state);

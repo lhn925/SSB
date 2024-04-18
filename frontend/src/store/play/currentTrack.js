@@ -59,12 +59,10 @@ const currentTrack = createSlice({
       // 현재 저장되어 있는 id 가 같다면
       setTrackInfo(state, action.payload.info);
       if (action.payload.playLog !== undefined) {
-        state.playLog =createPlayLog(action.payload.playLog);
+        state.playLog = createPlayLog(action.payload.playLog);
       }
     }, updatePlayLog(state, action) {
-      if (state.id === null) {
-        return;
-      }
+      setTrackInfo(state,action.payload.info);
       state.playLog = createPlayLog(action.payload.playLog);
     }
   }
