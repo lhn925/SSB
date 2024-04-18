@@ -65,7 +65,6 @@
 - Project Lombok
 
 ## 테스트
-- Spring Test
 - Spring Boot Test
 
 
