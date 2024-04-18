@@ -14,12 +14,12 @@
 . IDE: IntelliJ IDEA
 
 #백엔드 개발:
-프레임워크: Spring Boot 2.7.11
-ORM (Object-Relational Mapping): JPA (Java Persistence API), JDBC Template
-데이터베이스: MySQL
+.  프레임워크: Spring Boot 2.7.11
+. ORM (Object-Relational Mapping): JPA (Java Persistence API), JDBC Template
+. 데이터베이스: MySQL
 
 #프론트엔드 개발:
-프론트엔드 프레임워크: React
+. 프론트엔드 프레임워크: React
 
 
 
