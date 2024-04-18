@@ -16,8 +16,8 @@
 ### 백엔드 개발:
 * 프레임워크: Spring Boot 3.0.6
 * ORM (Object-Relational Mapping):
- * JPA (Java Persistence API)
- * JDBC Template
+* * JPA (Java Persistence API)
+* * JDBC Template
 * 데이터베이스: MySQL
 
 ### 프론트엔드 개발:
