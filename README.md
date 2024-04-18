@@ -8,12 +8,12 @@
 
 
 ## 개발 환경
-1.Version: Java 17
-2.IDE: inellij
-3.Framework : SpringBoot 2.7.11
-4.ORM : JPA , JDBC TEMPLATE
-5.Front : React
-6.DB : MY SQL
+1. Version: Java 17
+2. IDE: inellij
+3. Framework : SpringBoot 2.7.11
+4. ORM : JPA , JDBC TEMPLATE
+5. Front : React
+6. DB : MY SQL
 
 
 
