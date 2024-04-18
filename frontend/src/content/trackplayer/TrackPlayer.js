@@ -1,20 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import 'css/playerBar/playerBar.css';
 import 'css/track/track.css';
-import {ProgressBar} from "components/progressBar/ProgressBar";
 import ReactPlayer from "react-player";
-import {
-  authApi,
-  authTrackApi
-} from "utill/api/interceptor/ApiAuthInterceptor";
-import {useSelector} from "react-redux";
-import {toast} from "react-toastify";
-import {use} from "i18next";
-import axios from "axios";
+
 import {USERS_FILE_IMAGE, USERS_FILE_TRACK_PLAY} from "utill/api/ApiEndpoints";
 import {durationTime, secondsToTime} from "utill/function";
-import {useNavigate} from "react-router";
-import {REPEAT_ONE} from "../../utill/enum/PlaybackTypes";
+import {REPEAT_ONE} from "utill/enum/PlaybackTypes";
 
 /**
  *
@@ -61,35 +52,30 @@ export const TrackPlayer = ({
   // 재생바
   // 현재 재생 목록 -> 로컬스토리지에 저장 멜론과 비슷한 형태
 
-  const [settingsInfo, setSettingsInfo] = useState({
-    ...playerSettings.item
-  });
+  const [settingsInfo, setSettingsInfo] = useState(
+      playerSettings.item);
 
   // 플레이 시간
-  const [playedSeconds, setPlayedSeconds] = useState(0);
   const [url, setUrl] = useState(null);
 
   const [trackInfo, setTrackInfo] = useState(currentTrack);
 
   const [isPlaying, setIsPlaying] = useState(playing.item.playing);
-
   const [seeking, setSeeking] = useState(false);
 
   useEffect(() => {
     setTrackInfo(currentTrack);
-    if (currentTrack.playLog) {
-      setUrl(USERS_FILE_TRACK_PLAY + currentTrack.id + "/"
-          + currentTrack.playLog.token)
+    if (currentTrack && currentTrack.playLog) {
+      setUrl(
+          `${USERS_FILE_TRACK_PLAY}${currentTrack.id}/${currentTrack.playLog.token}`);
     }
-  }, [currentTrack, currentTrack.playLog]);
-
+  }, [currentTrack]);
   useEffect(() => {
     setIsPlaying(playing.item.playing);
-  }, [playing.item.playing]);
-  useEffect(() => {
     setSettingsInfo(playerSettings.item);
-  }, [playerSettings.item]);
+  }, [playing.item.playing, playerSettings.item]);
 
+  // 일시정지,플레이버튼
   const playPause = (e) => {
     e.preventDefault(); // 기본동작 정지
     changePlaying();
@@ -113,52 +99,44 @@ export const TrackPlayer = ({
   let linkToTrack;
   let linkToUploader;
 
-  const [percentage, setPercentage] = useState(0);
+  // const [percentage, setPercentage] = useState(0);
 
   let likeButton = 'liked-button-t';
   let followButton = 'liked-button-t';
   const toggleLike = function (id, e) {
 
   }
-  // 재생이 시작될때
-  const onReady = function (e) {
-    console.log("onReady :" + e.getCurrentTime());
-  }
 
-  // 중간에 일시정지하거나 버퍼링중에 호출
-  const onPlay = function (e) {
-    console.log("onPlay :" + e);
+  const onReady = function (e) {
+
+  }
+  // 재생이 제일 먼저 시작될때
+  const onStart = function (e) {
+    updateSettings("playedSeconds", settingsInfo.playedSeconds);
   }
 
   const onEnded = (e) => {
     // 종료시에 전체 길이 저장
-    setPlayedSeconds(trackInfo.trackLength);
+    // updateSettings("playedSeconds", trackInfo.trackLength);
   }
 
-  // r
   const onProgress = (e) => {
-    // console.log("onProgress :" + e.played);
-    // console.log("onProgress :" + e.playedSeconds);
     if (!seeking) {
-      setPlayedSeconds(e.playedSeconds);
-      setPercentage(
-          Number.parseInt((e.playedSeconds / trackInfo.trackLength) * 100));
+      updateSettings("playedSeconds", e.playedSeconds);
+      updateSettings("played",Number.parseInt(e.played * 100));
     }
-
   }
 
   const onDuration = (e) => {
-    console.log("onDuration :" + e);
+    playerRef.current.seekTo(settingsInfo.playedSeconds, 'seconds');
   }
 
   function setState(param) {
-
   }
 
-  const onError = () => {
+  const onError = (e) => {
     updateCurrentTrack(trackInfo.id);
   }
-
   const getPlayButton = (playing) => {
     return playing ? 'play-pause-btn-paused' : 'play-pause-btn';
   }
@@ -179,8 +157,8 @@ export const TrackPlayer = ({
     const seekToSeconds = trackInfo.trackLength * (percent / 100);
     if (playerRef.current) {
       playerRef.current.seekTo(seekToSeconds, 'seconds');
-      setPlayedSeconds(seekToSeconds);
-      setPercentage(percent);
+      updateSettings("playedSeconds", seekToSeconds);
+      updateSettings("played", percent);
       setSeeking(false);// 재생이동 중
     }
     // 원한다면 상태를 업데이트 하거나 화면에 표시할 수 있습니다.
@@ -202,8 +180,8 @@ export const TrackPlayer = ({
     const percent = (relativeX / width) * 100;
     // 전체 길이에서 percent 를 곱한 값
     const seekToSeconds = trackInfo.trackLength * (percent / 100);
-    setPlayedSeconds(seekToSeconds);
-    setPercentage(percent);
+    updateSettings("playedSeconds", seekToSeconds);
+    updateSettings("played", percent);
   }
   return (
       <div id='track-player-bar'>
@@ -221,21 +199,37 @@ export const TrackPlayer = ({
                  className='loop-btn controller-btn'></div>
           </div>
           <div id='tp-progress'>
-            <div id='tp-timepassed'>{secondsToTime(playedSeconds)}</div>
+            <div id='tp-timepassed'>{secondsToTime(
+                settingsInfo.playedSeconds)}</div>
             <div style={{width: '500px'}} ref={divRef} onMouseDown={onMouseDown}
                  onMouseOver={onMouseMove}
                  onMouseUp={onMouseUp} id='tp-scrubbar'
-                 data-seconds={percentage}>
+                 data-seconds={settingsInfo.played}>
               <div id='scrub-bg'></div>
-              <div id='scrub-progress' style={{width: percentage + `%`}}></div>
-              <div id='scrup-handle' style={{left: percentage + `%`}}></div>
+              <div id='scrub-progress' style={{width: settingsInfo.played + `%`}}></div>
+              <div id='scrup-handle' style={{left: settingsInfo.played  + `%`}}></div>
             </div>
             <div id='tp-duration'>{durationTime(trackInfo.trackLength)}</div>
           </div>
           <div className='tp-track-dets'>
-            <div id={getMuteButton(settingsInfo.muted)}
-                 className='controller-btn'
-                 onClick={() => updateSettings("muted", !settingsInfo.muted)}></div>
+
+            <div className="volume_btn">
+              <div id={getMuteButton(settingsInfo.muted)}
+                   className='controller-btn'
+                   onClick={() => updateSettings("muted", !settingsInfo.muted)}>
+              </div>
+              <input
+                  id="volumeControl"
+                  type="range"
+                  className="vertical-slider"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={settingsInfo.volume}
+                  onChange={(e) => updateSettings("volume", e.target.value)}
+              />
+            </div>
+
             <div className='tp-td-uploader-pic'>
               <a href={linkToTrack}><img className="player_cover_img"
                                          src={trackInfo.coverUrl
@@ -266,14 +260,11 @@ export const TrackPlayer = ({
             // url={getUrl()}
             // url={"/users/file/track/play/202/124a25c32864139a2149"} // 재생할 url
             playing={isPlaying} // 재생 여부 기본 : false
-
             onError={onError}
-
             loop={settingsInfo.playbackRate === REPEAT_ONE} // 반복재생 여부 false
-            volume={settingsInfo.volume} // 볼륨값 기본 Null
+            volume={Number.parseFloat(settingsInfo.volume)} // 볼륨값 기본 Null
             muted={settingsInfo.muted} // 음소거 여부
-            onStart={onPlay}
-            // onPlay={p}
+            onStart={onStart}
             //일시중지 또는 버퍼링 후 미디어 재생이 시작되거나 재개될 때 호출됩니다
             progressInterval={50}
             //onProgress콜백 사이의 시간 (밀리초)

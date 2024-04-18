@@ -16,10 +16,9 @@ const TrackPlayerContainer = () => {
     settingsCreate,
   } = useTrackPlayer();
   useEffect(() => {
-
     // settings 생성
     settingsCreate();
-    createCurrentTrack(202);
+    createCurrentTrack(1);
   }, [])
   return (
       <TrackPlayer

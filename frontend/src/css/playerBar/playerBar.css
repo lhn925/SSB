@@ -192,3 +192,24 @@
   cursor: default;
   opacity: 0.7;
 }
+
+
+.volume_btn {
+  position: relative; /* 컨트롤 버튼 위치 설정 */
+  width: 50px;
+  height: 80px;
+}
+.vertical-slider {
+  position: absolute; /* 슬라이더를 버튼 위에 절대 위치시킴 */
+  bottom: 150%; /* 버튼의 상단에 위치 */
+  left: 50%; /* 중앙 정렬 */
+  transform: translateX(-50%) rotate(-90deg); /* 중앙 정렬 및 회전 */
+  display: none; /* 기본적으로 숨김 처리 */
+  opacity: 0; /* 투명도 0으로 설정 */
+  transition: opacity 0.3s; /* 투명도 변경 애니메이션 */
+}
+
+.volume_btn:hover .vertical-slider, .vertical-slider:hover{
+  display: block; /* 호버 시 슬라이더 보임 */
+  opacity: 1; /* 투명도 1로 변경 */
+}

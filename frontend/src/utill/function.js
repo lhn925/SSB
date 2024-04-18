@@ -451,35 +451,37 @@ export function createUploadActions(coverImgFiles, setCoverImgFiles) {
   }
 }
 
-
 export function CreateTrackBody(track) {
-  return  {
-    id:track.id,
-    token:track.token,
-    title:track.title.value,
-    genreType:track.genreType,
-    genre: track.genreType !== GenreTypes.CUSTOM.name ? track.genre.value : track.customGenre.value,
-    tagList:track.tagList, // <
+  return {
+    id: track.id,
+    token: track.token,
+    title: track.title.value,
+    genreType: track.genreType,
+    genre: track.genreType !== GenreTypes.CUSTOM.name ? track.genre.value
+        : track.customGenre.value,
+    tagList: track.tagList, // <
     // tagList:[{id:0,tag:"임하늘"}], // <
-    desc:track.desc.value,
-    isPrivacy:track.isPrivacy,
-    isDownload:track.isDownload,
-    order:track.order
+    desc: track.desc.value,
+    isPrivacy: track.isPrivacy,
+    isDownload: track.isDownload,
+    order: track.order
   }
 }
+
 export function CreatePlayListBody(playList) {
-  return  {
-    title:playList.title.value,
-    playListType:playList.playListType.value,
-    tagList:playList.tagList,
-    desc:playList.desc.value,
-    isPrivacy:playList.isPrivacy,
-    isDownload:playList.isDownload,
+  return {
+    title: playList.title.value,
+    playListType: playList.playListType.value,
+    tagList: playList.tagList,
+    desc: playList.desc.value,
+    isPrivacy: playList.isPrivacy,
+    isDownload: playList.isDownload,
   }
 }
 
 export function recalculateTotalUploadPercent(tracks) {
-  const totalPercent = tracks.reduce((acc, track) => acc + track.uploadPercent, 0);
+  const totalPercent = tracks.reduce((acc, track) => acc + track.uploadPercent,
+      0);
   return Math.min(100, totalPercent / tracks.length);
 }
 
@@ -495,7 +497,9 @@ export function saveToLocalStorage(state) {
 export function loadFromLocalStorage(key) {
   try {
     const serializedState = localStorage.getItem(key);
-    if (serializedState === null) return undefined;
+    if (serializedState === null) {
+      return undefined;
+    }
     return JSON.parse(serializedState);
   } catch (e) {
     console.error('Could not load state', e);
@@ -512,7 +516,6 @@ export function removeFromLocalStorage(key) {
   }
 }
 
-
 export function useQueryParams() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -522,28 +525,29 @@ export function useQueryParams() {
     for (const key in params) {
       searchParams.set(key, params[key]);
     }
-    navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
+    navigate(`${location.pathname}?${searchParams.toString()}`,
+        {replace: true});
   };
 
   const getSearchParams = () => {
     return new URLSearchParams(location.search);
   };
 
-  return { setSearchParams, getSearchParams };
+  return {setSearchParams, getSearchParams};
 }
-export function durationTime (trackLength)  {
+
+export function durationTime(trackLength) {
   return secondsToTime(trackLength)
 }
 
-
-export function secondsToTime(seconds){
+export function secondsToTime(seconds) {
   if (!seconds) {
-    seconds=0;
+    seconds = 0;
   }
 
-  let duration = new Date(null);
-  duration.setSeconds(seconds);
-  // 시작 인덱스 14, 끝 인덱스는 14+5=19
+  const duration = new Date(null);
+  duration.setSeconds(Math.round(seconds));
+  // 시작 인덱스 14, 끝 인덱스는 14+5=19\
   return duration.toISOString().substring(14, 19);
 }
 

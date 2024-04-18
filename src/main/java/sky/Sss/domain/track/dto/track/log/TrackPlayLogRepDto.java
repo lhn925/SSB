@@ -22,6 +22,7 @@ public class TrackPlayLogRepDto {
 
     private Integer miniNumPlayTime;
 
+
     // 현재시간대 에서 처음 플레이 한건지 판단 여부
     // true 면 처음부터 끝까지 들었을 경우 공식플레이로 집계
     private Boolean isChartLog;

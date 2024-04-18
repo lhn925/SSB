@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.track.play;
 
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
@@ -14,6 +15,7 @@ import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
+import sky.Sss.global.utili.DayTime;
 
 /**
  * track 조회수 증가 및 재생 파일 가져오기
@@ -43,28 +45,15 @@ public class TrackPlayService {
     @Transactional
     public UrlResource getTrackPlayFile(Long id, String playToken) {
         SsbTrackAllPlayLogs playLogs = trackAllPlayLogService.findOne(id, playToken);
-
+        long nowMillis = DayTime.localDateTimeToEpochMillis(LocalDateTime.now()).getEpochSecond();
         SsbTrack ssbTrack = playLogs.getSsbTrack();
+        // 제한시간 지났는지에 대한 여부
         if (playLogs.getIsValid()) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
-
-        // 플레이 여부 업데이트
-        SsbTrackAllPlayLogs.updateIsValid(playLogs, true);
-
-
-//        SsbTrack ssbTrack = trackService.findOne(id, Status.ON);
-        // getTrackPlayFile 권한이 없을 경우
-//        User playUser = userQueryService.findOne(); // 요청한 유저
-
-        // 요청한 사용자가 비회원인지 확인 비회원이 아닐 경우
-        // 해당 요청한 track 에 소유자인지 확인
-//        boolean isOwnerPost = ssbTrack.getUser().equals(playUser);
-
-        // 요청한 사용자가 해당 track(비공개) 에 권한이 없는경우 예외 발생
-//        if (ssbTrack.getIsPrivacy() && !isOwnerPost) {// 비공개 일경우
-//            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
-//        }
+        if (nowMillis > playLogs.getExpireTime()) {
+            SsbTrackAllPlayLogs.updateIsValid(playLogs, true);
+        }
 
         return trackService.getSsbTrackFile(
             ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());

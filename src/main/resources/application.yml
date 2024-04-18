@@ -50,7 +50,7 @@ spring:
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         order_inserts: true
@@ -61,7 +61,7 @@ spring:
           batch_size: 100
     open-in-view: false
     #    true ddl-auto 먼저 실행되고 실행
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
   thymeleaf:
     cache: false
     prefix: classpath:/templates/
@@ -74,7 +74,7 @@ spring:
           enabled: true
   sql:
     init:
-      mode: always
+      mode: never
 #openapi:
 #  relaxed-binding:
 #    clientId: ${openapi.clientId}

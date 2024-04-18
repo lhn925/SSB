@@ -83,6 +83,9 @@ function App() {
 
   useEffect(() => {
     playingClear();
+
+
+
     const setWebLog = () => {
       const session = sessionStorage.getItem("ssb_session");
       if (session === null) {

@@ -7,7 +7,7 @@ const settings = {
   muted: false,
   played: 0,
   playedSeconds: 0,
-  loaded: 0,
+  loaded: 0, //
   duration: 0, // 지속시간
   playbackRate: 1.0,
   playBackType: AUTO_PLAY,// 순차 재생 다음곡으로 재생

@@ -14,7 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +30,7 @@ import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.base.BaseTimeEntity;
 import sky.Sss.global.base.login.DefaultLocationLog;
 import sky.Sss.global.base.login.DeviceDetails;
+import sky.Sss.global.utili.DayTime;
 
 /**
  * 플레이 로그 테이블
@@ -68,6 +72,11 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
     @Column(nullable = false)
     private Long closeTime;
 
+
+    // 파일 접근 제한 시간
+    @Column(nullable = false)
+    private Long expireTime;
+
     // 최소조건은 채웠고 재생횟수에 반영이 되는지 확인 값 컬럼
     @Column(nullable = false)
     @Enumerated(value = STRING)
@@ -107,6 +116,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setStartTime(removeMillis(startTime));
         ssbTrackAllPlayLogs.setIsValid(false);
 
+
         Integer trackMiniNum = TrackMinimumPlayTime.MINI_NUM_SECOND.getSeconds();
 
         // 전체 트랙길이가 60초보다 작을 경우
@@ -117,8 +127,16 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setCreatedDateTime(createdDateTime);
         // 처음 생성시 플레이 횟수에 반영 안됨 으로 설정
         SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, 0);
+
+
+        // 제한 시간 설정
+        Instant zoneInstant = DayTime.localDateTimeToEpochMillis(createdDateTime.plusHours(1));
+        ssbTrackAllPlayLogs.setExpireTime(zoneInstant.toEpochMilli());
+
         return ssbTrackAllPlayLogs;
     }
+
+
 
     public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, int playTime) {
 

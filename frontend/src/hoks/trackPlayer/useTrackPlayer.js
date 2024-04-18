@@ -41,6 +41,7 @@ const useTrackPlayer = () => {
   }
 // 현재 트랙정보 가져오기 재생 url O
   const updateCurrentTrack = (trackId) => {
+    console.log(trackId);
     TrackPlayApi(trackId).then((response) => {
       dispatch(currentActions.updatePlayLog(
           {info: response.data, playLog: response.data.trackPlayLogRepDto}));

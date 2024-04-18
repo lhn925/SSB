@@ -25,7 +25,7 @@ Login.prototype._init = function () {
 }
 Login.prototype._addEnterKeyEvent = function () {
   document.onkeyup = function (event) {
-    if (event.key == "Enter") {
+    if (event.key === "Enter") {
       document.getElementById("loginSubBtn").onclick();
     }
   };

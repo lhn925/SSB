@@ -1,6 +1,8 @@
 package sky.Sss.domain.track.service.track.play;
 
 
+import static sky.Sss.global.utili.DayTime.millisToLocalDateTime;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,6 +46,7 @@ import sky.Sss.global.base.login.DefaultLocationLog;
 import sky.Sss.global.base.login.DeviceDetails;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
+import sky.Sss.global.utili.DayTime;
 
 
 /**
@@ -140,11 +143,7 @@ public class TrackPlayMetricsService {
         UserLocationDto location = locationFinderService.findLocation();
 
         long nowTimeMillis = System.currentTimeMillis();
-        // Instant 객체 생성
-        Instant instant = Instant.ofEpochMilli(nowTimeMillis);
-
-        // 시스템의 기본 시간대를 사용하여 nowTimeMillis -> LocalDateTime 으로 변환
-        LocalDateTime nowLocalDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        LocalDateTime nowLocalDateTime = millisToLocalDateTime(nowTimeMillis);
         // 유저 지역정보
         DefaultLocationLog defaultLocationLog = DefaultLocationLog.createDefaultLocationLog(Status.ON, location,
             userAgent);
@@ -157,22 +156,28 @@ public class TrackPlayMetricsService {
 
         // 예상 closeTime 계산
         LocalDateTime closeDateTime = nowLocalDateTime.plusSeconds(ssbTrack.getTrackLength());
-        ZonedDateTime zonedDateTime = closeDateTime.atZone(ZoneId.systemDefault());
-        Instant zoneInstant = zonedDateTime.toInstant();
 
-        long exCloseTime = zoneInstant.toEpochMilli();
+        long exCloseTime = DayTime.localDateTimeToEpochMillis(closeDateTime).toEpochMilli();
 
-        boolean checkHour = checkHour(closeDateTime, nowLocalDateTime);
 
         // 예상 closeTime 저장
         SsbTrackAllPlayLogs.updateCloseTime(ssbTrackAllPlayLogs, exCloseTime);
-
-        // checkHour 로 판단  ChartStatus 저장
-        SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, checkHour);
-        // checkHour True일 경우 Chart 있는지 확인
-        if (ssbTrackAllPlayLogs.getChartStatus().equals(ChartStatus.REFLECTED)) {
-            checkChartStatus(user, ssbTrack, ssbTrackAllPlayLogs);
+        // 자신의 트랙이 아닐 경우에만 차트반영
+        if (!ssbTrack.getUser().getToken().equals(user.getToken())) {
+            boolean checkHour = checkHour(closeDateTime, nowLocalDateTime);
+            // checkHour 로 판단  ChartStatus 저장
+            SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, checkHour);
+            // checkHour True일 경우 Chart 있는지 확인
+            if (ssbTrackAllPlayLogs.getChartStatus().equals(ChartStatus.REFLECTED)) {
+                checkChartStatus(user, ssbTrack, ssbTrackAllPlayLogs);
+            }
+        } else {
+            // 자신의 트랙인 경우에는 무조건 false
+            // 차트 반영 안됨
+            // 기본조회수는 반영이 됨
+            SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, false);
         }
+
         // insert
         trackAllPlayLogService.add(ssbTrackAllPlayLogs);
         // 로그 정보 dto 생성
@@ -180,6 +185,8 @@ public class TrackPlayMetricsService {
         // trackPlayRepDto set
         TrackPlayRepDto.updateTrackPlayLogRepDto(trackPlayRepDto, trackPlayLogRepDto);
     }
+
+
 
 
     /**
