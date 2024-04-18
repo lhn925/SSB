@@ -7,15 +7,19 @@
 다른 사용자들의 음원을 스트리밍 할 수 있는 음악 사이트입니다.
 
 
-## 개발 환경
-1. Version: Java 17
-2. IDE: inellij
-3. Framework : SpringBoot 2.7.11
-4. ORM : JPA , JDBC TEMPLATE
-5. Front : React
-6. DB : MY SQL
+## 개발 환경 및 기술 스택
 
+#프로그래밍 언어 및 개발 환경:
+. Java 버전: Java 17
+. IDE: IntelliJ IDEA
 
+#백엔드 개발:
+프레임워크: Spring Boot 2.7.11
+ORM (Object-Relational Mapping): JPA (Java Persistence API), JDBC Template
+데이터베이스: MySQL
+
+#프론트엔드 개발:
+프론트엔드 프레임워크: React
 
 
 
