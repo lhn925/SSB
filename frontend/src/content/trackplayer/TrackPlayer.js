@@ -5,7 +5,12 @@ import ReactPlayer from "react-player";
 
 import {USERS_FILE_IMAGE, USERS_FILE_TRACK_PLAY} from "utill/api/ApiEndpoints";
 import {durationTime, secondsToTime} from "utill/function";
-import {playBackTypes, REPEAT_ONE} from "utill/enum/PlaybackTypes";
+import {
+  AUTO_PLAY,
+  playBackTypes,
+  REPEAT_ALL,
+  REPEAT_ONE
+} from "utill/enum/PlaybackTypes";
 
 /**
  *
@@ -68,6 +73,8 @@ export const TrackPlayer = ({
 
   const [isPlaying, setIsPlaying] = useState(playing.item.playing);
   const [seeking, setSeeking] = useState(false);
+  const [isEnd, setIsEnd] = useState(false);
+  const [isLast, setIsLast] = useState(false);
 
   useEffect(() => {
     setTrackInfo(currentTrack);
@@ -79,7 +86,28 @@ export const TrackPlayer = ({
   useEffect(() => {
     setLocalPlyInfo(localPly.item);
     setPlayOrders(localPly.playOrders);
-  }, [localPly.item, localPly.playOrders]);
+    const playBackType = playBackTypes[settingsInfo.playBackType];
+    //마지막이면서 전체 반복재생인경우
+
+    const lastAndShuffle = isLast && settingsInfo.shuffle;
+    if (playBackType === REPEAT_ALL && lastAndShuffle) {
+      updateSettings("index", 1);
+      updateCurrentTrack(localPly.item[[localPly.playOrders[1]]].id);
+      return;
+    }
+
+    // 마지막이면서 전체재생인 경우
+    if (isLast && playBackType === AUTO_PLAY) {
+      if (isPlaying) { // 재생인 경우에만 false 로 바꿔줌
+        changePlaying();
+      }
+      if (settingsInfo.shuffle) { // shuffle 인 경우 0번째 인덱스로
+        updateSettings("index", 0);
+      }
+      createCurrentTrack(trackInfo);
+    }
+
+  }, [localPly.item, localPly.playOrders, isLast]);
 
   useEffect(() => {
     setIsPlaying(playing.item.playing);
@@ -88,7 +116,6 @@ export const TrackPlayer = ({
   }, [playing.item.playing, playerSettings.item, localPlyInfo]);
 
   useEffect(() => {
-
     // 셔플이 바뀐 경우에는 x
     if (playerSettings.item.shuffle !== settingsInfo.shuffle) {
       return;
@@ -101,7 +128,7 @@ export const TrackPlayer = ({
       }
       createCurrentTrack(localPlyInfo[playOrders[playerSettings.item.index]]);
     }
-  }, [playerSettings.item.index, localPlyInfo,playerSettings.item.shuffle]);
+  }, [playerSettings.item.index, localPlyInfo, playerSettings.item.shuffle]);
 
   // 일시정지,플레이버튼
   const playPause = (e) => {
@@ -138,18 +165,59 @@ export const TrackPlayer = ({
   }
   // 재생이 제일 먼저 시작될때
   const onStart = function (e) {
+    setIsEnd(false);
+    setIsLast(false);
     updateSettings("playedSeconds", settingsInfo.playedSeconds);
   }
 
   const onEnded = (e) => {
+    // 전체재생
+    // 전체 반복 재생
+    // 무한 반복 재생
+    const playBackType = playBackTypes[settingsInfo.playBackType];
+    // 확인
+    setIsEnd(true);
+    updateSettings("playedSeconds", 0);
+    updateSettings("played", 0);
 
-    console.log("끝났다!");
-    // 종료시에 전체 길이 저장
-    // updateSettings("playedSeconds", trackInfo.trackLength);
+    // 현재 인덱스
+    const playIndex = settingsInfo.index;
+
+    // 전체 인덱스
+    const localLength = localPlyInfo.length - 1;
+
+    // 다음 인덱스
+    const nextIndex = playIndex + 1;
+
+    // 마지막 인지 확인
+    // 다음인덱스 전체인덱스보다 크면 true
+    const isLast = nextIndex > localLength;
+
+    setIsLast(isLast);
+
+    // 전체 무한 재생이면서 랜덤재생이 아닐 경우
+    if (playBackType === REPEAT_ALL && !settingsInfo.shuffle) {
+      nextTrackPlay(playIndex);
+      return;
+    }
+
+    // 한곡 무한 반복
+    if (playBackType === REPEAT_ONE) {
+      updateCurrentTrack(trackInfo.id);
+      return;
+    }
+
+    // 마지막 이면서 shuffle인경우
+    if (isLast && settingsInfo.shuffle) {
+      shuffleOrders(settingsInfo.shuffle);
+    }
+    // 마지막 재생목록인지 확인
+    // const isLast = nextIndex > localLength ? minIndex : nextIndex;
+
   }
 
   const onProgress = (e) => {
-    if (!seeking) {
+    if (!seeking && !isEnd) {
       updateSettings("playedSeconds", e.playedSeconds);
       updateSettings("played", Number.parseInt(e.played * 100));
       updateSettings("loaded", Number.parseInt(e.loaded * 100));
@@ -233,12 +301,13 @@ export const TrackPlayer = ({
     }
     updateSettings("index", changeIndex);
   }
-  const nextBtnOnClick = () => {
+
+  function nextTrackPlay(playIndex) {
     const localLength = localPlyInfo.length - 1;
 
     const minIndex = 0;
 
-    const nextIndex = settingsInfo.index + 1;
+    const nextIndex = playIndex + 1;
 
     const changeIndex = nextIndex > localLength ? minIndex : nextIndex;
     if (playerRef.current) {
@@ -246,6 +315,10 @@ export const TrackPlayer = ({
     }
     updateSettings("playedSeconds", 0);
     updateSettings("index", changeIndex);
+  }
+
+  const nextBtnOnClick = () => {
+    nextTrackPlay(settingsInfo.index);
   }
 
   const changePlayBackType = (e) => {

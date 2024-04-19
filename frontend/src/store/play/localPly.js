@@ -56,6 +56,8 @@ const localPly = createSlice({
 
         if (settings.shuffle) {
           state.playOrders = shuffle(orderArray);
+          console.log("create:")
+          console.log(   state.playOrders);
           return;
         }
         state.playOrders = orderArray;
@@ -143,6 +145,8 @@ const localPly = createSlice({
         const shuffleArray = shuffle(prevOrders);
         // 첫번째에 값 추가
         shuffleArray.splice(0, 0, currentOrders);
+
+        console.log(shuffleArray);
         state.playOrders = shuffleArray;
         return;
       }

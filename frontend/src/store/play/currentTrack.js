@@ -61,10 +61,14 @@ const currentTrack = createSlice({
         return;
       }
 
-      setTrackInfo(state, action.payload.info);
-      if (action.payload.playLog !== undefined) {
-        state.playLog = createPlayLog(action.payload.playLog);
+      // playLog 초기화
+      if (state.playLog !== null) {
+        state.playLog = null;
       }
+      setTrackInfo(state, action.payload.info);
+      // if (action.payload.playLog !== undefined) {
+      //   state.playLog = createPlayLog(action.payload.playLog);
+      // }
     }, updatePlayLog(state, action) {
       setTrackInfo(state,action.payload.info);
       state.playLog = createPlayLog(action.payload.playLog);
