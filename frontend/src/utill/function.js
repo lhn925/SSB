@@ -551,3 +551,14 @@ export function secondsToTime(seconds) {
   return duration.toISOString().substring(14, 19);
 }
 
+export function getRandomInt(min, max) {
+
+  let randomIndex = 0;
+  while (min < max) {
+    randomIndex = Math.floor(Math.random() * max);
+    if (min < randomIndex) {
+      return randomIndex;
+    }
+  }
+  return max;
+}

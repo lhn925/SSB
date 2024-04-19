@@ -5,7 +5,7 @@ import ReactPlayer from "react-player";
 
 import {USERS_FILE_IMAGE, USERS_FILE_TRACK_PLAY} from "utill/api/ApiEndpoints";
 import {durationTime, secondsToTime} from "utill/function";
-import {REPEAT_ONE} from "utill/enum/PlaybackTypes";
+import {playBackTypes, REPEAT_ONE} from "utill/enum/PlaybackTypes";
 
 /**
  *
@@ -40,7 +40,8 @@ export const TrackPlayer = ({
   updateSettings,
   localPly,
   localPlyAddTracks,
-  createCurrentTrack
+  createCurrentTrack,
+  shuffleOrders
 }) => {
   const playerRef = useRef();
   // 현재 재생목록
@@ -59,6 +60,7 @@ export const TrackPlayer = ({
       playerSettings.item);
 
   const [localPlyInfo, setLocalPlyInfo] = useState(localPly.item);
+  const [playOrders, setPlayOrders] = useState(localPly.playOrders);
   // 플레이 시간
   const [url, setUrl] = useState(null);
 
@@ -76,7 +78,8 @@ export const TrackPlayer = ({
   }, [currentTrack]);
   useEffect(() => {
     setLocalPlyInfo(localPly.item);
-  }, [localPly.item]);
+    setPlayOrders(localPly.playOrders);
+  }, [localPly.item, localPly.playOrders]);
 
   useEffect(() => {
     setIsPlaying(playing.item.playing);
@@ -85,14 +88,20 @@ export const TrackPlayer = ({
   }, [playing.item.playing, playerSettings.item, localPlyInfo]);
 
   useEffect(() => {
+
+    // 셔플이 바뀐 경우에는 x
+    if (playerSettings.item.shuffle !== settingsInfo.shuffle) {
+      return;
+    }
     if (localPlyInfo.length > 0) {
       if (playing.item.playing) {
-        updateCurrentTrack(localPlyInfo[playerSettings.item.index].id);
+        updateCurrentTrack(
+            localPlyInfo[playOrders[playerSettings.item.index]].id);
         return;
       }
-      createCurrentTrack(localPlyInfo[playerSettings.item.index]);
+      createCurrentTrack(localPlyInfo[playOrders[playerSettings.item.index]]);
     }
-  }, [playerSettings.item.index, localPlyInfo]);
+  }, [playerSettings.item.index, localPlyInfo,playerSettings.item.shuffle]);
 
   // 일시정지,플레이버튼
   const playPause = (e) => {
@@ -133,6 +142,8 @@ export const TrackPlayer = ({
   }
 
   const onEnded = (e) => {
+
+    console.log("끝났다!");
     // 종료시에 전체 길이 저장
     // updateSettings("playedSeconds", trackInfo.trackLength);
   }
@@ -211,28 +222,62 @@ export const TrackPlayer = ({
 
     const changeIndex = prevIndex < 0 ? maxIndex : prevIndex;
 
-
     if (playerRef.current) {
       playerRef.current.seekTo(0, "seconds");
     }
+    updateSettings("playedSeconds", 0);
     // 5초보다 크다면 이전곡이 아닌 0초부터 시작
     if (settingsInfo.playedSeconds > 5) {
-      updateSettings("playedSeconds", 0);
       updateCurrentTrack(trackInfo.id);
       return;
     }
-    // const prevTrack = localPly.item(changeIndex);
-    // updateCurrentTrack(prevTrack.id);
     updateSettings("index", changeIndex);
   }
-  const nextBtnOnClick = (event) => {
-    localPlyAddTracks(1);
-    localPlyAddTracks(2);
-    localPlyAddTracks(3);
-    localPlyAddTracks(4);
-    localPlyAddTracks(5);
+  const nextBtnOnClick = () => {
+    const localLength = localPlyInfo.length - 1;
+
+    const minIndex = 0;
+
+    const nextIndex = settingsInfo.index + 1;
+
+    const changeIndex = nextIndex > localLength ? minIndex : nextIndex;
+    if (playerRef.current) {
+      playerRef.current.seekTo(0, "seconds");
+    }
+    updateSettings("playedSeconds", 0);
+    updateSettings("index", changeIndex);
   }
 
+  const changePlayBackType = (e) => {
+    const maxIndex = playBackTypes.length - 1;
+    const currentIndex = Number.parseInt(e.target.dataset.id);
+
+    const changeIndex = currentIndex === maxIndex ? 0 : currentIndex + 1;
+
+    updateSettings("playBackType", changeIndex);
+  }
+
+  const changeShuffleType = () => {
+    const isShuffle = !settingsInfo.shuffle;
+    // 랜덤 재생에서
+    // 뒤로가기를 눌렀을 경우
+    // 이전에 들었던곡이 없다면 랜덤곡
+    // 있다면?
+    // 그 이전곡 플레이 만약
+    // 그 이전곡에서 다음 플레이를 누르면 뒤로가기전 플레이곡
+    // 인덱스 0 에서 눌렀다? 랜덤재생 대신 인덱스 원래 위치대로 아니다
+
+    shuffleOrders(isShuffle);
+    updateSettings("shuffle", isShuffle);
+    if (isShuffle) {
+      updateSettings("index", 0);
+      return;
+    }
+    // 기본 정렬된 Index 반환
+    const index = playOrders[settingsInfo.index];
+    updateSettings("index", index);
+
+  }
   return (
       <div id='track-player-bar'>
         <div id='track-player-container'>
@@ -245,9 +290,13 @@ export const TrackPlayer = ({
                  onClick={(e) => playPause(e)}></div>
             <div id='next-btn' className='controller-btn'
                  onClick={nextBtnOnClick}></div>
-            <div className='shuffle-btn controller-btn'></div>
-            <div id="loop-btn-active"
-                 className='loop-btn controller-btn'></div>
+            <div onClick={changeShuffleType}
+                 className={'controller-btn bg_player shuffle-btn '
+                     + (settingsInfo.shuffle && 'active')}></div>
+            <div data-id={settingsInfo.playBackType}
+                 onClick={changePlayBackType}
+                 className={'bg_player controller-btn '
+                     + playBackTypes[settingsInfo.playBackType]}></div>
           </div>
           <div id='tp-progress'>
             <div id='tp-timepassed'>{secondsToTime(
@@ -278,7 +327,7 @@ export const TrackPlayer = ({
                   min="0"
                   max="1"
                   step="0.01"
-                  value={settingsInfo.volume}
+                  value={settingsInfo.muted ? 0 : settingsInfo.volume}
                   onChange={(e) => updateSettings("volume", e.target.value)}
               />
             </div>

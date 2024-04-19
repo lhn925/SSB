@@ -12,6 +12,7 @@ const TrackPlayerContainer = () => {
     settingsCreate,
     changePlaying,
     playingClear,
+    shuffleOrders,
     createCurrentTrack,
     updateCurrentTrack,
     playing,
@@ -49,6 +50,7 @@ const TrackPlayerContainer = () => {
           localPly={localPly}
           localPlyAddTracks={localPlyAddTracks}
           createCurrentTrack={createCurrentTrack}
+          shuffleOrders={shuffleOrders}
 
           // player={player}
           // trackplayer={trackPlayer}

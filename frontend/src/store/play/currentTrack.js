@@ -57,6 +57,10 @@ const currentTrack = createSlice({
   reducers: {
     create(state, action) {
       // 현재 저장되어 있는 id 가 같다면
+      if (action.payload.info === undefined) {
+        return;
+      }
+
       setTrackInfo(state, action.payload.info);
       if (action.payload.playLog !== undefined) {
         state.playLog = createPlayLog(action.payload.playLog);

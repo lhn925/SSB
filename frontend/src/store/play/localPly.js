@@ -1,11 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
+  getRandomInt,
   loadFromLocalStorage,
   removeFromLocalStorage,
   saveToLocalStorage
 } from "utill/function";
 import {toast} from "react-toastify";
-import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
+import {LOCAL_PLAYER_SETTINGS, LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
+import {shuffle} from "lodash";
 
 //현재 재생 목록
 
@@ -25,6 +27,7 @@ const createTrackInfo = (data) => ({
 const initialState = {
   key: LOCAL_PLY_KEY,
   userId: null,
+  playOrders: [], // 재생 순서를 저장하는
   item: []
 }
 
@@ -34,7 +37,6 @@ const localPly = createSlice({
   reducers: {
     create(state, data) {
       const localPly = loadFromLocalStorage(state.key);
-
       const userId = data.payload.userId;
       state.userId = userId;
 
@@ -45,6 +47,18 @@ const localPly = createSlice({
           return;
         }
         state.item = localPly.list;
+        const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
+
+        const orderArray = [];
+        for (let i = 0; i < localPly.list.length; i++) {
+          orderArray.push(i);
+        }
+
+        if (settings.shuffle) {
+          state.playOrders = shuffle(orderArray);
+          return;
+        }
+        state.playOrders = orderArray;
       }
 
     }, addTracks(state, action) {
@@ -62,7 +76,8 @@ const localPly = createSlice({
         let maxIndex;
 
         if (localPly.list.length > 0) {
-          maxIndex = localPly.list.reduce((max, item) => Math.max(max, item.index), localPly.list[0].index);
+          maxIndex = localPly.list.reduce(
+              (max, item) => Math.max(max, item.index), localPly.list[0].index);
         } else {
           // 배열이 비어 있으면 적절한 기본값을 설정
           maxIndex = 0;
@@ -84,8 +99,24 @@ const localPly = createSlice({
         if (state.item.length === 0 && !userIdNotEq) {
           state.item = localPly.list;
         }
-
-        state.item.push(createTrackInfo(data));
+        const trackInfo = createTrackInfo(data);
+        state.item.push(trackInfo);
+        const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
+        // // 만약 랜덤 재생 중 이라면
+        if (settings.shuffle && state.item.length > 2) {
+          // 현재 재생중인 Index 보다 무조건 위로 가게끔 한다
+          const index = getRandomInt(data.playIndex,
+              state.item.length); // 중간에 추가할 index
+          // 둘이 같다면 맨 마지막에 추가
+          if (index === state.playOrders.length) {
+            state.playOrders.push(index);
+          } else {
+            // 중간에 추가
+            state.playOrders.splice(index, 0, state.playOrders.length);
+          }
+        } else {
+          state.playOrders.push(state.item.length - 1);
+        }
         saveToLocalStorage(
             {key: state.key, item: {list: state.item, userId: data.userId}})
         return;
@@ -93,8 +124,29 @@ const localPly = createSlice({
 
       data.index = state.item.length + 1;
       state.item.push(createTrackInfo(data));
+      state.playOrders.push(state.item.length - 1);
       saveToLocalStorage(
           {key: state.key, item: {list: state.item, userId: data.userId}})
+    }, shuffleOrders(state, action) {
+      const isShuffle = action.payload.isShuffle;
+
+      // 현재 재생하고있는 위치 인덱스
+      const playIndex = action.payload.playIndex;
+
+      // 현재 재생 하고 있는 위치에 트랙값을 가져온다
+      const currentOrders = state.playOrders[playIndex];
+      // 이전값
+      if (isShuffle) {
+        const prevOrders = state.playOrders;
+        // 재생하고 인덱스 값 삭제 후
+        prevOrders.splice(playIndex, 1);
+        const shuffleArray = shuffle(prevOrders);
+        // 첫번째에 값 추가
+        shuffleArray.splice(0, 0, currentOrders);
+        state.playOrders = shuffleArray;
+        return;
+      }
+      state.playOrders.sort();
     }
   }
 });
@@ -102,5 +154,6 @@ const localPly = createSlice({
 export let localPlyActions = {
   addTracks: localPly.actions.addTracks,
   create: localPly.actions.create,
+  shuffleOrders: localPly.actions.shuffleOrders,
 };
 export default localPly.reducer;

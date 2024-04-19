@@ -1,9 +1,15 @@
 // playbackTypes.js
-export const AUTO_PLAY = 'AutoPlay';
-export const REPEAT_ONE = 'RepeatOne';
-export const REPEAT_ALL = 'RepeatAll';
-export const SHUFFLE = 'Shuffle';
-export const NEXT = 'Next';
-export const QUEUE = 'Queue';
-export const CONTINUOUS_PLAY = 'ContinuousPlay';
+export const AUTO_PLAY = 'autoPlay'; // 전체 재생
+export const REPEAT_ONE = 'repeatOne'; // 한곡 반복 재생
+export const REPEAT_ALL = 'repeatAll'; // 전체 반복 재생
+export const SHUFFLE = 'shuffle';
+export const NEXT = 'next';
+export const QUEUE = 'queue';
+export const CONTINUOUS_PLAY = 'continuousPlay';
+
+const repeatTypes = {
+  AUTO_PLAY,REPEAT_ONE,REPEAT_ALL
+}
+
+export const playBackTypes = Object.values(repeatTypes);
 

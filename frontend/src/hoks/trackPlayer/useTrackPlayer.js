@@ -30,12 +30,18 @@ const useTrackPlayer = () => {
     ));
   }
 
+  const shuffleOrders = (isShuffle) => {
+    dispatch(localPlyActions.shuffleOrders(
+        {isShuffle:isShuffle,playIndex:playerSettings.item.index}
+    ));
+  }
+
   const localPlyAddTracks = (trackId) => {
-    console.log(trackId);
     TrackInfoApi(trackId).then((response) => {
       response.data.userId = userInfo.userId;
       response.data.createdDateTime = new Date().getTime();
-      console.log(response.data);
+      response.data.playIndex = playerSettings.item.index;
+      // console.log(response.data);
       dispatch(localPlyActions.addTracks({data:response.data}));
     }).catch((error) => {
       toast.error(error.message);
@@ -83,6 +89,7 @@ const useTrackPlayer = () => {
     updateCurrentTrack,
     playing,
     localPlyAddTracks,
+    shuffleOrders,
     currentTrack,
     localPly,
     localPlyCreate
