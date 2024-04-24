@@ -51,7 +51,6 @@ public class TrackChatIncludedService {
      * @return
      */
     public List<HourlyChartPlaysDto> hourlyChartFindByDayTime(int dayTime) {
-        List<HourlyChartPlaysDto> hourlyChartPlays = chartIncludedRepository.getHourlyChartPlays(dayTime);
-        return hourlyChartPlays;
+        return chartIncludedRepository.getHourlyChartPlays(dayTime);
     }
 }

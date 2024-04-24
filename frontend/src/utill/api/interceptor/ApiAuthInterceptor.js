@@ -101,7 +101,6 @@ export const authTrackApi = axios.create({
 authTrackApi.interceptors.request.use((config) => {
   const state = store.getState().authReducer;
   const access = state.access;
-
   if (access) {
     config.headers.Authorization = access;
   }
@@ -110,39 +109,39 @@ authTrackApi.interceptors.request.use((config) => {
   return Promise.reject(error);
 })
 
-
 authTrackApi.interceptors.response.use(
     // 200 이 나올때 처리
     (response) => {
       return response;
     }, async (error) => {
-      const {
-        config, response: {status},
-      } = error;
-
-      // const {t} = useTranslation();
-      // 토큰이 만료되었을때
-      if (status === HttpStatusCode.Unauthorized) {
-        const state = store.getState().authReducer;
-        const refresh = state.refresh;
-        const originRequest = config;
-        try {
-          const response = await memoizedPostRefreshToken(refresh);
-          const newAccessToken = response.data;
-          // accessToken 저장
-          store.dispatch(authActions.setAccess(newAccessToken));
-          store.dispatch(authActions.setAccessHeader());
-          originRequest.headers.Authorization = newAccessToken;
-          // 재요청
-          return axios(originRequest);
-        } catch (error) {
-          await persistor.purge();
-          // window.location.href = "/";
-          // toast.error(t(`errorMsg.error.token`));
-          return error;
-        }
-      } else {
-        return error.response;
+      if (!error.response) {
+        return Promise.reject('Network error or no response from server');
       }
+        const {
+          config, response: {status},
+        } = error;
+        // const {t} = useTranslation();
+        // 토큰이 만료되었을때
+        if (status === HttpStatusCode.Unauthorized) {
+          const state = store.getState().authReducer;
+          const refresh = state.refresh;
+          const originRequest = config;
+          try {
+            const response = await memoizedPostRefreshToken(refresh);
+            const newAccessToken = response.data;
+            // accessToken 저장
+            store.dispatch(authActions.setAccess(newAccessToken));
+            store.dispatch(authActions.setAccessHeader());
+            originRequest.headers.Authorization = newAccessToken;
+            // 재요청
+            return axios(originRequest);
+          } catch (error) {
+            await persistor.purge();
+            return Promise.reject(error);
+          }
+        } else {
+          return Promise.reject(error);
+        }
+
     }
 )

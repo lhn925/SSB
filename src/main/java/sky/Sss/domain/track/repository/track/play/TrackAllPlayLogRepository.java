@@ -14,20 +14,20 @@ import sky.Sss.domain.user.entity.User;
 public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlayLogs, Long> {
 
 
-    @Query("select s from SsbTrackAllPlayLogs s where s.id = :id and s.token =:token "
+    @Query("select s from SsbTrackAllPlayLogs s where s.token =:token "
         + "and s.user =:user "
         + "and s.ssbTrack =:ssbTrack "
         + "and s.chartStatus = :chartStatus")
-    Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id, @Param("token") String token, @Param("user") User user,
+    Optional<SsbTrackAllPlayLogs> findOne(@Param("token") String token, @Param("user") User user,
         @Param("ssbTrack")
         SsbTrack ssbTrack, @Param("chartStatus") ChartStatus chartStatus);
 
-    @Query("select s from SsbTrackAllPlayLogs s where s.id = :id and s.token =:token "
+    @Query("select s from SsbTrackAllPlayLogs s where s.token =:token "
         + "and s.user =:user "
         + "and s.ssbTrack =:ssbTrack "
         + "and s.playStatus =:playStatus "
     )
-    Optional<SsbTrackAllPlayLogs> findOne(@Param("id") Long id, @Param("token") String token, @Param("user") User user,
+    Optional<SsbTrackAllPlayLogs> findOne(@Param("token") String token, @Param("user") User user,
         @Param("ssbTrack")
         SsbTrack ssbTrack, @Param("playStatus") PlayStatus playStatus);
 

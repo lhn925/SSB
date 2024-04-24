@@ -180,8 +180,9 @@ public class FileStore {
             throw new RuntimeException();
         }
         // 길이
-        Integer track_length = Math.round(audioFile.getAudioHeader().getTrackLength());
+        Integer track_length = audioFile.getAudioHeader().getTrackLength();
         // 음질
+
         String bitRate = audioFile.getAudioHeader().getBitRate();//음질
         // 크기
         Long size = multipartFile.getSize();

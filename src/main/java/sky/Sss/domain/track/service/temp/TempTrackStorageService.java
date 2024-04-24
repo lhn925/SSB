@@ -41,8 +41,6 @@ public class TempTrackStorageService {
         // cover/fileToken/cover
         String fileToken = TokenUtil.getToken();
 
-        log.info("fileToken = {}", fileToken);
-
         UploadTrackFileDto uploadTrackFileDto = (UploadTrackFileDto) fileStore.storeTrackFileSave(
             tempTrackFileUploadDto.getTrackFile(),
             FileStore.TRACK_DIR, fileToken);

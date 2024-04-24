@@ -56,8 +56,6 @@ const localPly = createSlice({
 
         if (settings.shuffle) {
           state.playOrders = shuffle(orderArray);
-          console.log("create:")
-          console.log(   state.playOrders);
           return;
         }
         state.playOrders = orderArray;
@@ -105,7 +103,7 @@ const localPly = createSlice({
         state.item.push(trackInfo);
         const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
         // // 만약 랜덤 재생 중 이라면
-        if (settings.shuffle && state.item.length > 2) {
+        if (settings.shuffle && state.item.length > 1) {
           // 현재 재생중인 Index 보다 무조건 위로 가게끔 한다
           const index = getRandomInt(data.playIndex,
               state.item.length); // 중간에 추가할 index
@@ -123,7 +121,6 @@ const localPly = createSlice({
             {key: state.key, item: {list: state.item, userId: data.userId}})
         return;
       }
-
       data.index = state.item.length + 1;
       state.item.push(createTrackInfo(data));
       state.playOrders.push(state.item.length - 1);
@@ -137,6 +134,7 @@ const localPly = createSlice({
 
       // 현재 재생 하고 있는 위치에 트랙값을 가져온다
       const currentOrders = state.playOrders[playIndex];
+      console.log(currentOrders);
       // 이전값
       if (isShuffle) {
         const prevOrders = state.playOrders;
@@ -145,12 +143,14 @@ const localPly = createSlice({
         const shuffleArray = shuffle(prevOrders);
         // 첫번째에 값 추가
         shuffleArray.splice(0, 0, currentOrders);
-
-        console.log(shuffleArray);
         state.playOrders = shuffleArray;
         return;
       }
-      state.playOrders.sort();
+      state.playOrders.sort(function(a, b)  {
+        if(a > b) return 1;
+        if(a === b) return 0;
+        if(a < b) return -1;
+      });
     }
   }
 });

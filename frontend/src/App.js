@@ -52,7 +52,6 @@ const Settings = lazy(
 export const UploadValueContext = createContext();
 export const UploadActionsContext = createContext();
 
-
 function App() {
   const [coverImgFiles, setCoverImgFiles] = useState({
     tracks: [],
@@ -63,29 +62,29 @@ function App() {
   const coverImgFileActions = useMemo(() => (
       createUploadActions(coverImgFiles, setCoverImgFiles)
   ), []);
-
   const currentAuth = useAuth();
   const uploadInfo = useUpload();
-
   const bc = new BroadcastChannel(`my_chanel`);
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const {openModal,closeModal,changeModalType,modal} = useModal();
-  const {playingClear} = useTrackPlayer();
+  const {openModal, closeModal, changeModalType, modal} = useModal();
+
+  const {
+    playingClear,
+    changePlaying,
+    playing
+  } = useTrackPlayer();
 
   const {t} = useTranslation();
   const client = useRef({client: null});
-  BroadCast(bc, dispatch, location);
+  BroadCast(bc, dispatch, location, changePlaying, playing);
 
-  BeforeUnload(t, uploadInfo, client.current.client, dispatch, playingClear);
+  BeforeUnload(t, uploadInfo, client.current.client, playingClear, changePlaying);
 
   useEffect(() => {
     playingClear();
-
-
-
     const setWebLog = () => {
       const session = sessionStorage.getItem("ssb_session");
       if (session === null) {
@@ -142,7 +141,7 @@ function App() {
 
           <Suspense fallback="Loading...">
             <Routes>
-              <Route path="/" element={     <Profile/>}>
+              <Route path="/" element={<Profile/>}>
               </Route>
               {/*<Route path="/feed">*/}
               {/*</Route>*/}
@@ -181,7 +180,7 @@ function App() {
         </div>
 
         {
-            currentAuth.access && <TrackPlayerContainer/>
+            currentAuth.access && <TrackPlayerContainer bc={bc}/>
         }
 
 
@@ -189,4 +188,5 @@ function App() {
   )
       ;
 }
+
 export default App;

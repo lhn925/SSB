@@ -3,11 +3,13 @@ import {USERS_INFO} from "utill/api/ApiEndpoints";
 import {persistor} from "store/store";
 import * as StompJs from "@stomp/stompjs";
 import {useContext, useEffect} from "react";
-import {TempRemoveApi} from "../api/upload/TempRemoveApi";
-import {uploadInfoActions} from "../../store/upload/uploadInfo";
-import {UploadActionsContext, UploadValueContext} from "../../App";
+import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
+import {uploadInfoActions} from "store/upload/uploadInfo";
+import {UploadActionsContext, UploadValueContext} from "App";
+import {chartLogSave} from "utill/function";
 
-export function CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc) {
+export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
+    bc) {
   authApi.get(USERS_INFO).then(data => {
     const userData = data.data;
     if (client.current.client) {
@@ -58,10 +60,11 @@ function Connect(client, accessToken, refreshToken, userId, t, bc) {
   client.current.client = clientData;
 }
 
-
-export function BeforeUnload(t, uploadInfo, client, dispatch, playingClear) {
+export function BeforeUnload(t, uploadInfo, client, playingClear,changePlaying) {
   // beforeunload 이벤트 핸들러
   const handleBeforeUnload = (event) => {
+    changePlaying(false);
+    // chartLogSave(currentTrack, false, updateCurrPlayLog);
     if (uploadInfo.tracks.length > 0) {
       event.preventDefault();  // 기본 동작 방지
       const message = t(`msg.common.beforeunload`);
@@ -71,15 +74,15 @@ export function BeforeUnload(t, uploadInfo, client, dispatch, playingClear) {
       playingClear();  // 트랙이 없으면 재생 상태 정리
     }
   };
-
   // unload 이벤트 핸들러
   const handleUnload = () => {
+    changePlaying(false);
+    // chartLogSave(currentTrack, false, updateCurrPlayLog);
     playingClear();  // 재생 상태 정리
     if (client && client.active) {
       client.deactivate();  // WebSocket 연결 종료
     }
   };
-
   useEffect(() => {
     // unload와 beforeunload 이벤트를 윈도우에 추가
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -108,12 +111,18 @@ export const disConnectEvent = async (uploadInfo) => {
     }
   }
 }
-export function BroadCast(bc, dispatch, location) {
+
+export function BroadCast(bc, dispatch, location, changePlaying,
+    playing) {
   bc.onmessage = (e) => {
     let data = e.data;
     if (data.type === "logout") {
       dispatch(uploadInfoActions.cleanStore());
       window.location.replace("/")
+    } else if (data.type === "playing") {
+      if (playing.key && playing.key !== data.key) {
+        changePlaying(false);
+      }
     } else {
       window.location.replace(location.pathname);
     }

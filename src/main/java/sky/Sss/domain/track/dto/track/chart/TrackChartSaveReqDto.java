@@ -14,8 +14,6 @@ import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
 @Setter
 public class TrackChartSaveReqDto {
 
-    @NotNull
-    private Long id; // count ID;
     @NotBlank
     private String token;// count Token
     @NotNull

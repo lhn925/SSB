@@ -52,10 +52,8 @@ function Help(props) {
   useEffect(() => {
     let countDownInterVal = null;
     if (timer > 0) {
-
       countDownInterVal = GetInterval(timer, setTimer, authTimeLimit,
           setCountDownTime, t(`msg.auth.timeOut`))
-
     }
     return () => {
       clearInterval(countDownInterVal);

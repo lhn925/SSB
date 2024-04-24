@@ -14,9 +14,6 @@ import sky.Sss.domain.track.model.PlayStatus;
 @Setter
 @NoArgsConstructor
 public class TrackPlayLogModifyReqDto {
-
-    @NotNull
-    private Long id; // count ID;
     @NotBlank
     private String token;// count Token
 

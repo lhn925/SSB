@@ -13,7 +13,7 @@ const playingReducer = createSlice({
       if (state.key === null) {
         state.key = LOCAL_INST_+ new Date().getTime();
       }
-      state.item.playing = !state.item.playing;
+      state.item.playing = action.payload.isPlaying;
       saveToLocalStorage(state);
     },clear(state) {
       if (state.key !== null) {

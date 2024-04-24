@@ -13,6 +13,6 @@ public class TrackInfoReqDto {
 
     @NotNull
     private Long id;
-    @NotBlank
-    private String token;
+//    @NotBlank
+//    private String token;
 }

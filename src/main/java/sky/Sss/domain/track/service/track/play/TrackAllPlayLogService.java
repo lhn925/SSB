@@ -46,13 +46,13 @@ public class TrackAllPlayLogService {
         trackAllPlayLogRepository.save(ssbTrackAllPlayLogs);
     }
 
-    public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token, ChartStatus chartStatus) {
-        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack, chartStatus)
+    public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, String token, ChartStatus chartStatus) {
+        return trackAllPlayLogRepository.findOne(token, user, ssbTrack, chartStatus)
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, Long id, String token, PlayStatus playStatus) {
-        return trackAllPlayLogRepository.findOne(id, token, user, ssbTrack, playStatus)
+    public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, String token, PlayStatus playStatus) {
+        return trackAllPlayLogRepository.findOne(token, user, ssbTrack, playStatus)
             .orElseThrow(IllegalArgumentException::new);
     }
 

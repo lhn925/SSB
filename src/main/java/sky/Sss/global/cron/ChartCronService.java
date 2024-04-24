@@ -30,6 +30,8 @@ public class ChartCronService {
     @Scheduled(cron = "0 0 0-23 * * *")  //    초 - 분 - 시 - 일 - 월 - 요일
     public void hourlyTotal() {
         LocalDateTime rankingDateTime = LocalDateTime.now().minusHours(Hour.HOUR_01.getValue());
+        log.info("rankingDateTime = {}", rankingDateTime);
+
         int ranDayTime = DayTime.getDayTime(rankingDateTime);
         // track 시간대 별 종합 조회수 생성
         trackPlayMetricsService.addTrackHourlyTotalPlays(ranDayTime);

@@ -69,6 +69,7 @@ public class TrackPlayMetricsService {
 
     private final TrackChartHourlyService trackChartHourlyService;
     private final TrackChartDailyService trackChartDailyService;
+
     /**
      * @param user
      * @param ssbTrack
@@ -76,9 +77,9 @@ public class TrackPlayMetricsService {
      * @param token
      * @return
      */
-    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,
+    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, String token,
         PlayStatus playStatus) {
-        return trackAllPlayLogService.findOne(user, ssbTrack, id, token, playStatus);
+        return trackAllPlayLogService.findOne(user, ssbTrack, token, playStatus);
     }
 
     // include 테이블 총합
@@ -93,11 +94,12 @@ public class TrackPlayMetricsService {
     public void addChartIncluded(TrackChartSaveReqDto trackChartSaveReqDto) {
         TrackInfoReqDto trackInfoReqDto = trackChartSaveReqDto.getTrackInfoReqDto();
         User user = userQueryService.findOne();
-        SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(), Status.ON);
-        SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack, trackChartSaveReqDto.getId(),
+        SsbTrack ssbTrack = trackQueryService.findById(trackInfoReqDto.getId(), Status.ON);
+        SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack,
             trackChartSaveReqDto.getToken(), ChartStatus.REFLECTED);
 
-        Boolean isReflected = true;
+        // 반영여부
+        boolean isReflected = true;
 
         try {
             // 이미 테이블 에 반영되어 있는지
@@ -186,8 +188,6 @@ public class TrackPlayMetricsService {
     }
 
 
-
-
     /**
      * playLog 수정 사항
      *
@@ -198,10 +198,9 @@ public class TrackPlayMetricsService {
     public void modifyPlayLog(TrackPlayLogModifyReqDto trackPlayLogModifyReqDto) throws SsbPlayIncompleteException {
         TrackInfoReqDto trackInfoReqDto = trackPlayLogModifyReqDto.getTrackInfoReqDto();
         User user = userQueryService.findOne();
-        SsbTrack ssbTrack = trackQueryService.findOne(trackInfoReqDto.getId(), trackInfoReqDto.getToken(),
-            Status.ON);
+        SsbTrack ssbTrack = trackQueryService.findById(trackInfoReqDto.getId(), Status.ON);
         SsbTrackAllPlayLogs ssbTrackAllPlayLogs = getSsbTrackAllPlayLogs(user, ssbTrack,
-            trackPlayLogModifyReqDto.getId(), trackPlayLogModifyReqDto.getToken(), PlayStatus.INCOMPLETE);
+            trackPlayLogModifyReqDto.getToken(), PlayStatus.INCOMPLETE);
         // REFLECTED 플레이 로그였다면 -> NOT_REFLECTED
         if (ssbTrackAllPlayLogs.getChartStatus().equals(ChartStatus.REFLECTED)) {
             SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, false);
@@ -357,11 +356,11 @@ public class TrackPlayMetricsService {
     }
 
     public List<TrackTotalPlaysDto> getHourlyPlaysDtos(int ranDayTime, int endDayTime, PageRequest pageRequest) {
-        List<TrackTotalPlaysDto> hourlyPlayList = trackHourlyTotalPlaysService.getHourlyPlayDtoList(ranDayTime,
+        return trackHourlyTotalPlaysService.getHourlyPlayDtoList(ranDayTime,
             endDayTime,
             pageRequest);
-        return hourlyPlayList;
     }
+
     @Transactional
     public void addChartDaily(int ranDayTime, int prevDayTime, PageRequest pageRequest) {
 
@@ -412,9 +411,9 @@ public class TrackPlayMetricsService {
      * @param token
      * @return
      */
-    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, Long id, String token,
+    public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, String token,
         ChartStatus chartStatus) {
-        return trackAllPlayLogService.findOne(user, ssbTrack, id, token, chartStatus);
+        return trackAllPlayLogService.findOne(user, ssbTrack, token, chartStatus);
     }
 
     // 현재 시간대에 공식 로그가 있는지 화인

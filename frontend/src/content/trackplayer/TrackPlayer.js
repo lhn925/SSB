@@ -3,70 +3,48 @@ import 'css/playerBar/playerBar.css';
 import 'css/track/track.css';
 import ReactPlayer from "react-player";
 
-import {USERS_FILE_IMAGE, USERS_FILE_TRACK_PLAY} from "utill/api/ApiEndpoints";
-import {durationTime, secondsToTime} from "utill/function";
 import {
-  AUTO_PLAY,
+  USERS_FILE_IMAGE,
+  USERS_FILE_TRACK_PLAY
+} from "utill/api/ApiEndpoints";
+import {chartLogSave, durationTime, secondsToTime} from "utill/function";
+import {
+  ALL_PLAY,
   playBackTypes,
   REPEAT_ALL,
   REPEAT_ONE
 } from "utill/enum/PlaybackTypes";
+import {toast} from "react-toastify";
 
 /**
  *
  *
  *
  */
-
-// url={trackToPlay} // 재생할 url
-// playing={playing} // 재생 여부 기본 : false
-// loop={loop} // 반복재생 여부 false
-// volume={volume} // 볼륨값 기본 Null
-// muted={muted} // 음소거 여부
-//
-// progressInterval={50}
-// //onProgress콜백 사이의 시간 (밀리초)
-// onEnded={() => onEnded()}
-// //미디어 재생이 끝나면 호출됩니다 . ◦ 다음으로 설정된
-// //   경우 실행되지 않습니다 .looptrue
-//
-// onProgress={onProgress()}
-//
-// // 콜백을 포함하고 played 분수 및 초 단위 loaded 로 진행   ◦ 예:playedSecondsloadedSeconds
-// {/*{ played: 0.12, playedSeconds: 11.3, loaded: 0.34, loadedSeconds: 16.7 }*/}
-// onDuration={onDuration()}// 미디어 지속 시간(초)을 포함하는 콜백
-// onReady={() => keepProgress()}//미디어가 로드되고 재생할 준비가 되면 호출됩니다.
 export const TrackPlayer = ({
+  changePlayLog,
+  localPlayLog,
   changePlaying,
   playing,
   currentTrack,
-  updateCurrentTrack,
+  createCurrentPlayLog,
   playerSettings,
   updateSettings,
   localPly,
   localPlyAddTracks,
+  updateCurrPlayLog,
   createCurrentTrack,
-  shuffleOrders
+  shuffleOrders,
+  getPlyTrackByOrder,
 }) => {
   const playerRef = useRef();
-  // 현재 재생목록
-  // 앞으로가기
-  // 뒤로가기
-  // 재생 정지
-  // 재생
-  // 볼륨
-  // 좋아요
-  // 랜덤재생
-  // 프로필 이동
-  // 재생바
-  // 현재 재생 목록 -> 로컬스토리지에 저장 멜론과 비슷한 형태
 
   const [settingsInfo, setSettingsInfo] = useState(
       playerSettings.item);
 
   const [localPlyInfo, setLocalPlyInfo] = useState(localPly.item);
   const [playOrders, setPlayOrders] = useState(localPly.playOrders);
-  // 플레이 시간
+
   const [url, setUrl] = useState(null);
 
   const [trackInfo, setTrackInfo] = useState(currentTrack);
@@ -74,66 +52,79 @@ export const TrackPlayer = ({
   const [isPlaying, setIsPlaying] = useState(playing.item.playing);
   const [seeking, setSeeking] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
-  const [isLast, setIsLast] = useState(false);
 
+  // 일시정지,다음곡,이전곡,
   useEffect(() => {
-    setTrackInfo(currentTrack);
-    if (currentTrack && currentTrack.playLog) {
+    if (currentTrack === -1) {
+      return;
+    }
+    // 이전 트랙
+    const prevPlayToken = trackInfo.playLog?.token;
+    // 정보가 있고, playLog token 이 다를 경우에만 그리고
+    if (currentTrack.playLog?.token
+        && currentTrack.playLog.token !== prevPlayToken) {
       setUrl(
           `${USERS_FILE_TRACK_PLAY}${currentTrack.id}/${currentTrack.playLog.token}`);
     }
+    setTrackInfo(currentTrack);
   }, [currentTrack]);
+
   useEffect(() => {
     setLocalPlyInfo(localPly.item);
     setPlayOrders(localPly.playOrders);
-    const playBackType = playBackTypes[settingsInfo.playBackType];
-    //마지막이면서 전체 반복재생인경우
-
-    const lastAndShuffle = isLast && settingsInfo.shuffle;
-    if (playBackType === REPEAT_ALL && lastAndShuffle) {
-      updateSettings("index", 1);
-      updateCurrentTrack(localPly.item[[localPly.playOrders[1]]].id);
-      return;
-    }
-
-    // 마지막이면서 전체재생인 경우
-    if (isLast && playBackType === AUTO_PLAY) {
-      if (isPlaying) { // 재생인 경우에만 false 로 바꿔줌
-        changePlaying();
-      }
-      if (settingsInfo.shuffle) { // shuffle 인 경우 0번째 인덱스로
-        updateSettings("index", 0);
-      }
-      createCurrentTrack(trackInfo);
-    }
-
-  }, [localPly.item, localPly.playOrders, isLast]);
+  }, [localPly.item, localPly.playOrders]);
 
   useEffect(() => {
     setIsPlaying(playing.item.playing);
     setSettingsInfo(playerSettings.item);
 
-  }, [playing.item.playing, playerSettings.item, localPlyInfo]);
+  }, [playing.item.playing, playerSettings.item]);
 
   useEffect(() => {
-    // 셔플이 바뀐 경우에는 x
-    if (playerSettings.item.shuffle !== settingsInfo.shuffle) {
+    if (seeking) {
+      changeIsChartAndLogSave();
+    }
+  }, [seeking]);
+
+  // shuffle 여부 , index 여부
+  useEffect(() => {
+    if (localPlyInfo.length === 0) {
       return;
     }
-    if (localPlyInfo.length > 0) {
+    const plyTrackByOrder = getPlyTrackByOrder(playerSettings.item.order);
+
+    if (settingsInfo.order !== playerSettings.item.order) {
+      changePlayLog(plyTrackByOrder.id, plyTrackByOrder.index,
+          new Date().getTime());
+    }
+
+    // 셔플을 누를경우 Index 변환 문제로 인해
+    // 리로딩 되는 문제 발생
+    if (playerSettings.item.shuffle === settingsInfo.shuffle) {
       if (playing.item.playing) {
-        updateCurrentTrack(
-            localPlyInfo[playOrders[playerSettings.item.index]].id);
+        createCurrentPlayLog(plyTrackByOrder.id);
         return;
       }
-      createCurrentTrack(localPlyInfo[playOrders[playerSettings.item.index]]);
+      createCurrentTrack(plyTrackByOrder);
     }
-  }, [playerSettings.item.index, localPlyInfo, playerSettings.item.shuffle]);
+
+    // if (currentTrack !== -1) {
+    //   // const orderTrack = getPlyTrackByOrder(playerSettings.item.order);
+    //   changePlayLog(currentTrack.id, playerSettings.order, new Date().getTime());
+    // }
+
+  }, [playerSettings.item.order, playerSettings.item.shuffle]);
 
   // 일시정지,플레이버튼
   const playPause = (e) => {
     e.preventDefault(); // 기본동작 정지
-    changePlaying();
+
+    if (!isPlaying && localPlyInfo.length === 0) {
+      toast.error("텍스트 추가) 재생할 트랙을 추가해주세요.")
+      return;
+    }
+
+    changePlaying(!isPlaying);
     const trackId = Number.parseInt(e.target.dataset.id);
     if (trackId === -1) {
       return;
@@ -145,95 +136,107 @@ export const TrackPlayer = ({
       if (trackEq && playLog) {// 같은 아이디에다가 PlayLog 까지 있다면 X
         return;
       }
-      updateCurrentTrack(currentTrack.id);
+      createCurrentPlayLog(currentTrack.id);
     } else {
-
     }
   }
-
   let linkToTrack;
   let linkToUploader;
 
   let likeButton = 'liked-button-t';
   let followButton = 'liked-button-t';
   const toggleLike = function (id, e) {
-
+    localPlyAddTracks(5);
+    localPlyAddTracks(4);
+    localPlyAddTracks(3);
+    localPlyAddTracks(2);
+    localPlyAddTracks(1);
   }
 
-  const onReady = function (e) {
-    console.log("hi");
+  const onReadyHandler = function (e) {
   }
   // 재생이 제일 먼저 시작될때
-  const onStart = function (e) {
+  const onStartHandler = function (e) {
     setIsEnd(false);
-    setIsLast(false);
+    // 0초부터 시작하지 않았다면 false
+    if (settingsInfo.playedSeconds > 1 && trackInfo.playLog.isChartLog) {
+      updateCurrPlayLog("isChartLog", false);
+    }
     updateSettings("playedSeconds", settingsInfo.playedSeconds);
   }
 
-  const onEnded = (e) => {
+  const onEndedHandler = (e) => {
     // 전체재생
     // 전체 반복 재생
     // 무한 반복 재생
     const playBackType = playBackTypes[settingsInfo.playBackType];
     // 확인
     setIsEnd(true);
+
+    chartLogSave(trackInfo, trackInfo.playLog.isChartLog, updateCurrPlayLog);
+
     updateSettings("playedSeconds", 0);
     updateSettings("played", 0);
 
     // 현재 인덱스
-    const playIndex = settingsInfo.index;
+    const playIndex = settingsInfo.order;
 
     // 전체 인덱스
-    const localLength = localPlyInfo.length - 1;
+    const localLength = localPlyInfo.length;
 
     // 다음 인덱스
     const nextIndex = playIndex + 1;
 
     // 마지막 인지 확인
     // 다음인덱스 전체인덱스보다 크면 true
-    const isLast = nextIndex > localLength;
-
-    setIsLast(isLast);
+    const isLast = nextIndex === localLength;
 
     // 전체 무한 재생이면서 랜덤재생이 아닐 경우
-    if (playBackType === REPEAT_ALL && !settingsInfo.shuffle) {
+    if (playBackType === REPEAT_ALL) {
       nextTrackPlay(playIndex);
       return;
     }
-
     // 한곡 무한 반복
     if (playBackType === REPEAT_ONE) {
-      updateCurrentTrack(trackInfo.id);
+      createCurrentPlayLog(trackInfo.id);
       return;
     }
-
-    // 마지막 이면서 shuffle인경우
-    if (isLast && settingsInfo.shuffle) {
-      shuffleOrders(settingsInfo.shuffle);
+    // 전체 재생인데 마지막인 아닌경우
+    if (!isLast && playBackType === ALL_PLAY) {
+      nextTrackPlay(playIndex);
+      return;
     }
-    // 마지막 재생목록인지 확인
-    // const isLast = nextIndex > localLength ? minIndex : nextIndex;
-
+    // 전체 재생인데 마지막인 경우
+    if (isLast && playBackType === ALL_PLAY) {
+      createCurrentTrack(trackInfo);
+      return;
+    }
   }
-
-  const onProgress = (e) => {
+  const onProgressHandler = (e) => {
+    if (trackInfo.playLog === null) {
+      return;
+    }
+    const totalPlayTime = trackInfo.playLog.playTime + 0.05;
+    updateCurrPlayLog("playTime", totalPlayTime);
+    if (!trackInfo.playLog.isChartLog && totalPlayTime
+        >= trackInfo.playLog.miniNumPlayTime) {
+      chartLogSave(trackInfo, trackInfo.isChartLog, updateCurrPlayLog);
+    }
     if (!seeking && !isEnd) {
       updateSettings("playedSeconds", e.playedSeconds);
       updateSettings("played", Number.parseInt(e.played * 100));
       updateSettings("loaded", Number.parseInt(e.loaded * 100));
     }
   }
-
-  const onDuration = (e) => {
+  const onDurationHandler = (e) => {
     playerRef.current.seekTo(settingsInfo.playedSeconds, 'seconds');
   }
 
   function setState(param) {
   }
 
-  const onError = (e) => {
-    console.log("error")
-    updateCurrentTrack(trackInfo.id);
+  const onErrorHandler = (e) => {
+    createCurrentPlayLog(trackInfo.id);
   }
   const getPlayButton = (playing) => {
     return playing ? 'play-pause-btn-paused' : 'play-pause-btn';
@@ -261,7 +264,7 @@ export const TrackPlayer = ({
     }
     // 원한다면 상태를 업데이트 하거나 화면에 표시할 수 있습니다.
   };
-  const onMouseDown = (event) => {
+  const onMouseDown = () => {
     setSeeking(true);// 재생이동 중
   }
   const onMouseMove = (event) => {
@@ -282,43 +285,68 @@ export const TrackPlayer = ({
     updateSettings("played", percent);
   }
   const preBtnOnClick = () => {
+    changeIsChartAndLogSave();
     const localLength = localPlyInfo.length;
 
     const maxIndex = localLength === 0 ? localLength : localLength - 1;
 
-    const prevIndex = settingsInfo.index - 1;
+    const prevIndex = settingsInfo.order - 1;
 
     const changeIndex = prevIndex < 0 ? maxIndex : prevIndex;
 
     if (playerRef.current) {
       playerRef.current.seekTo(0, "seconds");
     }
+    if (!isPlaying) {
+      changePlaying(!isPlaying);
+    }
     updateSettings("playedSeconds", 0);
     // 5초보다 크다면 이전곡이 아닌 0초부터 시작
     if (settingsInfo.playedSeconds > 5) {
-      updateCurrentTrack(trackInfo.id);
+      createCurrentPlayLog(trackInfo.id);
       return;
     }
-    updateSettings("index", changeIndex);
+
+    // 하나만 있을경우
+    if (playerSettings.order === changeIndex) {
+      createCurrentPlayLog(trackInfo.id);
+      return;
+    }
+
+    updateSettings("order", changeIndex);
   }
 
   function nextTrackPlay(playIndex) {
-    const localLength = localPlyInfo.length - 1;
-
+    const totalLength = localPlyInfo.length;
     const minIndex = 0;
-
     const nextIndex = playIndex + 1;
-
-    const changeIndex = nextIndex > localLength ? minIndex : nextIndex;
+    const changeIndex = nextIndex === totalLength ? minIndex : nextIndex;
     if (playerRef.current) {
       playerRef.current.seekTo(0, "seconds");
     }
+    if (playIndex === changeIndex) {
+      createCurrentPlayLog(trackInfo.id);
+    } else {
+      updateSettings("order", changeIndex);
+    }
+
     updateSettings("playedSeconds", 0);
-    updateSettings("index", changeIndex);
+
+    if (!isPlaying) {
+      changePlaying(!isPlaying);
+    }
+  }
+
+  function changeIsChartAndLogSave() {
+    if (trackInfo.playLog === null) {
+      return;
+    }
+    chartLogSave(trackInfo, false, updateCurrPlayLog);
   }
 
   const nextBtnOnClick = () => {
-    nextTrackPlay(settingsInfo.index);
+    changeIsChartAndLogSave();
+    nextTrackPlay(settingsInfo.order);
   }
 
   const changePlayBackType = (e) => {
@@ -338,18 +366,23 @@ export const TrackPlayer = ({
     // 있다면?
     // 그 이전곡 플레이 만약
     // 그 이전곡에서 다음 플레이를 누르면 뒤로가기전 플레이곡
-    // 인덱스 0 에서 눌렀다? 랜덤재생 대신 인덱스 원래 위치대로 아니다
 
-    shuffleOrders(isShuffle);
     updateSettings("shuffle", isShuffle);
+    shuffleOrders(isShuffle);
     if (isShuffle) {
-      updateSettings("index", 0);
+      updateSettings("order", 0);
       return;
     }
     // 기본 정렬된 Index 반환
-    const index = playOrders[settingsInfo.index];
-    updateSettings("index", index);
-
+    const order = playOrders[settingsInfo.order];
+    updateSettings("order", order);
+  }
+  // 일시정지시
+  const onPauseHandler = (e) => {
+    if (trackInfo.playLog === null) {
+      return;
+    }
+    changeIsChartAndLogSave();
   }
   return (
       <div id='track-player-bar'>
@@ -435,22 +468,24 @@ export const TrackPlayer = ({
             // url={getUrl()}
             // url={"/users/file/track/play/202/124a25c32864139a2149"} // 재생할 url
             playing={isPlaying} // 재생 여부 기본 : false
-            onError={onError}
+            onError={onErrorHandler}
             loop={settingsInfo.playbackRate === REPEAT_ONE} // 반복재생 여부 false
             volume={Number.parseFloat(settingsInfo.volume)} // 볼륨값 기본 Null
             muted={settingsInfo.muted} // 음소거 여부
-            onStart={onStart}
+            onStart={onStartHandler}
             //일시중지 또는 버퍼링 후 미디어 재생이 시작되거나 재개될 때 호출됩니다
             progressInterval={50}
             //onProgress콜백 사이의 시간 (밀리초)
-            onEnded={onEnded}
+            onEnded={onEndedHandler}
+
             //미디어 재생이 끝나면 호출됩니다 . ◦ 다음으로 설정된
             //   경우 실행되지 않습니다 .looptrue
-            onProgress={onProgress}
+            onProgress={onProgressHandler}
+            onPause={onPauseHandler}
             // 콜백을 포함하고 played 분수 및 초 단위 loaded 로 진행   ◦ 예:playedSecondsloadedSeconds
             /*{ played: 0.12, playedSeconds: 11.3, loaded: 0.34, loadedSeconds: 16.7 }*/
-            onDuration={onDuration}// 미디어 지속 시간(초)을 포함하는 콜백
-            onReady={onReady}//미디어가 로드되고 재생할 준비가 되면 호출됩니다.
+            onDuration={onDurationHandler}// 미디어 지속 시간(초)을 포함하는 콜백
+            onReady={onReadyHandler}//미디어가 로드되고 재생할 준비가 되면 호출됩니다.
         />
       </div>
   );
