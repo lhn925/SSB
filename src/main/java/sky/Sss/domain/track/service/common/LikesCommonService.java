@@ -122,7 +122,7 @@ public class LikesCommonService {
 
         cancelLikeAndType(targetInfoDto.getTargetId(), targetInfoDto.getTargetToken(), user, contentsType);
 
-        int totalCount = getTotalCount(targetToken, contentsType);
+        int totalCount = getTotalCount(targetInfoDto.getTargetToken(), contentsType);
 
         return new TotalCountRepDto(totalCount);
     }
@@ -192,7 +192,7 @@ public class LikesCommonService {
 
     private TargetInfoDto getLikeTargetInfoDto(Long targetId, String targetToken, ContentsType contentsType) {
         if (contentsType.equals(ContentsType.TRACK)) {
-            return trackQueryService.getTargetInfoDto(targetId, targetToken, Status.ON);
+            return trackQueryService.getTargetInfoDto(targetId, Status.ON);
         } else if (contentsType.equals(ContentsType.PLAYLIST)) {
             return plyQueryService.getTargetInfoDto(targetId, targetToken, Status.ON);
         } else if (contentsType.equals(ContentsType.REPLY_TRACK)) {

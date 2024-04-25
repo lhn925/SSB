@@ -12,6 +12,7 @@ const TrackPlayerContainer = ({bc}) => {
     updateSettings,
     playerSettings,
     settingsCreate,
+    updatePlyTrackInfo,
     changePlaying,
     playingClear,
     updateCurrPlayLog,
@@ -24,6 +25,7 @@ const TrackPlayerContainer = ({bc}) => {
     localPly,
     localPlyCreate,
     getPlyTrackByOrder,
+    changeCurTrackInfo
   } = useTrackPlayer(bc);
   useEffect(() => {
     // settings 생성
@@ -62,7 +64,11 @@ const TrackPlayerContainer = ({bc}) => {
     if (localPly.item.length > 0) {
       const {findTrack, findOrder} = getLocalIndex();
       updateSettings("order", findOrder);
-      createCurrentTrack(findTrack);
+      if (currentTrack.id === -1) {
+        createCurrentTrack(findTrack);
+      } else {
+        changeCurTrackInfo(findTrack);
+      }
       changePlayLog(findTrack.id, findTrack.index,
           new Date().getTime())
     }
@@ -85,6 +91,7 @@ const TrackPlayerContainer = ({bc}) => {
           shuffleOrders={shuffleOrders}
           updateCurrPlayLog={updateCurrPlayLog}
           bc={bc}
+          updatePlyTrackInfo={updatePlyTrackInfo}
 
           // player={player}
           // trackplayer={trackPlayer}

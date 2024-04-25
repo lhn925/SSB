@@ -24,6 +24,7 @@ import sky.Sss.domain.user.model.ContentsType;
 @UserAuthorize
 @RestController
 public class TrackLikesController {
+
     private final LikesCommonService likesCommonService;
     /**
      * track 좋아요 등록
@@ -32,12 +33,12 @@ public class TrackLikesController {
      * @param id
      *     trackId
      */
-    @PostMapping("/{id}/{token}")
-    public ResponseEntity<TotalCountRepDto> saveLikes(@PathVariable Long id, @PathVariable String token) {
-        if (id == null || id == 0 || token == null || token.length() == 0) {
+    @PostMapping("/{id}")
+    public ResponseEntity<TotalCountRepDto> saveLikes(@PathVariable Long id) {
+        if (id == null || id == 0) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.addLikes(id, token, ContentsType.TRACK));
+        return ResponseEntity.ok(likesCommonService.addLikes(id, null, ContentsType.TRACK));
     }
 
     /**
@@ -46,13 +47,14 @@ public class TrackLikesController {
      * @param id
      *     trackId
      */
-    @DeleteMapping("/{id}/{token}")
-    public ResponseEntity<TotalCountRepDto> removeLikes(@PathVariable Long id, @PathVariable String token) {
-        if (id == null || id == 0 || token == null || token.length() == 0) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TotalCountRepDto> removeLikes(@PathVariable Long id) {
+        if (id == null || id == 0 ) {
             throw new IllegalArgumentException();
         }
-        return ResponseEntity.ok(likesCommonService.cancelLikes(id, token, ContentsType.TRACK));
+        return ResponseEntity.ok(likesCommonService.cancelLikes(id, null, ContentsType.TRACK));
     }
+
     /**
      * @param id
      *     trackId
@@ -64,6 +66,7 @@ public class TrackLikesController {
         }
         return ResponseEntity.ok(likesCommonService.addLikes(id, token, ContentsType.REPLY_TRACK));
     }
+
     /**
      * 리플 좋아요 취소 후 총 좋아요수 반환
      *

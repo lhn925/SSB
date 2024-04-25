@@ -11,7 +11,7 @@ const createPlayLog = (data) => ({
   miniNumPlayTime: data.miniNumPlayTime,
   isChartLog: data.isChartLog,
   playTime: 1, // playTime Seconds
-  isReflected:false // 조회수 반영 여부 true 면 더이상 api 요청 x
+  isReflected: false // 조회수 반영 여부 true 면 더이상 api 요청 x
 })
 
 const setTrackInfo = (info, data) => {
@@ -47,15 +47,11 @@ const currentTrack = createSlice({
       if (action.payload.info === undefined) {
         return;
       }
-
       // playLog 초기화
       if (state.playLog !== null) {
         state.playLog = null;
       }
       setTrackInfo(state, action.payload.info);
-      // if (action.payload.playLog !== undefined) {
-      //   state.playLog = createPlayLog(action.payload.playLog);
-      // }
     }, createPlayLog(state, action) {
       setTrackInfo(state, action.payload.info);
       state.playLog = createPlayLog(action.payload.playLog);
@@ -65,6 +61,14 @@ const currentTrack = createSlice({
       }
       const key = action.payload.key;
       state.playLog[key] = action.payload.value;
+    }, updateTrackInfo(state, action) {
+      const key = action.payload.key;
+      state[key] = action.payload.value;
+    }, changeTrackInfo(state, action) {
+      const trackInfo = action.payload.info;
+      if (state.id === parseInt(trackInfo.id)) {
+        setTrackInfo(state, trackInfo);
+      }
     }
   }
 });
@@ -73,5 +77,7 @@ export let currentActions = {
   create: currentTrack.actions.create,
   createPlayLog: currentTrack.actions.createPlayLog,
   updatePlayLog: currentTrack.actions.updatePlayLog,
+  updateTrackInfo: currentTrack.actions.updateTrackInfo,
+  changeTrackInfo: currentTrack.actions.changeTrackInfo,
 };
 export default currentTrack.reducer;

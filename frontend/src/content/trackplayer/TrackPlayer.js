@@ -7,7 +7,12 @@ import {
   USERS_FILE_IMAGE,
   USERS_FILE_TRACK_PLAY
 } from "utill/api/ApiEndpoints";
-import {chartLogSave, durationTime, secondsToTime} from "utill/function";
+import {
+  chartLogSave,
+  durationTime,
+  secondsToTime,
+  toggleLike
+} from "utill/function";
 import {
   ALL_PLAY,
   playBackTypes,
@@ -15,6 +20,8 @@ import {
   REPEAT_ONE
 } from "utill/enum/PlaybackTypes";
 import {toast} from "react-toastify";
+import TrackLikeApi from "../../utill/api/trackPlayer/TrackLikeApi";
+import TrackLikeCancelApi from "../../utill/api/trackPlayer/TrackLikeCancelApi";
 
 /**
  *
@@ -36,6 +43,7 @@ export const TrackPlayer = ({
   createCurrentTrack,
   shuffleOrders,
   getPlyTrackByOrder,
+  updatePlyTrackInfo,
 }) => {
   const playerRef = useRef();
 
@@ -143,15 +151,8 @@ export const TrackPlayer = ({
   let linkToTrack;
   let linkToUploader;
 
-  let likeButton = 'liked-button-t';
   let followButton = 'liked-button-t';
-  const toggleLike = function (id, e) {
-    localPlyAddTracks(5);
-    localPlyAddTracks(4);
-    localPlyAddTracks(3);
-    localPlyAddTracks(2);
-    localPlyAddTracks(1);
-  }
+
 
   const onReadyHandler = function (e) {
   }
@@ -452,8 +453,11 @@ export const TrackPlayer = ({
                   className='tp-track-name'>{trackInfo.title}</p>
               </a>
             </div>
-            <div id={likeButton} className='controller-btn'
-                 onClick={(e) => toggleLike(currentTrack.id, e)}></div>
+            <div className={'controller-btn ' + (trackInfo.isLike
+                ? 'liked-button-t' : 'liked-button')}
+                 data-id={currentTrack.id}
+                 onClick={(e) => toggleLike(trackInfo,updatePlyTrackInfo,
+                     e)}></div>
             <div id={followButton} className='controller-btn'
                  onClick={(e) => toggleLike(currentTrack.id, e)}></div>
             <div id='playlist-button' className='controller-btn'></div>

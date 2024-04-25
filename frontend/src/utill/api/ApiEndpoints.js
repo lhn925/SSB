@@ -37,3 +37,5 @@ export const TRACKS_INFO_SEARCH_ID = "/tracks/info/search/"
 export const TRACKS_LOG_ID = "/tracks/log/"
 export const TRACKS_LOG_ID_CHART = "/tracks/log/chart"
 export const TRACKS_LOG = "/tracks/log"
+
+export const TRACKS_LIKES = "/tracks/likes/"

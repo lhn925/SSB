@@ -35,6 +35,22 @@ const useTrackPlayer = (bc) => {
         }
     ));
   }
+  const updatePlyTrackInfo = (trackId, key, value) => {
+    dispatch(localPlyActions.updatePlyTrackInfo(
+        {
+          id:trackId,
+          key:key,
+          value:value
+        }
+    ));
+  }
+  const changePlyTrackInfo = (data) => {
+    dispatch(localPlyActions.changePlyTrackInfo(
+        {
+          data:data
+        }
+    ));
+  }
 
   const updateSettings = (key, value) => {
     dispatch(settingsActions.updateSettings(
@@ -82,14 +98,17 @@ const useTrackPlayer = (bc) => {
     dispatch(currentActions.create({info: data}))
 
   }
+  const changeCurTrackInfo = (data) => {
+    dispatch(currentActions.changeTrackInfo({info: data}))
+  }
 // 현재 트랙정보 가져오기 재생 url O
   const createCurrentPlayLog = (trackId) => {
     if (trackId === -1) {
       return;
     }
     TrackPlayApi(trackId).then((response) => {
-      dispatch(currentActions.createPlayLog(
-          {info: response.data, playLog: response.data.trackPlayLogRepDto}));
+      dispatch(currentActions.createPlayLog({info: response.data, playLog: response.data.trackPlayLogRepDto}));
+      changePlyTrackInfo(response.data);
     }).catch((error) => {
       toast.error(error.data?.errorDetails[0].message);
     })
@@ -105,6 +124,8 @@ const useTrackPlayer = (bc) => {
   }, [playing, currentTrack])
 
   return {
+    changeCurTrackInfo,
+    updatePlyTrackInfo,
     changePlayLog,
     localPlayLog,
     updateSettings,

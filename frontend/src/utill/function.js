@@ -7,6 +7,9 @@ import {GenreTypes} from "content/upload/UploadTypes";
 import {useLocation, useNavigate} from "react-router";
 import TrackChartLogApi from "./api/trackPlayer/TrackChartLogApi";
 import TrackLogModifyApi from "./api/trackPlayer/TrackLogModifyApi";
+import TrackLikeApi from "./api/trackPlayer/TrackLikeApi";
+import {toast} from "react-toastify";
+import TrackLikeCancelApi from "./api/trackPlayer/TrackLikeCancelApi";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -564,6 +567,28 @@ export function getRandomInt(min, max) {
   return max;
 }
 
+export async function toggleLike(trackInfo, updatePlyTrackInfo, e) {
+
+  const isLike = trackInfo.isLike;
+  const title = trackInfo.title;
+  const trackId = trackInfo.id;
+  const toastText = !isLike? title +" was saved to your Library." : title +" cancel"
+
+  handleLikeTracking(isLike, trackId).then((r) => {
+    toast.success("텍스트 추가) " + toastText);
+    updatePlyTrackInfo(trackId, "isLike", !isLike);
+  }).catch((error) => {
+    toast.error("텍스트 추가) 실패")
+  })
+}
+
+export async function handleLikeTracking(isLike, trackId) {
+  if (isLike) {
+    return TrackLikeCancelApi(trackId);
+  } else {
+    return TrackLikeApi(trackId);
+  }
+}
 
 export async function handleChartTracking(isChartLog, body) {
   if (isChartLog) {
@@ -572,6 +597,7 @@ export async function handleChartTracking(isChartLog, body) {
     return TrackLogModifyApi(body);
   }
 }
+
 export function chartLogSave(currentInfo, isChartLog, updateCurrPlayLog) {
   if (currentInfo.id === null || currentInfo.playLog === null) {
     return;

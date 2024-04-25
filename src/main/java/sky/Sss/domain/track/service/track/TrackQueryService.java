@@ -73,4 +73,9 @@ public class TrackQueryService {
         return trackQueryRepository.getTargetInfoDto(id, token, isStatus.getValue())
             .orElseThrow(SsbFileNotFoundException::new);
     }
+
+    public TargetInfoDto getTargetInfoDto(long id, Status isStatus) {
+        return trackQueryRepository.getTargetInfoDto(id, isStatus.getValue())
+            .orElseThrow(SsbFileNotFoundException::new);
+    }
 }

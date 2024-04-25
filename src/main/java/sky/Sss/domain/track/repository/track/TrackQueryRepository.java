@@ -67,5 +67,13 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id, @Param("token") String token,
         @Param("isStatus") boolean isStatus);
 
+    @Query(
+        "select new sky.Sss.domain.track.dto.common.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "
+            + " on s.user.id = u.id "
+            + " where s.id = :id and s.isStatus =:isStatus")
+    Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id,
+        @Param("isStatus") boolean isStatus);
+
+
 
 }

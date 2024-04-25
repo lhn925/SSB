@@ -39,7 +39,6 @@ const localPly = createSlice({
       const localPly = loadFromLocalStorage(state.key);
       const userId = data.payload.userId;
       state.userId = userId;
-
       if (localPly) {
         const userIdNotEq = userId !== localPly.userId;
         if (userIdNotEq) {
@@ -48,19 +47,16 @@ const localPly = createSlice({
         }
         state.item = localPly.list;
         const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
-
         const orderArray = [];
         for (let i = 0; i < localPly.list.length; i++) {
           orderArray.push(i);
         }
-
         if (settings.shuffle) {
           state.playOrders = shuffle(orderArray);
           return;
         }
         state.playOrders = orderArray;
       }
-
     }, addTracks(state, action) {
       // 갖고 오기
       const localPly = loadFromLocalStorage(state.key);
@@ -134,7 +130,6 @@ const localPly = createSlice({
 
       // 현재 재생 하고 있는 위치에 트랙값을 가져온다
       const currentOrders = state.playOrders[playIndex];
-      console.log(currentOrders);
       // 이전값
       if (isShuffle) {
         const prevOrders = state.playOrders;
@@ -146,11 +141,37 @@ const localPly = createSlice({
         state.playOrders = shuffleArray;
         return;
       }
-      state.playOrders.sort(function(a, b)  {
-        if(a > b) return 1;
-        if(a === b) return 0;
-        if(a < b) return -1;
+      state.playOrders.sort(function (a, b) {
+        if (a > b) {
+          return 1;
+        }
+        if (a === b) {
+          return 0;
+        }
+        if (a < b) {
+          return -1;
+        }
       });
+    }, updatePlyTrackInfo(state, action) {
+      const id = parseInt(action.payload.id);
+      const key = action.payload.key;
+      state.item.map((data) => {
+        if (data.id === id) {
+          data[key] = action.payload.value;
+        }
+      })
+      saveToLocalStorage({key: state.key, item: {list: state.item, userId: state.userId}})
+    }, changePlyTrackInfo(state, action) {
+      const data = action.payload.data;
+      const id = parseInt(data.id)
+      state.item.map((track) => {
+        const index = track.index;
+        if (track.id === id) {
+          track = createTrackInfo(data);
+          track.index = index;
+        }
+      })
+      saveToLocalStorage({key: state.key, item: {list: state.item, userId: state.userId}})
     }
   }
 });
@@ -159,5 +180,7 @@ export let localPlyActions = {
   addTracks: localPly.actions.addTracks,
   create: localPly.actions.create,
   shuffleOrders: localPly.actions.shuffleOrders,
+  updatePlyTrackInfo: localPly.actions.updatePlyTrackInfo,
+  changePlyTrackInfo: localPly.actions.changePlyTrackInfo,
 };
 export default localPly.reducer;
