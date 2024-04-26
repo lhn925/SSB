@@ -18,6 +18,7 @@ import currentTrack from "store/play/currentTrack";
 import playerSettings from "store/play/playerSettings";
 import localPly from "store/play/localPly";
 import localPlayLog from "store/play/localPlayLog";
+import localPlyTracks from "store/play/localPlyTracks";
 const persistConfig = {
   key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
   version: 1,
@@ -35,7 +36,8 @@ const rootReducer = combineReducers({
   currentTrack,
   playerSettings,
   localPly,
-  localPlayLog
+  localPlayLog,
+  localPlyTracks
 })
 
 

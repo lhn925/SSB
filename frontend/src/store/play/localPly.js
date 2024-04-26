@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
-  createTrackInfo,
+  createPlyInfo,
   getRandomInt,
   loadFromLocalStorage,
   removeFromLocalStorage,
@@ -19,8 +19,6 @@ const initialState = {
 }
 
 function setStoragePly(state, userId) {
-
-  const saveItem = state.item;
   state.item.sort(function (a, b) {
     if (a.index > b.index) {
       return 1;
@@ -98,7 +96,7 @@ const localPly = createSlice({
         if (state.item.length === 0 && !userIdNotEq) {
           state.item = localPly.list;
         }
-        const trackInfo = createTrackInfo(data);
+        const trackInfo = createPlyInfo(data);
         state.item.push(trackInfo);
         const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
         // // 만약 랜덤 재생 중 이라면
@@ -120,7 +118,7 @@ const localPly = createSlice({
         return;
       }
       data.index = state.item.length + 1;
-      state.item.push(createTrackInfo(data));
+      state.item.push(createPlyInfo(data));
       state.playOrders.push(state.item.length - 1);
       saveToLocalStorage(
           {key: state.key, item: {list: state.item, userId: data.userId}})
@@ -170,20 +168,16 @@ const localPly = createSlice({
       state.item.map((track) => {
         const index = track.index;
         if (track.id === id) {
-          track = createTrackInfo(data);
+          track = createPlyInfo(data);
           track.index = index;
         }
       })
       setStoragePly(state, state.userId);
     }, removePlyByTrackId(state, action) {
-      // 삭제 할시에
-      // index 재배치?
-      // 아니면
+      // play
       const removeId = action.payload.id;
       const prevList = state.item;
       state.item = prevList.filter(track => track.id !== removeId);
-
-
       setStoragePly(state, state.userId);
     }
   }

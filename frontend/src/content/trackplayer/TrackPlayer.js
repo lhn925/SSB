@@ -97,28 +97,23 @@ export const TrackPlayer = ({
     if (localPlyInfo.length === 0) {
       return;
     }
-    const plyTrackByOrder = getPlyTrackByOrder(playerSettings.item.order);
-
     if (settingsInfo.order !== playerSettings.item.order) {
-      changePlayLog(plyTrackByOrder.id, plyTrackByOrder.index,
-          new Date().getTime());
+      changePlayLog(playerSettings.item.order);
     }
 
     // 셔플을 누를경우 Index 변환 문제로 인해
     // 리로딩 되는 문제 발생
     if (playerSettings.item.shuffle === settingsInfo.shuffle) {
       if (playing.item.playing) {
-        createCurrentPlayLog(plyTrackByOrder.id);
+        createCurrentPlayLog(playerSettings.item.order);
         return;
       }
-      createCurrentTrack(plyTrackByOrder);
+      createCurrentTrack(playerSettings.item.order);
     }
-
     // if (currentTrack !== -1) {
     //   // const orderTrack = getPlyTrackByOrder(playerSettings.item.order);
     //   changePlayLog(currentTrack.id, playerSettings.order, new Date().getTime());
     // }
-
   }, [playerSettings.item.order, playerSettings.item.shuffle]);
 
   // 일시정지,플레이버튼
@@ -142,7 +137,7 @@ export const TrackPlayer = ({
       if (trackEq && playLog) {// 같은 아이디에다가 PlayLog 까지 있다면 X
         return;
       }
-      createCurrentPlayLog(currentTrack.id);
+      createCurrentPlayLog(settingsInfo.order);
     } else {
     }
   }
@@ -197,7 +192,7 @@ export const TrackPlayer = ({
     }
     // 한곡 무한 반복
     if (playBackType === REPEAT_ONE) {
-      createCurrentPlayLog(trackInfo.id);
+      createCurrentPlayLog(playIndex);
       return;
     }
     // 전체 재생인데 마지막인 아닌경우
@@ -207,7 +202,7 @@ export const TrackPlayer = ({
     }
     // 전체 재생인데 마지막인 경우
     if (isLast && playBackType === ALL_PLAY) {
-      createCurrentTrack(trackInfo);
+      createCurrentTrack(playIndex);
       return;
     }
   }
@@ -235,7 +230,7 @@ export const TrackPlayer = ({
   }
 
   const onErrorHandler = (e) => {
-    createCurrentPlayLog(trackInfo.id);
+    createCurrentPlayLog(settingsInfo.order);
   }
   const getPlayButton = (playing) => {
     return playing ? 'play-pause-btn-paused' : 'play-pause-btn';
@@ -302,16 +297,14 @@ export const TrackPlayer = ({
     updateSettings("playedSeconds", 0);
     // 5초보다 크다면 이전곡이 아닌 0초부터 시작
     if (settingsInfo.playedSeconds > 5) {
-      createCurrentPlayLog(trackInfo.id);
+      createCurrentPlayLog(settingsInfo.order);
       return;
     }
-
     // 하나만 있을경우
     if (playerSettings.order === changeIndex) {
-      createCurrentPlayLog(trackInfo.id);
+      createCurrentPlayLog(changeIndex);
       return;
     }
-
     updateSettings("order", changeIndex);
   }
 
@@ -324,7 +317,7 @@ export const TrackPlayer = ({
       playerRef.current.seekTo(0, "seconds");
     }
     if (playIndex === changeIndex) {
-      createCurrentPlayLog(trackInfo.id);
+      createCurrentPlayLog(playIndex);
     } else {
       updateSettings("order", changeIndex);
     }

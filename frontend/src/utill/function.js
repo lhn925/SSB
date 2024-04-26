@@ -568,7 +568,6 @@ export function getRandomInt(min, max) {
 }
 
 export function createTrackInfo(data){return {
-  index: data.index, // 순번
   id: data.id,
   title: data.title,
   userName: data.userName,
@@ -579,5 +578,14 @@ export function createTrackInfo(data){return {
   isPrivacy: data.isPrivacy,
   createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
 }}
+
+
+
+export function createPlyInfo(data){return {
+  index: data.index, // 순번
+  id: data.id,
+  createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
+}}
+
 
 

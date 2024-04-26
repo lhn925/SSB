@@ -11,7 +11,6 @@ const localPlayLog = createSlice({
   initialState: initialState,
   reducers: {
     changePlayLog(state, action) {
-
       const id = action.payload.id;
       const index = action.payload.index;
       const startTime = action.payload.startTime;

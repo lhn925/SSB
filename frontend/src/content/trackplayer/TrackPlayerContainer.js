@@ -8,6 +8,7 @@ const TrackPlayerContainer = ({bc}) => {
   // 재생 여부
 
   const {
+    localPlyTracks,
     changePlayLog,
     localPlayLog,
     updateSettings,
@@ -26,7 +27,7 @@ const TrackPlayerContainer = ({bc}) => {
     localPly,
     localPlyCreate,
     getPlyTrackByOrder,
-    changeCurTrackInfo
+    changeCurrTrackInfo
   } = useTrackPlayer(bc);
   useEffect(() => {
     // settings 생성
@@ -40,63 +41,57 @@ const TrackPlayerContainer = ({bc}) => {
   useEffect(() => {
     function getLocalIndex() {
       const playLog = loadFromLocalStorage(localPlayLog.key);
-      let findTrack;
       let findOrder = -1;
       if (playLog === undefined) {
-        findTrack = localPly.item[0];
-        findOrder = 0;
+        return 0;
       }
       const localId = playLog[0];
       const localIndex = playLog[1];
       if (localId === null || localId === -1 || localIndex === null
           || localIndex === 0) {
-        findTrack = localPly.item[0];
-        findOrder = 0;
+        return 0;
       }
       // 로컬에 있는 마지막 플레이리스트 로그 찾아서 반환
       localPly.item.map((data, index) => {
             if (data.index === localIndex) {
-              findTrack = data;
               findOrder = index;
             }
           }
       );
       const order = playerSettings.item.order;
       // 만약 찾지 못하였으면
-      console.log(order);
-      console.log("findOrder : "+ findOrder);
       if (findOrder === -1) {
         const maxOrder = localPly.item.length;
-        const isOver = order === maxOrder;
-
+        const isOver = (order + 1) === maxOrder;
         // 만약 넘지 않았다
         if (!isOver) {
           findOrder = order;
-          findTrack = localPly.playOrders[order + 1];
         } else {
-          findTrack = localPly.item[0];
           findOrder = 0;
         }
       }
-
-      return {findOrder, findTrack};
+      return findOrder;
     }
-
     if (localPly.item.length > 0) {
-      const {findTrack, findOrder} = getLocalIndex();
+      const findOrder = getLocalIndex();
       updateSettings("order", findOrder);
       if (currentTrack.id === -1) {
-        createCurrentTrack(findTrack);
+        createCurrentTrack(findOrder);
       } else {
-        changeCurTrackInfo(findTrack);
+        createCurrentPlayLog(findOrder);
       }
-      changePlayLog(findTrack.id, findTrack.index,
-          new Date().getTime())
+      changePlayLog(findOrder);
+    }
+  }, [localPly.item.length]);
+  useEffect(() => {
+    if (currentTrack.id !== -1) {
+      changeCurrTrackInfo(playerSettings.item.order);
     }
   }, [localPly.item]);
 
   return (
       <TrackPlayer
+          localPlyTracks={localPlyTracks}
           localPlayLog={localPlayLog}
           changePlayLog={changePlayLog}
           currentTrack={currentTrack}
