@@ -8,6 +8,11 @@ import {useEffect} from "react";
 import {settingsActions} from "store/play/playerSettings";
 import {localPlyActions} from "store/play/localPly";
 import {playLogActions} from "../../store/play/localPlayLog";
+import {HttpStatusCode} from "axios";
+import {createTrackInfo, loadFromLocalStorage} from "../../utill/function";
+import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
+import TrackInfoSearchListApi
+  from "utill/api/trackPlayer/TrackInfoSearchListApi";
 
 const useTrackPlayer = (bc) => {
   const dispatch = useDispatch();
@@ -29,25 +34,25 @@ const useTrackPlayer = (bc) => {
   const changePlayLog = (id, index, startTime) => {
     dispatch(playLogActions.changePlayLog(
         {
-          id:id,
-          index:index,
-          startTime:startTime
+          id: id,
+          index: index,
+          startTime: startTime
         }
     ));
   }
   const updatePlyTrackInfo = (trackId, key, value) => {
     dispatch(localPlyActions.updatePlyTrackInfo(
         {
-          id:trackId,
-          key:key,
-          value:value
+          id: trackId,
+          key: key,
+          value: value
         }
     ));
   }
   const changePlyTrackInfo = (data) => {
     dispatch(localPlyActions.changePlyTrackInfo(
         {
-          data:data
+          data: data
         }
     ));
   }
@@ -69,15 +74,37 @@ const useTrackPlayer = (bc) => {
       response.data.userId = userInfo.userId;
       response.data.createdDateTime = new Date().getTime();
       response.data.playIndex = playerSettings.item.order;
-      // console.log(response.data);
       dispatch(localPlyActions.addTracks({data: response.data}));
     }).catch((error) => {
       toast.error(error.message);
     })
   }
 
+  // 로컬 플레이리스트 정보 최신화
   const localPlyCreate = () => {
-    dispatch(localPlyActions.create({userId: userInfo.userId}));
+    const localPly = loadFromLocalStorage(LOCAL_PLY_KEY);
+    if (localPly) {
+      const searchIds = localPly.list.map(track => track.id);
+      const updatePly = [];
+      TrackInfoSearchListApi(searchIds).then((r) => {
+        const searchTracks = r.data;
+        searchTracks.map(search => {
+          const findInfo = localPly.list.filter(
+              local => search.id === local.id);
+          findInfo.map(info => {
+            search.index = info.index;
+            search.createdDateTime = info.createdDateTime;
+            updatePly.push(createTrackInfo(search));
+          })
+        })
+        localPly.list = updatePly;
+        dispatch(localPlyActions.create({userId: userInfo.userId,localPly:localPly}));
+      }).catch((e) => {
+        console.error(e);
+      })
+    } else {
+      dispatch(localPlyActions.create({userId: userInfo.userId}));
+    }
   }
 
   const getPlyTrackByOrder = (order) => {
@@ -107,10 +134,16 @@ const useTrackPlayer = (bc) => {
       return;
     }
     TrackPlayApi(trackId).then((response) => {
-      dispatch(currentActions.createPlayLog({info: response.data, playLog: response.data.trackPlayLogRepDto}));
+      dispatch(currentActions.createPlayLog(
+          {info: response.data, playLog: response.data.trackPlayLogRepDto}));
       changePlyTrackInfo(response.data);
     }).catch((error) => {
-      toast.error(error.data?.errorDetails[0].message);
+      if (error.status === HttpStatusCode.Forbidden || error.status
+          === HttpStatusCode.NotFound) {
+        dispatch(localPlyActions.removePlyByTrackId({id: trackId}));
+        toast.error(error.data?.errorDetails[0].message);
+      }
+
     })
   }
   const updateCurrPlayLog = (key, value) => {

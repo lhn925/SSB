@@ -3,10 +3,20 @@ import {persistor, store} from "store/store";
 import {authActions} from "store/auth/authReducers";
 import mem from "mem";
 import {LOGIN_REFRESH, USERS_INFO} from "utill/api/ApiEndpoints";
-import {toast} from "react-toastify";
-import {useTranslation} from "react-i18next";
 import {removeFromLocalStorage} from "utill/function";
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
+
+
+// get 배열 쿼리를 위한 설정
+axios.defaults.paramsSerializer = function(paramObj) {
+  const params = new URLSearchParams()
+  for (const key in paramObj) {
+    params.append(key, paramObj[key])
+  }
+
+  return params.toString()
+}
+
 // 토큰이 불 필요한 URL
 export const nonAuthApi = axios.create({
   baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -137,10 +147,10 @@ authTrackApi.interceptors.response.use(
             return axios(originRequest);
           } catch (error) {
             await persistor.purge();
-            return Promise.reject(error);
+            return Promise.reject(error.response);
           }
         } else {
-          return Promise.reject(error);
+          return Promise.reject(error.response);
         }
 
     }

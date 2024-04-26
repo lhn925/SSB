@@ -567,75 +567,17 @@ export function getRandomInt(min, max) {
   return max;
 }
 
-export async function toggleLike(trackInfo, updatePlyTrackInfo, e) {
+export function createTrackInfo(data){return {
+  index: data.index, // 순번
+  id: data.id,
+  title: data.title,
+  userName: data.userName,
+  coverUrl: data.coverUrl,
+  trackLength: Number.parseInt(data.trackLength),
+  isOwner: data.isOwner,
+  isLike: data.isLike,
+  isPrivacy: data.isPrivacy,
+  createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
+}}
 
-  const isLike = trackInfo.isLike;
-  const title = trackInfo.title;
-  const trackId = trackInfo.id;
-  const toastText = !isLike? title +" was saved to your Library." : title +" cancel"
 
-  handleLikeTracking(isLike, trackId).then((r) => {
-    toast.success("텍스트 추가) " + toastText);
-    updatePlyTrackInfo(trackId, "isLike", !isLike);
-  }).catch((error) => {
-    toast.error("텍스트 추가) 실패")
-  })
-}
-
-export async function handleLikeTracking(isLike, trackId) {
-  if (isLike) {
-    return TrackLikeCancelApi(trackId);
-  } else {
-    return TrackLikeApi(trackId);
-  }
-}
-
-export async function handleChartTracking(isChartLog, body) {
-  if (isChartLog) {
-    return TrackChartLogApi(body);
-  } else {
-    return TrackLogModifyApi(body);
-  }
-}
-
-export function chartLogSave(currentInfo, isChartLog, updateCurrPlayLog) {
-  if (currentInfo.id === null || currentInfo.playLog === null) {
-    return;
-  }
-
-  const miniNumPlayTime = currentInfo.playLog.miniNumPlayTime;
-  const startTime = currentInfo.playLog.startTime;
-  const playTime = Math.round(currentInfo.playLog.playTime);
-  const trackId = currentInfo.id;
-  const logToken = currentInfo.playLog.token;
-  const isReflected = currentInfo.playLog.isReflected;
-  updateCurrPlayLog("isChartLog", false);
-  // 플레이 시간
-  const closeTime = startTime + (playTime * 1000);
-  // 최소시간 충족 여부 확인
-  // console.log("zpzpp")
-
-  if (miniNumPlayTime > playTime) {
-    return;
-  }
-  // 조회수 반영 여부
-  if (isReflected) {
-    return;
-  }
-  const body = {
-    token: logToken,
-    playTime: playTime,
-    closeTime: closeTime,
-    isChartLog: isChartLog,
-    trackInfoReqDto: {
-      id: trackId
-    }
-  }
-  updateCurrPlayLog("isReflected", true);
-  handleChartTracking(isChartLog, body).catch((error) => {
-    if (error.status === 422) { // 해당 경우에만 False
-      // 나머지는 서버가 꺼져있거나 400 에러가 뜬다면 해당플레이를 집계하지 않음
-      updateCurrPlayLog("isReflected", false);
-    }
-  })
-}

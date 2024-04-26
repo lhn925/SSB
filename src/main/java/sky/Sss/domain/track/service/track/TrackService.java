@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.track.TrackInfoModifyReqDto;
 import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
+import sky.Sss.domain.track.dto.track.reply.TracksInfoReqDto;
 import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
@@ -414,7 +417,6 @@ public class TrackService {
         } catch (UserInfoNotFoundException e) {
             return null;
         }
-
         boolean isOwnerPost = ssbTrack.getUser().getToken().equals(user.getToken()); // 작성자인지 확인
         // 파일에 권한이 있는지 없는지 확인
         // isPrivacy : true 비공개 ,false 공개
@@ -429,15 +431,10 @@ public class TrackService {
         // 해당 트랙에 접근 권한이 없을 경우 플레이 x
         trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
 
-        //
-        updateIsOwnerAndIsLike(trackPlayRepDto, user, isMember, isOwnerPost);
-
+        updateIsOwnerAndIsLike(trackPlayRepDto, ssbTrack.getUser(), isMember, isOwnerPost);
         return trackPlayRepDto;
     }
-
-
     public TrackInfoSimpleDto getTrackInfoSimpleDto(long id) {
-        TrackInfoSimpleDto trackInfoSimpleDto = trackQueryService.getTrackInfoSimpleDto(id, Status.ON);
         User user = null;
         boolean isMember = true;
         try {
@@ -446,28 +443,48 @@ public class TrackService {
             // 비회원인지 확인
             isMember = false;
         }
-
-        Boolean isPrivacy = trackInfoSimpleDto.getIsPrivacy();
-
-        // 비공개인데 비회원일경우
-        if (isPrivacy && !isMember) {
-            return null;
-        }
-        boolean isOwnerPost = isMember && trackInfoSimpleDto.getUserName().equals(user.getUserName());
-        // 비공개인데 자신의 것이 아닌 경우
-        if (isPrivacy && !isOwnerPost) {
-            return null;
+        List<TrackInfoSimpleDto> simpleDtoList;
+        Set<Long> ids = new HashSet<>();
+        ids.add(id);
+        if (isMember) {
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids,user.getId(), Status.ON);
+        } else {
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, Status.ON, false);
         }
 
-        updateIsOwnerAndIsLike(trackInfoSimpleDto, user, isMember, isOwnerPost);
-        return trackInfoSimpleDto;
+        if (simpleDtoList.isEmpty()) {
+            return null;
+        }
+        return simpleDtoList.get(0);
     }
 
-    private void updateIsOwnerAndIsLike(TrackInfoSimpleDto trackInfoSimpleDto, User user, boolean isMember, boolean isOwnerPost) {
+    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(TracksInfoReqDto tracksInfoReqDto) {
+        Set<Long> idSet = new HashSet<>(tracksInfoReqDto.getIds());
+        User user = null;
+        boolean isMember = true;
+        try {
+            user = userQueryService.findOne();
+        } catch (UserInfoNotFoundException e) {
+            // 비회원인지 확인
+            isMember = false;
+        }
+        List<TrackInfoSimpleDto> simpleDtoList = null;
+        if (isMember) {
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, user.getId(), Status.ON);
+        } else {
+            // 비회원일 경우 liked 포함 X
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, Status.ON, false);
+        }
+        return simpleDtoList;
+    }
+
+
+    private void updateIsOwnerAndIsLike(TrackInfoSimpleDto trackInfoSimpleDto, User user, boolean isMember,
+        boolean isOwnerPost) {
 
         // coverUrl이 없을 경우 user 프로필 사진으로 대체
         if (trackInfoSimpleDto.getCoverUrl() == null) {
-            TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto,user.getPictureUrl());
+            TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto, user.getPictureUrl());
         }
         TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwnerPost);
         // 자신의 트랙이 아닐 경우
@@ -483,11 +500,11 @@ public class TrackService {
             TrackInfoSimpleDto.updateIsLike(trackInfoSimpleDto, isLike);
         }
     }
+
     @Transactional
     public void deleteTrack(Long id, String token) {
         User user = userQueryService.findOne();
         SsbTrack ssbTrack = findOne(id, token, user, Status.ON);
-
 
         // Feed 삭제
         feedService.deleteFeed(user, ssbTrack.getId(), ContentsType.TRACK);

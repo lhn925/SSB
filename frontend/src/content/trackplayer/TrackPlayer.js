@@ -8,10 +8,8 @@ import {
   USERS_FILE_TRACK_PLAY
 } from "utill/api/ApiEndpoints";
 import {
-  chartLogSave,
   durationTime,
   secondsToTime,
-  toggleLike
 } from "utill/function";
 import {
   ALL_PLAY,
@@ -20,8 +18,8 @@ import {
   REPEAT_ONE
 } from "utill/enum/PlaybackTypes";
 import {toast} from "react-toastify";
-import TrackLikeApi from "../../utill/api/trackPlayer/TrackLikeApi";
-import TrackLikeCancelApi from "../../utill/api/trackPlayer/TrackLikeCancelApi";
+import {ToggleLike} from "content/trackplayer/ToggleLike";
+import {ChartLogSave} from "content/trackplayer/ChartLogSave";
 
 /**
  *
@@ -174,7 +172,7 @@ export const TrackPlayer = ({
     // 확인
     setIsEnd(true);
 
-    chartLogSave(trackInfo, trackInfo.playLog.isChartLog, updateCurrPlayLog);
+    ChartLogSave(trackInfo, trackInfo.playLog.isChartLog, updateCurrPlayLog);
 
     updateSettings("playedSeconds", 0);
     updateSettings("played", 0);
@@ -221,7 +219,7 @@ export const TrackPlayer = ({
     updateCurrPlayLog("playTime", totalPlayTime);
     if (!trackInfo.playLog.isChartLog && totalPlayTime
         >= trackInfo.playLog.miniNumPlayTime) {
-      chartLogSave(trackInfo, trackInfo.isChartLog, updateCurrPlayLog);
+      ChartLogSave(trackInfo, trackInfo.isChartLog, updateCurrPlayLog);
     }
     if (!seeking && !isEnd) {
       updateSettings("playedSeconds", e.playedSeconds);
@@ -342,7 +340,7 @@ export const TrackPlayer = ({
     if (trackInfo.playLog === null) {
       return;
     }
-    chartLogSave(trackInfo, false, updateCurrPlayLog);
+    ChartLogSave(trackInfo, false, updateCurrPlayLog);
   }
 
   const nextBtnOnClick = () => {
@@ -384,6 +382,19 @@ export const TrackPlayer = ({
       return;
     }
     changeIsChartAndLogSave();
+  }
+
+  const testLocalInfo = () => {
+    localPlyAddTracks(1);
+    localPlyAddTracks(3);
+    localPlyAddTracks(4);
+    localPlyAddTracks(5);
+    localPlyAddTracks(6);
+    localPlyAddTracks(6);
+    localPlyAddTracks(8);
+    localPlyAddTracks(9);
+    localPlyAddTracks(10);
+    localPlyAddTracks(11);
   }
   return (
       <div id='track-player-bar'>
@@ -456,10 +467,10 @@ export const TrackPlayer = ({
             <div className={'controller-btn ' + (trackInfo.isLike
                 ? 'liked-button-t' : 'liked-button')}
                  data-id={currentTrack.id}
-                 onClick={(e) => toggleLike(trackInfo,updatePlyTrackInfo,
+                 onClick={(e) => ToggleLike(trackInfo,updatePlyTrackInfo,
                      e)}></div>
             <div id={followButton} className='controller-btn'
-                 onClick={(e) => toggleLike(currentTrack.id, e)}></div>
+                 onClick={(e) => testLocalInfo()}></div>
             <div id='playlist-button' className='controller-btn'></div>
           </div>
         </div>

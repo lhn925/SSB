@@ -1,5 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
+  createTrackInfo,
   getRandomInt,
   loadFromLocalStorage,
   removeFromLocalStorage,
@@ -10,20 +11,6 @@ import {LOCAL_PLAYER_SETTINGS, LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {shuffle} from "lodash";
 
 //현재 재생 목록
-
-const createTrackInfo = (data) => ({
-  index: data.index, // 순번
-  id: data.id,
-  title: data.title,
-  userName: data.userName,
-  coverUrl: data.coverUrl,
-  trackLength: Number.parseInt(data.trackLength),
-  isOwner: data.isOwner,
-  isLike: data.isLike,
-  isPrivacy: data.isPrivacy,
-  createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
-})
-
 const initialState = {
   key: LOCAL_PLY_KEY,
   userId: null,
@@ -31,13 +18,30 @@ const initialState = {
   item: []
 }
 
+function setStoragePly(state, userId) {
+
+  const saveItem = state.item;
+  state.item.sort(function (a, b) {
+    if (a.index > b.index) {
+      return 1;
+    }
+    if (a.index === b.index) {
+      return 0;
+    }
+    if (a.index < b.index) {
+      return -1;
+    }
+  });
+  saveToLocalStorage({key: state.key, item: {list: state.item, userId: userId}})
+}
+
 const localPly = createSlice({
   name: "localPly",
   initialState: initialState,
   reducers: {
-    create(state, data) {
-      const localPly = loadFromLocalStorage(state.key);
-      const userId = data.payload.userId;
+    create(state, action) {
+      const localPly = action.payload.localPly;
+      const userId = action.payload.userId;
       state.userId = userId;
       if (localPly) {
         const userIdNotEq = userId !== localPly.userId;
@@ -56,6 +60,7 @@ const localPly = createSlice({
           return;
         }
         state.playOrders = orderArray;
+        setStoragePly(state, userId);
       }
     }, addTracks(state, action) {
       // 갖고 오기
@@ -68,9 +73,7 @@ const localPly = createSlice({
         // 유저아이디가 일치하지 않는 경우
         // data.index = localPly.list.length + 1;
         // 가장 큰 index 를 가짐
-
         let maxIndex;
-
         if (localPly.list.length > 0) {
           maxIndex = localPly.list.reduce(
               (max, item) => Math.max(max, item.index), localPly.list[0].index);
@@ -113,8 +116,7 @@ const localPly = createSlice({
         } else {
           state.playOrders.push(state.item.length - 1);
         }
-        saveToLocalStorage(
-            {key: state.key, item: {list: state.item, userId: data.userId}})
+        setStoragePly(state, data.userId);
         return;
       }
       data.index = state.item.length + 1;
@@ -160,7 +162,8 @@ const localPly = createSlice({
           data[key] = action.payload.value;
         }
       })
-      saveToLocalStorage({key: state.key, item: {list: state.item, userId: state.userId}})
+
+      setStoragePly(state, state.userId);
     }, changePlyTrackInfo(state, action) {
       const data = action.payload.data;
       const id = parseInt(data.id)
@@ -171,7 +174,17 @@ const localPly = createSlice({
           track.index = index;
         }
       })
-      saveToLocalStorage({key: state.key, item: {list: state.item, userId: state.userId}})
+      setStoragePly(state, state.userId);
+    }, removePlyByTrackId(state, action) {
+      // 삭제 할시에
+      // index 재배치?
+      // 아니면
+      const removeId = action.payload.id;
+      const prevList = state.item;
+      state.item = prevList.filter(track => track.id !== removeId);
+
+
+      setStoragePly(state, state.userId);
     }
   }
 });
@@ -182,5 +195,6 @@ export let localPlyActions = {
   shuffleOrders: localPly.actions.shuffleOrders,
   updatePlyTrackInfo: localPly.actions.updatePlyTrackInfo,
   changePlyTrackInfo: localPly.actions.changePlyTrackInfo,
+  removePlyByTrackId: localPly.actions.removePlyByTrackId,
 };
 export default localPly.reducer;

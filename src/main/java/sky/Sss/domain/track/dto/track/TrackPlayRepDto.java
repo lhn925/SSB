@@ -20,10 +20,10 @@ public class TrackPlayRepDto extends TrackInfoSimpleDto implements Serializable 
     private TrackPlayLogRepDto trackPlayLogRepDto;
 
 
-
     @Builder
     private TrackPlayRepDto(SsbTrack ssbTrack) {
-        super(ssbTrack.getId(),ssbTrack.getToken(),ssbTrack.getTitle(),ssbTrack.getUser().getUserName(),ssbTrack.getTrackLength(),ssbTrack.getCoverUrl(),ssbTrack.getIsPrivacy(),ssbTrack.getCreatedDateTime());
+        super(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser().getUserName(),
+            ssbTrack.getTrackLength(), ssbTrack.getCoverUrl(), ssbTrack.getIsPrivacy(), ssbTrack.getCreatedDateTime());
     }
 
     public static TrackPlayRepDto create(SsbTrack ssbTrack) {
@@ -32,7 +32,8 @@ public class TrackPlayRepDto extends TrackInfoSimpleDto implements Serializable 
     }
 
 
-    public static void updateTrackPlayLogRepDto(TrackPlayRepDto trackPlayRepDto ,TrackPlayLogRepDto trackPlayLogRepDto ) {
+    public static void updateTrackPlayLogRepDto(TrackPlayRepDto trackPlayRepDto,
+        TrackPlayLogRepDto trackPlayLogRepDto) {
         // 조회수 측정 정보
         trackPlayRepDto.setTrackPlayLogRepDto(trackPlayLogRepDto);
     }

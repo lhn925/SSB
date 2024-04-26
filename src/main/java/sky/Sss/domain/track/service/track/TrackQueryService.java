@@ -2,6 +2,7 @@ package sky.Sss.domain.track.service.track;
 
 
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,8 @@ public class TrackQueryService {
 
 
     public List<TrackInfoRepDto> getTrackInfoRepDto(List<String> tokenList, User user, Status isStatus) {
-        List<TrackInfoRepDto> infoRepDtoList = trackQueryRepository.findAllByToken(tokenList, user, isStatus.getValue());
+        List<TrackInfoRepDto> infoRepDtoList = trackQueryRepository.findAllByToken(tokenList, user,
+            isStatus.getValue());
         if (infoRepDtoList.isEmpty()) {
             throw new SsbFileNotFoundException();
         }
@@ -49,11 +51,16 @@ public class TrackQueryService {
     }
 
     public TrackInfoSimpleDto getTrackInfoSimpleDto(Long id, Status isStatus) {
-        return  trackQueryRepository.getTrackInfoSimpleDto(id, isStatus.getValue())
+        return trackQueryRepository.getTrackInfoSimpleDto(id, isStatus.getValue())
             .orElseThrow(SsbFileNotFoundException::new);
     }
 
-
+    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, long likedUserId, Status isStatus) {
+        return trackQueryRepository.getTrackInfoSimpleDtoList(ids, likedUserId, isStatus.getValue());
+    }
+    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, Status isStatus, boolean isPrivacy) {
+        return trackQueryRepository.getTrackInfoSimpleDtoList(ids, isStatus.getValue(), isPrivacy);
+    }
 
     public SsbTrack findOneJoinUser(Long id, String token, Status isStatus) {
         return trackQueryRepository.findByIdJoinUser(id, token, isStatus.getValue())

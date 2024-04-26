@@ -4,6 +4,7 @@ package sky.Sss.domain.track.service.track;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -95,6 +96,12 @@ public class TrackLikesService {
     public Optional<SsbTrackLikes> findOneAsOpt(long trackId, User user) {
         return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
     }
+
+    public List<SsbTrackLikes> findOneAsOpt(Set<Long> ids, User user) {
+//        return trackLikesRepository.findBySsbTrackIdAndUser(0L, user);
+        return null;
+    }
+
 
 
     /**

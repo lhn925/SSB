@@ -1,8 +1,9 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {saveToLocalStorage} from "../../utill/function";
+import {saveToLocalStorage} from "utill/function";
+import {LOCAL_PLY_LOG} from "utill/enum/localKeyEnum";
 
 const initialState = {
-  key: "local:play-log",
+  key: LOCAL_PLY_LOG,
   item: [-1,0,0] // 트랙아이디,플레이리스트 index,시작 날짜
 }
 const localPlayLog = createSlice({
