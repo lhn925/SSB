@@ -5,14 +5,13 @@
  */
 import {createSlice} from '@reduxjs/toolkit';
 
-const createPlayLog = (data) => ({
-  token: data.token,
-  startTime: data.startTime,
-  miniNumPlayTime: data.miniNumPlayTime,
-  isChartLog: data.isChartLog,
-  playTime: 1, // playTime Seconds
-  isReflected: false // 조회수 반영 여부 true 면 더이상 api 요청 x
-})
+const setPlayLog = (playLog, data) => {
+  playLog.trackId = data.trackId
+  playLog.token = data.token
+  playLog.startTime = data.startTime
+  playLog.miniNumPlayTime = data.miniNumPlayTime
+  playLog.isChartLog = data.isChartLog
+};
 
 const setTrackInfo = (info, data) => {
   info.id = Number.parseInt(data.id)
@@ -26,7 +25,18 @@ const setTrackInfo = (info, data) => {
   info.createdDateTime = data.createdDateTime
 };
 
-const initialState = {
+const playLog = {
+  trackId: -1,
+  token: null,
+  startTime: null,
+  miniNumPlayTime: 0,
+  isChartLog: false,
+  playTime: 1, // playTime Seconds
+  isReflected: false
+}
+
+
+const trackInfo = {
   id: -1,
   title: null,
   userName: null,
@@ -35,8 +45,11 @@ const initialState = {
   isOwner: false,
   isLike: false,
   isPrivacy: false,
-  createdDateTime: null,
-  playLog: null,
+  createdDateTime: null
+}
+const initialState = {
+  info: trackInfo,
+  playLog: playLog
 }
 const currentTrack = createSlice({
   name: "currentTrack",
@@ -48,26 +61,24 @@ const currentTrack = createSlice({
         return;
       }
       // playLog 초기화
-      if (state.playLog !== null) {
-        state.playLog = null;
+      if (state.playLog.id !== -1) {
+        state.playLog = playLog;
       }
-      setTrackInfo(state, action.payload.info);
+      setTrackInfo(state.info, action.payload.info);
     }, createPlayLog(state, action) {
-      setTrackInfo(state, action.payload.info);
-      state.playLog = createPlayLog(action.payload.playLog);
+      setTrackInfo(state.info, action.payload.info);
+      action.payload.playLog.trackId = action.payload.info.id;
+      setPlayLog(state.playLog, action.payload.playLog);
     }, updatePlayLog(state, action) {
-      if (state.playLog === null) {
-        return;
-      }
       const key = action.payload.key;
       state.playLog[key] = action.payload.value;
     }, updateTrackInfo(state, action) {
       const key = action.payload.key;
-      state[key] = action.payload.value;
+      state.info[key] = action.payload.value;
     }, changeTrackInfo(state, action) {
       const trackInfo = action.payload.info;
-      if (state.id === parseInt(trackInfo.id)) {
-        setTrackInfo(state, trackInfo);
+      if (state.info.id === parseInt(trackInfo.id)) {
+        setTrackInfo(state.info, trackInfo);
       }
     }
   }

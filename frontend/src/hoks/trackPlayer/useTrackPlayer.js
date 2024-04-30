@@ -11,7 +11,6 @@ import {playLogActions} from "../../store/play/localPlayLog";
 import {HttpStatusCode} from "axios";
 import {
   createPlyInfo,
-  createTrackInfo,
   loadFromLocalStorage
 } from "utill/function";
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
@@ -48,7 +47,7 @@ const useTrackPlayer = (bc) => {
     ));
   }
   const updatePlyTrackInfo = (trackId, key, value) => {
-    dispatch(localPlyActions.updatePlyTrackInfo(
+    dispatch(localPlyTracksActions.updatePlyTrackInfo(
         {
           id: trackId,
           key: key,
@@ -87,9 +86,6 @@ const useTrackPlayer = (bc) => {
       toast.error(error.message);
     })
   }
-
-
-
   const localPlyAddTrackInfo = (data) => {
     dispatch(localPlyTracksActions.addTrackInfo({data: data}));
   }
@@ -148,13 +144,14 @@ const useTrackPlayer = (bc) => {
 
   }
   const changeCurrTrackInfo = (order) => {
+    console.log(order);
     const data = getPlyTrackByOrder(order);
+    console.log(data);
     dispatch(currentActions.changeTrackInfo({info: data}))
   }
 // order 정보 가져오기
   const createCurrentPlayLog = (order) => {
     const trackId = getPlyTrackByOrder(order).id
-
     TrackPlayApi(trackId).then((response) => {
         dispatch(currentActions.createPlayLog(
             {info: response.data, playLog: response.data.trackPlayLogRepDto}));
@@ -163,6 +160,8 @@ const useTrackPlayer = (bc) => {
       if (error.status === HttpStatusCode.Forbidden || error.status
           === HttpStatusCode.NotFound) {
         localPlyCreate();
+        // 현재 재생 할려던 트랙에 접근 권한이 없을 경우 -1 부여
+        updateCurrTrackInfo("id", -1);
         toast.error(error.data?.errorDetails[0].message);
       }
 
@@ -170,6 +169,11 @@ const useTrackPlayer = (bc) => {
   }
   const updateCurrPlayLog = (key, value) => {
     dispatch(currentActions.updatePlayLog(
+        {key: key, value: value}
+    ));
+  }
+  const updateCurrTrackInfo = (key, value) => {
+    dispatch(currentActions.updateTrackInfo(
         {key: key, value: value}
     ));
   }
@@ -197,6 +201,7 @@ const useTrackPlayer = (bc) => {
     currentTrack,
     getPlyTrackByOrder,
     updateCurrPlayLog,
+    updateCurrTrackInfo,
     localPly,
     localPlyCreate
   };

@@ -1,18 +1,18 @@
 import TrackChartLogApi from "utill/api/trackPlayer/TrackChartLogApi";
 import TrackLogModifyApi from "utill/api/trackPlayer/TrackLogModifyApi";
 
-
-export function ChartLogSave(currentInfo, isChartLog, updateCurrPlayLog) {
-  if (currentInfo.id === null || currentInfo.playLog === null) {
+export function ChartLogSave(currentInfo, playLog, isChartLog,
+    updateCurrPlayLog) {
+  if (currentInfo.id === -1 || playLog.trackId === -1) {
     return;
   }
 
-  const miniNumPlayTime = currentInfo.playLog.miniNumPlayTime;
-  const startTime = currentInfo.playLog.startTime;
-  const playTime = Math.round(currentInfo.playLog.playTime);
+  const miniNumPlayTime = playLog.miniNumPlayTime;
+  const startTime = playLog.startTime;
+  const playTime = Math.round(playLog.playTime);
   const trackId = currentInfo.id;
-  const logToken = currentInfo.playLog.token;
-  const isReflected = currentInfo.playLog.isReflected;
+  const logToken = playLog.token;
+  const isReflected = playLog.isReflected;
   updateCurrPlayLog("isChartLog", false);
   // 플레이 시간
   const closeTime = startTime + (playTime * 1000);
@@ -43,7 +43,8 @@ export function ChartLogSave(currentInfo, isChartLog, updateCurrPlayLog) {
     }
   })
 }
-async function handleChartTracking(isChartLog, body) {
+
+function handleChartTracking(isChartLog, body) {
   if (isChartLog) {
     return TrackChartLogApi(body);
   } else {

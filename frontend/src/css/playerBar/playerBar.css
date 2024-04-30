@@ -119,7 +119,7 @@
 }
 
 .tp-td-track-info {
-  min-width: 230px;
+  min-width: 200px;
   width: 100%;
 }
 
@@ -164,6 +164,9 @@
 .shuffle-btn.active {
   background-image: url("../image/shuffle-active.png");
 }
+.follow-button-t {
+  background-image: url("../image/follow-active.png");
+}
 
 #mute-volume-btn {
   background: url(https://a-v2.sndcdn.com/assets/images/playback/volume-max-1fbfd63.svg) no-repeat center;
@@ -188,6 +191,10 @@
   margin-left: 7px;
   width: 24px;
   height: 24px;
+}
+
+.follow-button-t {
+
 }
 
 #playlist-button {

@@ -187,7 +187,7 @@ export let localPlyActions = {
   addTracks: localPly.actions.addTracks,
   create: localPly.actions.create,
   shuffleOrders: localPly.actions.shuffleOrders,
-  updatePlyTrackInfo: localPly.actions.updatePlyTrackInfo,
+  // updatePlyTrackInfo: localPly.actions.updatePlyTrackInfo,
   changePlyTrackInfo: localPly.actions.changePlyTrackInfo,
   removePlyByTrackId: localPly.actions.removePlyByTrackId,
 };

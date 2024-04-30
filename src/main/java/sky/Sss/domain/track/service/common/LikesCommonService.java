@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.TotalCountRepDto;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
+import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
 import sky.Sss.domain.track.service.playList.reply.PlyReplyLikesService;
@@ -74,6 +76,17 @@ public class LikesCommonService {
         // push 를 받을 사용자
         User toUser = likeTargetInfoDto.getToUser();
 
+        // 같은 사용자인지 확인
+        boolean isOwner = fromUser.getToken().equals(toUser.getToken());
+        if (isOwner) {
+            throw new IllegalArgumentException("code.error");
+        }
+        boolean isLikeType = contentsType.equals(ContentsType.TRACK) || contentsType.equals(ContentsType.PLAYLIST);
+
+        // 트랙혹은 플레이리스트 like 인데 like 할려는 트랙이 비공개이며, 그리고 작성자가 본인것이 아닌 경우
+        if (isLikeType && likeTargetInfoDto.getIsPrivacy()) {
+            throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
+        }
         long targetId = likeTargetInfoDto.getTargetId();
         String targetToken = likeTargetInfoDto.getTargetToken();
 
@@ -97,7 +110,7 @@ public class LikesCommonService {
 
         try {
             // 같은 사용자 인지 확인
-            if (!fromUser.getToken().equals(toUser.getToken())) {
+            if (!isOwner) {
                 // userPushMessages Table insert
                 userPushMsgService.addUserPushMsg(userPushMessages);
                 // push messages

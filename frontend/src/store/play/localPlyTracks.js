@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {toast} from "react-toastify";
-import {createTrackInfo} from "../../utill/function";
+import {createTrackInfo} from "utill/function";
 
 //현재 재생 목록
 /**
@@ -18,7 +18,6 @@ const localPlyTracks = createSlice({
   name: "localPlyTracks",
   initialState: initialState,
   reducers: {
-
     addTrackInfo(state,action) {
       const data = action.payload.data;
       const trackInfo = createTrackInfo(data);
@@ -29,12 +28,24 @@ const localPlyTracks = createSlice({
       } else {
         state.tracks.push(trackInfo);
       }
+    }, updatePlyTrackInfo(state, action) {
+      const id = parseInt(action.payload.id);
+      const key = action.payload.key;
+      state.tracks.map((data) => {
+        if (data.id === id) {
+          console.log("before : "+ data.isLike);
+          data[key] = action.payload.value;
+
+          console.log("after:" +data.isLike);
+        }
+      })
     }
   }
 });
 
 
 export let localPlyTracksActions = {
-  addTrackInfo: localPlyTracks.actions.addTrackInfo
+  addTrackInfo: localPlyTracks.actions.addTrackInfo,
+  updatePlyTrackInfo: localPlyTracks.actions.updatePlyTrackInfo
 };
 export default localPlyTracks.reducer;
