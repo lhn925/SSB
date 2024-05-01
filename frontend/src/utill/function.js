@@ -10,6 +10,11 @@ import TrackLogModifyApi from "./api/trackPlayer/TrackLogModifyApi";
 import TrackLikeApi from "./api/trackPlayer/TrackLikeApi";
 import {toast} from "react-toastify";
 import TrackLikeCancelApi from "./api/trackPlayer/TrackLikeCancelApi";
+import {
+  LOCAL_PLAYER_SETTINGS,
+  LOCAL_PLY_KEY,
+  LOCAL_PLY_LOG
+} from "./enum/localKeyEnum";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -567,25 +572,38 @@ export function getRandomInt(min, max) {
   return max;
 }
 
-export function createTrackInfo(data){return {
-  id: data.id,
-  title: data.title,
-  userName: data.userName,
-  coverUrl: data.coverUrl,
-  trackLength: Number.parseInt(data.trackLength),
-  isOwner: data.isOwner,
-  isLike: data.isLike,
-  isPrivacy: data.isPrivacy,
-  createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
-}}
+export function createTrackInfo(data) {
+  return {
+    id: data.id,
+    title: data.title,
+    userName: data.userName,
+    coverUrl: data.coverUrl,
+    trackLength: Number.parseInt(data.trackLength),
+    isOwner: data.isOwner,
+    isLike: data.isLike,
+    isPrivacy: data.isPrivacy,
+    postUser: {
+      id: data.postUser.id,
+      userName: data.postUser.userName,
+      isFollow: data.postUser.isFollow,
+    },
+    createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
+  }
+}
 
+export function removeLocalStorage() {
+  removeFromLocalStorage(LOCAL_PLY_KEY);
+  removeFromLocalStorage(LOCAL_PLY_LOG);
+  removeFromLocalStorage(LOCAL_PLAYER_SETTINGS);
+}
 
-
-export function createPlyInfo(data){return {
-  index: data.index, // 순번
-  id: data.id,
-  createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
-}}
+export function createPlyInfo(data) {
+  return {
+    index: data.index, // 순번
+    id: data.id,
+    createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
+  }
+}
 
 
 

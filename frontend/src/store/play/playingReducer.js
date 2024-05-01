@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {removeFromLocalStorage, saveToLocalStorage} from "utill/function";
 import {LOCAL_INST_} from "utill/enum/localKeyEnum";
+import {RESET_ALL} from "../actions/Types";
 const initialState = {
   key: null,
   item:{playing:false}
@@ -20,6 +21,8 @@ const playingReducer = createSlice({
         removeFromLocalStorage(state.key);
       }
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

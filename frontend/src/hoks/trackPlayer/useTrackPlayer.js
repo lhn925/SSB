@@ -144,9 +144,7 @@ const useTrackPlayer = (bc) => {
 
   }
   const changeCurrTrackInfo = (order) => {
-    console.log(order);
     const data = getPlyTrackByOrder(order);
-    console.log(data);
     dispatch(currentActions.changeTrackInfo({info: data}))
   }
 // order 정보 가져오기

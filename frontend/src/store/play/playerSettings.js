@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {loadFromLocalStorage, saveToLocalStorage} from "utill/function";
 import {LOCAL_PLAYER_SETTINGS} from "utill/enum/localKeyEnum";
+import {RESET_ALL} from "../actions/Types";
 
 const settings = {
   order: 0, // 재생위치정보
@@ -51,6 +52,8 @@ const playerSettings = createSlice({
         saveToLocalStorage({key: state.key, item: localStorage});
       }
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

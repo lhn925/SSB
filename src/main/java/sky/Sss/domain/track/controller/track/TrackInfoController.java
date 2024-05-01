@@ -61,7 +61,11 @@ public class TrackInfoController {
      */
     @GetMapping("/search/list")
     public ResponseEntity<List<TrackInfoSimpleDto>> getTrackInfoList(@ModelAttribute TracksInfoReqDto tracksInfoReqDto) throws SsbTrackAccessDeniedException {
+        log.info("simpleDtoList = {}","getTrackInfoList");
         List<TrackInfoSimpleDto> simpleDtoList = trackService.getTrackInfoSimpleDtoList(tracksInfoReqDto);
+
+
+
         if (simpleDtoList.isEmpty()) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }

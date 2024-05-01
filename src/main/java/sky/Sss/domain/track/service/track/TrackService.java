@@ -46,11 +46,13 @@ import sky.Sss.domain.track.service.common.TagLinkCommonService;
 import sky.Sss.domain.track.service.playList.PlyTracksService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
+import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
+import sky.Sss.domain.user.service.follows.UserFollowsService;
 import sky.Sss.global.file.dto.UploadFileDto;
 import sky.Sss.global.file.utili.FileStore;
 import sky.Sss.global.redis.dto.RedisKeyDto;
@@ -73,6 +75,7 @@ public class TrackService {
     private final TrackLikesService trackLikesService;
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
+    private final UserFollowsService userFollowsService;
 
     private final PlyTracksService plyTracksService;
     private final RedisCacheService redisCacheService;
@@ -426,14 +429,18 @@ public class TrackService {
             return null;
         }
         trackPlayRepDto = TrackPlayRepDto.create(ssbTrack);
-
         // 비회원 플레이 X
         // 해당 트랙에 접근 권한이 없을 경우 플레이 x
         trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
-
         updateIsOwnerAndIsLike(trackPlayRepDto, ssbTrack.getUser(), isMember, isOwnerPost);
+        // 팔로우 여부 확인 후 업데이트
+        if (!isOwnerPost) {
+            boolean isFollow = userFollowsService.existsFollowing(user, ssbTrack.getUser());
+            UserProfileRepDto.updateIsFollow(trackPlayRepDto.getPostUser(), isFollow);
+        }
         return trackPlayRepDto;
     }
+
     public TrackInfoSimpleDto getTrackInfoSimpleDto(long id) {
         User user = null;
         boolean isMember = true;
@@ -447,7 +454,7 @@ public class TrackService {
         Set<Long> ids = new HashSet<>();
         ids.add(id);
         if (isMember) {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids,user.getId(), Status.ON);
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, user.getId(), Status.ON);
         } else {
             simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, Status.ON, false);
         }

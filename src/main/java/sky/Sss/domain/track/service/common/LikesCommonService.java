@@ -3,7 +3,6 @@ package sky.Sss.domain.track.service.common;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.TotalCountRepDto;
-import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
@@ -181,7 +179,7 @@ public class LikesCommonService {
         String key = contentsType.getLikeKey() + targetToken;
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            isExists = redisCacheService.existsByToken(user, key);
+            isExists = redisCacheService.existsBySubKey(user.getToken(), key);
         }
 
         if (!isExists) {

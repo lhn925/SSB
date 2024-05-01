@@ -3,12 +3,16 @@ import {persistor, store} from "store/store";
 import {authActions} from "store/auth/authReducers";
 import mem from "mem";
 import {LOGIN_REFRESH, USERS_INFO} from "utill/api/ApiEndpoints";
-import {removeFromLocalStorage} from "utill/function";
-import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
-
+import {removeFromLocalStorage, removeLocalStorage} from "utill/function";
+import {
+  LOCAL_PLAYER_SETTINGS,
+  LOCAL_PLY_KEY,
+  LOCAL_PLY_LOG
+} from "utill/enum/localKeyEnum";
+import {resetAll} from "../../../store/actions";
 
 // get 배열 쿼리를 위한 설정
-axios.defaults.paramsSerializer = function(paramObj) {
+axios.defaults.paramsSerializer = function (paramObj) {
   const params = new URLSearchParams()
   for (const key in paramObj) {
     params.append(key, paramObj[key])
@@ -84,7 +88,8 @@ authApi.interceptors.response.use(
           // 재요청
           return axios(originRequest);
         } catch (error) {
-          removeFromLocalStorage(LOCAL_PLY_KEY);
+          removeLocalStorage();
+          store.dispatch(resetAll());
           await persistor.purge();
           window.location.href = "/";
           // toast.error(t(`errorMsg.error.token`));
@@ -127,31 +132,35 @@ authTrackApi.interceptors.response.use(
       if (!error.response) {
         return Promise.reject('Network error or no response from server');
       }
-        const {
-          config, response: {status},
-        } = error;
-        // const {t} = useTranslation();
-        // 토큰이 만료되었을때
-        if (status === HttpStatusCode.Unauthorized) {
-          const state = store.getState().authReducer;
-          const refresh = state.refresh;
-          const originRequest = config;
-          try {
-            const response = await memoizedPostRefreshToken(refresh);
-            const newAccessToken = response.data;
-            // accessToken 저장
-            store.dispatch(authActions.setAccess(newAccessToken));
-            store.dispatch(authActions.setAccessHeader());
-            originRequest.headers.Authorization = newAccessToken;
-            // 재요청
-            return axios(originRequest);
-          } catch (error) {
-            await persistor.purge();
-            return Promise.reject(error.response);
-          }
-        } else {
+      const {
+        config, response: {status},
+      } = error;
+      // const {t} = useTranslation();
+      // 토큰이 만료되었을때
+      if (status === HttpStatusCode.Unauthorized) {
+        const state = store.getState().authReducer;
+        const refresh = state.refresh;
+        const originRequest = config;
+        try {
+          const response = await memoizedPostRefreshToken(refresh);
+          const newAccessToken = response.data;
+          // accessToken 저장
+          store.dispatch(authActions.setAccess(newAccessToken));
+          store.dispatch(authActions.setAccessHeader());
+          originRequest.headers.Authorization = newAccessToken;
+          // 재요청
+          return axios(originRequest);
+        } catch (error) {
+
+          removeLocalStorage();
+          store.dispatch(resetAll());
+          // store.dispatch(authActions.reset());
+          await persistor.purge();
           return Promise.reject(error.response);
         }
+      } else {
+        return Promise.reject(error.response);
+      }
 
     }
 )

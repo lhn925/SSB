@@ -8,7 +8,7 @@ import {Route, Routes, useLocation, useNavigate} from "react-router";
 import {ToastContainer} from "react-toastify";
 import {
   createContext,
-  lazy,
+  lazy, memo,
   Suspense,
   useEffect,
   useMemo,
@@ -37,6 +37,8 @@ import useModal from "hoks/modal/useModal";
 import useTrackPlayer from "hoks/trackPlayer/useTrackPlayer";
 import useAuth from "hoks/auth/useAuth";
 import useUpload from "hoks/upload/useUpload";
+import mem from "mem";
+import {SESSION_ID} from "utill/enum/localKeyEnum";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -79,14 +81,14 @@ function App() {
 
   const {t} = useTranslation();
   const client = useRef({client: null});
-  BroadCast(bc, dispatch, location, changePlaying, playing);
+  BroadCast(bc, dispatch, location, changePlaying, playing,t);
 
   BeforeUnload(t, uploadInfo, client.current.client, playingClear, changePlaying);
 
   useEffect(() => {
     playingClear();
     const setWebLog = () => {
-      const session = sessionStorage.getItem("ssb_session");
+      const session = sessionStorage.getItem(SESSION_ID);
       if (session === null) {
         sessionStorage.setItem("ssb_session", uuidV4());
       }
@@ -114,9 +116,11 @@ function App() {
   }, [client.current.client, uploadInfo.tracks])
 
   useEffect(() => {
-    if (currentAuth.access) {
-      CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);
+    if (currentAuth.access == null) {
+      return;
     }
+
+    CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
 
   return (

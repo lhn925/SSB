@@ -74,7 +74,7 @@ public class UserFollowsService {
         String key = getUserFollowingListKey(followerUser.getToken());
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            isExists =  redisCacheService.existsByToken(followingUser, key);
+            isExists =  redisCacheService.existsBySubKey(followingUser.getToken(), key);
         }
 
         if (!isExists) {

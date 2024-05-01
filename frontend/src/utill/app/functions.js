@@ -6,7 +6,7 @@ import {useContext, useEffect} from "react";
 import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
 import {uploadInfoActions} from "store/upload/uploadInfo";
 import {UploadActionsContext, UploadValueContext} from "App";
-import {chartLogSave} from "utill/function";
+import {SESSION_ID} from "../enum/localKeyEnum";
 
 export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
     bc) {
@@ -23,11 +23,11 @@ export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
     Connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
         bc);
   }).catch(() => {
-    if (client.current.client) {
-      persistor.purge().then(() => {
+    persistor.purge().then(() => {
+      if (client.current.client) {
         client.current.client.deactivate()
-      });
-    }
+      }
+    });
   });
 }
 
@@ -60,7 +60,8 @@ function Connect(client, accessToken, refreshToken, userId, t, bc) {
   client.current.client = clientData;
 }
 
-export function BeforeUnload(t, uploadInfo, client, playingClear,changePlaying) {
+export function BeforeUnload(t, uploadInfo, client, playingClear,
+    changePlaying) {
   // beforeunload 이벤트 핸들러
   const handleBeforeUnload = (event) => {
     changePlaying(false);
@@ -113,7 +114,7 @@ export const disConnectEvent = async (uploadInfo) => {
 }
 
 export function BroadCast(bc, dispatch, location, changePlaying,
-    playing) {
+    playing,t) {
   bc.onmessage = (e) => {
     let data = e.data;
     if (data.type === "logout") {
@@ -123,8 +124,11 @@ export function BroadCast(bc, dispatch, location, changePlaying,
       if (playing.key && playing.key !== data.key) {
         changePlaying(false);
       }
-    } else {
-      window.location.replace(location.pathname);
+    } else if (data.type === "login"){
+      const currSessionId = sessionStorage.getItem(SESSION_ID);
+      if (data.sessionId !== currSessionId) {
+        window.location.replace(location.pathname);
+      }
     }
   }
 }

@@ -174,7 +174,7 @@ public class RepostCommonService {
         boolean isExists = false;
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            isExists = redisCacheService.existsByToken(user, key);
+            isExists = redisCacheService.existsBySubKey(user.getToken(), key);
         }
         // 레디스에 없으면 DB 확인
         if (!isExists) {

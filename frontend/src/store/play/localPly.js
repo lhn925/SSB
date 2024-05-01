@@ -9,6 +9,7 @@ import {
 import {toast} from "react-toastify";
 import {LOCAL_PLAYER_SETTINGS, LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {shuffle} from "lodash";
+import {RESET_ALL} from "../actions/Types";
 
 //현재 재생 목록
 const initialState = {
@@ -180,6 +181,8 @@ const localPly = createSlice({
       state.item = prevList.filter(track => track.id !== removeId);
       setStoragePly(state, state.userId);
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

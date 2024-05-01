@@ -9,6 +9,7 @@ import LoginApi from "utill/api/LoginApi/LoginApi";
 import {modalActions} from "store/modalType/modalType";
 import {helpActions} from "store/helpType/helpType";
 import Captcha from "components/captcha/Captcha";
+import {SESSION_ID} from "utill/enum/localKeyEnum";
 
 function Login(props) {
 
@@ -41,7 +42,7 @@ function Login(props) {
       setErrorMsg(t(`msg.password.NotBlank`));
       return;
     }
-    if (captchaKey != null && captcha == "") {
+    if (captchaKey != null && captcha === "") {
       setErrorMsg(t(`msg.captcha.NotBlank`));
       return;
     }
@@ -66,10 +67,10 @@ function Login(props) {
       dispatch(authActions.setAccessHeader());
       toast.dismiss(loading);
       toast.success("로그인 성공 했습니다.");
-      props.bc.postMessage({type: "login"})
+      props.bc.postMessage(
+          {type: "login", sessionId: sessionStorage.getItem(SESSION_ID)})
       props.closeModal();
       navigate("/");
-
     }).catch(error => {
       let message;
       toast.dismiss(loading);

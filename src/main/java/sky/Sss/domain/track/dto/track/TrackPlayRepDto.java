@@ -16,13 +16,11 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 @Setter(PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TrackPlayRepDto extends TrackInfoSimpleDto implements Serializable {
-
     private TrackPlayLogRepDto trackPlayLogRepDto;
-
 
     @Builder
     private TrackPlayRepDto(SsbTrack ssbTrack) {
-        super(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser().getUserName(),
+        super(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser(),
             ssbTrack.getTrackLength(), ssbTrack.getCoverUrl(), ssbTrack.getIsPrivacy(), ssbTrack.getCreatedDateTime());
     }
 
@@ -30,8 +28,6 @@ public class TrackPlayRepDto extends TrackInfoSimpleDto implements Serializable 
         // 서버 호출 시간
         return TrackPlayRepDto.builder().ssbTrack(ssbTrack).build();
     }
-
-
     public static void updateTrackPlayLogRepDto(TrackPlayRepDto trackPlayRepDto,
         TrackPlayLogRepDto trackPlayLogRepDto) {
         // 조회수 측정 정보

@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {toast} from "react-toastify";
 import {createTrackInfo} from "utill/function";
+import {RESET_ALL} from "store/actions/Types";
 
 //현재 재생 목록
 /**
@@ -33,13 +34,12 @@ const localPlyTracks = createSlice({
       const key = action.payload.key;
       state.tracks.map((data) => {
         if (data.id === id) {
-          console.log("before : "+ data.isLike);
           data[key] = action.payload.value;
-
-          console.log("after:" +data.isLike);
         }
       })
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

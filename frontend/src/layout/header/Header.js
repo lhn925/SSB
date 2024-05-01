@@ -12,8 +12,8 @@ import LogoutApi from "utill/api/logout/LogoutApi";
 import {persistor} from "store/store";
 import {toast} from "react-toastify";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
-import {removeFromLocalStorage} from "utill/function";
-import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
+import {removeLocalStorage} from "utill/function";
+import {resetAll} from "store/actions";
 
 function Header(props) {
   const auth = useSelector(state => state?.authReducer);
@@ -21,27 +21,24 @@ function Header(props) {
   const {t} = useTranslation();
   const variable = useRef({isDoubleClick: false});
 
-
   const clickBtnLogout = async () => {
     if (variable.current.isDoubleClick) {
       return;
     }
     variable.current.isDoubleClick = true;
     let loading = toast.loading(t(`msg.common.logout.progress`));
-    LogoutApi({Authorization: auth.access, RefreshAuth: auth.refresh})
-    .then(() => {
-      persistor.purge();
-      removeFromLocalStorage(LOCAL_PLY_KEY);
-      props.bc.postMessage({type: "logout"});
-      toast.dismiss(loading);
-      toast.success(t(`msg.common.logout.success`));
-    }).catch(() => {
-      toast.error(t("errorMsg.server"));
-    })
+    await persistor.purge();
+    props.dispatch(resetAll());
+    removeLocalStorage();
+    await LogoutApi({Authorization: auth.access, RefreshAuth: auth.refresh})
+    toast.dismiss(loading);
+    toast.success(t(`msg.common.logout.success`), {onClose:() => {
+        props.bc.postMessage({type: "logout"})
+      }});
   }
   const navigate = props.navigate;
   useEffect(() => {
-  },[userInfo])
+  }, [userInfo])
   const openModal = () => {
     props.changeModalType(LOGIN)
     props.openModal();
@@ -54,7 +51,8 @@ function Header(props) {
           <div className="header-left">
             <div>
               <Link to="/"
-                       className="text_none_decoration header_font_color">{t(`msg.common.sky.logo`)}</Link>
+                    className="text_none_decoration header_font_color">{t(
+                  `msg.common.sky.logo`)}</Link>
             </div>
             <div><Link to="/"
                        className="text_none_decoration header_font_color">{t(
@@ -91,7 +89,8 @@ function Header(props) {
                     userId={userInfo.userId}
                     pictureUrl={userInfo.pictureUrl}
                 /> : <>
-                  <button onClick={openModal} className="btn-login-open btn-blue-outline btn-outline" >
+                  <button onClick={openModal}
+                          className="btn-login-open btn-blue-outline btn-outline">
                     {t(`msg.loginForm.sky.login`)}</button>
                 </>
               }
@@ -105,7 +104,13 @@ function Header(props) {
   )
 }
 
-function CircularImageDropdown({pictureUrl,userId, navigate, clickBtnLogout,client}) {
+function CircularImageDropdown({
+  pictureUrl,
+  userId,
+  navigate,
+  clickBtnLogout,
+  client
+}) {
   // const sendMessage = () =>{
   //   if (client) {
   //     client.publish({headers:{name:"lim222"},destination:"/app/push",body:JSON.stringify({userId:'lim222',message:'안녕하세요'})});
@@ -115,7 +120,7 @@ function CircularImageDropdown({pictureUrl,userId, navigate, clickBtnLogout,clie
       <>
         <Dropdown>
           <Dropdown.Toggle variant="" id="dropdown-basic">
-            <img src={USERS_FILE_IMAGE + pictureUrl} />
+            <img src={USERS_FILE_IMAGE + pictureUrl}/>
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
@@ -131,7 +136,8 @@ function CircularImageDropdown({pictureUrl,userId, navigate, clickBtnLogout,clie
               <img src="/css/image/profile2.png"/>
               Following
             </Dropdown.Item>
-            <Dropdown.Item className="profile" onClick={() => navigate(`/settings`)}>
+            <Dropdown.Item className="profile"
+                           onClick={() => navigate(`/settings`)}>
               settings
             </Dropdown.Item>
             <Dropdown.Item className="profile" onClick={clickBtnLogout}>

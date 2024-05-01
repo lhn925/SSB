@@ -1,12 +1,13 @@
 import {configureStore, createSlice} from '@reduxjs/toolkit';
 import {PURGE} from "redux-persist/es/constants";
+import {RESET_ALL} from "../actions/Types";
 
 const initialState = {
   userId: null,
   email: null,
   pictureUrl: null,
   userName: null,
-  isLoginBlocked:null,
+  isLoginBlocked: null,
 }
 const userReducers = createSlice({
   name: "user",
@@ -31,9 +32,9 @@ const userReducers = createSlice({
     setUserName(state, action) {
       state.userName = action.payload.userName;
     }
-  },
-  extraReducers(builder) {
+  }, extraReducers(builder) {
     builder.addCase(PURGE, () => initialState);
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

@@ -36,7 +36,7 @@ const rootReducer = combineReducers({
   currentTrack,
   playerSettings,
   localPly,
-  localPlayLog,
+  localPlayLog ,
   localPlyTracks
 })
 

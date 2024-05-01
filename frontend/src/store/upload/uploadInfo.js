@@ -3,6 +3,7 @@ import {
   recalculateTotalUploadPercent
 } from "utill/function";
 import {disConnectEvent} from "utill/app/functions";
+import {RESET_ALL} from "../actions/Types";
 
 const createTrackInfo = (data) => ({
   id: data.id,
@@ -159,6 +160,8 @@ const uploadInfo = createSlice({
       })
       state.isPlayList = isPlayList;
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

@@ -117,7 +117,7 @@ public class PlyLikesService {
         String key = getLikeKey(token);
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            return redisCacheService.existsByToken(user, key);
+            return redisCacheService.existsBySubKey(user.getToken(), key);
         }
         Optional<SsbPlyLikes> plyLikesOptional = plyLikesRepository.findBySettingsIdAndUser(id, user);
 

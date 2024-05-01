@@ -18,6 +18,10 @@ import {
 import {toast} from "react-toastify";
 import {ToggleLike} from "content/trackplayer/ToggleLike";
 import {ChartLogSave} from "content/trackplayer/ChartLogSave";
+import store from "../../store/store";
+import {resetAll} from "../../store/actions";
+import {useDispatch} from "react-redux";
+import {ToggleFollow} from "./ToggleFollow";
 
 /**
  *
@@ -49,6 +53,7 @@ export const TrackPlayer = ({
 }) => {
   const playerRef = useRef();
 
+  const dispatch = useDispatch();
   const [settingsInfo, setSettingsInfo] = useState(
       playerSettings.item);
 
@@ -66,13 +71,10 @@ export const TrackPlayer = ({
   const variable = useRef({
     isDoubleClick: false // 더블 클릭 방지
   })
-
   useEffect(() => {
     if (localPly.userId === null) {
-      localPlyCreate();
       return;
     }
-
     function getLocalIndex() {
       const playLog = loadFromLocalStorage(localPlayLog.key);
       let findOrder = -1;
@@ -221,9 +223,6 @@ export const TrackPlayer = ({
   }
   let linkToTrack;
   let linkToUploader;
-
-  let followButton = 'liked-button-t';
-
   const onReadyHandler = function (e) {
   }
   // 재생이 제일 먼저 시작될때
@@ -281,6 +280,7 @@ export const TrackPlayer = ({
     // 전체 재생인데 마지막인 경우
     if (isLast && playBackType === ALL_PLAY) {
       createCurrentTrack(playIndex);
+      changePlaying(false);
       return;
     }
   }
@@ -453,11 +453,22 @@ export const TrackPlayer = ({
     }
     changeIsChartAndLogSave();
   }
-  const toggleLike = (e) => {
-    console.log(trackInfo.isLike);
+  const toggleLike = () => {
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    variable.current.isDoubleClick = true;
     ToggleLike(trackInfo, updatePlyTrackInfo);
+    variable.current.isDoubleClick = false;
   }
-
+  const toggleFollow = () => {
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    variable.current.isDoubleClick = true;
+    ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo);
+    variable.current.isDoubleClick = false;
+  }
   const testLocalInfo = () => {
     localPlyAddTracks(1);
     localPlyAddTracks(3);
@@ -533,30 +544,32 @@ export const TrackPlayer = ({
             </div>
             <div className='tp-td-track-info text-start'>
               <a href={linkToUploader}><p
-                  className='tp-track-uploader'>{trackInfo.userName}</p></a>
+                  className='tp-track-uploader'>{trackInfo.postUser.userName}</p>
+              </a>
               <a href={linkToTrack}><p
                   className='tp-track-name'>{trackInfo.title}</p>
               </a>
             </div>
-            {!trackInfo.isOwner && <div className={'controller-btn ' + (trackInfo.isLike
-                ? 'liked-button-t' : 'liked-button')}
-                 data-id={currentTrack.info.id}
-                 onClick={(e) => toggleLike(e)}></div>}
-            <div className='controller-btn bg_player follow-button-t '
-                 onClick={(e) => testLocalInfo()}></div>
-            <div id='playlist-button' className='controller-btn'></div>
+            {!trackInfo.isOwner && <>
+              <div className={'controller-btn ' + (trackInfo.isLike
+                  ? 'liked-button-t' : 'liked-button')}
+                   data-id={currentTrack.info.id}
+                   onClick={(e) => toggleLike(e)}></div>
+              <div className={'controller-btn bg_player ' + (
+                  trackInfo.postUser.isFollow ? 'follow-button-t'
+                      : 'follow-button')}
+                   onClick={(e) => toggleFollow(e)}></div>
+            </>}
+            <div id='playlist-button' className='controller-btn' onClick={testLocalInfo}></div>
 
           </div>
         </div>
-
         <ReactPlayer
             ref={playerRef}
             width='100%'
             height='0%'
 
             url={url}
-            // url={getUrl()}
-            // url={"/users/file/track/play/202/124a25c32864139a2149"} // 재생할 url
             playing={isPlaying} // 재생 여부 기본 : false
             onError={onErrorHandler}
             loop={settingsInfo.playbackRate === REPEAT_ONE} // 반복재생 여부 false

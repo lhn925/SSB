@@ -167,6 +167,9 @@
 .follow-button-t {
   background-image: url("../image/follow-active.png");
 }
+.follow-button {
+  background-image: url("../image/follow.png");
+}
 
 #mute-volume-btn {
   background: url(https://a-v2.sndcdn.com/assets/images/playback/volume-max-1fbfd63.svg) no-repeat center;

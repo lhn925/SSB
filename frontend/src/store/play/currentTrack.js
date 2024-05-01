@@ -4,6 +4,7 @@
  * 현재 재생 할려고 하는 track
  */
 import {createSlice} from '@reduxjs/toolkit';
+import {RESET_ALL} from "../actions/Types";
 
 const setPlayLog = (playLog, data) => {
   playLog.trackId = data.trackId
@@ -16,7 +17,9 @@ const setPlayLog = (playLog, data) => {
 const setTrackInfo = (info, data) => {
   info.id = Number.parseInt(data.id)
   info.title = data.title
-  info.userName = data.userName
+  info.postUser.userName = data.postUser.userName
+  info.postUser.id = data.postUser.id
+  info.postUser.isFollow = data.postUser.isFollow
   info.trackLength = Number.parseInt(data.trackLength);
   info.coverUrl = data.coverUrl
   info.isOwner = data.isOwner
@@ -39,12 +42,16 @@ const playLog = {
 const trackInfo = {
   id: -1,
   title: null,
-  userName: null,
   trackLength: 0,
   coverUrl: null,
   isOwner: false,
   isLike: false,
   isPrivacy: false,
+  postUser:{
+    userName: null,
+    id:-1,
+    isFollow:false,
+  },
   createdDateTime: null
 }
 const initialState = {
@@ -77,10 +84,15 @@ const currentTrack = createSlice({
       state.info[key] = action.payload.value;
     }, changeTrackInfo(state, action) {
       const trackInfo = action.payload.info;
+      if (trackInfo == null) {
+        return;
+      }
       if (state.info.id === parseInt(trackInfo.id)) {
         setTrackInfo(state.info, trackInfo);
       }
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

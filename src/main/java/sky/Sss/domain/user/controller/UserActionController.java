@@ -27,12 +27,8 @@ import sky.Sss.domain.user.service.UserQueryService;
 @RequestMapping("/users/action")
 @UserAuthorize
 public class UserActionController {
-
-
     private final UserQueryService userQueryService;
     private final UserActionService userActionService;
-    private final UserPushMsgService userPushMsgService;
-
     /**
      * @param followingUid
      *     팔로우를 당하는 유저 ID
@@ -42,31 +38,14 @@ public class UserActionController {
     @PostMapping("/my-following/{following-uid}")
     public ResponseEntity<?> saveFollowing(@PathVariable(name = "following-uid") Long followingUid) {
         checkFollowingUid(followingUid == null || followingUid <= 0);
-        // 팔로우를 신청한 사용자
-        User fromUser = userQueryService.findOne();
-
-        // 사용자가 같은경우 예외 처리
-        checkFollowingUid(fromUser.getId().equals(followingUid));
-        // 팔로우 대상자
-        User toUser = userQueryService.findOne(followingUid, Enabled.ENABLED);
-
-        userActionService.addFollows(fromUser, toUser);
-
-        UserPushMessages userPushMessages = UserPushMessages.create(toUser, fromUser, PushMsgType.FOLLOW,
-            ContentsType.USER, null);
-
-        // pushMsg
-        userPushMsgService.addUserPushMsg(userPushMessages);
-        userPushMsgService.sendOrCacheMessages(ContentsType.USER.getUrl() + fromUser.getId(), fromUser.getUserName(), toUser, userPushMessages);
-
-        // 대상자에 follower count 검색 후 반환
+        userActionService.addFollowerActions(followingUid);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
     // 상대방 언 팔로우
     /**
      * @param followingUid
+     *     내가 팔로우한 사람을 언팔로우
      *     팔로우를 취소 당하는 유저 ID
      * @return FollowerTotalCountDto
      */

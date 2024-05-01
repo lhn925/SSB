@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReplyLikes;
-import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
-import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.track.repository.playList.reply.PlyReplyLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
@@ -120,7 +118,7 @@ public class PlyReplyLikesService {
         String key = getLikeKey(replyToken);
         // redis 에 있는지 확인
         if (redisCacheService.hasRedis(key)) {
-            return redisCacheService.existsByToken(user, key);
+            return redisCacheService.existsBySubKey(user.getToken(), key);
         }
         Optional<SsbPlyReplyLikes> replyLikesOptional = plyReplyLikesRepository.findBySsbPlyReplyIdAndUser(replyId, user);
 

@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {saveToLocalStorage} from "utill/function";
 import {LOCAL_PLY_LOG} from "utill/enum/localKeyEnum";
+import {RESET_ALL} from "../actions/Types";
 
 const initialState = {
   key: LOCAL_PLY_LOG,
@@ -19,6 +20,8 @@ const localPlayLog = createSlice({
       state.item[2] = startTime;
       saveToLocalStorage(state);
     }
+  },extraReducers: (builder) => {
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

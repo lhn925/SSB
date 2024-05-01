@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.redis.dto.RedisKeyDto;
@@ -91,29 +90,19 @@ public class RedisCacheService {
     /**
      * map 형태로 된 cache 에 값이 존재하는 지 boolean 값으로 반환 검색
      *
-     * @param user
+     * @param subKey
+     *     : userId,userToken
      * @param key
      * @return
      */
-    public boolean existsByUserId(User user, String key) {
+    public boolean existsBySubKey(String subKey, String key) {
         TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
         };
         Map<String, UserSimpleInfoDto> hashMap = getData(key, typeReference);
-        return hashMap.containsKey(user.getUserId());
-    }
-
-    /**
-     * map 형태로 된 cache 에 값이 존재하는 지 boolean 값으로 반환 검색
-     *
-     * @param user
-     * @param key
-     * @return
-     */
-    public boolean existsByToken(User user, String key) {
-        TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
-        };
-        Map<String, UserSimpleInfoDto> hashMap = getData(key, typeReference);
-        return hashMap.containsKey(user.getToken());
+        if (hashMap == null) {
+            return false;
+        }
+        return hashMap.containsKey(subKey);
     }
 
     /**
@@ -127,13 +116,18 @@ public class RedisCacheService {
         };
         int count = 0;
         if (hasRedis(key)) {
-            if (collectionType instanceof HashMap) {
-                HashMap<Object, Object> map = (HashMap) getData(key, typeReference);
-                count = map.size();
-            } else if (collectionType instanceof HashSet) {
-                HashSet<Object> set = (HashSet) getData(key, typeReference);
-                count = set.size();
+            try {
+                if (collectionType instanceof HashMap) {
+                    HashMap map = (HashMap) getData(key, typeReference);
+                    count = map.size();
+                } else if (collectionType instanceof HashSet) {
+                    HashSet set = (HashSet) getData(key, typeReference);
+                    count = set.size();
+                }
+            } catch (NullPointerException e) {
+                return 0;
             }
+
         }
         return count;
     }
@@ -152,19 +146,17 @@ public class RedisCacheService {
      */
     // redis 에 caching 데이터 찾은 후 존재하지 않을 경우 등록
     public <T> void upsertCacheMapValueByKey(T value, String key, String subMapKey) {
-        Map<String, T> objectMap = null;
-
-        String cachingData = null;
+        Map<String, T> objectMap =  new HashMap<>();
         // redis 에 존재하는 경우
         if (this.hasRedis(key)) { //
             TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
             };
             objectMap = getData(key, typeReference);
+            if (objectMap == null) {
+                objectMap = new HashMap<>();
+            }
             objectMap.put(subMapKey, value);
-
         } else {
-            // redis 에 존재하지 않는 경우 새로 hashMap 생성
-            objectMap = new HashMap<>();
             objectMap.put(subMapKey, value);
         }
         // hashMap -> jsonString 형태로 변환후
@@ -232,8 +224,6 @@ public class RedisCacheService {
         // hashMap -> jsonString 형태로 변환후
         // redis 에 저장
         setData(key, objectList);
-
-
     }
 
     /**
@@ -258,11 +248,9 @@ public class RedisCacheService {
         }
         // hashMap -> jsonString 형태로 변환후
         // redis 에 저장
-
         // size 가 0 이면 자동으로 삭제
-        if ( objectMap != null && !objectMap.isEmpty()) {
-            Boolean delete = redisQueryService.delete(key);
-            System.out.println("delete = " + delete);
+        if (objectMap == null || objectMap.isEmpty()) {
+            redisQueryService.delete(key);
         } else {
             setData(key, objectMap);
         }
@@ -295,8 +283,6 @@ public class RedisCacheService {
             return true;
         }
     }
-
-
 
 
 }

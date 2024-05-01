@@ -33,7 +33,7 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
 
 
     @Query(
-        "select new sky.Sss.domain.track.dto.track.TrackInfoSimpleDto(s.id,s.token,s.title,u.userName,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"
+        "select new sky.Sss.domain.track.dto.track.TrackInfoSimpleDto(s.id,s.token,s.title,u,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"
             + " from SsbTrack s join fetch User u on s.user = u where s.id =:id and s.isStatus =:isStatus")
     Optional<TrackInfoSimpleDto> getTrackInfoSimpleDto(@Param("id") Long id,
         @Param("isStatus") boolean isStatus);
@@ -50,9 +50,10 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
      */
     @Query(
         "select new sky.Sss.domain.track.dto.track."
-            + "TrackInfoSimpleDto(s.id,s.token,s.title,s.trackLength,s.coverUrl,s.isPrivacy,u,:likedUserId,l,s.createdDateTime)"
+            + "TrackInfoSimpleDto(s.id,s.token,s.title,s.trackLength,s.coverUrl,s.isPrivacy,u,:likedUserId,l,f,s.createdDateTime)"
             + " from SsbTrack s join fetch User u on s.user = u "
-            + " left outer join SsbTrackLikes l on s.id = l.ssbTrack.id and (l.user.id = :likedUserId or l.user is null)"
+            + " left outer join SsbTrackLikes l on s.id = l.ssbTrack.id and (l.user.id = :likedUserId or l.user is null) "
+            + " left outer join UserFollows f on s.user.id = f.followingUser.id and (f.followerUser.id = :likedUserId or f.followerUser is null) "
             + " where s.id in (:ids) and s.isStatus =:isStatus and (s.isPrivacy = false or"
             + " (s.isPrivacy = true and s.user.id = :likedUserId) )")
     List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(@Param("ids") Set<Long> ids,

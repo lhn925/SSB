@@ -67,7 +67,6 @@ public class TrackLikesService {
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = user.getToken();
         // 좋아요 수 업로드
-//        updateTotalCount(ssbTrack.getToken());
         redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
 

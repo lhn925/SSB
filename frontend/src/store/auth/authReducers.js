@@ -1,5 +1,6 @@
-import {configureStore, createSlice} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import {PURGE} from "redux-persist/es/constants";
+import {RESET_ALL} from "../actions/Types";
 
 const initialState = {
   access: null,
@@ -15,11 +16,9 @@ const authReducers = createSlice({
       Object.assign(state, initialState)
     },
     setAccess(state, action) {
-      let accessToken = action.payload.accessToken;
-      state.access = accessToken;
+      state.access = action.payload.accessToken;
     }, setRefresh(state, action) {
-      let refreshToken = action.payload.refreshToken;
-      state.refresh = refreshToken;
+      state.refresh = action.payload.refreshToken;
     }, setAccessHeader(state) {
       state.accessHeader = {"Authorization": state.access};
     }, setRefreshHeader(state) {
@@ -27,9 +26,9 @@ const authReducers = createSlice({
         "RefreshAuth": state.refresh
       };
     },
-    extraReducers(builder) {
-      builder.addCase(PURGE, () => initialState);
-    }
+  }, extraReducers(builder) {
+    builder.addCase(PURGE, () => initialState);
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

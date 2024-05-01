@@ -1,6 +1,7 @@
 import {toast} from "react-toastify";
 import TrackLikeCancelApi from "utill/api/trackPlayer/TrackLikeCancelApi";
 import TrackLikeApi from "utill/api/trackPlayer/TrackLikeApi";
+import {HttpStatusCode} from "axios";
 
 export function ToggleLike(trackInfo, updatePlyTrackInfo) {
   if (trackInfo.id === -1) {
@@ -15,11 +16,12 @@ export function ToggleLike(trackInfo, updatePlyTrackInfo) {
 
   handleLikeTracking(isLike, trackId)
   .then((r) => {
-    console.log(r);
     toast.success("텍스트 추가) " + toastText);
     updatePlyTrackInfo(trackId, "isLike", !isLike);
   }).catch((error) => {
-    // toast.error("텍스트 추가) 실패")
+    if (error.status === HttpStatusCode.BadRequest) {
+      updatePlyTrackInfo(trackId, "isLike", !isLike);
+    }
     toast.error(error.data?.errorDetails[0].message);
   })
 }

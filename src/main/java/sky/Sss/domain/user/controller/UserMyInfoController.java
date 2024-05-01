@@ -86,6 +86,7 @@ public class UserMyInfoController {
      */
     @GetMapping
     public ResponseEntity<UserMyInfoDto> userProfileForm() {
+        log.info("userProfileForm");
         // 유저 정보 조회
         return new ResponseEntity<>(userQueryService.getUserMyInfoDto(), HttpStatus.OK);
     }
