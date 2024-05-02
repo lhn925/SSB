@@ -13,12 +13,12 @@ import {
 import modalType from "store/modalType/modalType";
 import helpType from "store/helpType/helpType";
 import uploadInfo from "store/upload/uploadInfo";
-import playingReducer from "store/play/playingReducer";
-import currentTrack from "store/play/currentTrack";
-import playerSettings from "store/play/playerSettings";
-import localPly from "store/play/localPly";
-import localPlayLog from "store/play/localPlayLog";
-import localPlyTracks from "store/play/localPlyTracks";
+import playingReducer from "store/trackplayer/playingReducer";
+import currentTrack from "store/trackplayer/currentTrack";
+import playerSettings from "store/trackplayer/playerSettings";
+import localPly from "store/trackplayer/localPly";
+import localPlayLog from "store/trackplayer/localPlayLog";
+import localPlyTracks from "store/trackplayer/localPlyTracks";
 const persistConfig = {
   key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
   version: 1,

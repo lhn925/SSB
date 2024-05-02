@@ -1,0 +1,184 @@
+.queue {
+  height: 100%;
+  position: relative;
+  /*z-index: 1000;*/
+  background-color: #fff;
+  /*background-color: var(--surface-color);*/
+
+}
+
+.queue__scrollableInner{
+  height: 100%;
+  overflow-x: hidden;
+  width: 480px;
+  /*padding-right: 30px;*/
+}
+
+body:not(.sc-classic) .queue {
+  border: 1px solid rgba(0, 0, 0, .15);
+  /*border: 1px solid rgba(var(--primary-rgb), .15);*/
+  border-radius: 6px
+}
+
+.sc-classic .queue {
+  box-shadow: 0 0 4px rgba(0, 0, 0, .25);
+  background-color: #fff
+}
+
+.queue__itemsHeight {
+  /*background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=), url(~assets/images/play-queue/bg-tile.svg);*/
+  /*background-image: url("../image/iu.jpg");*/
+  background-repeat: no-repeat, repeat-y
+}
+
+.theme-dark .queue__itemsHeight {
+  /*background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg==), url(~assets/images/play-queue/bg-tile-dark.svg);*/
+  /*background-image: url("../image/iu.jpg");*/
+  background-repeat: no-repeat, repeat-y
+}
+
+.sc-classic .queue__itemsHeight {
+  /*background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=), url(~assets/images/play-queue/bg-tile-classic.png);*/
+  /*background-image: url("../image/iu.jpg");*/
+  background-repeat: no-repeat, repeat-y
+}
+
+.queue__itemsContainer {
+  position: relative
+}
+
+.queue__panel {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  height: 64px
+}
+
+.sc-classic .queue__panel {
+  padding: 9px 24px;
+  border-bottom: 1px solid #e5e5e5
+}
+
+.queue__title {
+  cursor: pointer;
+  flex-grow: 1
+}
+
+.sc-classic .queue__title {
+  line-height: 46px
+}
+
+body:not(.sc-classic) .queue__hide {
+  border-radius: 50%;
+  align-self: center
+}
+
+.sc-classic .queue__hide, .sc-classic .queue__hide:focus, .sc-classic .queue__hide:hover {
+  height: 46px;
+  /*background-image: url("../image/iu.jpg");*/
+  /*background-image: url(~assets/images/close.svg);*/
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: 24px 24px
+}
+
+.queue__hide svg {
+  height: 24px;
+  width: 24px
+}
+
+body:not(.sc-classic) .queue__clear {
+  align-self: center
+}
+
+.sc-classic .queue__clear {
+  margin-right: 16px
+}
+
+.queue__dragCover, .queue__scrollable {
+  top: 60px;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  position: absolute
+}
+
+.sc-classic .queue__dragCover, .sc-classic .queue__scrollable {
+  top: 64px
+}
+
+body:not(.sc-classic) .queue__dragCover, body:not(.sc-classic) .queue__scrollable {
+  border-radius: 0 0 4px 4px
+}
+
+.queue__dragCover {
+  display: none;
+  z-index: 1
+}
+
+.queue__dragCover.m-active {
+  display: block
+}
+
+.queue__itemWrapper {
+  background-color: #fff;
+  /*background-color: var(--surface-color);*/
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px
+}
+
+.sc-classic .queue__itemWrapper {
+  background-color: #fff;
+  height: 48px
+}
+
+.queue__fallback.queue__itemWrapper {
+  height: 80px
+}
+
+.sc-classic .queue__fallback.queue__itemWrapper {
+  height: 120px;
+  padding-top: 16px
+}
+
+.queue.m-visible .queue__itemWrapper {
+  transition-property: transform, opacity, visibility;
+  transition-duration: .3s
+
+}
+
+.queue__dropIndicator {
+  border-top: 2px solid #f50;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1
+}
+
+.sc-classic .queue__dropIndicator {
+  border-top: 1px solid #f50
+}
+
+.queue__dropIndicatorText {
+  background-color: #666;
+  /*background-color: var(--secondary-color);*/
+  color: #fff;
+  /*color: var(--surface-color);*/
+  max-width: 240px;
+  padding: 4px 8px;
+  /*padding: var(--spacing-0_5x) var(--spacing-1x);*/
+  position: absolute;
+  top: 0;
+  right: 80px
+}
+
+.sc-classic .queue__dropIndicatorText {
+  background-color: rgba(0, 0, 0, .6);
+  color: #fff;
+  padding: 8px 12px;
+  right: 60px
+}

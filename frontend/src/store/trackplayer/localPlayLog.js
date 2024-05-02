@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {saveToLocalStorage} from "utill/function";
 import {LOCAL_PLY_LOG} from "utill/enum/localKeyEnum";
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 
 const initialState = {
   key: LOCAL_PLY_LOG,

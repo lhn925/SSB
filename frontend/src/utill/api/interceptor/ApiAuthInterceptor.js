@@ -154,7 +154,6 @@ authTrackApi.interceptors.response.use(
 
           removeLocalStorage();
           store.dispatch(resetAll());
-          // store.dispatch(authActions.reset());
           await persistor.purge();
           return Promise.reject(error.response);
         }

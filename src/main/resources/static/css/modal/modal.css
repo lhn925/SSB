@@ -47,7 +47,7 @@
   width: 600px;
   height: 700px;
   position: relative;
-  top: 0px;
+  top: 0;
   padding: 10px;
 }
 @media (max-width: 730px) { /* 모바일 화면 크기 기준으로 설정할 수 있는 임의의 값 사용 */

@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {removeFromLocalStorage, saveToLocalStorage} from "utill/function";
 import {LOCAL_INST_} from "utill/enum/localKeyEnum";
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 const initialState = {
   key: null,
   item:{playing:false}

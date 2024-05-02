@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {loadFromLocalStorage, saveToLocalStorage} from "utill/function";
 import {LOCAL_PLAYER_SETTINGS} from "utill/enum/localKeyEnum";
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 
 const settings = {
   order: 0, // 재생위치정보

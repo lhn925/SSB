@@ -1,13 +1,13 @@
 import {useDispatch, useSelector} from "react-redux";
-import {playingActions} from "store/play/playingReducer";
+import {playingActions} from "store/trackplayer/playingReducer";
 import TrackInfoApi from "utill/api/trackPlayer/TrackInfoApi";
-import {currentActions} from "store/play/currentTrack";
+import {currentActions} from "store/trackplayer/currentTrack";
 import {toast} from "react-toastify";
 import TrackPlayApi from "utill/api/trackPlayer/TrackPlayApi";
 import {useEffect} from "react";
-import {settingsActions} from "store/play/playerSettings";
-import {localPlyActions} from "store/play/localPly";
-import {playLogActions} from "../../store/play/localPlayLog";
+import {settingsActions} from "store/trackplayer/playerSettings";
+import {localPlyActions} from "store/trackplayer/localPly";
+import {playLogActions} from "../../store/trackplayer/localPlayLog";
 import {HttpStatusCode} from "axios";
 import {
   createPlyInfo,
@@ -16,7 +16,7 @@ import {
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import TrackInfoSearchListApi
   from "utill/api/trackPlayer/TrackInfoSearchListApi";
-import {localPlyTracksActions} from "store/play/localPlyTracks";
+import {localPlyTracksActions} from "store/trackplayer/localPlyTracks";
 
 const useTrackPlayer = (bc) => {
   const dispatch = useDispatch();
@@ -135,6 +135,11 @@ const useTrackPlayer = (bc) => {
     dispatch(playingActions.changePlaying({isPlaying: isPlaying}));
   }
 
+  const changePlyVisible = (isVisible) => {
+    dispatch(localPlyTracksActions.changePlyVisible({isVisible: isVisible}));
+  }
+
+
   // 현재 트랙정보 가져오기 재생 url x
   const createCurrentTrack = (order) => {
     updateSettings("played", 0);
@@ -201,7 +206,8 @@ const useTrackPlayer = (bc) => {
     updateCurrPlayLog,
     updateCurrTrackInfo,
     localPly,
-    localPlyCreate
+    localPlyCreate,
+    changePlyVisible
   };
 };
 

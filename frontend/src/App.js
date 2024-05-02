@@ -6,7 +6,7 @@ import "css/bootstrap/bootstrap.min.css"
 import "css/base.css"
 import {Route, Routes, useLocation, useNavigate} from "react-router";
 import {ToastContainer} from "react-toastify";
-import {
+import React, {
   createContext,
   lazy, memo,
   Suspense,
@@ -39,6 +39,7 @@ import useAuth from "hoks/auth/useAuth";
 import useUpload from "hoks/upload/useUpload";
 import mem from "mem";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
+import {PlayList} from "./components/trackplayer/PlayList";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다

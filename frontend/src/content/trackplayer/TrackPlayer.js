@@ -18,10 +18,9 @@ import {
 import {toast} from "react-toastify";
 import {ToggleLike} from "content/trackplayer/ToggleLike";
 import {ChartLogSave} from "content/trackplayer/ChartLogSave";
-import store from "../../store/store";
-import {resetAll} from "../../store/actions";
 import {useDispatch} from "react-redux";
-import {ToggleFollow} from "./ToggleFollow";
+import {ToggleFollow} from "content/trackplayer/ToggleFollow";
+import {PlayList} from "components/trackplayer/PlayList";
 
 /**
  *
@@ -49,25 +48,22 @@ export const TrackPlayer = ({
   updateCurrPlayLog,
   updateCurrTrackInfo,
   localPly,
-  localPlyCreate
+  localPlyCreate,
+  changePlyVisible
 }) => {
   const playerRef = useRef();
-
-  const dispatch = useDispatch();
   const [settingsInfo, setSettingsInfo] = useState(
       playerSettings.item);
-
   const [localPlyInfo, setLocalPlyInfo] = useState(localPly.item);
   const [playOrders, setPlayOrders] = useState(localPly.playOrders);
-
   const [url, setUrl] = useState(null);
-
   const [trackInfo, setTrackInfo] = useState(currentTrack.info);
   const [currPlayLog, setCurrPlayLog] = useState(currentTrack.playLog);
-
   const [isPlaying, setIsPlaying] = useState(playing.item.playing);
   const [seeking, setSeeking] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
+
+  const [isVisible, setVisible] = useState(localPlyTracks.isVisible);
   const variable = useRef({
     isDoubleClick: false // 더블 클릭 방지
   })
@@ -75,6 +71,7 @@ export const TrackPlayer = ({
     if (localPly.userId === null) {
       return;
     }
+
     function getLocalIndex() {
       const playLog = loadFromLocalStorage(localPlayLog.key);
       let findOrder = -1;
@@ -161,7 +158,7 @@ export const TrackPlayer = ({
       return;
     }
     changeCurrTrackInfo(settingsInfo.order);
-  }, [localPlyTracks]);
+  }, [localPlyTracks.tracks]);
 
   useEffect(() => {
     setIsPlaying(playing.item.playing);
@@ -173,6 +170,10 @@ export const TrackPlayer = ({
       changeIsChartAndLogSave();
     }
   }, [seeking]);
+
+  useEffect(() => {
+    changePlyVisible(isVisible);
+  }, [isVisible]);
 
   // shuffle 여부 , index 여부
   useEffect(() => {
@@ -281,7 +282,6 @@ export const TrackPlayer = ({
     if (isLast && playBackType === ALL_PLAY) {
       createCurrentTrack(playIndex);
       changePlaying(false);
-      return;
     }
   }
   const onProgressHandler = (e) => {
@@ -469,21 +469,17 @@ export const TrackPlayer = ({
     ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo);
     variable.current.isDoubleClick = false;
   }
-  const testLocalInfo = () => {
-    localPlyAddTracks(1);
-    localPlyAddTracks(3);
-    localPlyAddTracks(4);
-    localPlyAddTracks(5);
-    localPlyAddTracks(6);
-    localPlyAddTracks(6);
-    localPlyAddTracks(8);
-    localPlyAddTracks(9);
-    localPlyAddTracks(10);
-    localPlyAddTracks(11);
+
+  const changeIsVisible = (value) => {
+    setVisible(value);
+  }
+  const plyButtonClickHandler = () => {
+    changeIsVisible(!isVisible);
   }
   return (
       <div id='track-player-bar'>
         <div id='track-player-container'>
+          <PlayList isVisible={isVisible} changeIsVisible={changeIsVisible}/>
           <div id='tp-controller'>
             <div id='previous-btn'
                  className='controller-btn' onClick={preBtnOnClick}></div>
@@ -536,11 +532,11 @@ export const TrackPlayer = ({
             </div>
 
             <div className='tp-td-uploader-pic'>
-              <a href={linkToTrack}><img className="player_cover_img"
-                                         src={trackInfo.coverUrl
-                                             && USERS_FILE_IMAGE
-                                             + trackInfo.coverUrl}
-                                         alt={""}/></a>
+              <a href={linkToTrack}> <img className="player_cover_img"
+                                          src={trackInfo.coverUrl
+                                              && USERS_FILE_IMAGE
+                                              + trackInfo.coverUrl}
+                                          alt={""}/></a>
             </div>
             <div className='tp-td-track-info text-start'>
               <a href={linkToUploader}><p
@@ -560,8 +556,10 @@ export const TrackPlayer = ({
                       : 'follow-button')}
                    onClick={(e) => toggleFollow(e)}></div>
             </>}
-            <div id='playlist-button' className='controller-btn' onClick={testLocalInfo}></div>
-
+            <div className={'controller-btn bg_player ' + (
+                isVisible ? 'ply-button-t'
+                    : 'ply-button')} onClick={plyButtonClickHandler}>
+            </div>
           </div>
         </div>
         <ReactPlayer

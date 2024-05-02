@@ -1,0 +1,212 @@
+
+.queueItemView {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  cursor: pointer
+}
+
+.sc-classic .queueItemView {
+  padding: 0 24px;
+  font-size: 12px
+}
+
+body:not(.sc-classic) .queueItemView {
+  border-radius: 4px
+}
+
+.queueItemView.m-active .queueItemView__duration, .queueItemView.m-overlayOpen .queueItemView__duration, .queueItemView:hover .queueItemView__duration, .queueItemView__actions {
+  display: none
+}
+
+.queueItemView.m-active .queueItemView__actions, .queueItemView.m-overlayOpen .queueItemView__actions, .queueItemView:hover .queueItemView__actions {
+  display: flex;
+  justify-content: flex-end
+}
+
+.queueItemView.m-active .queueItemView__like, .queueItemView.m-dimmed .queueItemView__like {
+  display: block
+}
+
+/*.queueItemView.m-active .queueItemView__remove, .queueItemView.m-dimmed .queueItemView__remove, .queueItemView__like {*/
+/*  !*display: none*!*/
+/*}*/
+
+.queueItemView__details {
+  overflow: hidden;
+  flex-grow: 1
+}
+
+.queueItemView__artwork {
+  position: relative
+}
+
+.sc-classic .queueItemView__artwork {
+  margin-right: 7px
+}
+
+.queueItemView__playButton {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: none
+}
+
+.sc-classic .queueItemView__playButton {
+  top: 3px;
+  left: 4px
+}
+
+.queueItemView.m-active .queueItemView__playButton, .queueItemView:hover .queueItemView__playButton {
+  display: block
+}
+
+.queueItemView.m-active .queueItemView__playButton .sc-button-play, .queueItemView:hover .queueItemView__playButton .sc-button-play {
+  height: 24px;
+  width: 24px
+}
+
+.queueItemView.m-active .queueItemView__playButton svg, .queueItemView:hover .queueItemView__playButton svg {
+  height: 16px;
+  width: 16px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+
+.queueItemView.m-active.m-playing .queueItemView__playButton > .sc-button-play:not(.sc-button-pause), .queueItemView:not(.m-active) .queueItemView__playButton > .sc-button-play.sc-button-pause, .queueItemView:not(.m-playing) .queueItemView__playButton > .sc-button-play.sc-button-pause {
+  display: none
+}
+
+.queueItemView__actions, .queueItemView__duration {
+  min-width: 64px
+}
+
+.sc-classic .queueItemView__actions, .sc-classic .queueItemView__duration {
+  min-width: 52px
+}
+
+.queueItemView__duration {
+  text-align: right;
+  line-height: 36px;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums
+}
+
+.queueItemView__meta {
+  display: flex
+}
+
+.queueItemView__username {
+  flex: 0 1 auto
+}
+
+.queueItemView__context {
+  flex: 1 1 50%;
+  display: none
+}
+
+.queueItemView:hover .queueItemView__context:not(:empty) {
+  display: inherit
+}
+
+.queueItemView:hover .queueItemView__context:before {
+  content: "·";
+  margin: 0 .5em
+}
+
+.queueItemView__meta {
+  color: #666;
+}
+
+.sc-classic .queueItemView__meta {
+  color: #999
+}
+
+.queueItemView__title {
+  color: #000;
+}
+
+.sc-classic .queueItemView__title {
+  color: #333
+}
+
+.queueItemView.m-active, .queueItemView:hover, .queueItemView:hover.m-active {
+  background: #f3f3f3;
+}
+
+.sc-classic .queueItemView.m-active, .sc-classic .queueItemView:hover {
+  background: #f8f8f8
+}
+
+.sc-classic .queueItemView:hover.m-active {
+  background: #f2f2f2
+}
+
+.queueItemView__artwork, .queueItemView__details {
+  transition: opacity .3s
+}
+
+body:not(.sc-classic) .queueItemView.m-dimmed .queueItemView__artworkImage, body:not(.sc-classic) .queueItemView.m-dimmed .queueItemView__details, body:not(.sc-classic) .queueItemView.m-dimmed .queueItemView__duration {
+  opacity: .6
+}
+
+.sc-classic .queueItemView.m-dimmed .queueItemView__artworkImage, .sc-classic .queueItemView.m-dimmed .queueItemView__details {
+  opacity: .5
+}
+
+.sc-classic .queueItemView__dragHandle {
+  border: 0;
+  /*background-image: url(~assets/images/play-queue/drag-handle.svg);*/
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: 24px 24px;
+  width: 24px;
+  height: 48px;
+  margin-left: -24px;
+  cursor: move;
+  flex-shrink: 0;
+  visibility: hidden
+}
+
+body:not(.sc-classic) .queueItemView__dragHandle {
+  display: flex;
+  align-items: center;
+  visibility: hidden
+}
+
+.queueItemView__dragHandle svg {
+  width: 24px;
+  height: 24px
+}
+
+.queueItemView:not(.m-active):hover .queueItemView__dragHandle {
+  visibility: visible
+}
+
+.sc-classic .queueItemView__like.sc-button-small.sc-button-like:before, .sc-classic .queueItemView__more.sc-button-small.sc-button-more:before {
+  height: 24px;
+  width: 24px;
+  left: 0
+}
+
+.queueItemView__like.sc-button-like.sc-button-selected, .queueItemView__more.sc-button-more.sc-button-selected {
+  color: #1aafec;
+}
+
+.sc-classic .queueItemView__more.sc-button-small.sc-button-more:before {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZmlsbD0iIzAwMCIgZD0iTTcgMTFoMnYySDd2LTJ6bTQgMGgydjJoLTJ2LTJ6bTQgMGgydjJoLTJ2LTJ6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=);
+  background-size: 24px 24px;
+}
+.sc-classic .removeFromNextUp, .sc-classic .removeFromNextUp:hover {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTE1LjUgOS4yMDVsLS43MDUtLjcwNUwxMiAxMS4yOTUgOS4yMDUgOC41bC0uNzA1LjcwNUwxMS4yOTUgMTIgOC41IDE0Ljc5NWwuNzA1LjcwNUwxMiAxMi43MDVsMi43OTUgMi43OTUuNzA1LS43MDVMMTIuNzA1IDEyeiIvPgo8L3N2Zz4K);
+  background-size: 24px 24px;
+  background-position: 4px;
+  background-repeat: no-repeat;
+}
+
+.sc-classic .queueItemView__like.sc-button-small.sc-button-icon, .sc-classic .queueItemView__more.sc-button-small.sc-button-more, .sc-classic .queueItemView__remove.sc-button-small.sc-button-icon {
+  min-width: 24px;
+  height: 24px
+}

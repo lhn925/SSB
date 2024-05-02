@@ -9,7 +9,7 @@ import {
 import {toast} from "react-toastify";
 import {LOCAL_PLAYER_SETTINGS, LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {shuffle} from "lodash";
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 
 //현재 재생 목록
 const initialState = {

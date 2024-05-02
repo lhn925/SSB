@@ -11,6 +11,7 @@
 }
 
 #track-player-container {
+  position: relative;
   width: 91.75vw;
   max-width: 1240px;
   height: 48px;
@@ -171,6 +172,13 @@
   background-image: url("../image/follow.png");
 }
 
+.ply-button-t {
+  background-image: url("../image/music-playlist-active.png");
+}
+.ply-button {
+  background-image: url("../image/music-playlist.png");
+}
+
 #mute-volume-btn {
   background: url(https://a-v2.sndcdn.com/assets/images/playback/volume-max-1fbfd63.svg) no-repeat center;
   margin: 0 12px;
@@ -180,6 +188,7 @@
   background: url(https://a-v2.sndcdn.com/assets/images/playback/volume-muted-745945a.svg) no-repeat center;
   margin: 0 12px;
 }
+
 
 .liked-button {
   background-image: url('../image/svg/heart.svg');
@@ -213,7 +222,7 @@
   margin: 0;
 }
 
-.tp-track0-uploader, .tp-track-name {
+.tp-track-uploader, .tp-track-name {
   font-weight: 300;
 }
 

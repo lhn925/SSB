@@ -4,7 +4,7 @@
  * 현재 재생 할려고 하는 track
  */
 import {createSlice} from '@reduxjs/toolkit';
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 
 const setPlayLog = (playLog, data) => {
   playLog.trackId = data.trackId
