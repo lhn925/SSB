@@ -18,7 +18,6 @@ import {
 import {toast} from "react-toastify";
 import {ToggleLike} from "content/trackplayer/ToggleLike";
 import {ChartLogSave} from "content/trackplayer/ChartLogSave";
-import {useDispatch} from "react-redux";
 import {ToggleFollow} from "content/trackplayer/ToggleFollow";
 import {PlayList} from "components/trackplayer/PlayList";
 
@@ -28,6 +27,8 @@ import {PlayList} from "components/trackplayer/PlayList";
  *
  */
 export const TrackPlayer = ({
+  changeOrder,
+  getPlyTrackByTrackId,
   localPlyTracks,
   changeCurrTrackInfo,
   updatePlyTrackInfo,
@@ -75,7 +76,7 @@ export const TrackPlayer = ({
     function getLocalIndex() {
       const playLog = loadFromLocalStorage(localPlayLog.key);
       let findOrder = -1;
-      if (playLog === undefined) {
+      if (playLog == null) {
         return 0;
       }
       const localId = playLog[0];
@@ -474,12 +475,36 @@ export const TrackPlayer = ({
     setVisible(value);
   }
   const plyButtonClickHandler = () => {
+    // localPlyAddTracks(1);
+    // localPlyAddTracks(3);
+    // localPlyAddTracks(4);
+    // localPlyAddTracks(5);
+    // localPlyAddTracks(6);
+    // localPlyAddTracks(6);
+    // localPlyAddTracks(8);
+    // localPlyAddTracks(9);
+    // localPlyAddTracks(10);
+    // localPlyAddTracks(11);
+
     changeIsVisible(!isVisible);
+  }
+
+  const playListProps = {
+    changeOrder,
+    getPlyTrackByTrackId,
+    isVisible,
+    changeIsVisible,
+    isPlaying,
+    localPlyInfo,
+    trackInfo,
+    settingsInfo
   }
   return (
       <div id='track-player-bar'>
         <div id='track-player-container'>
-          <PlayList isVisible={isVisible} changeIsVisible={changeIsVisible}/>
+          <PlayList
+              {...playListProps}
+          />
           <div id='tp-controller'>
             <div id='previous-btn'
                  className='controller-btn' onClick={preBtnOnClick}></div>

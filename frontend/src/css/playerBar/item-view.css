@@ -158,7 +158,7 @@ body:not(.sc-classic) .queueItemView.m-dimmed .queueItemView__artworkImage, body
 
 .sc-classic .queueItemView__dragHandle {
   border: 0;
-  /*background-image: url(~assets/images/play-queue/drag-handle.svg);*/
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZmlsbD0iI0NDQyIgZD0iTTkgNWgydjJIOVY1em00IDBoMnYyaC0yVjV6bTAgOGgydjJoLTJ2LTJ6bTAtNGgydjJoLTJWOXptMCA4aDJ2MmgtMnYtMnpNOSA5aDJ2Mkg5Vjl6bTAgNGgydjJIOXYtMnptMCA0aDJ2Mkg5di0yeiIvPgogICAgPC9nPgo8L3N2Zz4K);
   background-repeat: no-repeat;
   background-position: 50%;
   background-size: 24px 24px;

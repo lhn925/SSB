@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import {toast} from "react-toastify";
 import {createTrackInfo, saveToLocalStorage} from "utill/function";
 import {RESET_ALL} from "store/actions/Types";
-import {LOCAL_INST_} from "../../utill/enum/localKeyEnum";
+import {LOCAL_INST_} from "utill/enum/localKeyEnum";
 
 //현재 재생 목록
 /**

@@ -180,8 +180,18 @@ const localPly = createSlice({
       const prevList = state.item;
       state.item = prevList.filter(track => track.id !== removeId);
       setStoragePly(state, state.userId);
+    }, changeOrder(state, action) {
+      const items = Array.from(state.item);
+      const sourceIndex = action.payload.sourceIndex;
+      const destinationIndex = action.payload.destIndex;
+      const [reorderedItem] = items.splice(sourceIndex, 1);
+      // reorderedItem.index = destinationIndex + 1;
+      items.splice(destinationIndex, 0, reorderedItem);
+      // 바뀐 위치아래는 index + 1;
+      state.item = items.map((item, index) =>({ ...item, index: index + 1 }));
+      setStoragePly(state, state.userId);
     }
-  },extraReducers: (builder) => {
+  }, extraReducers: (builder) => {
     builder.addCase(RESET_ALL, () => initialState);
   }
 });
@@ -193,5 +203,6 @@ export let localPlyActions = {
   // updatePlyTrackInfo: localPly.actions.updatePlyTrackInfo,
   changePlyTrackInfo: localPly.actions.changePlyTrackInfo,
   removePlyByTrackId: localPly.actions.removePlyByTrackId,
+  changeOrder: localPly.actions.changeOrder,
 };
 export default localPly.reducer;

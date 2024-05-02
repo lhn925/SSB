@@ -127,7 +127,13 @@ const useTrackPlayer = (bc) => {
     }
     return undefined;
   }
-
+  const getPlyTrackByTrackId = (trackId) => {
+    const findTrack = localPlyTracks.tracks.filter(track => track.id === trackId);
+    if (findTrack.length > 0) {
+      return findTrack[0];
+    }
+    return undefined;
+  }
   const changePlaying = (isPlaying) => {
     if (isPlaying) {
       bc.postMessage({type: "playing", key: playing.key});
@@ -139,6 +145,14 @@ const useTrackPlayer = (bc) => {
     dispatch(localPlyTracksActions.changePlyVisible({isVisible: isVisible}));
   }
 
+
+  const changeOrder = (sourceIndex, destIndex) => {
+    dispatch(localPlyActions.changeOrder(
+        {
+          sourceIndex: sourceIndex,
+          destIndex: destIndex,
+        }))
+  }
 
   // 현재 트랙정보 가져오기 재생 url x
   const createCurrentTrack = (order) => {
@@ -154,11 +168,12 @@ const useTrackPlayer = (bc) => {
   }
 // order 정보 가져오기
   const createCurrentPlayLog = (order) => {
-    const trackId = getPlyTrackByOrder(order).id
-    TrackPlayApi(trackId).then((response) => {
+    const trackInfo = getPlyTrackByOrder(order);
+    TrackPlayApi(trackInfo.id).then((response) => {
+      const info = response.data;
         dispatch(currentActions.createPlayLog(
-            {info: response.data, playLog: response.data.trackPlayLogRepDto}));
-        changePlyTrackInfo(response.data);
+            {info: info, playLog: response.data.trackPlayLogRepDto}));
+        // changePlyTrackInfo(response.data);
     }).catch((error) => {
       if (error.status === HttpStatusCode.Forbidden || error.status
           === HttpStatusCode.NotFound) {
@@ -186,6 +201,8 @@ const useTrackPlayer = (bc) => {
   }, [playing, currentTrack])
 
   return {
+    changeOrder,
+    getPlyTrackByTrackId,
     localPlyTracks,
     changeCurrTrackInfo,
     updatePlyTrackInfo,

@@ -1,0 +1,165 @@
+
+
+
+
+
+
+
+
+
+
+.sc-button {
+  display: inline-block;
+  position: relative;
+  height: 26px;
+  margin: 0;
+  padding: 2px 11px 2px 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  background-color: #fff;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  font-family: Inter,sans-serif;
+  font-weight: 100;
+  text-align: center;
+  vertical-align: initial;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  box-sizing: border-box
+}
+.sc-button-next:before,.sc-button-pause:before,.sc-button-play:before,.sc-button-prev:before {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 1px;
+  width: 100%;
+  height: 100%;
+  content: "";
+  background-repeat: no-repeat;
+  opacity: 1;
+  transition: opacity .3s;
+  background-position: 50%
+}
+
+
+
+.sc-button-small.sc-button-next,.sc-button-small.sc-button-pause,.sc-button-small.sc-button-play,.sc-button-small.sc-button-prev {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0;
+  line-height: 20px
+}
+.sc-button-next,.sc-button-pause,.sc-button-play,.sc-button-prev {
+  width: 24px;
+  height: 24px;
+  margin: 1px 0;
+  padding: 0;
+  text-indent: -100000px;
+  border: 0
+}
+.sc-button-next.sc-button-focus,.sc-button-next:focus,.sc-button-next:hover,.sc-button-pause.sc-button-focus,.sc-button-pause:focus,.sc-button-pause:hover,.sc-button-play.sc-button-focus,.sc-button-play:focus,.sc-button-play:hover,.sc-button-prev.sc-button-focus,.sc-button-prev:focus,.sc-button-prev:hover {
+  background-color: #439cb9
+}
+
+.sc-button-next,.sc-button-pause,.sc-button-play,.sc-button-prev,.sc-button.sc-button-blocked,.sc-button.sc-button-play.sc-button-disabled:disabled,.sc-button.sc-button-play:disabled,.sc-button.sc-button-play:disabled:hover {
+  background-color: #1aafec;
+  border-radius: 50%
+}
+.sc-button-pause:before {
+  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjhweCIgaGVpZ2h0PSIxMHB4IiB2aWV3Qm94PSIwIDAgOCAxMCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDMuMi4yICg5OTgzKSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5QYXVzZSAyNDwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxkZWZzPjwvZGVmcz4KICAgIDxnIGlkPSJQYWdlLTEiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHNrZXRjaDp0eXBlPSJNU1BhZ2UiPgogICAgICAgIDxnIGlkPSJidXR0b25zIiBza2V0Y2g6dHlwZT0iTVNBcnRib2FyZEdyb3VwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTY4Mi4wMDAwMDAsIC05MzUuMDAwMDAwKSIgZmlsbD0iI0ZGRkZGRiI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNjg3LDkzNSBMMTY4Nyw5NDUgTDE2OTAsOTQ1IEwxNjkwLDkzNSBMMTY4Nyw5MzUgWiBNMTY4Miw5MzUgTDE2ODIsOTQ1IEwxNjg1LDk0NSBMMTY4NSw5MzUgTDE2ODIsOTM1IFoiIGlkPSJQYXVzZS0yNCIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+)
+}
+.sc-button-play:before {
+  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjdweCIgaGVpZ2h0PSIxMnB4IiB2aWV3Qm94PSIwIDAgNyAxMiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDMuMi4yICg5OTgzKSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5QbGF5IDI0PC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGRlZnM+PC9kZWZzPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+CiAgICAgICAgPGcgaWQ9ImJ1dHRvbnMiIHNrZXRjaDp0eXBlPSJNU0FydGJvYXJkR3JvdXAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNjUxLjAwMDAwMCwgLTkzNC4wMDAwMDApIiBmaWxsPSIjRkZGRkZGIj4KICAgICAgICAgICAgPHBhdGggZD0iTTE2NTEsOTQ2IEwxNjUyLjYxNTM4LDk0MCBMMTY1MSw5MzQgTDE2NTgsOTQwIEwxNjUxLDk0NiBaIiBpZD0iUGxheS0yNCIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+)
+}
+
+.sc-button.sc-button-play.sc-button-blocked,.sc-button.sc-button-play.sc-button-disabled:disabled,.sc-button.sc-button-play:disabled {
+  opacity: .4
+}
+
+.sc-button-nostyle,.sc-button-nostyle:active,.sc-button-nostyle:focus,.sc-button-nostyle:hover,.sc-button.sc-button-nostyle:disabled,.sc-button.sc-button-nostyle:disabled:hover {
+  border: 0;
+  background: none;
+  transition: none;
+  padding-top: 3px;
+  padding-bottom: 3px
+}
+
+.sc-button-nostyle:focus {
+  outline: thin dotted
+}
+
+.sc-button-next:after,.sc-button-pause:after,.sc-button-play:after,.sc-button-prev:after {
+  content: "";
+  opacity: 0;
+  transition: opacity .5s
+}
+/*.sc-artwork {*/
+/*  background-size: cover;*/
+/*  background-position: 50% 50%;*/
+/*  display: inline-block*/
+/*}*/
+.sc-button-addtoset:before,.sc-button-like:before,.sc-button-like-t:before {
+  left: 5px
+}
+
+
+.sc-button-like:before {
+  background-image: url('image/svg/heart.svg');
+  background-size: 16px 16px
+}
+
+.sc-button-like-t:before {
+  background-image: url('image/svg/liked.svg');
+  background-size: 16px 16px
+}
+
+
+
+.sc-button-small.sc-button-more:before {
+  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjE0cHgiIGhlaWdodD0iNHB4IiB2aWV3Qm94PSIwIDAgMTQgNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICA8dGl0bGU+bW9yZTwvdGl0bGU+CiAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9InJnYigzNCwgMzQsIDM0KSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIi8+CiAgICA8Y2lyY2xlIGN4PSI3IiBjeT0iMiIgcj0iMiIvPgogICAgPGNpcmNsZSBjeD0iMTIiIGN5PSIyIiByPSIyIi8+CiAgPC9nPgo8L3N2Zz4K);
+  background-size: 14px 4px
+}
+.sc-button-addtoset:before,.sc-button-block:before,.sc-button-buy:before,.sc-button-camera:before,.sc-button-copylink:before,.sc-button-delete:before,.sc-button-distribute:before,.sc-button-download:before,.sc-button-edit:before,.sc-button-follow:before,.sc-button-gotostats:before,.sc-button-insights:before,.sc-button-like:before,.sc-button-like-t:before,.sc-button-mastering:before,.sc-button-message:before,.sc-button-moderate:before,.sc-button-more:before,.sc-button-pageleft:before,.sc-button-pageright:before,.sc-button-privacy:before,.sc-button-queue:before,.sc-button-refresh:before,.sc-button-reply:before,.sc-button-report:before,.sc-button-repost:before,.sc-button-share:before,.sc-button-startstation:before,.sc-button-upload:before,.sc-button-viewonsoundcloud:before {
+  content: "";
+  display: block;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  width: 20px;
+  height: 20px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  left: 4px
+}
+.sc-button-nostyle,.sc-button-nostyle:active,.sc-button-nostyle:focus,.sc-button-nostyle:hover,.sc-button.sc-button-nostyle:disabled,.sc-button.sc-button-nostyle:disabled:hover {
+  border: 0;
+  background: none;
+  transition: none;
+  padding-top: 3px;
+  padding-bottom: 3px
+}
+
+.sc-button-block,.sc-button-buy,.sc-button-camera,.sc-button-copylink,.sc-button-delete,.sc-button-distribute,.sc-button-download,.sc-button-edit,.sc-button-follow,.sc-button-gotostats,.sc-button-insights,.sc-button-like,.sc-button-mastering,.sc-button-message,.sc-button-moderate,.sc-button-more,.sc-button-pageleft,.sc-button-pageright,.sc-button-privacy,.sc-button-queue,.sc-button-refresh,.sc-button-reply,.sc-button-report,.sc-button-repost,.sc-button-share,.sc-button-startstation,.sc-button-upload,.sc-button-viewonsoundcloud {
+  text-indent: 19px
+}
+.sc-button-small.sc-button-icon:not(.sc-button-stretch-icon),.sc-button-small.sc-button-responsive:not(.sc-button-stretch-icon) {
+  min-width: 25px
+}
+
+
+
+.sc-artwork.sc-artwork-placeholder-7 {
+  background-image: linear-gradient(135deg,#e6846e,#70929c)
+}
+a.sc-link-light {
+  color: #999;
+}
+
+.sc-text-light {
+  color: #999;
+}

@@ -432,7 +432,7 @@ public class TrackService {
         // 비회원 플레이 X
         // 해당 트랙에 접근 권한이 없을 경우 플레이 x
         trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
-        updateIsOwnerAndIsLike(trackPlayRepDto, ssbTrack.getUser(), isMember, isOwnerPost);
+        updateIsOwnerAndIsLike(trackPlayRepDto, user, isMember, isOwnerPost);
         // 팔로우 여부 확인 후 업데이트
         if (!isOwnerPost) {
             boolean isFollow = userFollowsService.existsFollowing(user, ssbTrack.getUser());
