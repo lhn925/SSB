@@ -34,7 +34,7 @@ const userReducers = createSlice({
     }
   }, extraReducers(builder) {
     builder.addCase(PURGE, () => initialState);
-    builder.addCase(RESET_ALL, () => initialState);
+    // builder.addCase(RESET_ALL, () => initialState);
   }
 });
 

@@ -88,7 +88,12 @@ export const TrackPlayer = ({
       // 로컬에 있는 마지막 플레이리스트 로그 찾아서 반환
       localPly.item.map((data, index) => {
             if (data.index === localIndex && data.id === localId) {
-              findOrder = index;
+              localPly.playOrders.map((orderIndex, order) => {
+                if (index === orderIndex) {
+                  // playOrders 순서 에 맞게 반환
+                  findOrder = order;
+                }
+              })
             }
           }
       );
@@ -110,7 +115,6 @@ export const TrackPlayer = ({
     const findOrder = getLocalIndex();
     updateSettings("order", findOrder);
     changePlayLog(findOrder);
-
     // 처음 접속시
     if (localPly.item.length > 0 && localPlyInfo.length === 0) {
       createCurrentTrack(findOrder);
@@ -150,6 +154,33 @@ export const TrackPlayer = ({
   }, [currentTrack.playLog]);
 
   useEffect(() => {
+    // 현재 플레이로그 트랙아이디가 -1이 아닐 경우
+    if (localPlayLog.item[0] !== -1 && localPlyInfo.length !== 0) {
+      // 트랙아이디
+
+      const trackId = localPlayLog.item[0];
+      // 플레이리스트 Index
+      const prevIndex = localPlayLog.item[1];
+
+      // 이전 인덱스의 정보 (인덱스,아이디,추가한날짜)
+      const prevPly = localPlyInfo.filter(prev => prev.index === prevIndex)[0];
+      // 바뀐 localPly 에서 추가한 날짜와 트랙아이디로 인덱스 바뀌었는지 확인
+      localPly.item.map((item, index) => {
+        // 인덱스가 다르고 트랙아이디가 같고 추가한날짜가 같을경우
+        if (item.index !== prevPly.index && item.id === prevPly.id
+            && item.createdDateTime === prevPly.createdDateTime) {
+          playOrders.map((data, order) => {
+            if (data === index) {
+             // 모든 재생 순서는 playOrder 를 따른다
+              updateSettings("order", order);
+            }
+          })
+          updateCurrTrackInfo("index", item.index);
+        }
+      })
+
+    }
+
     setLocalPlyInfo(localPly.item);
     setPlayOrders(localPly.playOrders);
   }, [localPly.item, localPly.playOrders]);
@@ -168,7 +199,7 @@ export const TrackPlayer = ({
 
   useEffect(() => {
     if (seeking) {
-      changeIsChartAndLogSave();
+      changeIsChartAndLogSave(false);
     }
   }, [seeking]);
 
@@ -187,7 +218,23 @@ export const TrackPlayer = ({
     // 셔플을 누를경우 Index 변환 문제로 인해
     // 리로딩 되는 문제 발생
     if (playerSettings.item.shuffle === settingsInfo.shuffle) {
-      if (playing.item.playing) {
+
+      // 오더가 바뀌었는데
+      // 현재 재생하고 있는 index 와 추가날짜 TrackId가 같다면
+      // playLog를 불러오지 않는다
+      const plyTrackItem = getPlyTrackByOrder(playerSettings.item.order);
+
+      const addDateTime = plyTrackItem.addDateTime;
+      const createdDateTime = currentTrack.info.createdDateTime;
+      const plyTrackIndex = plyTrackItem.index;
+      const currTrackIndex = currentTrack.info.index;
+      const plyTrackId = plyTrackItem.id;
+      const currentTrackId = currentTrack.info.id;
+      const eqCurrTrack = addDateTime === createdDateTime &&
+          plyTrackIndex === currTrackIndex && plyTrackId === currentTrackId;
+
+      // 같지 않을 경우 PlayLog 가져옴
+      if (playing.item.playing && !eqCurrTrack) {
         createCurrentPlayLog(playerSettings.item.order);
         return;
       }
@@ -230,6 +277,7 @@ export const TrackPlayer = ({
   // 재생이 제일 먼저 시작될때
   const onStartHandler = function (e) {
     setIsEnd(false);
+    setIsDoubleClick(false);
     // 0초부터 시작하지 않았다면 false
     if (settingsInfo.playedSeconds > 1 && currPlayLog.isChartLog) {
       updateCurrPlayLog("isChartLog", false);
@@ -293,7 +341,9 @@ export const TrackPlayer = ({
     updateCurrPlayLog("playTime", totalPlayTime);
     if (!currPlayLog.isChartLog && totalPlayTime
         >= currPlayLog.miniNumPlayTime) {
-      ChartLogSave(trackInfo, currPlayLog, trackInfo.isChartLog,
+
+      // changeIsChartAndLogSave(true)
+      ChartLogSave(trackInfo, currPlayLog, currPlayLog.isChartLog,
           updateCurrPlayLog);
     }
     if (!seeking && !isEnd) {
@@ -359,7 +409,11 @@ export const TrackPlayer = ({
     updateSettings("played", percent);
   }
   const preBtnOnClick = () => {
-    changeIsChartAndLogSave();
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    setIsDoubleClick(true);
+    changeIsChartAndLogSave(false);
     const localLength = localPlyInfo.length;
 
     const maxIndex = localLength === 0 ? localLength : localLength - 1;
@@ -407,15 +461,19 @@ export const TrackPlayer = ({
     }
   }
 
-  function changeIsChartAndLogSave() {
+  function changeIsChartAndLogSave(isChartLog) {
     if (currPlayLog.trackId === -1) {
       return;
     }
-    ChartLogSave(trackInfo, currPlayLog, false, updateCurrPlayLog);
+    ChartLogSave(trackInfo, currPlayLog, isChartLog, updateCurrPlayLog);
   }
 
   const nextBtnOnClick = () => {
-    changeIsChartAndLogSave();
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    setIsDoubleClick(true);
+    changeIsChartAndLogSave(false);
     nextTrackPlay(settingsInfo.order);
   }
 
@@ -452,39 +510,45 @@ export const TrackPlayer = ({
     if (currPlayLog.trackId === -1) {
       return;
     }
-    changeIsChartAndLogSave();
+    changeIsChartAndLogSave(false);
   }
+
+  function setIsDoubleClick(isDoubleClick) {
+    variable.current.isDoubleClick = isDoubleClick;
+  }
+
   const toggleLike = () => {
     if (variable.current.isDoubleClick) {
       return;
     }
-    variable.current.isDoubleClick = true;
+    setIsDoubleClick(true);
     ToggleLike(trackInfo, updatePlyTrackInfo);
-    variable.current.isDoubleClick = false;
+    setIsDoubleClick(false);
   }
   const toggleFollow = () => {
+    localPlyAddTracks(1);
+    localPlyAddTracks(3);
+    localPlyAddTracks(4);
+    localPlyAddTracks(5);
+    localPlyAddTracks(6);
+    localPlyAddTracks(6);
+    localPlyAddTracks(8);
+    localPlyAddTracks(9);
+    localPlyAddTracks(10);
+    localPlyAddTracks(11);
+
     if (variable.current.isDoubleClick) {
       return;
     }
-    variable.current.isDoubleClick = true;
+    setIsDoubleClick(true);
     ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo);
-    variable.current.isDoubleClick = false;
+    setIsDoubleClick(false);
   }
 
   const changeIsVisible = (value) => {
     setVisible(value);
   }
   const plyButtonClickHandler = () => {
-    // localPlyAddTracks(1);
-    // localPlyAddTracks(3);
-    // localPlyAddTracks(4);
-    // localPlyAddTracks(5);
-    // localPlyAddTracks(6);
-    // localPlyAddTracks(6);
-    // localPlyAddTracks(8);
-    // localPlyAddTracks(9);
-    // localPlyAddTracks(10);
-    // localPlyAddTracks(11);
 
     changeIsVisible(!isVisible);
   }
@@ -497,7 +561,10 @@ export const TrackPlayer = ({
     isPlaying,
     localPlyInfo,
     trackInfo,
-    settingsInfo
+    updateSettings,
+    settingsInfo,
+    localPlayLog,
+    changePlayLog,
   }
   return (
       <div id='track-player-bar'>

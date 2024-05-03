@@ -88,9 +88,9 @@ authApi.interceptors.response.use(
           // 재요청
           return axios(originRequest);
         } catch (error) {
+          await persistor.purge();
           removeLocalStorage();
           store.dispatch(resetAll());
-          await persistor.purge();
           window.location.href = "/";
           // toast.error(t(`errorMsg.error.token`));
           return error;
@@ -151,10 +151,9 @@ authTrackApi.interceptors.response.use(
           // 재요청
           return axios(originRequest);
         } catch (error) {
-
           removeLocalStorage();
-          store.dispatch(resetAll());
           await persistor.purge();
+          store.dispatch(resetAll());
           return Promise.reject(error.response);
         }
       } else {

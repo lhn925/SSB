@@ -35,6 +35,7 @@ export function ChartLogSave(currentInfo, playLog, isChartLog,
       id: trackId
     }
   }
+
   updateCurrPlayLog("isReflected", true);
   handleChartTracking(isChartLog, body).catch((error) => {
     if (error.status === 422) { // 해당 경우에만 False
@@ -42,6 +43,8 @@ export function ChartLogSave(currentInfo, playLog, isChartLog,
       updateCurrPlayLog("isReflected", false);
     }
   })
+
+  // return handleChartTracking();
 }
 
 function handleChartTracking(isChartLog, body) {

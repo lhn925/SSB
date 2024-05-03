@@ -61,11 +61,7 @@ public class TrackInfoController {
      */
     @GetMapping("/search/list")
     public ResponseEntity<List<TrackInfoSimpleDto>> getTrackInfoList(@ModelAttribute TracksInfoReqDto tracksInfoReqDto) throws SsbTrackAccessDeniedException {
-        log.info("simpleDtoList = {}","getTrackInfoList");
         List<TrackInfoSimpleDto> simpleDtoList = trackService.getTrackInfoSimpleDtoList(tracksInfoReqDto);
-
-
-
         if (simpleDtoList.isEmpty()) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
@@ -80,7 +76,7 @@ public class TrackInfoController {
     @UserAuthorize
     @GetMapping("/total")
     public ResponseEntity<TotalLengthRepDto> getTotalLength() {
-        Integer totalLength = trackService.getTotalLength(userQueryService.findOne());
+        Integer totalLength = trackService.getTotalLength();
         return ResponseEntity.ok(new TotalLengthRepDto(totalLength, FileStore.TRACK_UPLOAD_LIMIT));
     }
 }

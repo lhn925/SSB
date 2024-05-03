@@ -127,8 +127,10 @@ const localPly = createSlice({
       const isShuffle = action.payload.isShuffle;
 
       // 현재 재생하고있는 위치 인덱스
-      const playIndex = action.payload.playIndex;
-
+      let playIndex = action.payload.playIndex;
+      if (playIndex >= state.item.length) {
+        playIndex = 0;
+      }
       // 현재 재생 하고 있는 위치에 트랙값을 가져온다
       const currentOrders = state.playOrders[playIndex];
       // 이전값
@@ -178,17 +180,30 @@ const localPly = createSlice({
       // play
       const removeId = action.payload.id;
       const prevList = state.item;
-      state.item = prevList.filter(track => track.id !== removeId);
-      setStoragePly(state, state.userId);
+
+      const findRemoveList = prevList.filter(track => track.id === removeId);
+
+      if (findRemoveList.length > 0) {
+        const minIndex = findRemoveList.reduce((max, item) => Math.min(max, item.index),
+            findRemoveList[0].index);
+        const updateList = prevList.filter(track => track.id !== removeId);
+
+        for (let i = minIndex - 1; i < updateList.length; i++) {
+          updateList[i].index = i + 1; // 인덱스 재조정
+        }
+        state.item = updateList;
+        setStoragePly(state, state.userId);
+      }
+
+
     }, changeOrder(state, action) {
-      const items = Array.from(state.item);
-      const sourceIndex = action.payload.sourceIndex;
-      const destinationIndex = action.payload.destIndex;
-      const [reorderedItem] = items.splice(sourceIndex, 1);
-      // reorderedItem.index = destinationIndex + 1;
-      items.splice(destinationIndex, 0, reorderedItem);
+      // const items = Array.from(state.item);
+      // const sourceIndex = action.payload.sourceIndex;
+      // const destinationIndex = action.payload.destIndex;
+      // const [reorderedItem] = items.splice(sourceIndex, 1);
+      // items.splice(destinationIndex, 0, reorderedItem);
       // 바뀐 위치아래는 index + 1;
-      state.item = items.map((item, index) =>({ ...item, index: index + 1 }));
+      state.item = action.payload.items;
       setStoragePly(state, state.userId);
     }
   }, extraReducers: (builder) => {

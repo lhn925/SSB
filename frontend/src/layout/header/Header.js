@@ -15,11 +15,19 @@ import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 import {removeLocalStorage} from "utill/function";
 import {resetAll} from "store/actions";
 
-function Header(props) {
-  const auth = useSelector(state => state?.authReducer);
-  const userInfo = useSelector(state => state?.userReducer);
+function Header({
+  navigate,
+  openModal,
+  changeModalType,
+  auth,
+  userReducer,
+  client,
+  dispatch,
+  bc
+}) {
   const {t} = useTranslation();
   const variable = useRef({isDoubleClick: false});
+  const [userInfo, setUserInfo] = useState(userReducer);
 
   const clickBtnLogout = async () => {
     if (variable.current.isDoubleClick) {
@@ -27,21 +35,23 @@ function Header(props) {
     }
     variable.current.isDoubleClick = true;
     let loading = toast.loading(t(`msg.common.logout.progress`));
-    await persistor.purge();
-    props.dispatch(resetAll());
-    removeLocalStorage();
     await LogoutApi({Authorization: auth.access, RefreshAuth: auth.refresh})
     toast.dismiss(loading);
-    toast.success(t(`msg.common.logout.success`), {onClose:() => {
-        props.bc.postMessage({type: "logout"})
-      }});
+    await persistor.purge();
+    dispatch(resetAll());
+    removeLocalStorage();
+    toast.success(t(`msg.common.logout.success`), {
+      onClose: () => {
+        bc.postMessage({type: "logout"})
+      }
+    });
   }
-  const navigate = props.navigate;
   useEffect(() => {
-  }, [userInfo])
-  const openModal = () => {
-    props.changeModalType(LOGIN)
-    props.openModal();
+    setUserInfo(userReducer);
+  }, [userReducer])
+  const openModalHandler = () => {
+    changeModalType(LOGIN)
+    openModal();
   }
   return (
       <header role="banner"
@@ -85,11 +95,11 @@ function Header(props) {
                 userInfo.userId !== null ? <CircularImageDropdown
                     clickBtnLogout={clickBtnLogout}
                     navigate={navigate}
-                    client={props.client}
+                    client={client}
                     userId={userInfo.userId}
                     pictureUrl={userInfo.pictureUrl}
                 /> : <>
-                  <button onClick={openModal}
+                  <button onClick={openModalHandler}
                           className="btn-login-open btn-blue-outline btn-outline">
                     {t(`msg.loginForm.sky.login`)}</button>
                 </>

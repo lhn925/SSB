@@ -158,6 +158,10 @@ public class TrackService {
     public Integer getTotalLength(User user) {
         return trackQueryService.getTotalLength(user);
     }
+    public Integer getTotalLength() {
+        User user = userQueryService.findOne();
+        return getTotalLength(user);
+    }
 
     /**
      * 다중 Track 저장 후 tokenList 반납

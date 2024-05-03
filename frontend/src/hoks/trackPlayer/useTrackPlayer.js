@@ -38,6 +38,9 @@ const useTrackPlayer = (bc) => {
 
   const changePlayLog = (order) => {
     const data = localPly.item[localPly.playOrders[order]];
+    if (data === undefined) {
+      return;
+    }
     dispatch(playLogActions.changePlayLog(
         {
           id: data.id,
@@ -70,6 +73,7 @@ const useTrackPlayer = (bc) => {
   }
 
   const shuffleOrders = (isShuffle) => {
+    console.log(playerSettings.item.order);
     dispatch(localPlyActions.shuffleOrders(
         {isShuffle: isShuffle, playIndex: playerSettings.item.order}
     ));
@@ -120,15 +124,21 @@ const useTrackPlayer = (bc) => {
   }
 
   const getPlyTrackByOrder = (order) => {
-    const id = localPly.item[localPly.playOrders[order]].id;
-    const findTrack = localPlyTracks.tracks.filter(track => track.id === id);
+    const localPlyItem = localPly.item[localPly.playOrders[order]];
+    const findTrack = localPlyTracks.tracks.filter(track => track.id === localPlyItem.id);
+    findTrack.index = localPlyItem.index;
+    findTrack.addDateTime = localPlyItem.createdDateTime;
     if (findTrack.length > 0) {
-      return findTrack[0];
+      const findTrackElement = {...findTrack[0]};
+      findTrackElement.index = localPlyItem.index;
+      findTrackElement.addDateTime = localPlyItem.createdDateTime;
+      return findTrackElement;
     }
     return undefined;
   }
   const getPlyTrackByTrackId = (trackId) => {
-    const findTrack = localPlyTracks.tracks.filter(track => track.id === trackId);
+    const findTrack = localPlyTracks.tracks.filter(
+        track => track.id === trackId);
     if (findTrack.length > 0) {
       return findTrack[0];
     }
@@ -141,16 +151,19 @@ const useTrackPlayer = (bc) => {
     dispatch(playingActions.changePlaying({isPlaying: isPlaying}));
   }
 
+  const removePlyByTrackId = (trackId) => {
+
+    dispatch(localPlyActions.removePlyByTrackId({id: trackId}));
+  }
+
   const changePlyVisible = (isVisible) => {
     dispatch(localPlyTracksActions.changePlyVisible({isVisible: isVisible}));
   }
 
-
-  const changeOrder = (sourceIndex, destIndex) => {
+  const changeOrder = (items) => {
     dispatch(localPlyActions.changeOrder(
         {
-          sourceIndex: sourceIndex,
-          destIndex: destIndex,
+          items: items
         }))
   }
 
@@ -170,15 +183,19 @@ const useTrackPlayer = (bc) => {
   const createCurrentPlayLog = (order) => {
     const trackInfo = getPlyTrackByOrder(order);
     TrackPlayApi(trackInfo.id).then((response) => {
-      const info = response.data;
-        dispatch(currentActions.createPlayLog(
-            {info: info, playLog: response.data.trackPlayLogRepDto}));
-        // changePlyTrackInfo(response.data);
+      const info = {
+        ...response.data,
+        addDateTime: trackInfo.addDateTime,
+        index: trackInfo.index
+      };
+      dispatch(currentActions.createPlayLog(
+          {info: info, playLog: response.data.trackPlayLogRepDto}));
     }).catch((error) => {
       if (error.status === HttpStatusCode.Forbidden || error.status
           === HttpStatusCode.NotFound) {
-        localPlyCreate();
         // 현재 재생 할려던 트랙에 접근 권한이 없을 경우 -1 부여
+        removePlyByTrackId(trackInfo.id);
+        shuffleOrders(playerSettings.shuffle);
         updateCurrTrackInfo("id", -1);
         toast.error(error.data?.errorDetails[0].message);
       }

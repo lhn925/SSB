@@ -40,6 +40,7 @@ import useUpload from "hoks/upload/useUpload";
 import mem from "mem";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
 import {PlayList} from "./components/trackplayer/PlayList";
+import useUserInfo from "./hoks/user/useUserInfo";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -66,6 +67,7 @@ function App() {
       createUploadActions(coverImgFiles, setCoverImgFiles)
   ), []);
   const currentAuth = useAuth();
+  const userReducer = useUserInfo();
   const uploadInfo = useUpload();
   const bc = new BroadcastChannel(`my_chanel`);
   const dispatch = useDispatch();
@@ -126,10 +128,14 @@ function App() {
 
   return (
       <div className="App">
-        <Header modal={modal} dispatch={dispatch}
+        <Header modal={modal}
+                dispatch={dispatch}
                 openModal={openModal}
+                userReducer={userReducer}
                 changeModalType={changeModalType}
-                bc={bc} client={client.current.client} navigate={navigate}/>
+                bc={bc}
+                client={client.current.client}
+                navigate={navigate}/>
         <ToastContainer
             position="top-right"
             autoClose={3000}

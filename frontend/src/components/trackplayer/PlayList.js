@@ -8,8 +8,8 @@ import iu from "css/image/iu.jpg"
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {ProgressBar} from "../progressBar/ProgressBar";
 import {BtnOutLine} from "../button/BtnOutLine";
-import {USERS_FILE_IMAGE} from "../../utill/api/ApiEndpoints";
-import {durationTime} from "../../utill/function";
+import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
+import {durationTime} from "utill/function";
 
 export function PlayList({
   changeOrder,
@@ -19,7 +19,10 @@ export function PlayList({
   isPlaying,
   localPlyInfo,
   trackInfo,
-  settingsInfo
+  updateSettings,
+  settingsInfo,
+  localPlayLog,
+  changePlayLog,
 }) {
   return (
       <>
@@ -48,7 +51,9 @@ export function PlayList({
                 }}>
                   <div className="queue__itemsContainer">
                     {<DragDropContext
-                        onDragEnd={(e) => handleOnDragEnd(e, changeOrder)}>
+                        onDragEnd={(e) => handleOnDragEnd(e, changeOrder,
+                            localPlyInfo,   localPlayLog,
+                            changePlayLog, updateSettings)}>
                       <Droppable droppableId="droppable-songs">
                         {(provided) => getDragAndDrop(provided, localPlyInfo,
                             getPlyTrackByTrackId)}
@@ -79,6 +84,7 @@ export function PlayList({
 }
 
 function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
+
   const infoTracks = localPlyInfo.map((item) => ({
     ...item, info: getPlyTrackByTrackId(item.id)
   }))
@@ -104,7 +110,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
                                width: '32px'
                              }}>
                           <a href="#">
-                            <img style={{backgroundColor:'#fff'}} className="player_cover_img"
+                            <img style={{backgroundColor: '#fff'}}
+                                 className="player_cover_img"
                                  src={data.info.coverUrl
                                      && USERS_FILE_IMAGE
                                      + data.info.coverUrl} alt="cover"/>
@@ -121,7 +128,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
                           className="queueItemView__details text-start">
                         <div className="queueItemView__meta">
                           <a draggable="true" className="queueItemView__username ply-track-uploader
-                            sc-truncate" href="/user-565240779">{data.info.postUser.userName} </a>
+                            sc-truncate"
+                             href="/user-565240779">{data.info.postUser.userName} </a>
                           <a draggable="true" className="queueItemView__context
                             sc-text-h4 sc-link-light sc-link-secondary sc-truncate"
                              title="From your history"
@@ -143,14 +151,15 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
                       </div>
                       <div className="queueItemView__actions">
                         {
-                          !data.info.isOwner &&
+                            !data.info.isOwner &&
                             <button type="button"
-                                  className={"sc-button-like"+ (data.info.isLike ? "-t" : "") +
-                                      " queueItemView__like sc-button sc-button-small sc-button-icon sc-button-nostyle"}
-                                  aria-describedby="tooltip-10505"
-                                  tabIndex={0}
-                                  title="Like"
-                                  aria-label="Like"></button>
+                                    className={"sc-button-like"
+                                        + (data.info.isLike ? "-t" : "") +
+                                        " queueItemView__like sc-button sc-button-small sc-button-icon sc-button-nostyle"}
+                                    aria-describedby="tooltip-10505"
+                                    tabIndex={0}
+                                    title="Like"
+                                    aria-label="Like"></button>
                         }
                         <button type="button"
                                 className="removeFromNextUp queueItemView__remove sc-button sc-button-small sc-button-icon sc-button-nostyle"
@@ -178,15 +187,35 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
   </div>;
 }
 
-function handleOnDragEnd(result, changeOrder) {
+function handleOnDragEnd(result,
+    changeOrder,
+    localPlyInfo,
+    localPlayLog,
+    changePlayLog,
+    updateSettings) {
   if (!result.destination) {
     return;
   }
+  const prevIndex = result.source.index;
+  const currIndex = result.destination.index;
+  // 현재 재생 로그
+  // 현재 order
+
+  // // 0.....7.8
+  const items = localPlyInfo.map((data) => ({...data}));
+  const [reorderedItem] = items.splice(prevIndex, 1);
+  items.splice(currIndex, 0, reorderedItem);
+
+  // 원래 있던 위치가 변경한 위치보다 크다면
+  const minIndex = Math.min(prevIndex, currIndex);
+  const maxIndex = Math.max(prevIndex, currIndex);
+
+  // 최소한의 범위에서 인덱스 업데이트
+  for (let i = minIndex; i <= maxIndex; i++) {
+    items[i].index = i + 1; // 인덱스 재조정
+  }
+
 
   // 만약 현재 재생하고 있는 위치에 변화가 생긴다면
-
-  console.log(result.draggableId);
-  console.log(result.destination.index);
-
-  changeOrder(result.source.index, result.destination.index);
+  changeOrder(items);
 }
