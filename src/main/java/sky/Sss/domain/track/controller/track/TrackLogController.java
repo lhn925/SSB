@@ -99,6 +99,8 @@ public class TrackLogController {
     public ResponseEntity<TrackPlayRepDto> getTrackInfo(@PathVariable Long id, HttpServletRequest request) throws SsbTrackAccessDeniedException {
         TrackPlayRepDto trackPlayDto = trackService.getAuthorizedTrackInfo(id, Status.ON,
             request.getHeader("User-Agent"));
+
+
         if (trackPlayDto == null) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }

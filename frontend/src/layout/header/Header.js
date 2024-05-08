@@ -19,7 +19,7 @@ function Header({
   navigate,
   openModal,
   changeModalType,
-  auth,
+  currentAuth,
   userReducer,
   client,
   dispatch,
@@ -35,7 +35,7 @@ function Header({
     }
     variable.current.isDoubleClick = true;
     let loading = toast.loading(t(`msg.common.logout.progress`));
-    await LogoutApi({Authorization: auth.access, RefreshAuth: auth.refresh})
+    await LogoutApi({Authorization: currentAuth.access, RefreshAuth: currentAuth.refresh})
     toast.dismiss(loading);
     await persistor.purge();
     dispatch(resetAll());

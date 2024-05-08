@@ -3,14 +3,11 @@ import TrackLikeCancelApi from "utill/api/trackPlayer/TrackLikeCancelApi";
 import TrackLikeApi from "utill/api/trackPlayer/TrackLikeApi";
 import {HttpStatusCode} from "axios";
 
-export function ToggleLike(trackInfo, updatePlyTrackInfo) {
-  if (trackInfo.id === -1) {
+export function ToggleLike(trackId,title,isLike, updatePlyTrackInfo) {
+  if (trackId === -1) {
     return;
   }
 
-  const isLike = trackInfo.isLike;
-  const title = trackInfo.title;
-  const trackId = trackInfo.id;
   const toastText = !isLike ? title + " was saved to your Library." : title
       + " cancel"
 

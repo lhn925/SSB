@@ -134,6 +134,7 @@ function App() {
                 userReducer={userReducer}
                 changeModalType={changeModalType}
                 bc={bc}
+                currentAuth={currentAuth}
                 client={client.current.client}
                 navigate={navigate}/>
         <ToastContainer

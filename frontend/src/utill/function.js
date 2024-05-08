@@ -605,5 +605,15 @@ export function createPlyInfo(data) {
   }
 }
 
-
+export function sorted (a, b) {
+  if (a.index > b.index) {
+    return 1;
+  }
+  if (a.index === b.index) {
+    return 0;
+  }
+  if (a.index < b.index) {
+    return -1;
+  }
+}
 

@@ -151,6 +151,7 @@ authTrackApi.interceptors.response.use(
           // 재요청
           return axios(originRequest);
         } catch (error) {
+          console.log("401 에러");
           removeLocalStorage();
           await persistor.purge();
           store.dispatch(resetAll());

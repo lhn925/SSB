@@ -171,7 +171,7 @@ export const TrackPlayer = ({
             && item.createdDateTime === prevPly.createdDateTime) {
           playOrders.map((data, order) => {
             if (data === index) {
-             // 모든 재생 순서는 playOrder 를 따른다
+              // 모든 재생 순서는 playOrder 를 따른다
               updateSettings("order", order);
             }
           })
@@ -247,14 +247,13 @@ export const TrackPlayer = ({
   }, [playerSettings.item.order, playerSettings.item.shuffle]);
 
   // 일시정지,플레이버튼
-  const playPause = (e) => {
+  const onPlayButton = (e) => {
     e.preventDefault(); // 기본동작 정지
 
     if (!isPlaying && localPlyInfo.length === 0) {
       toast.error("텍스트 추가) 재생할 트랙을 추가해주세요.")
       return;
     }
-
     changePlaying(!isPlaying);
     const trackId = Number.parseInt(e.target.dataset.id);
     if (trackId === -1) {
@@ -267,7 +266,6 @@ export const TrackPlayer = ({
         return;
       }
       createCurrentPlayLog(settingsInfo.order);
-    } else {
     }
   }
   let linkToTrack;
@@ -517,12 +515,14 @@ export const TrackPlayer = ({
     variable.current.isDoubleClick = isDoubleClick;
   }
 
-  const toggleLike = () => {
+  const toggleLike = (id) => {
     if (variable.current.isDoubleClick) {
       return;
     }
+    const trackInfo = getPlyTrackByTrackId(id);
     setIsDoubleClick(true);
-    ToggleLike(trackInfo, updatePlyTrackInfo);
+    ToggleLike(trackInfo.id, trackInfo.title, trackInfo.isLike,
+        updatePlyTrackInfo);
     setIsDoubleClick(false);
   }
   const toggleFollow = () => {
@@ -559,12 +559,18 @@ export const TrackPlayer = ({
     isVisible,
     changeIsVisible,
     isPlaying,
+    playOrders,
     localPlyInfo,
     trackInfo,
     updateSettings,
     settingsInfo,
     localPlayLog,
     changePlayLog,
+    changePlaying,
+    currPlayLog,
+    createCurrentPlayLog,
+    playerRef,
+    toggleLike
   }
   return (
       <div id='track-player-bar'>
@@ -578,7 +584,7 @@ export const TrackPlayer = ({
             <div id={getPlayButton(isPlaying)}
                  data-id={trackInfo.id}
                  className='controller-btn'
-                 onClick={(e) => playPause(e)}></div>
+                 onClick={(e) => onPlayButton(e)}></div>
             <div id='next-btn' className='controller-btn'
                  onClick={nextBtnOnClick}></div>
             <div onClick={changeShuffleType}
@@ -642,7 +648,7 @@ export const TrackPlayer = ({
               <div className={'controller-btn ' + (trackInfo.isLike
                   ? 'liked-button-t' : 'liked-button')}
                    data-id={currentTrack.info.id}
-                   onClick={(e) => toggleLike(e)}></div>
+                   onClick={(e) => toggleLike(trackInfo.id)}></div>
               <div className={'controller-btn bg_player ' + (
                   trackInfo.postUser.isFollow ? 'follow-button-t'
                       : 'follow-button')}

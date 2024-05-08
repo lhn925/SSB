@@ -4,7 +4,7 @@ import {
   getRandomInt,
   loadFromLocalStorage,
   removeFromLocalStorage,
-  saveToLocalStorage
+  saveToLocalStorage, sorted
 } from "utill/function";
 import {toast} from "react-toastify";
 import {LOCAL_PLAYER_SETTINGS, LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
@@ -21,15 +21,7 @@ const initialState = {
 
 function setStoragePly(state, userId) {
   state.item.sort(function (a, b) {
-    if (a.index > b.index) {
-      return 1;
-    }
-    if (a.index === b.index) {
-      return 0;
-    }
-    if (a.index < b.index) {
-      return -1;
-    }
+    return sorted(a, b);
   });
   saveToLocalStorage({key: state.key, item: {list: state.item, userId: userId}})
 }
@@ -49,6 +41,9 @@ const localPly = createSlice({
           return;
         }
         state.item = localPly.list;
+        state.item.sort(function (a, b) {
+          return sorted(a, b);
+        });
         const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
         const orderArray = [];
         for (let i = 0; i < localPly.list.length; i++) {
@@ -194,8 +189,6 @@ const localPly = createSlice({
         state.item = updateList;
         setStoragePly(state, state.userId);
       }
-
-
     }, changeOrder(state, action) {
       // const items = Array.from(state.item);
       // const sourceIndex = action.payload.sourceIndex;

@@ -5,7 +5,7 @@ import {RESET_ALL} from "store/actions/Types";
 
 const settings = {
   order: 0, // 재생위치정보
-  volume: 0.8,
+  volume: 0.5,
   muted: false,
   played: 0,
   playedSeconds: 0,

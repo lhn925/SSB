@@ -3,13 +3,9 @@ import "css/playerBar/playList.css"
 import "css/playerBar/queue.css"
 import "css/playerBar/item-view.css"
 import "css/sc_custom.css"
-// import "css/playerBar/sc.css"
-import iu from "css/image/iu.jpg"
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
-import {ProgressBar} from "../progressBar/ProgressBar";
-import {BtnOutLine} from "../button/BtnOutLine";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
-import {durationTime} from "utill/function";
+import {durationTime, sorted} from "utill/function";
 
 export function PlayList({
   changeOrder,
@@ -21,9 +17,51 @@ export function PlayList({
   trackInfo,
   updateSettings,
   settingsInfo,
+  playOrders,
   localPlayLog,
   changePlayLog,
+  changePlaying,
+  currPlayLog,
+  createCurrentPlayLog,
+  playerRef,
+  toggleLike
 }) {
+
+  const onPlayButtonClickHandler = (e) => {
+    const index = Number.parseInt(e.currentTarget.dataset.id);
+    // changePlaying(false);
+    const trackEq = index === trackInfo.index;
+    let currOrder = index - 1;
+    // 현재 셔플 재생이라면
+    // Index 위치 값 반환
+    if (settingsInfo.shuffle) {
+      for (let i=0; i < playOrders.length; i++) {
+        const order = playOrders[i];
+        if (order === currOrder) {
+          currOrder = i;
+          break;
+        }
+      }
+    }
+    // 선택한 곡이 현재 재생 곡일경우 그리고 재생하고 있을 경우
+    // 일시정지후 return
+    if (trackEq && isPlaying) {
+      changePlaying(false);
+      return;
+    }
+    // 만약 재생중이지 않을 경우 PlayLog 확인 후 플레이
+    changePlaying(true);
+    if (trackEq && !isPlaying && currPlayLog.trackId !== -1) {
+      return;
+    }
+    updateSettings("played", 0);
+    updateSettings("playedSeconds", 0);
+    if (playerRef.current) {
+      playerRef.current.seekTo(0, "seconds");
+    }
+    updateSettings("order", currOrder);
+  }
+
   return (
       <>
         <div className={isVisible ? "playControls__queue" : "playControls"}>
@@ -52,11 +90,12 @@ export function PlayList({
                   <div className="queue__itemsContainer">
                     {<DragDropContext
                         onDragEnd={(e) => handleOnDragEnd(e, changeOrder,
-                            localPlyInfo,   localPlayLog,
+                            localPlyInfo, localPlayLog,
                             changePlayLog, updateSettings)}>
                       <Droppable droppableId="droppable-songs">
                         {(provided) => getDragAndDrop(provided, localPlyInfo,
-                            getPlyTrackByTrackId)}
+                            getPlyTrackByTrackId, trackInfo, isPlaying,
+                            onPlayButtonClickHandler,toggleLike)}
 
 
                       </Droppable>
@@ -83,11 +122,16 @@ export function PlayList({
       ;
 }
 
-function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
+function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
+    isPlaying, onPlayButtonClickHandler,toggleLike) {
 
   const infoTracks = localPlyInfo.map((item) => ({
     ...item, info: getPlyTrackByTrackId(item.id)
   }))
+
+  infoTracks.sort(function (a, b) {
+    return sorted(a, b);
+  });
   return <div {...provided.droppableProps}
               ref={provided.innerRef}>
     {infoTracks.map((data, index) => (
@@ -96,7 +140,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
           {(provided) => (
               <>
                 <div ref={provided.innerRef}{...provided.draggableProps}>
-                  <div className="queue__itemWrapper">
+                  <div className={"queue__itemWrapper " + (trackInfo.index
+                  === data.index ? "current_ply_track" : "")}>
                     <div
                         className="tp-track-dets queueItemView queue__itemsHeight sc-px-2x">
                       <div
@@ -117,11 +162,12 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
                                      + data.info.coverUrl} alt="cover"/>
                           </a>
                         </div>
-                        <div
-                            className="queueItemView__playButton">
-                          {/*<div className="sc-button-play sc-button"></div>*/}
-                          <div
-                              className="sc-button sc-button-pause"></div>
+                        <div className="queueItemView__playButton"
+                             data-id={data.index}
+                             onClick={(e) => onPlayButtonClickHandler(e)}>
+                          <div className={(data.index === trackInfo.index
+                              && isPlaying ? "sc-button-pause " : "sc-button-play ")
+                              + "  sc-button"}></div>
                         </div>
                       </div>
                       <div
@@ -133,13 +179,13 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
                           <a draggable="true" className="queueItemView__context
                             sc-text-h4 sc-link-light sc-link-secondary sc-truncate"
                              title="From your history"
-                             href="/you/history">From
-                            your history</a>
+                             href="/you/history">
+                            From your history</a>
                         </div>
                         <div
                             className="queueItemView__title sc-truncate">
                           <a draggable="true"
-                             className="sc-link-dark sc-text-h4 sc-link-primary ply-track-name"
+                             className="sc-link-dark sc-text-h4 sc-link-primary ply-track-name "
                              href="/user-565240779/midas-touch-kiss-of-life">
                             {data.info.title}
                           </a>
@@ -158,6 +204,7 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId) {
                                         " queueItemView__like sc-button sc-button-small sc-button-icon sc-button-nostyle"}
                                     aria-describedby="tooltip-10505"
                                     tabIndex={0}
+                                    onClick={() => toggleLike(data.info.id)}
                                     title="Like"
                                     aria-label="Like"></button>
                         }
@@ -214,7 +261,6 @@ function handleOnDragEnd(result,
   for (let i = minIndex; i <= maxIndex; i++) {
     items[i].index = i + 1; // 인덱스 재조정
   }
-
 
   // 만약 현재 재생하고 있는 위치에 변화가 생긴다면
   changeOrder(items);
