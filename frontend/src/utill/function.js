@@ -15,6 +15,8 @@ import {
   LOCAL_PLY_KEY,
   LOCAL_PLY_LOG
 } from "./enum/localKeyEnum";
+import {shuffle} from "lodash";
+import {PLUS} from "../content/trackplayer/NumberSignTypes";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -601,11 +603,12 @@ export function createPlyInfo(data) {
   return {
     index: data.index, // 순번
     id: data.id,
+    isStatus: 1, // 재생목록에 추가한 날짜
     createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
   }
 }
 
-export function sorted (a, b) {
+export function sorted(a, b) {
   if (a.index > b.index) {
     return 1;
   }
@@ -617,3 +620,96 @@ export function sorted (a, b) {
   }
 }
 
+export function shufflePlayOrder(playOrders, isShuffle, localPly, playIndex) {
+  let prevOrders = [...playOrders];
+  // 현재 재생 하고 있는 위치에 트랙값을 가져온다
+  if (playOrders.length !== localPly.length) {
+    const orderArray = []
+    for (let i = 0; i < localPly.length; i++) {
+      orderArray.push(i);
+    }
+    prevOrders = orderArray;
+  }
+  // 현재 재생하고있는 위치 인덱스
+  if (playIndex >= localPly.length) {
+    playIndex = 0;
+  }
+  const currentOrders = prevOrders[playIndex];
+  // 이전값
+  if (isShuffle) {
+    // 재생하고 인덱스 값 삭제 후
+    prevOrders.splice(playIndex, 1);
+    const shuffleArray = shuffle(prevOrders);
+    // 첫번째에 값 추가
+    shuffleArray.splice(0, 0, currentOrders);
+    prevOrders = shuffleArray;
+    return prevOrders;
+  }
+  prevOrders.sort(function (a, b) {
+    if (a > b) {
+      return 1;
+    }
+    if (a === b) {
+      return 0;
+    }
+    if (a < b) {
+      return -1;
+    }
+  });
+  return prevOrders;
+}
+
+export function removeLocalPlyByIndex(removeIndex, localPly) {
+  // play
+  const prevList = localPly.map(item => ({...item}));
+  const findRemoveList = prevList.filter(track => track.index === removeIndex);
+  if (findRemoveList.length > 0) {
+    const minIndex = findRemoveList.reduce(
+        (max, item) => Math.min(max, item.index),
+        findRemoveList[0].index);
+    const updateList = prevList.filter(track => track.index !== removeIndex);
+
+    for (let i = minIndex - 1; i < updateList.length; i++) {
+      updateList[i].index = i + 1; // 인덱스 재조정
+    }
+    return updateList;
+  }
+  return undefined;
+}
+
+// order 계산
+export function calculateOrder(order,
+    localPlyInfo, playOrders,
+    statusOnLocalPly, numberSign, updateSettings) {
+  let calOrder = order;
+  if (localPlyInfo.length === 0 ) {
+    updateSettings("order", 0);
+    return undefined;
+  }
+  if (localPlyInfo.length <= calOrder || calOrder == null || calOrder === -1) {
+    calOrder = 0;
+  }
+  const localPlyItem = localPlyInfo[playOrders[calOrder]];
+  if (localPlyItem == null) {
+    calOrder = 0;
+  }
+  // statusOnLocalPly
+  if (localPlyItem.isStatus === 0) {
+    let searchOrder = 0;
+    while (statusOnLocalPly.length > 0) {
+       searchOrder = numberSign === PLUS ? calOrder++ : calOrder--;
+
+      if (searchOrder >= localPlyInfo.length || searchOrder < 0) {
+        searchOrder = numberSign === PLUS ? 0 : localPlyInfo.length - 1;
+      }
+      const searchInfo = localPlyInfo[playOrders[searchOrder]];
+      if (searchInfo.isStatus === 1) {
+        break;
+      }
+    }
+    updateSettings("order", searchOrder);
+    return undefined;
+  } else {
+    return localPlyItem;
+  }
+}

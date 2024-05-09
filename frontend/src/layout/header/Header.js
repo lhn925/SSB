@@ -35,7 +35,8 @@ function Header({
     }
     variable.current.isDoubleClick = true;
     let loading = toast.loading(t(`msg.common.logout.progress`));
-    await LogoutApi({Authorization: currentAuth.access, RefreshAuth: currentAuth.refresh})
+    await LogoutApi(
+        {Authorization: currentAuth.access, RefreshAuth: currentAuth.refresh})
     toast.dismiss(loading);
     await persistor.purge();
     dispatch(resetAll());
@@ -48,7 +49,7 @@ function Header({
   }
   useEffect(() => {
     setUserInfo(userReducer);
-  }, [userReducer])
+  }, [userReducer, currentAuth])
   const openModalHandler = () => {
     changeModalType(LOGIN)
     openModal();

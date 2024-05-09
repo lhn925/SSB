@@ -7,16 +7,22 @@ import TrackPlayApi from "utill/api/trackPlayer/TrackPlayApi";
 import {useEffect} from "react";
 import {settingsActions} from "store/trackplayer/playerSettings";
 import {localPlyActions} from "store/trackplayer/localPly";
-import {playLogActions} from "../../store/trackplayer/localPlayLog";
+import {playLogActions} from "store/trackplayer/localPlayLog";
 import {HttpStatusCode} from "axios";
 import {
+  calculateOrder,
   createPlyInfo,
-  loadFromLocalStorage
+  loadFromLocalStorage,
+  removeFromLocalStorage,
+  removeLocalPlyByIndex,
+  shufflePlayOrder
 } from "utill/function";
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import TrackInfoSearchListApi
   from "utill/api/trackPlayer/TrackInfoSearchListApi";
 import {localPlyTracksActions} from "store/trackplayer/localPlyTracks";
+import {resetCurrentTrack, resetLocalPlyTrack} from "store/actions/index";
+import {PLUS} from "content/trackplayer/NumberSignTypes";
 
 const useTrackPlayer = (bc) => {
   const dispatch = useDispatch();
@@ -72,10 +78,9 @@ const useTrackPlayer = (bc) => {
     ));
   }
 
-  const shuffleOrders = (isShuffle) => {
-    console.log(playerSettings.item.order);
+  const shuffleOrders = (shuffleArray) => {
     dispatch(localPlyActions.shuffleOrders(
-        {isShuffle: isShuffle, playIndex: playerSettings.item.order}
+        {playOrders: shuffleArray}
     ));
   }
 
@@ -97,14 +102,17 @@ const useTrackPlayer = (bc) => {
   // 로컬 플레이리스트 정보 최신화
   const localPlyCreate = () => {
     const localPly = loadFromLocalStorage(LOCAL_PLY_KEY);
-    if (localPly) {
-      const searchIds = localPly.list.map(track => track.id);
+
+    const statusList = localPly?.list.filter(
+        track => Number.parseInt(track.isStatus) === 1);
+    if (statusList && statusList.length > 0) {
+      const searchIds = statusList.map(item => item.id);
       const updatePly = [];
       TrackInfoSearchListApi(searchIds).then((r) => {
         const searchTracks = r.data;
         searchTracks.map(search => {
           localPlyAddTrackInfo(search);
-          const findInfo = localPly.list.filter(
+          const findInfo = statusList.filter(
               local => search.id === local.id);
           findInfo.map(info => {
             search.index = info.index;
@@ -113,26 +121,44 @@ const useTrackPlayer = (bc) => {
           })
         })
         localPly.list = updatePly;
-        dispatch(localPlyActions.create(
-            {userId: userInfo.userId, localPly: localPly}));
+        localPlyActionsCreate({userId: userInfo.userId, localPly: localPly})
       }).catch((e) => {
         console.error(e);
       })
     } else {
-      dispatch(localPlyActions.create({userId: userInfo.userId}));
+      localPlyActionsCreate({userId: userInfo.userId});
     }
   }
+  const localPlyActionsCreate = (data) => {
+    dispatch(localPlyActions.create(data));
+  }
+  const resetCurrTrack = () => {
+    dispatch(resetCurrentTrack());
+  }
 
-  const getPlyTrackByOrder = (order) => {
-    const localPlyItem = localPly.item[localPly.playOrders[order]];
-    const findTrack = localPlyTracks.tracks.filter(track => track.id === localPlyItem.id);
-    findTrack.index = localPlyItem.index;
-    findTrack.addDateTime = localPlyItem.createdDateTime;
-    if (findTrack.length > 0) {
-      const findTrackElement = {...findTrack[0]};
-      findTrackElement.index = localPlyItem.index;
-      findTrackElement.addDateTime = localPlyItem.createdDateTime;
-      return findTrackElement;
+  const getStatusOnLocalPly = () => {
+    const statusOnLocalPly = localPly.item.filter((data) => data.isStatus === 1);
+
+    if (statusOnLocalPly.length === 0) {
+      dispatch(resetLocalPlyTrack());
+      localPlyActionsCreate({userId:userInfo.userId});
+    }
+    return statusOnLocalPly;
+  }
+  const getPlyTrackByOrder = (order, numberSign) => {
+    const localPlyItem = calculateOrder(order, localPly.item,
+        localPly.playOrders, getStatusOnLocalPly(), numberSign,updateSettings);
+    if (localPlyItem) {
+      const findTrack = localPlyTracks.tracks.filter(
+          track => track.id === localPlyItem.id);
+      // findTrack.index = localPlyItem.index;
+      // findTrack.addDateTime = localPlyItem.createdDateTime;
+      if (findTrack.length > 0) {
+        const findTrackElement = {...findTrack[0]};
+        findTrackElement.index = localPlyItem.index;
+        findTrackElement.addDateTime = localPlyItem.createdDateTime;
+        return findTrackElement;
+      }
     }
     return undefined;
   }
@@ -155,7 +181,11 @@ const useTrackPlayer = (bc) => {
 
     dispatch(localPlyActions.removePlyByTrackId({id: trackId}));
   }
-
+  const removePlyByIndex = (removeIndex) => {
+    // const updateList = removeLocalPlyByIndex(removeIndex, localPly.item);
+    dispatch(localPlyActions.removePlyByIndex({index: removeIndex}));
+    // return updateList;
+  }
   const changePlyVisible = (isVisible) => {
     dispatch(localPlyTracksActions.changePlyVisible({isVisible: isVisible}));
   }
@@ -168,20 +198,28 @@ const useTrackPlayer = (bc) => {
   }
 
   // 현재 트랙정보 가져오기 재생 url x
-  const createCurrentTrack = (order) => {
+  const createCurrentTrack = (order, numberSign) => {
     updateSettings("played", 0);
     updateSettings("playedSeconds", 0);
-    const data = getPlyTrackByOrder(order);
+    const data = getPlyTrackByOrder(order, numberSign);
+    if (data === undefined) {
+      return;
+    }
     dispatch(currentActions.create({info: data}))
-
   }
-  const changeCurrTrackInfo = (order) => {
-    const data = getPlyTrackByOrder(order);
+  const changeCurrTrackInfo = (order, numberSign) => {
+    const data = getPlyTrackByOrder(order, numberSign);
+    if (data === undefined) {
+      return;
+    }
     dispatch(currentActions.changeTrackInfo({info: data}))
   }
 // order 정보 가져오기
-  const createCurrentPlayLog = (order) => {
-    const trackInfo = getPlyTrackByOrder(order);
+  const createCurrentPlayLog = (order, numberSign) => {
+    const trackInfo = getPlyTrackByOrder(order, numberSign);
+    if (trackInfo === undefined) {
+      return;
+    }
     TrackPlayApi(trackInfo.id).then((response) => {
       const info = {
         ...response.data,
@@ -195,7 +233,10 @@ const useTrackPlayer = (bc) => {
           === HttpStatusCode.NotFound) {
         // 현재 재생 할려던 트랙에 접근 권한이 없을 경우 -1 부여
         removePlyByTrackId(trackInfo.id);
-        shuffleOrders(playerSettings.shuffle);
+        const shuffleArray = shufflePlayOrder(localPly.playOrders,
+            playerSettings.item.shuffle,
+            localPly.item, playerSettings.item.order);
+        shuffleOrders(shuffleArray);
         updateCurrTrackInfo("id", -1);
         toast.error(error.data?.errorDetails[0].message);
       }
@@ -213,11 +254,8 @@ const useTrackPlayer = (bc) => {
     ));
   }
 
-  useEffect(() => {
-
-  }, [playing, currentTrack])
-
   return {
+    removePlyByIndex,
     changeOrder,
     getPlyTrackByTrackId,
     localPlyTracks,
@@ -241,7 +279,10 @@ const useTrackPlayer = (bc) => {
     updateCurrTrackInfo,
     localPly,
     localPlyCreate,
-    changePlyVisible
+    changePlyVisible,
+    getStatusOnLocalPly,
+    resetCurrTrack,
+    localPlyActionsCreate
   };
 };
 

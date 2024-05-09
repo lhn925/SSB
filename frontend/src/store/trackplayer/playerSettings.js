@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import {loadFromLocalStorage, saveToLocalStorage} from "utill/function";
 import {LOCAL_PLAYER_SETTINGS} from "utill/enum/localKeyEnum";
 import {RESET_ALL} from "store/actions/Types";
+import {PLUS} from "content/trackplayer/NumberSignTypes";
 
 const settings = {
   order: 0, // 재생위치정보
@@ -14,7 +15,8 @@ const settings = {
   playbackRate: 1.0,
   playBackType: 0,// 순차 재생 다음곡으로 재생
   shuffle: false,// 랜덤재생
-  startT: null
+  startT: null,
+  numberSign:PLUS
 };
 const initialState = {
   key: LOCAL_PLAYER_SETTINGS,

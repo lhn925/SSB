@@ -6,8 +6,8 @@ import ReactPlayer from "react-player";
 import {USERS_FILE_IMAGE, USERS_FILE_TRACK_PLAY} from "utill/api/ApiEndpoints";
 import {
   durationTime,
-  loadFromLocalStorage,
-  secondsToTime,
+  loadFromLocalStorage, removeFromLocalStorage,
+  secondsToTime, shufflePlayOrder,
 } from "utill/function";
 import {
   ALL_PLAY,
@@ -20,6 +20,8 @@ import {ToggleLike} from "content/trackplayer/ToggleLike";
 import {ChartLogSave} from "content/trackplayer/ChartLogSave";
 import {ToggleFollow} from "content/trackplayer/ToggleFollow";
 import {PlayList} from "components/trackplayer/PlayList";
+import {MINUS, PLUS} from "content/trackplayer/NumberSignTypes";
+import {LOCAL_PLY_KEY} from "../../utill/enum/localKeyEnum";
 
 /**
  *
@@ -50,7 +52,11 @@ export const TrackPlayer = ({
   updateCurrTrackInfo,
   localPly,
   localPlyCreate,
-  changePlyVisible
+  changePlyVisible,
+  removePlyByIndex,
+  resetCurrTrack,
+  getStatusOnLocalPly,
+  localPlyActionsCreate
 }) => {
   const playerRef = useRef();
   const [settingsInfo, setSettingsInfo] = useState(
@@ -63,6 +69,8 @@ export const TrackPlayer = ({
   const [isPlaying, setIsPlaying] = useState(playing.item.playing);
   const [seeking, setSeeking] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
+  // const [statusOnLocalPly, setStatusOnLocalPly] = useState(
+  //     getStatusOnLocalPly());
 
   const [isVisible, setVisible] = useState(localPlyTracks.isVisible);
   const variable = useRef({
@@ -72,7 +80,6 @@ export const TrackPlayer = ({
     if (localPly.userId === null) {
       return;
     }
-
     function getLocalIndex() {
       const playLog = loadFromLocalStorage(localPlayLog.key);
       let findOrder = -1;
@@ -81,13 +88,15 @@ export const TrackPlayer = ({
       }
       const localId = playLog[0];
       const localIndex = playLog[1];
+      const createdDateTime = playLog[2];
       if (localId === null || localId === -1 || localIndex === null
           || localIndex === 0) {
         return 0;
       }
       // 로컬에 있는 마지막 플레이리스트 로그 찾아서 반환
       localPly.item.map((data, index) => {
-            if (data.index === localIndex && data.id === localId) {
+            if (data.createdDateTime === createdDateTime && data.id === localId
+                && data.isStatus !== 0) {
               localPly.playOrders.map((orderIndex, order) => {
                 if (index === orderIndex) {
                   // playOrders 순서 에 맞게 반환
@@ -113,11 +122,11 @@ export const TrackPlayer = ({
     }
 
     const findOrder = getLocalIndex();
-    updateSettings("order", findOrder);
+    updateOrderAndSign(findOrder, PLUS);
     changePlayLog(findOrder);
     // 처음 접속시
     if (localPly.item.length > 0 && localPlyInfo.length === 0) {
-      createCurrentTrack(findOrder);
+      createCurrentTrack(findOrder, PLUS);
       return;
     }
     // 재생중이면 그대로 유지
@@ -127,15 +136,17 @@ export const TrackPlayer = ({
       if (currentTrack.info.id === -1) {
         // 이전 재생 목록 혹은 다음 재생 목록
         // 비공개가 처리가 됐을 경우 list 재 배치 후 playLog 생성
-        createCurrentPlayLog(findOrder)
+        createCurrentPlayLog(findOrder, PLUS)
       }
     }
-  }, [localPly.item.length]);
+  }, [localPly.item.length, localPly.playOrders.length]);
   // 일시정지,다음곡,이전곡,
   useEffect(() => {
-    if (currentTrack.info.id === -1) {
-      return;
-    }
+    // if (currentTrack.info.id === -1) {
+    //
+    //   console.log(trackInfo.id);
+    //   return;
+    // }
     setTrackInfo(currentTrack.info);
   }, [currentTrack.info]);
   useEffect(() => {
@@ -154,14 +165,23 @@ export const TrackPlayer = ({
   }, [currentTrack.playLog]);
 
   useEffect(() => {
+
+    if (localPly.item.length === 0) {
+      return;
+    }
+    const statusOnLocalPly1 = getStatusOnLocalPly();
+    if (statusOnLocalPly1.length === 0) {
+      changePlaying(false);
+      resetCurrTrack();
+      removeFromLocalStorage(LOCAL_PLY_KEY);
+    }
+
     // 현재 플레이로그 트랙아이디가 -1이 아닐 경우
     if (localPlayLog.item[0] !== -1 && localPlyInfo.length !== 0) {
       // 트랙아이디
-
-      const trackId = localPlayLog.item[0];
+      // const trackId = localPlayLog.item[0];
       // 플레이리스트 Index
       const prevIndex = localPlayLog.item[1];
-
       // 이전 인덱스의 정보 (인덱스,아이디,추가한날짜)
       const prevPly = localPlyInfo.filter(prev => prev.index === prevIndex)[0];
       // 바뀐 localPly 에서 추가한 날짜와 트랙아이디로 인덱스 바뀌었는지 확인
@@ -172,18 +192,17 @@ export const TrackPlayer = ({
           playOrders.map((data, order) => {
             if (data === index) {
               // 모든 재생 순서는 playOrder 를 따른다
-              updateSettings("order", order);
+              // updateSettings("order", order);
+              updateOrderAndSign(order, PLUS);
             }
           })
           updateCurrTrackInfo("index", item.index);
         }
       })
-
     }
-
     setLocalPlyInfo(localPly.item);
     setPlayOrders(localPly.playOrders);
-  }, [localPly.item, localPly.playOrders]);
+  }, [localPly.item]);
 
   useEffect(() => {
     if (trackInfo.id === -1) {
@@ -218,33 +237,36 @@ export const TrackPlayer = ({
     // 셔플을 누를경우 Index 변환 문제로 인해
     // 리로딩 되는 문제 발생
     if (playerSettings.item.shuffle === settingsInfo.shuffle) {
-
       // 오더가 바뀌었는데
       // 현재 재생하고 있는 index 와 추가날짜 TrackId가 같다면
       // playLog를 불러오지 않는다
-      const plyTrackItem = getPlyTrackByOrder(playerSettings.item.order);
-
-      const addDateTime = plyTrackItem.addDateTime;
-      const createdDateTime = currentTrack.info.createdDateTime;
-      const plyTrackIndex = plyTrackItem.index;
-      const currTrackIndex = currentTrack.info.index;
-      const plyTrackId = plyTrackItem.id;
-      const currentTrackId = currentTrack.info.id;
-      const eqCurrTrack = addDateTime === createdDateTime &&
-          plyTrackIndex === currTrackIndex && plyTrackId === currentTrackId;
-
-      // 같지 않을 경우 PlayLog 가져옴
-      if (playing.item.playing && !eqCurrTrack) {
-        createCurrentPlayLog(playerSettings.item.order);
-        return;
+      const numberSign = playerSettings.item.numberSign;
+      const plyTrackItem = getPlyTrackByOrder(playerSettings.item.order,
+          numberSign);
+      if (plyTrackItem) {
+        const addDateTime = plyTrackItem.addDateTime;
+        const createdDateTime = currentTrack.info.createdDateTime;
+        const plyTrackIndex = plyTrackItem.index;
+        const currTrackIndex = currentTrack.info.index;
+        const plyTrackId = plyTrackItem.id;
+        const currentTrackId = currentTrack.info.id;
+        const eqCurrTrack = addDateTime === createdDateTime &&
+            plyTrackIndex === currTrackIndex && plyTrackId === currentTrackId;
+        // 같지 않을 경우 PlayLog 가져옴
+        if (playing.item.playing && !eqCurrTrack) {
+          createCurrentPlayLog(playerSettings.item.order,
+              numberSign);
+          return;
+        }
       }
-      createCurrentTrack(playerSettings.item.order);
+      createCurrentTrack(playerSettings.item.order, numberSign);
     }
     // if (currentTrack !== -1) {
     //   // const orderTrack = getPlyTrackByOrder(playerSettings.item.order);
     //   changePlayLog(currentTrack.id, playerSettings.order, new Date().getTime());
     // }
-  }, [playerSettings.item.order, playerSettings.item.shuffle]);
+  }, [playerSettings.item.order, playerSettings.item.shuffle,
+    playerSettings.item.numberSign]);
 
   // 일시정지,플레이버튼
   const onPlayButton = (e) => {
@@ -265,7 +287,7 @@ export const TrackPlayer = ({
       if (trackEq && currPlayLog.trackId !== -1) {// 같은 아이디에다가 PlayLog 까지 있다면 X
         return;
       }
-      createCurrentPlayLog(settingsInfo.order);
+      createCurrentPlayLog(settingsInfo.order, PLUS);
     }
   }
   let linkToTrack;
@@ -317,7 +339,7 @@ export const TrackPlayer = ({
     }
     // 한곡 무한 반복
     if (playBackType === REPEAT_ONE) {
-      createCurrentPlayLog(playIndex);
+      createCurrentPlayLog(playIndex, PLUS);
       return;
     }
     // 전체 재생인데 마지막인 아닌경우
@@ -327,7 +349,7 @@ export const TrackPlayer = ({
     }
     // 전체 재생인데 마지막인 경우
     if (isLast && playBackType === ALL_PLAY) {
-      createCurrentTrack(playIndex);
+      createCurrentTrack(playIndex, PLUS);
       changePlaying(false);
     }
   }
@@ -358,7 +380,7 @@ export const TrackPlayer = ({
   }
 
   const onErrorHandler = (e) => {
-    createCurrentPlayLog(settingsInfo.order);
+    createCurrentPlayLog(settingsInfo.order, PLUS);
   }
   const getPlayButton = (playing) => {
     return playing ? 'play-pause-btn-paused' : 'play-pause-btn';
@@ -406,7 +428,13 @@ export const TrackPlayer = ({
     updateSettings("playedSeconds", seekToSeconds);
     updateSettings("played", percent);
   }
-  const preBtnOnClick = () => {
+
+  function updateOrderAndSign(changeIndex, numberSign) {
+    updateSettings("order", changeIndex);
+    updateSettings("numberSign", numberSign);
+  }
+
+  const onPreBtnClick = () => {
     if (variable.current.isDoubleClick) {
       return;
     }
@@ -426,18 +454,19 @@ export const TrackPlayer = ({
     if (!isPlaying) {
       changePlaying(!isPlaying);
     }
+    setIsDoubleClick(false);
     updateSettings("playedSeconds", 0);
     // 5초보다 크다면 이전곡이 아닌 0초부터 시작
     if (settingsInfo.playedSeconds > 5) {
-      createCurrentPlayLog(settingsInfo.order);
+      createCurrentPlayLog(settingsInfo.order, MINUS);
       return;
     }
     // 하나만 있을경우
     if (playerSettings.order === changeIndex) {
-      createCurrentPlayLog(changeIndex);
+      createCurrentPlayLog(changeIndex, MINUS);
       return;
     }
-    updateSettings("order", changeIndex);
+    updateOrderAndSign(changeIndex, MINUS);
   }
 
   function nextTrackPlay(playIndex) {
@@ -449,9 +478,9 @@ export const TrackPlayer = ({
       playerRef.current.seekTo(0, "seconds");
     }
     if (playIndex === changeIndex) {
-      createCurrentPlayLog(playIndex);
+      createCurrentPlayLog(playIndex, PLUS);
     } else {
-      updateSettings("order", changeIndex);
+      updateOrderAndSign(changeIndex, PLUS);
     }
     updateSettings("playedSeconds", 0);
     if (!isPlaying) {
@@ -473,6 +502,8 @@ export const TrackPlayer = ({
     setIsDoubleClick(true);
     changeIsChartAndLogSave(false);
     nextTrackPlay(settingsInfo.order);
+    setIsDoubleClick(false);
+
   }
 
   const changePlayBackType = (e) => {
@@ -494,14 +525,19 @@ export const TrackPlayer = ({
     // 그 이전곡에서 다음 플레이를 누르면 뒤로가기전 플레이곡
 
     updateSettings("shuffle", isShuffle);
-    shuffleOrders(isShuffle);
+
+    const shuffleArray = shufflePlayOrder(playOrders, settingsInfo.shuffle,
+        localPlyInfo,
+        settingsInfo.order);
+    shuffleOrders(shuffleArray);
+
     if (isShuffle) {
-      updateSettings("order", 0);
+      updateOrderAndSign(0, PLUS);
       return;
     }
     // 기본 정렬된 Index 반환
     const order = playOrders[settingsInfo.order];
-    updateSettings("order", order);
+    updateOrderAndSign(order, PLUS);
   }
   // 일시정지시
   const onPauseHandler = (e) => {
@@ -516,16 +552,6 @@ export const TrackPlayer = ({
   }
 
   const toggleLike = (id) => {
-    if (variable.current.isDoubleClick) {
-      return;
-    }
-    const trackInfo = getPlyTrackByTrackId(id);
-    setIsDoubleClick(true);
-    ToggleLike(trackInfo.id, trackInfo.title, trackInfo.isLike,
-        updatePlyTrackInfo);
-    setIsDoubleClick(false);
-  }
-  const toggleFollow = () => {
     localPlyAddTracks(1);
     localPlyAddTracks(3);
     localPlyAddTracks(4);
@@ -537,6 +563,19 @@ export const TrackPlayer = ({
     localPlyAddTracks(10);
     localPlyAddTracks(11);
 
+    if (id === -1) {
+      return;
+    }
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    const trackInfo = getPlyTrackByTrackId(id);
+    setIsDoubleClick(true);
+    ToggleLike(trackInfo.id, trackInfo.title, trackInfo.isLike,
+        updatePlyTrackInfo);
+    setIsDoubleClick(false);
+  }
+  const toggleFollow = () => {
     if (variable.current.isDoubleClick) {
       return;
     }
@@ -570,7 +609,14 @@ export const TrackPlayer = ({
     currPlayLog,
     createCurrentPlayLog,
     playerRef,
-    toggleLike
+    toggleLike,
+    shuffleOrders,
+    updateCurrTrackInfo,
+    removePlyByIndex,
+    resetCurrTrack,
+    variable,
+    updateOrderAndSign,
+    setIsDoubleClick
   }
   return (
       <div id='track-player-bar'>
@@ -580,7 +626,7 @@ export const TrackPlayer = ({
           />
           <div id='tp-controller'>
             <div id='previous-btn'
-                 className='controller-btn' onClick={preBtnOnClick}></div>
+                 className='controller-btn' onClick={onPreBtnClick}></div>
             <div id={getPlayButton(isPlaying)}
                  data-id={trackInfo.id}
                  className='controller-btn'
@@ -648,7 +694,7 @@ export const TrackPlayer = ({
               <div className={'controller-btn ' + (trackInfo.isLike
                   ? 'liked-button-t' : 'liked-button')}
                    data-id={currentTrack.info.id}
-                   onClick={(e) => toggleLike(trackInfo.id)}></div>
+                   onClick={(e) => toggleLike(currentTrack.info.id)}></div>
               <div className={'controller-btn bg_player ' + (
                   trackInfo.postUser.isFollow ? 'follow-button-t'
                       : 'follow-button')}

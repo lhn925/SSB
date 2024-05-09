@@ -4,7 +4,7 @@ import TrackLikeApi from "utill/api/trackPlayer/TrackLikeApi";
 import {HttpStatusCode} from "axios";
 
 export function ToggleLike(trackId,title,isLike, updatePlyTrackInfo) {
-  if (trackId === -1) {
+  if (trackId === -1 || trackId === undefined) {
     return;
   }
 

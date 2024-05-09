@@ -13,9 +13,6 @@ const userReducers = createSlice({
   name: "user",
   initialState: initialState,
   reducers: {
-    reset(state) {
-      Object.assign(state, initialState)
-    },
     setUserId(state, action) {
       state.userId = action.payload.userId;
     },
@@ -34,12 +31,11 @@ const userReducers = createSlice({
     }
   }, extraReducers(builder) {
     builder.addCase(PURGE, () => initialState);
-    // builder.addCase(RESET_ALL, () => initialState);
+    builder.addCase(RESET_ALL, () => initialState);
   }
 });
 
 export let userActions = {
-  reset: userReducers.actions.reset,
   setUserId: userReducers.actions.setUserId,
   setEmail: userReducers.actions.setEmail,
   setPictureUrl: userReducers.actions.setPictureUrl,

@@ -4,12 +4,13 @@ import {
   getRandomInt,
   loadFromLocalStorage,
   removeFromLocalStorage,
-  saveToLocalStorage, sorted
+  saveToLocalStorage,
+  sorted
 } from "utill/function";
 import {toast} from "react-toastify";
 import {LOCAL_PLAYER_SETTINGS, LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {shuffle} from "lodash";
-import {RESET_ALL} from "store/actions/Types";
+import {LOCAL_PLY_TRACK_RESET, RESET_ALL} from "store/actions/Types";
 
 //현재 재생 목록
 const initialState = {
@@ -26,6 +27,8 @@ function setStoragePly(state, userId) {
   saveToLocalStorage({key: state.key, item: {list: state.item, userId: userId}})
 }
 
+
+
 const localPly = createSlice({
   name: "localPly",
   initialState: initialState,
@@ -40,22 +43,28 @@ const localPly = createSlice({
           removeFromLocalStorage(state.key);
           return;
         }
-        state.item = localPly.list;
-        state.item.sort(function (a, b) {
+
+        localPly.list.sort(function (a, b) {
           return sorted(a, b);
         });
+
         const settings = loadFromLocalStorage(LOCAL_PLAYER_SETTINGS);
         const orderArray = [];
         for (let i = 0; i < localPly.list.length; i++) {
           orderArray.push(i);
+          localPly.list[i].index = i + 1;
         }
+        state.item = localPly.list;
         if (settings.shuffle) {
           state.playOrders = shuffle(orderArray);
           return;
         }
         state.playOrders = orderArray;
         setStoragePly(state, userId);
+        return;
       }
+      state.item = [];
+      setStoragePly(state, userId);
     }, addTracks(state, action) {
       // 갖고 오기
       const localPly = loadFromLocalStorage(state.key);
@@ -119,37 +128,7 @@ const localPly = createSlice({
       saveToLocalStorage(
           {key: state.key, item: {list: state.item, userId: data.userId}})
     }, shuffleOrders(state, action) {
-      const isShuffle = action.payload.isShuffle;
-
-      // 현재 재생하고있는 위치 인덱스
-      let playIndex = action.payload.playIndex;
-      if (playIndex >= state.item.length) {
-        playIndex = 0;
-      }
-      // 현재 재생 하고 있는 위치에 트랙값을 가져온다
-      const currentOrders = state.playOrders[playIndex];
-      // 이전값
-      if (isShuffle) {
-        const prevOrders = state.playOrders;
-        // 재생하고 인덱스 값 삭제 후
-        prevOrders.splice(playIndex, 1);
-        const shuffleArray = shuffle(prevOrders);
-        // 첫번째에 값 추가
-        shuffleArray.splice(0, 0, currentOrders);
-        state.playOrders = shuffleArray;
-        return;
-      }
-      state.playOrders.sort(function (a, b) {
-        if (a > b) {
-          return 1;
-        }
-        if (a === b) {
-          return 0;
-        }
-        if (a < b) {
-          return -1;
-        }
-      });
+      state.playOrders = action.payload.playOrders;
     }, updatePlyTrackInfo(state, action) {
       const id = parseInt(action.payload.id);
       const key = action.payload.key;
@@ -158,7 +137,7 @@ const localPly = createSlice({
           data[key] = action.payload.value;
         }
       })
-
+      // shuffleOrders 구조 변경 해야함
       setStoragePly(state, state.userId);
     }, changePlyTrackInfo(state, action) {
       const data = action.payload.data;
@@ -189,18 +168,28 @@ const localPly = createSlice({
         state.item = updateList;
         setStoragePly(state, state.userId);
       }
+    }, removePlyByIndex(state, action) {
+      // const updateList = action.payload.updateList;
+      // if (updateList) {
+      //   state.item = updateList;
+      //   setStoragePly(state, state.userId);
+      // }
+      // const copyItem = [...state.item];
+      state.item.map(data => {
+        if (data.index === action.payload.index) {
+          data.isStatus = 0;
+        }
+      })
+      setStoragePly(state, state.userId);
+
     }, changeOrder(state, action) {
-      // const items = Array.from(state.item);
-      // const sourceIndex = action.payload.sourceIndex;
-      // const destinationIndex = action.payload.destIndex;
-      // const [reorderedItem] = items.splice(sourceIndex, 1);
-      // items.splice(destinationIndex, 0, reorderedItem);
       // 바뀐 위치아래는 index + 1;
       state.item = action.payload.items;
       setStoragePly(state, state.userId);
     }
   }, extraReducers: (builder) => {
     builder.addCase(RESET_ALL, () => initialState);
+    builder.addCase(LOCAL_PLY_TRACK_RESET, () => initialState);
   }
 });
 
@@ -212,5 +201,6 @@ export let localPlyActions = {
   changePlyTrackInfo: localPly.actions.changePlyTrackInfo,
   removePlyByTrackId: localPly.actions.removePlyByTrackId,
   changeOrder: localPly.actions.changeOrder,
+  removePlyByIndex: localPly.actions.removePlyByIndex,
 };
 export default localPly.reducer;

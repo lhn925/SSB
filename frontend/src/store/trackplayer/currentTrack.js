@@ -4,7 +4,11 @@
  * 현재 재생 할려고 하는 track
  */
 import {createSlice} from '@reduxjs/toolkit';
-import {RESET_ALL} from "store/actions/Types";
+import {
+  CURRENT_RESET,
+  CURRENT_TRACK_RESET,
+  RESET_ALL
+} from "store/actions/Types";
 
 const setPlayLog = (playLog, data) => {
   playLog.trackId = data.trackId
@@ -99,6 +103,7 @@ const currentTrack = createSlice({
     }
   },extraReducers: (builder) => {
     builder.addCase(RESET_ALL, () => initialState);
+    builder.addCase(CURRENT_TRACK_RESET, () => initialState);
   }
 });
 

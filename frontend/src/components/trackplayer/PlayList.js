@@ -5,13 +5,20 @@ import "css/playerBar/item-view.css"
 import "css/sc_custom.css"
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
-import {durationTime, sorted} from "utill/function";
+import {
+  durationTime,
+  removeLocalPlyByIndex,
+  shufflePlayOrder,
+  sorted
+} from "utill/function";
+import {PLUS} from "content/trackplayer/NumberSignTypes";
 
 export function PlayList({
   changeOrder,
   getPlyTrackByTrackId,
   isVisible,
   changeIsVisible,
+  updateOrderAndSign,
   isPlaying,
   localPlyInfo,
   trackInfo,
@@ -24,18 +31,22 @@ export function PlayList({
   currPlayLog,
   createCurrentPlayLog,
   playerRef,
-  toggleLike
+  toggleLike,
+  removePlyByIndex,
+  resetCurrTrack,
+  variable,
+  shuffleOrders,
+  setIsDoubleClick
 }) {
 
-  const onPlayButtonClickHandler = (e) => {
+  const onClickPlayButtonHandler = (e) => {
     const index = Number.parseInt(e.currentTarget.dataset.id);
-    // changePlaying(false);
     const trackEq = index === trackInfo.index;
     let currOrder = index - 1;
     // 현재 셔플 재생이라면
     // Index 위치 값 반환
     if (settingsInfo.shuffle) {
-      for (let i=0; i < playOrders.length; i++) {
+      for (let i = 0; i < playOrders.length; i++) {
         const order = playOrders[i];
         if (order === currOrder) {
           currOrder = i;
@@ -51,15 +62,75 @@ export function PlayList({
     }
     // 만약 재생중이지 않을 경우 PlayLog 확인 후 플레이
     changePlaying(true);
-    if (trackEq && !isPlaying && currPlayLog.trackId !== -1) {
+    if (trackEq && !isPlaying) {
+      if (currPlayLog.trackId !== -1) {
+        return;
+      }
+      resetPlayedSeconds();
+      createCurrentPlayLog(currOrder, PLUS);
       return;
     }
+    resetPlayedSeconds();
+    // updateSettings("order", currOrder);
+    updateOrderAndSign(currOrder, PLUS);
+  }
+
+  function resetPlayedSeconds() {
     updateSettings("played", 0);
     updateSettings("playedSeconds", 0);
     if (playerRef.current) {
       playerRef.current.seekTo(0, "seconds");
     }
-    updateSettings("order", currOrder);
+  }
+
+  const onClickRmBtnHandler = (index) => {
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    setIsDoubleClick(true);
+    const currentEq = trackInfo.index === index;
+    if (currentEq) {
+      changePlaying(false);
+      resetCurrTrack();
+      resetPlayedSeconds();
+      if ((settingsInfo.order + 1) < localPlyInfo.length) {
+        updateOrderAndSign(settingsInfo.order + 1, PLUS);
+      }
+      changePlaying(true);
+    }
+    removePlyByIndex(index);
+    // const shuffleArray = shufflePlayOrder(playOrders, settingsInfo.shuffle, updateList,
+    //     settingsInfo.order);
+/*
+    const copyPlayOrders = [...playOrders];
+
+    const removeOrder = index - 1;
+    let spliceOrder = -1;
+
+    const currentOrder = settingsInfo.order;
+
+
+    playOrders.map((data, order) => {
+      if (data === (removeOrder)) {
+        spliceOrder = order;
+      }
+      if (data > removeOrder) {
+        copyPlayOrders[order] -= 1;
+      }
+    });
+
+    if (spliceOrder < currentOrder) {
+      // updateSettings("order", currentOrder - 1);
+    }
+
+    copyPlayOrders.splice(spliceOrder, 1);*/
+
+
+    // if (currentEq && localPlyInfo.length > 1) {
+    //   changePlaying(true);
+    // }
+    setIsDoubleClick(false);
+    // 플레이 리스트
   }
 
   return (
@@ -75,7 +146,8 @@ export function PlayList({
                       className="btn queue__clear sc-button sc-button-medium sc-text-h4 sc-px-1.5x sc-py-0.75x sc-mr-1x">Clear
               </button>
               <button type="button"
-                      className="btn queue__hide sc-button sc-button-nostyle sc-ir">X
+                      className="btn queue__hide sc-button sc-button-nostyle sc-ir"
+                      onClick={() => changeIsVisible(!isVisible)}>X
               </button>
             </div>
 
@@ -95,7 +167,8 @@ export function PlayList({
                       <Droppable droppableId="droppable-songs">
                         {(provided) => getDragAndDrop(provided, localPlyInfo,
                             getPlyTrackByTrackId, trackInfo, isPlaying,
-                            onPlayButtonClickHandler,toggleLike)}
+                            onClickPlayButtonHandler, toggleLike,
+                            onClickRmBtnHandler)}
 
 
                       </Droppable>
@@ -123,7 +196,7 @@ export function PlayList({
 }
 
 function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
-    isPlaying, onPlayButtonClickHandler,toggleLike) {
+    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler) {
 
   const infoTracks = localPlyInfo.map((item) => ({
     ...item, info: getPlyTrackByTrackId(item.id)
@@ -135,7 +208,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
   return <div {...provided.droppableProps}
               ref={provided.innerRef}>
     {infoTracks.map((data, index) => (
-        <Draggable key={data.index}
+
+        data.isStatus !== 0 && <Draggable key={data.index}
                    draggableId={data.index + ""} index={index}>
           {(provided) => (
               <>
@@ -164,7 +238,7 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                         </div>
                         <div className="queueItemView__playButton"
                              data-id={data.index}
-                             onClick={(e) => onPlayButtonClickHandler(e)}>
+                             onClick={(e) => onClickPlayButtonHandler(e)}>
                           <div className={(data.index === trackInfo.index
                               && isPlaying ? "sc-button-pause " : "sc-button-play ")
                               + "  sc-button"}></div>
@@ -211,6 +285,7 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                         <button type="button"
                                 className="removeFromNextUp queueItemView__remove sc-button sc-button-small sc-button-icon sc-button-nostyle"
                                 tabIndex={0}
+                                onClick={() => onClickRmBtnHandler(data.index)}
                                 title="Remove from Next up"
                                 aria-label="Remove from Next up">
                         </button>
