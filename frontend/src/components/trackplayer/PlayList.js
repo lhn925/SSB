@@ -6,12 +6,13 @@ import "css/sc_custom.css"
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 import {
-  durationTime,
+  durationTime, removeFromLocalStorage,
   removeLocalPlyByIndex,
   shufflePlayOrder,
   sorted
 } from "utill/function";
 import {PLUS} from "content/trackplayer/NumberSignTypes";
+import {LOCAL_PLY_KEY} from "../../utill/enum/localKeyEnum";
 
 export function PlayList({
   changeOrder,
@@ -36,7 +37,8 @@ export function PlayList({
   resetCurrTrack,
   variable,
   shuffleOrders,
-  setIsDoubleClick
+  setIsDoubleClick,
+  resetPlyTrack
 }) {
 
   const onClickPlayButtonHandler = (e) => {
@@ -101,41 +103,26 @@ export function PlayList({
 
     }
     removePlyByIndex(index);
-    // const shuffleArray = shufflePlayOrder(playOrders, settingsInfo.shuffle, localPlyInfo,
-    //     settingsInfo.order);
-
-    // shuffleOrders(shuffleArray);
-/*
-    const copyPlayOrders = [...playOrders];
-
-    const removeOrder = index - 1;
-    let spliceOrder = -1;
-
-    const currentOrder = settingsInfo.order;
-
-
-    playOrders.map((data, order) => {
-      if (data === (removeOrder)) {
-        spliceOrder = order;
-      }
-      if (data > removeOrder) {
-        copyPlayOrders[order] -= 1;
-      }
-    });
-
-    if (spliceOrder < currentOrder) {
-      // updateSettings("order", currentOrder - 1);
-    }
-
-    copyPlayOrders.splice(spliceOrder, 1);*/
-
-
-    // if (currentEq && localPlyInfo.length > 1) {
-    //   changePlaying(true);
-    // }
     setIsDoubleClick(false);
     // 플레이 리스트
   }
+
+
+  // 전체 클리어
+  const onClickClearHandler = () => {
+    if (variable.current.isDoubleClick) {
+      return;
+    }
+    setIsDoubleClick(true);
+    changePlaying(false);
+    resetCurrTrack();
+    resetPlayedSeconds();
+    resetPlyTrack();
+    removeFromLocalStorage(LOCAL_PLY_KEY);
+    setIsDoubleClick(false);
+    // 플레이 리스트
+  }
+
 
   return (
       <>
@@ -146,7 +133,7 @@ export function PlayList({
                   className="queue__title sc-font-light sc-type-medium sc-text-h2 sc-px-2x sc-py-1x text-start">
                 현재 재생 목록
               </div>
-              <button type="button"
+              <button type="button" onClick={onClickClearHandler}
                       className="btn queue__clear sc-button sc-button-medium sc-text-h4 sc-px-1.5x sc-py-0.75x sc-mr-1x">Clear
               </button>
               <button type="button"

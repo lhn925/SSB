@@ -136,12 +136,13 @@ const useTrackPlayer = (bc) => {
   const resetCurrTrack = () => {
     dispatch(resetCurrentTrack());
   }
-
+  const resetPlyTrack = () => {
+    dispatch(resetLocalPlyTrack());
+  }
   const getStatusOnLocalPly = () => {
     const statusOnLocalPly = localPly.item.filter((data) => data.isStatus === 1);
-
     if (statusOnLocalPly.length === 0) {
-      dispatch(resetLocalPlyTrack());
+      resetPlyTrack();
       localPlyActionsCreate({userId:userInfo.userId});
     }
     return statusOnLocalPly;
@@ -283,7 +284,8 @@ const useTrackPlayer = (bc) => {
     changePlyVisible,
     getStatusOnLocalPly,
     resetCurrTrack,
-    localPlyActionsCreate
+    localPlyActionsCreate,
+    resetPlyTrack
   };
 };
 

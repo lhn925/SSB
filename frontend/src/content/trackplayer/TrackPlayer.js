@@ -56,7 +56,8 @@ export const TrackPlayer = ({
   removePlyByIndex,
   resetCurrTrack,
   getStatusOnLocalPly,
-  localPlyActionsCreate
+  localPlyActionsCreate,
+  resetPlyTrack
 }) => {
   const playerRef = useRef();
   const [settingsInfo, setSettingsInfo] = useState(
@@ -119,8 +120,6 @@ export const TrackPlayer = ({
     if (localPly.userId === null) {
       return;
     }
-
-
     const findOrder = getLocalIndex();
     updateOrderAndSign(findOrder, PLUS);
     changePlayLog(findOrder);
@@ -140,6 +139,7 @@ export const TrackPlayer = ({
   }, [currentTrack.info]);
   useEffect(() => {
     if (currentTrack.playLog.trackId === -1) {
+      setCurrPlayLog(currentTrack.playLog);
       return;
     }
     const prevPlayToken = currPlayLog.token;
@@ -155,6 +155,7 @@ export const TrackPlayer = ({
 
   useEffect(() => {
     if (localPly.item.length === 0) {
+      setLocalPlyInfo(localPly.item);
       return;
     }
     const newStatusLocalPly = getStatusOnLocalPly();
@@ -204,7 +205,6 @@ export const TrackPlayer = ({
     setLocalPlyInfo(localPly.item);
     setPlayOrders(localPly.playOrders);
     setStatusOnLocalPly(newStatusLocalPly);
-    // setStatusOnLocalPly(newStatusLocalPly);
   }, [localPly.item]);
 
   useEffect(() => {
@@ -279,11 +279,11 @@ export const TrackPlayer = ({
       toast.error("텍스트 추가) 재생할 트랙을 추가해주세요.")
       return;
     }
-    changePlaying(!isPlaying);
     const trackId = Number.parseInt(e.target.dataset.id);
     if (trackId === -1) {
       return;
     }
+    changePlaying(!isPlaying);
     // 같은 트랙인지 확인
     const trackEq = trackInfo.id === trackId;
     if (!isPlaying) { // 재생일 경우
@@ -619,7 +619,8 @@ export const TrackPlayer = ({
     resetCurrTrack,
     variable,
     updateOrderAndSign,
-    setIsDoubleClick
+    setIsDoubleClick,
+    resetPlyTrack
   }
   return (
       <div id='track-player-bar'>
