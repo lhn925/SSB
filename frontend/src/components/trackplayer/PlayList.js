@@ -12,7 +12,7 @@ import {
   sorted
 } from "utill/function";
 import {PLUS} from "content/trackplayer/NumberSignTypes";
-import {LOCAL_PLY_KEY} from "../../utill/enum/localKeyEnum";
+import {LOCAL_PLY_KEY, LOCAL_PLY_LOG} from "../../utill/enum/localKeyEnum";
 
 export function PlayList({
   changeOrder,
@@ -38,7 +38,7 @@ export function PlayList({
   variable,
   shuffleOrders,
   setIsDoubleClick,
-  resetPlyTrack
+  resetPlyTrack,
 }) {
 
   const onClickPlayButtonHandler = (e) => {
@@ -119,6 +119,7 @@ export function PlayList({
     resetPlayedSeconds();
     resetPlyTrack();
     removeFromLocalStorage(LOCAL_PLY_KEY);
+    removeFromLocalStorage(LOCAL_PLY_LOG);
     setIsDoubleClick(false);
     // 플레이 리스트
   }

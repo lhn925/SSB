@@ -166,7 +166,7 @@ export const TrackPlayer = ({
     }
 
     // 현재 플레이로그 트랙아이디가 -1이 아닐 경우
-    if (localPlayLog.item[0] !== -1 && localPlyInfo.length !== 0) {
+    if (localPly.item.length > 0 && localPlayLog.item[0] !== -1 && localPlyInfo.length > 0) {
       // 트랙아이디
       // const trackId = localPlayLog.item[0];
       // 플레이리스트 Index
@@ -620,7 +620,8 @@ export const TrackPlayer = ({
     variable,
     updateOrderAndSign,
     setIsDoubleClick,
-    resetPlyTrack
+    resetPlyTrack,
+    updateCurrPlayLog
   }
   return (
       <div id='track-player-bar'>
