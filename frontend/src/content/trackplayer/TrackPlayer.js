@@ -69,57 +69,57 @@ export const TrackPlayer = ({
   const [isPlaying, setIsPlaying] = useState(playing.item.playing);
   const [seeking, setSeeking] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
-  // const [statusOnLocalPly, setStatusOnLocalPly] = useState(
-  //     getStatusOnLocalPly());
+  const [statusOnLocalPly, setStatusOnLocalPly] = useState(null);
 
   const [isVisible, setVisible] = useState(localPlyTracks.isVisible);
   const variable = useRef({
     isDoubleClick: false // 더블 클릭 방지
   })
+
+  function getLocalIndex() {
+    const playLog = loadFromLocalStorage(localPlayLog.key);
+    let findOrder = -1;
+    if (playLog == null) {
+      return 0;
+    }
+    const localId = playLog[0];
+    const localIndex = playLog[1];
+    const createdDateTime = playLog[3];
+    if (localId === null || localId === -1 || localIndex === null
+        || localIndex === 0) {
+      return 0;
+    }
+    // 로컬에 있는 마지막 플레이리스트 로그 찾아서 반환
+    localPly.item.map((data, index) => {
+          if (data.createdDateTime === createdDateTime && data.id === localId && data.isStatus !== 0) {
+            localPly.playOrders.map((orderIndex, order) => {
+              if (index === orderIndex) {
+                // playOrders 순서 에 맞게 반환
+                findOrder = order;
+              }
+            })
+          }
+        }
+    );
+    const order = playerSettings.item.order;
+    // 만약 찾지 못하였으면
+    if (findOrder === -1) {
+      const maxOrder = localPly.item.length;
+      const isOver = (order + 1) === maxOrder;
+      // 만약 넘지 않았다
+      if (!isOver) {
+        findOrder = order;
+      } else {
+        findOrder = 0;
+      }
+    }
+    return findOrder;
+  }
   useEffect(() => {
     if (localPly.userId === null) {
       return;
     }
-    function getLocalIndex() {
-      const playLog = loadFromLocalStorage(localPlayLog.key);
-      let findOrder = -1;
-      if (playLog == null) {
-        return 0;
-      }
-      const localId = playLog[0];
-      const localIndex = playLog[1];
-      const createdDateTime = playLog[2];
-      if (localId === null || localId === -1 || localIndex === null
-          || localIndex === 0) {
-        return 0;
-      }
-      // 로컬에 있는 마지막 플레이리스트 로그 찾아서 반환
-      localPly.item.map((data, index) => {
-            if (data.createdDateTime === createdDateTime && data.id === localId
-                && data.isStatus !== 0) {
-              localPly.playOrders.map((orderIndex, order) => {
-                if (index === orderIndex) {
-                  // playOrders 순서 에 맞게 반환
-                  findOrder = order;
-                }
-              })
-            }
-          }
-      );
-      const order = playerSettings.item.order;
-      // 만약 찾지 못하였으면
-      if (findOrder === -1) {
-        const maxOrder = localPly.item.length;
-        const isOver = (order + 1) === maxOrder;
-        // 만약 넘지 않았다
-        if (!isOver) {
-          findOrder = order;
-        } else {
-          findOrder = 0;
-        }
-      }
-      return findOrder;
-    }
+
 
     const findOrder = getLocalIndex();
     updateOrderAndSign(findOrder, PLUS);
@@ -127,17 +127,6 @@ export const TrackPlayer = ({
     // 처음 접속시
     if (localPly.item.length > 0 && localPlyInfo.length === 0) {
       createCurrentTrack(findOrder, PLUS);
-      return;
-    }
-    // 재생중이면 그대로 유지
-    // 플레이 리스트에 변화가 생겼을 경우
-    // 플레이
-    if (localPlyInfo.length !== localPly.item.length) {
-      if (currentTrack.info.id === -1) {
-        // 이전 재생 목록 혹은 다음 재생 목록
-        // 비공개가 처리가 됐을 경우 list 재 배치 후 playLog 생성
-        createCurrentPlayLog(findOrder, PLUS)
-      }
     }
   }, [localPly.item.length, localPly.playOrders.length]);
   // 일시정지,다음곡,이전곡,
@@ -165,12 +154,11 @@ export const TrackPlayer = ({
   }, [currentTrack.playLog]);
 
   useEffect(() => {
-
     if (localPly.item.length === 0) {
       return;
     }
-    const statusOnLocalPly1 = getStatusOnLocalPly();
-    if (statusOnLocalPly1.length === 0) {
+    const newStatusLocalPly = getStatusOnLocalPly();
+    if (newStatusLocalPly.length === 0) {
       changePlaying(false);
       resetCurrTrack();
       removeFromLocalStorage(LOCAL_PLY_KEY);
@@ -200,8 +188,23 @@ export const TrackPlayer = ({
         }
       })
     }
+
+    const findOrder = getLocalIndex();
+    // 재생중이면 그대로 유지
+    // 플레이 리스트에 변화가 생겼을 경우
+    // 플레이
+    if (statusOnLocalPly && statusOnLocalPly.length !== newStatusLocalPly.length) {
+      if (currentTrack.info.id === -1) {
+        // 이전 재생 목록 혹은 다음 재생 목록
+        // 비공개가 처리가 됐을 경우 list 재 배치 후 playLog 생성
+        createCurrentPlayLog(findOrder, PLUS)
+      }
+    }
+
     setLocalPlyInfo(localPly.item);
     setPlayOrders(localPly.playOrders);
+    setStatusOnLocalPly(newStatusLocalPly);
+    // setStatusOnLocalPly(newStatusLocalPly);
   }, [localPly.item]);
 
   useEffect(() => {
@@ -526,7 +529,7 @@ export const TrackPlayer = ({
 
     updateSettings("shuffle", isShuffle);
 
-    const shuffleArray = shufflePlayOrder(playOrders, settingsInfo.shuffle,
+    const shuffleArray = shufflePlayOrder(playOrders,isShuffle,
         localPlyInfo,
         settingsInfo.order);
     shuffleOrders(shuffleArray);

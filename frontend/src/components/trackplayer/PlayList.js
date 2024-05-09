@@ -97,10 +97,14 @@ export function PlayList({
         updateOrderAndSign(settingsInfo.order + 1, PLUS);
       }
       changePlaying(true);
+    } else {
+
     }
     removePlyByIndex(index);
-    // const shuffleArray = shufflePlayOrder(playOrders, settingsInfo.shuffle, updateList,
+    // const shuffleArray = shufflePlayOrder(playOrders, settingsInfo.shuffle, localPlyInfo,
     //     settingsInfo.order);
+
+    // shuffleOrders(shuffleArray);
 /*
     const copyPlayOrders = [...playOrders];
 

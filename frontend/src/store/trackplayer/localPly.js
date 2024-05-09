@@ -153,21 +153,24 @@ const localPly = createSlice({
     }, removePlyByTrackId(state, action) {
       // play
       const removeId = action.payload.id;
-      const prevList = state.item;
-
-      const findRemoveList = prevList.filter(track => track.id === removeId);
-
-      if (findRemoveList.length > 0) {
-        const minIndex = findRemoveList.reduce((max, item) => Math.min(max, item.index),
-            findRemoveList[0].index);
-        const updateList = prevList.filter(track => track.id !== removeId);
-
-        for (let i = minIndex - 1; i < updateList.length; i++) {
-          updateList[i].index = i + 1; // 인덱스 재조정
-        }
-        state.item = updateList;
+      // const prevList = state.item;
+      //
+      // const findRemoveList = prevList.filter(track => track.id === removeId);
+      //
+      // if (findRemoveList.length > 0) {
+      //   const minIndex = findRemoveList.reduce((max, item) => Math.min(max, item.index),
+      //       findRemoveList[0].index);
+      //   const updateList = prevList.filter(track => track.id !== removeId);
+        state.item.map(data => {
+          if (data.id === removeId) {
+            data.isStatus = 0;
+          }
+        })
+        // for (let i = minIndex - 1; i < updateList.length; i++) {
+        //   updateList[i].index = i + 1; // 인덱스 재조정
+        // }
+        // state.item = updateList;
         setStoragePly(state, state.userId);
-      }
     }, removePlyByIndex(state, action) {
       // const updateList = action.payload.updateList;
       // if (updateList) {

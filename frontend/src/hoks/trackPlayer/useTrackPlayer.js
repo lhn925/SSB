@@ -52,6 +52,7 @@ const useTrackPlayer = (bc) => {
           id: data.id,
           index: data.index,
           startTime: new Date().getTime(),
+          addDateTime: data.createdDateTime,
         }
     ));
   }

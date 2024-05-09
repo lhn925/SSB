@@ -623,13 +623,13 @@ export function sorted(a, b) {
 export function shufflePlayOrder(playOrders, isShuffle, localPly, playIndex) {
   let prevOrders = [...playOrders];
   // 현재 재생 하고 있는 위치에 트랙값을 가져온다
-  if (playOrders.length !== localPly.length) {
-    const orderArray = []
-    for (let i = 0; i < localPly.length; i++) {
-      orderArray.push(i);
-    }
-    prevOrders = orderArray;
-  }
+  // if (playOrders.length !== localPly.length) {
+  //   const orderArray = []
+  //   for (let i = 0; i < localPly.length; i++) {
+  //     orderArray.push(i);
+  //   }
+  //   prevOrders = orderArray;
+  // }
   // 현재 재생하고있는 위치 인덱스
   if (playIndex >= localPly.length) {
     playIndex = 0;
