@@ -6,21 +6,21 @@ server:
     include-stacktrace: never
     include-binding-errors: never
   address: localhost
-  servlet:
-    session:
-      timeout: 1m
+#  servlet:
+#    session:
+#      timeout: 1m
 spring:
   servlet:
     multipart:
       max-file-size: 10000MB
       max-request-size: 10000MB
       enabled: true
-  session:
-    redis:
-      flush-mode: on_save
-      namespace: spring:session
-    store-type: redis
-    timeout: 100
+#  session:
+#    redis:
+#      flush-mode: on_save
+#      namespace: spring:session
+#    store-type: redis
+#    timeout: 100
   data:
     redis:
       repositories:

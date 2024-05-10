@@ -31,9 +31,6 @@ public class RedisKeyExpireEventListener extends KeyExpirationEventMessageListen
      */
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        log.info("message = {}", message.toString());
-        log.info("new String(pattern) = {}", new String(pattern));
-
         String session = message.toString();
         expireLoginStatusUpdate(session);
         super.onMessage(message, pattern);

@@ -375,8 +375,7 @@ public class UserLoginStatusService {
         for (UserLoginStatus userLoginStatus : userLoginStatusList) {
             // 세션 삭제
             // 현재 접속하고 있는 세션 제외
-            if (!userLoginStatus.getSessionId().equals(sessionId) && redisQueryService.hasRedis(
-                RedisKeyDto.REDIS_SESSION_KEY + userLoginStatus.getSessionId())) {
+            if (!userLoginStatus.getSessionId().equals(sessionId)) {
                 // 레디스 토큰 값 삭제
                 removeRedisToken(userLoginStatus);
             }

@@ -68,7 +68,7 @@ public class EmailApiController {
      * @return
      */
     @PostMapping("/join")
-    public ResponseEntity sendJoinMail(
+    public ResponseEntity<?> sendJoinMail(
         @Validated @RequestBody EmailSendDto emailSendDto,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {

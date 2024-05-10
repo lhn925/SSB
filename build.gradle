@@ -72,7 +72,7 @@ dependencies {
     implementation group: 'com.maxmind.geoip2', name: 'geoip2', version: '4.0.1'
 
     // Redis
-    implementation 'org.springframework.session:spring-session-data-redis'
+//    implementation 'org.springframework.session:spring-session-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     implementation 'org.webjars:webjars-locator-core'

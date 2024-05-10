@@ -5,9 +5,7 @@ import io.lettuce.core.SocketOptions;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import java.time.Duration;
-import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,14 +14,10 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import sky.Sss.global.redis.service.RedisTagService;
 
 @Configuration
-@EnableRedisHttpSession
+//@EnableRedisHttpSession
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -35,6 +29,10 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+//
+//        Jedis는 멀티스레드 환경에서 안전하지 않다.
+//            Lettuce는 Netty 기반 환경으로 비동기를 지원한다.
+//            Lettuce는 거의 모든 측면에서 성능이 Jedis보다 우수하다.
 
 //        Lettuce 라이브러리를 사용한다면 Keep Alive 기능을 활성화하고 Connection timeout을 설정하는 것을 추천합니다.
 //
@@ -77,22 +75,24 @@ public class RedisConfig {
         redisConfiguration.setHostName(host);
         redisConfiguration.setPort(port);
         redisConfiguration.setDatabase(0);
-        return new LettuceConnectionFactory(redisConfiguration,clientConfig);
+        return new LettuceConnectionFactory(redisConfiguration, clientConfig);
     }
+
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer() {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory());
         return redisMessageListenerContainer;
     }
-    @Bean
-    public RedisConnectionFactory redisConnectionFactoryToken() {
-        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
-        redisConfiguration.setHostName(host);
-        redisConfiguration.setPort(port);
-        redisConfiguration.setDatabase(1);
-        return new LettuceConnectionFactory(redisConfiguration);
-    }
+
+//    @Bean
+//    public RedisConnectionFactory redisConnectionFactoryToken() {
+//        RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
+//        redisConfiguration.setHostName(host);
+//        redisConfiguration.setPort(port);
+//        redisConfiguration.setDatabase(1);
+//        return new LettuceConnectionFactory(redisConfiguration);
+//    }
 
 
     @Bean(name = "redisTemplate")
@@ -103,12 +103,12 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean(name = "redisTemplateToken")
-    public RedisTemplate<?, ?> redisTemplateToken() {
-        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactoryToken());
-        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
+//    @Bean(name = "redisTemplateToken")
+//    public RedisTemplate<?, ?> redisTemplateToken() {
+//        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setConnectionFactory(redisConnectionFactoryToken());
+//        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
+//        return redisTemplate;
+//    }
 
 }
