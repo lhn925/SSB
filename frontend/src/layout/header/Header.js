@@ -97,7 +97,7 @@ function Header({
                     clickBtnLogout={clickBtnLogout}
                     navigate={navigate}
                     client={client}
-                    userId={userInfo.userId}
+                    userName={userInfo.userName}
                     pictureUrl={userInfo.pictureUrl}
                 /> : <>
                   <button onClick={openModalHandler}
@@ -117,7 +117,7 @@ function Header({
 
 function CircularImageDropdown({
   pictureUrl,
-  userId,
+  userName,
   navigate,
   clickBtnLogout,
   client
@@ -136,15 +136,15 @@ function CircularImageDropdown({
 
           <Dropdown.Menu>
             <Dropdown.Item className="profile"
-                           onClick={() => navigate(`/${userId}`)}>
+                           onClick={() => navigate(`/${userName}`)}>
               <img/>Profile
             </Dropdown.Item>
             <Dropdown.Item href="#/action-2">
-              <img src="/css/image/profile2.png"/>
+              <img src="css/image/profile2.png" alt=""/>
               Likes
             </Dropdown.Item>
             <Dropdown.Item href="#/action-3">
-              <img src="/css/image/profile2.png"/>
+              <img src="css/image/profile2.png"/>
               Following
             </Dropdown.Item>
             <Dropdown.Item className="profile"

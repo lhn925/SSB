@@ -1,0 +1,40 @@
+#app{
+  background-color: #f2f2f2;
+}
+.content-container{
+  width: 91.75vw;
+  max-width: 1240px;
+  padding-top: 46px;
+  background: #fff;
+  min-width: 960px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+}
+
+.sidebar-placeholder{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px #e2e2e2 solid;
+  margin-top: 22px;
+}
+
+.track-index-page-container{
+  display: flex;
+  width: 100%;
+}
+
+.extraspace{
+  margin-bottom: 40px;
+}
+
+.ad-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 15px auto;
+  height: 250px;
+  width: 300px;}

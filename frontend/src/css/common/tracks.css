@@ -1,0 +1,40 @@
+
+.track-index-container {
+  flex: 2;
+  padding: 30px 30px;}
+.track-index-tabs {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #1aafec;
+  margin-bottom: 20px;
+}
+.ti-tab{
+  font-size: 24px;
+  height: 39px;
+  margin-right: 12px;}
+a {
+  color: black;
+}
+.ttmid{
+  margin-left: 12px;
+}
+.invisi-scroll{
+/*// overflow: scroll;*/
+/*// height: 80vh;*/
+}
+::-webkit-scrollbar {
+  width: 0px;  /* remove scrollbar space */
+/*background: transparent;  !* optional: just make scrollbar invisible *!*/
+}
+.ti-tab a:hover {
+  padding-bottom: 7px;
+  border-bottom: 1px black solid;
+  cursor: pointer;
+}
+
+.tagpicked {
+  border-bottom: 1px black solid;
+}
+/*// .ti-tab a:active {*/
+/*   //   color: $cloud-orange;*/
+/*   // }*/

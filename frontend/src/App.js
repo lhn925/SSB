@@ -41,6 +41,8 @@ import mem from "mem";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
 import {PlayList} from "./components/trackplayer/PlayList";
 import useUserInfo from "./hoks/user/useUserInfo";
+import {resetAll} from "./store/actions";
+import ProfileContainer from "./content/profile/ProfileContainer";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -84,9 +86,10 @@ function App() {
 
   const {t} = useTranslation();
   const client = useRef({client: null});
-  BroadCast(bc, dispatch, location, changePlaying, playing,t);
+  BroadCast(bc, dispatch, location, changePlaying, playing, t);
 
-  BeforeUnload(t, uploadInfo, client.current.client, playingClear, changePlaying);
+  BeforeUnload(t, uploadInfo, client.current.client, playingClear,
+      changePlaying);
 
   useEffect(() => {
     playingClear();
@@ -120,9 +123,9 @@ function App() {
 
   useEffect(() => {
     if (currentAuth.access == null) {
+      // dispatch(resetAll());
       return;
     }
-
     CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
 
@@ -153,13 +156,11 @@ function App() {
 
           <Suspense fallback="Loading...">
             <Routes>
-              <Route path="/" element={<Profile/>}>
-              </Route>
-              {/*<Route path="/feed">*/}
+              {/*<Route path="/" element={<Profile userInfo={userReducer}/>}>*/}
               {/*</Route>*/}
-              <Route path="/:userName" element={
-                <Profile/>
-              }>
+              <Route path="/feed">
+              </Route>
+              <Route path="/:userName" element={<ProfileContainer/>}>
               </Route>
               <Route path="/upload" element={
                 <UploadActionsContext.Provider value={coverImgFileActions}>

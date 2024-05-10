@@ -39,6 +39,7 @@ function Connect(client, accessToken, refreshToken, userId, t, bc) {
     }, debug: function (message) {
     }, onStompError: function (message) {
     },
+
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
   })
