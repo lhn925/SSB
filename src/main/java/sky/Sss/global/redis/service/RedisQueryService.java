@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Range.Bound;
 import org.springframework.data.domain.Range.RangeBuilder;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,55 +29,133 @@ public class RedisQueryService {
 
 
     public void setData(String key, Object value, Long expiredTime) {
-        redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.MILLISECONDS);
+        try {
+            redisTemplate.opsForValue().set(key, value, expiredTime, TimeUnit.MILLISECONDS);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+        }
     }
 
     public void setData(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value);
+        try {
+            redisTemplate.opsForValue().set(key, value);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+        }
+
     }
 
 
     public void setRememberData(String key, String value, Long expiredTime) {
-        redisTemplate.opsForValue().set(RedisKeyDto.REDIS_REMEMBER_KEY + key, value, expiredTime, TimeUnit.MILLISECONDS);
+        try {
+            redisTemplate.opsForValue()
+                .set(RedisKeyDto.REDIS_REMEMBER_KEY + key, value, expiredTime, TimeUnit.MILLISECONDS);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+        }
     }
 
     public String getData(String key) {
-        return (String) redisTemplate.opsForValue().get(key);
+
+        try {
+            return (String) redisTemplate.opsForValue().get(key);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return null;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return null;
+        }
     }
 
     public <T> T getData(String key, TypeReference<T> typeReference) {
+//
         try {
-            // typeReference 를 사용 하여 json 문자열을 TypeReference 선언된 제네릭에 맞게 역 직렬화
             return objectMapper.readValue((String) redisTemplate.opsForValue().get(key), typeReference);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return null;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return null;
         }
     }
 
     public String getRememberData(String key) {
-        return (String) redisTemplate.opsForValue().get(RedisKeyDto.REDIS_REMEMBER_KEY + key);
+
+        try {
+            return (String) redisTemplate.opsForValue().get(RedisKeyDto.REDIS_REMEMBER_KEY + key);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return null;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return null;
+        }
+
     }
 
     public Boolean delete(String key) {
+        try {
+            return redisTemplate.delete(key);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return true;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return true;
+        }
 
-        return redisTemplate.delete(key);
     }
 
 
     public Boolean deleteRemember(String key) {
-        return redisTemplate.delete(RedisKeyDto.REDIS_REMEMBER_KEY + key);
+
+        try {
+            return redisTemplate.delete(RedisKeyDto.REDIS_REMEMBER_KEY + key);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return true;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return true;
+        }
     }
 
     public Boolean deleteSession(String key) {
-        return redisTemplate.delete(RedisKeyDto.REDIS_SESSION_KEY + key);
+
+        try {
+            return redisTemplate.delete(RedisKeyDto.REDIS_SESSION_KEY + key);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return true;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return true;
+        }
+
     }
 
 
     public Boolean hasRedis(String key) {
-        if (!StringUtils.hasText(key)) {
+        try {
+            if (!StringUtils.hasText(key)) {
+                return false;
+            }
+            return redisTemplate.hasKey(key);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return false;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
             return false;
         }
-        return redisTemplate.hasKey(key);
     }
 
 
