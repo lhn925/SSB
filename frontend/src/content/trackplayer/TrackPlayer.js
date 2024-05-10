@@ -22,6 +22,7 @@ import {ToggleFollow} from "content/trackplayer/ToggleFollow";
 import {PlayList} from "components/trackplayer/PlayList";
 import {MINUS, PLUS} from "content/trackplayer/NumberSignTypes";
 import {LOCAL_PLY_KEY} from "../../utill/enum/localKeyEnum";
+import {useTranslation} from "react-i18next";
 
 /**
  *
@@ -71,6 +72,7 @@ export const TrackPlayer = ({
   const [seeking, setSeeking] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
   const [statusOnLocalPly, setStatusOnLocalPly] = useState(null);
+  const {t} = useTranslation();
 
   const [isVisible, setVisible] = useState(localPlyTracks.isVisible);
   const variable = useRef({
@@ -276,7 +278,7 @@ export const TrackPlayer = ({
     e.preventDefault(); // 기본동작 정지
 
     if (!isPlaying && localPlyInfo.length === 0) {
-      toast.error("텍스트 추가) 재생할 트랙을 추가해주세요.")
+      toast.error(t(`msg.player.localPly.empty`))
       return;
     }
     const trackId = Number.parseInt(e.target.dataset.id);
@@ -575,7 +577,7 @@ export const TrackPlayer = ({
     const trackInfo = getPlyTrackByTrackId(id);
     setIsDoubleClick(true);
     ToggleLike(trackInfo.id, trackInfo.title, trackInfo.isLike,
-        updatePlyTrackInfo);
+        updatePlyTrackInfo,t);
     setIsDoubleClick(false);
   }
   const toggleFollow = () => {
@@ -583,7 +585,7 @@ export const TrackPlayer = ({
       return;
     }
     setIsDoubleClick(true);
-    ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo);
+    ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo,t);
     setIsDoubleClick(false);
   }
 
@@ -621,7 +623,8 @@ export const TrackPlayer = ({
     updateOrderAndSign,
     setIsDoubleClick,
     resetPlyTrack,
-    updateCurrPlayLog
+    updateCurrPlayLog,
+    t
   }
   return (
       <div id='track-player-bar'>

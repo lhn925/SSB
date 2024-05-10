@@ -23,6 +23,7 @@ import TrackInfoSearchListApi
 import {localPlyTracksActions} from "store/trackplayer/localPlyTracks";
 import {resetCurrentTrack, resetLocalPlyTrack} from "store/actions/index";
 import {PLUS} from "content/trackplayer/NumberSignTypes";
+import {useTranslation} from "react-i18next";
 
 const useTrackPlayer = (bc) => {
   const dispatch = useDispatch();
@@ -32,7 +33,7 @@ const useTrackPlayer = (bc) => {
   const localPly = useSelector(state => state?.localPly);
   const localPlayLog = useSelector(state => state?.localPlayLog);
   const localPlyTracks = useSelector(state => state?.localPlyTracks);
-
+  const {t} = useTranslation();
   const userInfo = useSelector(state => state?.userReducer);
 
   const playingClear = () => {
@@ -90,7 +91,7 @@ const useTrackPlayer = (bc) => {
       response.data.userId = userInfo.userId;
       response.data.createdDateTime = new Date().getTime();
       response.data.playIndex = playerSettings.item.order;
-      dispatch(localPlyActions.addTracks({data: response.data}));
+      dispatch(localPlyActions.addTracks({data: response.data,text:t(`msg.player.local.limit`)}));
       localPlyAddTrackInfo(response.data);
     }).catch((error) => {
       toast.error(error.message);

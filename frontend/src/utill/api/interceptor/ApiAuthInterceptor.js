@@ -9,7 +9,7 @@ import {
   LOCAL_PLY_KEY,
   LOCAL_PLY_LOG
 } from "utill/enum/localKeyEnum";
-import {resetAll} from "../../../store/actions";
+import {resetAll} from "store/actions";
 
 // get 배열 쿼리를 위한 설정
 axios.defaults.paramsSerializer = function (paramObj) {

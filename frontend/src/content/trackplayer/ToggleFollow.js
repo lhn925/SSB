@@ -4,8 +4,10 @@ import TrackLikeApi from "utill/api/trackPlayer/TrackLikeApi";
 import {UserUnFollowingApi} from "utill/api/follow/UserUnFollowingApi";
 import {UserFollowingApi} from "utill/api/follow/UserFollowingApi";
 import {HttpStatusCode} from "axios";
+import {useTranslation} from "react-i18next";
 
-export function ToggleFollow(trackId, postUser, updatePlyTrackInfo) {
+export function ToggleFollow(trackId, postUser, updatePlyTrackInfo,t) {
+
   if (trackId === -1 || postUser.id === -1) {
     return;
   }
@@ -13,18 +15,17 @@ export function ToggleFollow(trackId, postUser, updatePlyTrackInfo) {
   const isFollow = postUser.isFollow;
   const userName = postUser.userName;
   const uid = postUser.id;
-  const toastText = !isFollow ? userName + " was saved to your Library." : userName
-      + " cancel"
+
+  const toastText = !isFollow ? `msg.follow.save` : `msg.follow.cancel`;
 
   handleFollowUser(isFollow, uid)
   .then((r) => {
-    toast.success("텍스트 추가) " + toastText);
+    toast.success(t(toastText,{userName:userName}));
     updatePlyTrackInfo(trackId, "postUser", {...postUser,isFollow:!isFollow});
   }).catch((error) => {
     if (error.status === HttpStatusCode.BadRequest) {
       updatePlyTrackInfo(trackId, "isFollow", !isFollow);
     }
-    // toast.error("텍스트 추가) 실패")
     toast.error(error.data?.errorDetails[0].message);
   })
 }

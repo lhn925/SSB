@@ -1,5 +1,22 @@
 {
   "msg": {
+    "like": {
+      "track": {
+        "save": "{{title}} 가 라이브러리에 저장 되었습니다.",
+        "cancel": "{{title}} 가 라이브러리에 삭제 되었습니다."
+      }
+    },
+    "follow": {
+      "save":"{{userName}} 님을 팔로우 합니다.",
+      "cancel": "{{userName}} 님을 팔로우 하지 않습니다."
+    },
+    "player": {
+      "localPly": "현재 재생 목록",
+      "ply.clear": "전체 삭제",
+      "ply.history": "From your history",
+      "local.limit": "플레이리스트의 트랙 갯수는 최대 500개 까지입니다.",
+      "localPly.empty": "재생할 트랙을 추가해주세요."
+    },
     "track.upload": {
       "limit.used.text1": "무료 업로드 가능 용량의 {{percent.percent}}% 사용 됨",
       "limit.used.text2": "180분 중 {{percent.totalLength}}분({{percent.percent}}%) 사용함.",

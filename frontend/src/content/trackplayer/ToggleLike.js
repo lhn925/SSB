@@ -3,17 +3,16 @@ import TrackLikeCancelApi from "utill/api/trackPlayer/TrackLikeCancelApi";
 import TrackLikeApi from "utill/api/trackPlayer/TrackLikeApi";
 import {HttpStatusCode} from "axios";
 
-export function ToggleLike(trackId,title,isLike, updatePlyTrackInfo) {
+export function ToggleLike(trackId,title,isLike, updatePlyTrackInfo,t) {
   if (trackId === -1 || trackId === undefined) {
     return;
   }
 
-  const toastText = !isLike ? title + " was saved to your Library." : title
-      + " cancel"
+  const toastText = !isLike ? `msg.like.track.save` : `msg.like.track.cancel`;
 
   handleLikeTracking(isLike, trackId)
   .then((r) => {
-    toast.success("텍스트 추가) " + toastText);
+    toast.success(t(toastText,{title:title}));
     updatePlyTrackInfo(trackId, "isLike", !isLike);
   }).catch((error) => {
     if (error.status === HttpStatusCode.BadRequest) {

@@ -39,6 +39,7 @@ export function PlayList({
   shuffleOrders,
   setIsDoubleClick,
   resetPlyTrack,
+    t
 }) {
 
   const onClickPlayButtonHandler = (e) => {
@@ -115,8 +116,8 @@ export function PlayList({
     }
     setIsDoubleClick(true);
     changePlaying(false);
-    resetCurrTrack();
     resetPlayedSeconds();
+    resetCurrTrack();
     resetPlyTrack();
     removeFromLocalStorage(LOCAL_PLY_KEY);
     removeFromLocalStorage(LOCAL_PLY_LOG);
@@ -132,10 +133,11 @@ export function PlayList({
             <div className="queue__panel sc-p-2x sc-pb-1x">
               <div
                   className="queue__title sc-font-light sc-type-medium sc-text-h2 sc-px-2x sc-py-1x text-start">
-                현재 재생 목록
+                {t(`msg.player.localPly`)}
               </div>
               <button type="button" onClick={onClickClearHandler}
-                      className="btn queue__clear sc-button sc-button-medium sc-text-h4 sc-px-1.5x sc-py-0.75x sc-mr-1x">Clear
+                      className="btn queue__clear sc-button sc-button-medium sc-text-h4 sc-px-1.5x sc-py-0.75x sc-mr-1x">
+                {t(`msg.player.ply.clear`)}
               </button>
               <button type="button"
                       className="btn queue__hide sc-button sc-button-nostyle sc-ir"
@@ -160,7 +162,7 @@ export function PlayList({
                         {(provided) => getDragAndDrop(provided, localPlyInfo,
                             getPlyTrackByTrackId, trackInfo, isPlaying,
                             onClickPlayButtonHandler, toggleLike,
-                            onClickRmBtnHandler)}
+                            onClickRmBtnHandler,t)}
 
 
                       </Droppable>
@@ -188,7 +190,7 @@ export function PlayList({
 }
 
 function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
-    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler) {
+    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler,t) {
 
   const infoTracks = localPlyInfo.map((item) => ({
     ...item, info: getPlyTrackByTrackId(item.id)
@@ -246,7 +248,7 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                             sc-text-h4 sc-link-light sc-link-secondary sc-truncate"
                              title="From your history"
                              href="/you/history">
-                            From your history</a>
+                            {t(`msg.player.ply.history`)}</a>
                         </div>
                         <div
                             className="queueItemView__title sc-truncate">

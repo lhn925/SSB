@@ -69,6 +69,7 @@ const localPly = createSlice({
       // 갖고 오기
       const localPly = loadFromLocalStorage(state.key);
       const data = action.payload.data;
+      const limitText = action.payload.text;
       state.userId = data.userId;
 
       // 로컬 스토리지에 있다면
@@ -93,9 +94,13 @@ const localPly = createSlice({
           data.index = 1;
 
         }
+        const statusOnLocalPly = state.item.filter((data) => data.isStatus === 1);
+        const localPlyStatusList = localPly.list.filter((data) => data.isStatus === 1);
+
+        const limit = 500;
         // 500개 제한
-        if (state.item.length === 500 || localPly.list.length === 500) {
-          toast.error("텍스트 처리) 오백개 제한")
+        if (statusOnLocalPly.length > limit || localPlyStatusList.length > limit) {
+          toast.error(limitText)
           return;
         }
         if (state.item.length === 0 && !userIdNotEq) {
