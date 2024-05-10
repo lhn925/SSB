@@ -37,4 +37,5 @@ public class BaseTimeEntity {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @DateTimeFormat(pattern = "yyyy:MM:dd HH:mm:ss")
     private LocalDateTime lastModifiedDateTime;
+
 }

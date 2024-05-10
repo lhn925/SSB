@@ -36,6 +36,8 @@ public class UserHelpService {
         User findUser = userQueryService.findOne(userPwResetFormDto.getUserId());
         //현재 비밀번호 와 대조
         isPasswordSameAsNew(userPwResetFormDto, findUser);
+
+        // 여기 업데이트
         User.updatePw(findUser, userPwResetFormDto.getNewPw(), userPwResetFormDto.getPwSecLevel(), passwordEncoder);
         return getCustomUserDetails(findUser);
     }
@@ -48,7 +50,8 @@ public class UserHelpService {
      */
     @Transactional
     public CustomUserDetails myPagePwUpdate(UserPwUpdateFormDto userPwUpdateFormDto) {
-        User findUser = userQueryService.findOne();
+        // 여기 업데이트
+        User findUser = userQueryService.getEntityUser();
 
         isPasswordSameAsNew(userPwUpdateFormDto, findUser);
         User.updatePw(findUser, userPwUpdateFormDto.getNewPw(), userPwUpdateFormDto.getPwSecLevel(),

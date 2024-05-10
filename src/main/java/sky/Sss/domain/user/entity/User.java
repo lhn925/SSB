@@ -13,13 +13,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
+import sky.Sss.domain.user.dto.redis.RedisUserDTO;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Blocked;
 import sky.Sss.domain.user.model.Enabled;
@@ -49,19 +49,19 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token",nullable = false)
+    @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "user_id",nullable = false)
+    @Column(name = "user_id", nullable = false)
     private String userId;
     @Column(nullable = false)
     private String password;
 
     // 사용자 이름 or 사용자 profileLink 주소
-    @Column(name = "user_name",nullable = false)
+    @Column(name = "user_name", nullable = false)
     private String userName;
 
-    @Column(name = "email",nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     // 프로필 사진
@@ -79,8 +79,8 @@ public class User extends BaseTimeEntity {
     @Enumerated(STRING)
     private PwSecLevel pwSecLevel;
 
-//    @Column(nullable = false)
-    @Column(name = "salt",nullable = false)
+    //    @Column(nullable = false)
+    @Column(name = "salt", nullable = false)
     private String salt;
 
     // 차단: true , 차단 x : false
@@ -93,8 +93,10 @@ public class User extends BaseTimeEntity {
 
 
     @Builder
-    private User(Long id ,String token, String userId, String password, String userName, String email, String pictureUrl,
-        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled,Boolean isLoginBlocked) {
+    private User(Long id, String token, String userId, String password, String userName, String email,
+        String pictureUrl,
+        LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, String salt, Boolean isEnabled,
+        Boolean isLoginBlocked) {
         this.id = id;
         this.token = token;
         this.userId = userId;
@@ -108,8 +110,8 @@ public class User extends BaseTimeEntity {
         this.salt = salt;
         this.isEnabled = isEnabled;
         this.isLoginBlocked = isLoginBlocked;
-    }
 
+    }
 
 
     // 가입할 유저 entity 생성
@@ -165,13 +167,13 @@ public class User extends BaseTimeEntity {
     }
 
 
-    public static void updateUserName(User user,String updateName, LocalDateTime plusMonthsDate) {
+    public static void updateUserName(User user, String updateName, LocalDateTime plusMonthsDate) {
         user.setUserName(updateName);
         // 3개월 동안 변경 불가능
         user.setUserNameModifiedDate(plusMonthsDate);
     }
 
-    public static void updatePicture(User user,String uploadFile) {
+    public static void updatePicture(User user, String uploadFile) {
         user.setPictureUrl(uploadFile);
     }
 
@@ -181,7 +183,7 @@ public class User extends BaseTimeEntity {
      * @param fileStore
      * @throws IOException
      */
-    public static void deletePicture(User user,FileStore fileStore) throws IOException {
+    public static void deletePicture(User user, FileStore fileStore) throws IOException {
         if (StringUtils.hasText(user.getPictureUrl())) {
             fileStore.deleteFile(FileStore.IMAGE_DIR, user.getPictureUrl());
         }
@@ -194,6 +196,21 @@ public class User extends BaseTimeEntity {
     public static void changeIsLoginBlocked(User user, UserLoginBlockUpdateDto userLoginBlockUpdateDto) {
         user.setIsLoginBlocked(userLoginBlockUpdateDto.getIsLoginBlocked());
     }
+
+    public static User redisUserDtoToUser(RedisUserDTO redisUserDTO) {
+        User createUser = User.builder().id(redisUserDTO.getId()).
+            token(redisUserDTO.getToken()).
+            userName(redisUserDTO.getUserName()).userId(redisUserDTO.getUserId())
+            .email(redisUserDTO.getEmail())
+            .pictureUrl(redisUserDTO.getPictureUrl()).userNameModifiedDate(redisUserDTO.getUserNameModifiedDate())
+            .grade(redisUserDTO.getGrade()).pwSecLevel(redisUserDTO.getPwSecLevel())
+            .isEnabled(redisUserDTO.getIsEnabled())
+            .isLoginBlocked(redisUserDTO.getIsLoginBlocked()).build();
+        createUser.setLastModifiedDateTime(redisUserDTO.getLastModifiedDateTime());
+        createUser.setCreatedDateTime(redisUserDTO.getCreatedDateTime());
+        return createUser;
+    }
+
     @Override
     public String toString() {
         return "User{" +

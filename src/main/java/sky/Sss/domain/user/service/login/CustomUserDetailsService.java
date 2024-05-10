@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.LoginBlockException;
 import sky.Sss.domain.user.repository.UserQueryRepository;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.locationfinder.dto.UserLocationDto;
 import sky.Sss.global.locationfinder.service.LocationFinderService;
 
@@ -21,12 +22,11 @@ import sky.Sss.global.locationfinder.service.LocationFinderService;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserQueryRepository userQueryRepository;
+    private final UserQueryService userQueryService;
     private final LocationFinderService locationFinderService;
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        log.info("loadUserByUsername userId = {}", userId);
-        User findUser = userQueryRepository.findByUserId(userId)
+        User findUser = userQueryService.getOptUserEntity(userId)
             .orElseThrow(() -> new UsernameNotFoundException("login.NotFound"));
         return User.UserBuilder(findUser);
     }

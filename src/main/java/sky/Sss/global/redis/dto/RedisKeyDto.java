@@ -20,6 +20,12 @@ public class RedisKeyDto {
 
     public static final String REDIS_PLY_POSITION_MAP_KEY = "spring:ply:position:";
 
+    public static final String REDIS_USERS_INFO_MAP_KEY = "spring:users:info:";
+
+    public static final String REDIS_USER_IDS_MAP_KEY = "spring:user:ids:";
+    public static final String REDIS_USER_EMAILS_MAP_KEY = "spring:user:email:";
+    public static final String REDIS_USER_NAMES_MAP_KEY = "spring:user:usernames:";
+
 
     public static final String REDIS_TRACK_REPOST_MAP_KEY = "spring:track:repost:";
     public static final String REDIS_PLY_REPOST_MAP_KEY = "spring:ply:repost:";

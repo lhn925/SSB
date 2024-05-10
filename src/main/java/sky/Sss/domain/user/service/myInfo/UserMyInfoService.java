@@ -40,7 +40,8 @@ public class UserMyInfoService {
         throws DuplicateCheckException {
         // 변경 가능 여부
         boolean isChange = false;
-        User user = userQueryService.findOne();
+        // 여기 업데이트
+        User user = userQueryService.getEntityUser();
 
         LocalDateTime userNameModifiedDate = user.getUserNameModifiedDate();
 
@@ -60,6 +61,7 @@ public class UserMyInfoService {
         }
 
         if (!isChange) {
+            // 여기 업데이트
             User.updateUserName(user, userNameUpdateDto.getUserName(), plusMonthsDate);
             UserInfoDto.createUserInfo(user);
         }
@@ -68,19 +70,19 @@ public class UserMyInfoService {
 
     @Transactional
     public UploadFileDto updatePicture(MultipartFile file) {
-        User user = userQueryService.findOne();
+        // 여기 업데이트
+        User user = userQueryService.getEntityUser();
         UploadFileDto uploadFileDto = null;
         if (!file.isEmpty()) {
             try {
                 uploadFileDto = fileStore.storeFileSave(file, FileStore.PICTURE_TYPE, 500);
                 uploadFileDto.setUserId(user.getUserId());
-                if (uploadFileDto != null) {
-                    //기존에 있던 이미지 삭제 없으면 삭제 x
-                    User.deletePicture(user, fileStore);
-                    // 서버에 저장되는 파일이름 저장
-                    User.updatePicture(user, uploadFileDto.getStoreFileName());
-                    UserInfoDto.createUserInfo(user);
-                }
+                //기존에 있던 이미지 삭제 없으면 삭제 x
+
+                User.deletePicture(user, fileStore);
+                // 서버에 저장되는 파일이름 저장
+                User.updatePicture(user, uploadFileDto.getStoreFileName());
+                UserInfoDto.createUserInfo(user);
 
             } catch (IOException e) {
                 throw new RuntimeException("error");
@@ -93,7 +95,8 @@ public class UserMyInfoService {
     @Transactional
     public void deletePicture() throws FileNotFoundException {
 
-        User user = userQueryService.findOne();
+        // 여기 업데이트
+        User user = userQueryService.getEntityUser();
 
         String pictureUrl = user.getPictureUrl();
 
@@ -115,7 +118,8 @@ public class UserMyInfoService {
 
     @Transactional
     public void updateLoginBlocked(UserLoginBlockUpdateDto userLoginBlockUpdateDto) {
-        User user = userQueryService.findOne();
+        // 여기 업데이트
+        User user = userQueryService.getEntityUser();
         // block 여부 업데이트
         User.changeIsLoginBlocked(user, userLoginBlockUpdateDto);
         // 세션 업데이트
