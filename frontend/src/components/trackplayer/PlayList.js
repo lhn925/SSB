@@ -7,12 +7,10 @@ import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 import {
   durationTime, removeFromLocalStorage,
-  removeLocalPlyByIndex,
-  shufflePlayOrder,
   sorted
 } from "utill/function";
 import {PLUS} from "content/trackplayer/NumberSignTypes";
-import {LOCAL_PLY_KEY, LOCAL_PLY_LOG} from "../../utill/enum/localKeyEnum";
+import {LOCAL_PLY_KEY, LOCAL_PLY_LOG} from "utill/enum/localKeyEnum";
 
 export function PlayList({
   changeOrder,

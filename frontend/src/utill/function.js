@@ -136,7 +136,6 @@ export function PwSecureLevel(password) {// 패스워드 안전 강도
   }
 
   if (regex2.test(password)) { // 대문자 검색
-    console.log("2:" + regex2.test(password))
     ++secLevel;
   }
   if (regex4.test(password)) { // 숫자 검색
@@ -187,14 +186,15 @@ export function GetInterval(timer, setTimer, authTimeLimit, setCountDownTime,
 
 export function Regex(type, value) { // 정규표현식 모음
   let regex;
-  let testResult;
+  let regexResult;
 
   switch (type) {
     case "userId": // * 아이디: 5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.
       regex = /^[a-z0-9_-]{5,20}$/;
       break;
-    case "userName":
-      regex = /^[a-zA-Z0-9가-힣]{2,8}$/;
+    case "userName":// 30자 이하, 첫 단어와 끝문장이 .으로 이루이지면 안됨 한글 안됨,띄어쓰기도 안됨 _______
+      // regex = /^[a-zA-Z0-9가-힣]{2,8}$/;
+      regex = /^[a-z_](?!.*\.{2})[a-z_\.]{0,28}[a-z_]$/;
       break;
     case "email": //이메일 형식이 아닙니다.
       regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -202,9 +202,48 @@ export function Regex(type, value) { // 정규표현식 모음
     default:
       return true;
   }
+  regexResult = regex.test(value);
+  return regexResult;
+}
 
-  testResult = regex.test(value);
-  return testResult;
+export function validateUserName(value) {
+
+  let messageCode = `msg.userJoinForm.userName.regex`;
+  let isRegex = true;
+  // 조건 1: 소문자 영어 알파벳, 언더바, 마침표로만 구성된다.
+  if (!/^[a-z_\.]+$/.test(value)) {
+    isRegex = false;
+    messageCode += `1`;
+  }
+
+  // // 조건 2: 문자열이 소문자 영어 알파벳 또는 언더바로 시작하고 끝난다.
+  // if (!isRegex && !/^[a-z_][a-z_\.]*[a-z_]$/.test(value)) {
+  //   isRegex = false;
+  // }
+
+  // 조건 2: 마침표는 연속으로 두 번 나타나지 않는다.
+  if (isRegex && /\.{2,}/.test(value)) {
+    isRegex = false;
+    messageCode += `2`;
+  }
+
+  // 조건 4: 마침표는 문자열의 시작과 끝에 위치할 수 없다.
+  if (isRegex &&(/^\./.test(value) || /\.$/.test(value))){
+    isRegex = false;
+    messageCode += `3`;
+  }
+
+  // 조건 5: 문자열의 최대 길이는 30자이다.
+  if (isRegex && value.length > 30) {
+    isRegex = false;
+    messageCode += `4`;
+  }
+
+  if (isRegex) {
+    messageCode = ``;
+  }
+  // 모든 조건이 충족된 경우
+  return {isRegex,messageCode};
 }
 
 export function StartCountdown( // 유효시간 5분 알림
@@ -347,8 +386,18 @@ export function useToggleableOptions(typeNames, initialOptions, selected) {
 }
 
 export function RegexCheck(name, input_value, setErrors, t) {
-  let isRegex = !Regex(name, input_value);
-  let message = Regex ? t(`msg.userJoinForm.` + name) : '';
+
+  let message = ``;
+  let isRegex;
+  if (name === "userName") {
+    const regexResult = validateUserName(input_value);
+    isRegex = !regexResult.isRegex;
+    message = isRegex ? t(regexResult.messageCode): '';
+  } else {
+    isRegex = !Regex(name, input_value);
+    message = Regex ? t(`msg.userJoinForm.` + name) : '';
+  }
+
   ChangeError(setErrors, name, message, isRegex);
   return isRegex;
 }

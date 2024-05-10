@@ -117,7 +117,7 @@ public class UserJoinController {
         userJoinService.duplicateCheckJoin(userJoinPostDto, bindingResult);
         userJoinService.join(userJoinPostDto);
         // 회원가입 성공
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void addError(BindingResult bindingResult, String email, String userJoinPostDto, String code) {

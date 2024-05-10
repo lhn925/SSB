@@ -52,7 +52,7 @@ function IdQuery(props) {
     const response = await QueryIdApi(userId);
 
     variable.current.isDoubleClick = false;
-    if (response.code != 200) {
+    if (response.code !== 200) {
       if (response.data.errorDetails !== undefined) {
         response.data.errorDetails.map((data) => {
           ChangeError(setErrors, "userId", data.message, true);

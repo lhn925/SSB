@@ -7,6 +7,7 @@ export function PwInput({
   onKeyUp,
   placeholder,
   passwordRef,
+    onBlur,
   secLevelClass,
   secLevelStr,type
 }) {
@@ -19,7 +20,9 @@ export function PwInput({
                  placeholder={placeholder}
                  className={"form-control " + (error
                      ? 'border-danger' : '')}
-                 onKeyUp={onKeyUp} ref={passwordRef}/>
+                 onKeyUp={onKeyUp}
+                 onBlur={onBlur}
+                 ref={passwordRef}/>
           <div className="password-info">
             <em className={"how-secure " + secLevelClass}
                 name="secureLevel"
@@ -28,7 +31,9 @@ export function PwInput({
               handleShowPwChecked &&
                   <button type="button" id="btn-show"
                           className={"btn-show hide " + (isShowPwChecked ? 'on'
-                              : '')} onClick={handleShowPwChecked}>
+                              : '')}
+
+                          onClick={handleShowPwChecked}>
                     <span className="blind"></span>
                   </button>
             }

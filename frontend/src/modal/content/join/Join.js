@@ -161,7 +161,7 @@ function Join(props) {
         : secureLevel);
     return true;
   }
-  const onKeyUp = async (e) => {
+  const onBlur = async (e) => {
     const {value, name} = e.target;
     const input_value = value.split(" ").join("");
     // 공백 체크
@@ -183,8 +183,9 @@ function Join(props) {
       // 중복 체크 후 중복이면 리턴
     }
     if (name === "password") {
+      console.log(input_value);
       // 8글자이하 16글자 초과시에
-      let number = await PwSecureLevel(input_value);
+      let number = PwSecureLevel(input_value);
       setSecureLevel(PwSecureCheckFn(number));
       let error = number === 0;
       let message = error ? t(`msg.userJoinForm.password`) : '';
@@ -273,13 +274,15 @@ function Join(props) {
             <div className="form-group">
               <Input name="userId" placeholder={t(`msg.common.sky.id`)} type="text"
                      error={errors.userId.error} message={errors.userId.message}
-                     iconClass="form-id" onKeyUp={onKeyUp} t={t}/>
+                     iconClass="form-id" onBlur={onBlur} t={t}/>
             </div>
             <div className="form-group">
               <PwInput handleShowPwChecked={handleShowPwChecked} name="password"
                        error={errors.password.error}
                        message={errors.password.message}
-                       isShowPwChecked={isShowPwChecked} onKeyUp={onKeyUp}
+                       isShowPwChecked={isShowPwChecked}
+                       onKeyUp={onBlur}
+                       onBlur={onBlur}
                        passwordRef={passwordRef}
                        placeholder={t(`msg.common.sky.pw`)}
                        secLevelStr={secureLevel.secLevelStr}
@@ -289,13 +292,13 @@ function Join(props) {
               <Input name="userName" placeholder={t(`msg.common.sky.userName`)} type="text"
                      error={errors.userName.error}
                      message={errors.userName.message} iconClass="form-name"
-                     onKeyUp={onKeyUp} t={t}/>
+                     onBlur={onBlur} t={t}/>
             </div>
             <div className="form-group">
-              {EmailInput(errors, auth, t, onKeyUp, emailRef, clickBtnSendCode)}
+              {EmailInput(errors, auth, t, onBlur, emailRef, clickBtnSendCode)}
             </div>
             <div className="form-group">
-              {AuthInput(errors, auth, t, onKeyUp, authCodeCheckBtn,
+              {AuthInput(errors, auth, t, onBlur, authCodeCheckBtn,
                   countDownTime)}
             </div>
             <div className="form-group"
