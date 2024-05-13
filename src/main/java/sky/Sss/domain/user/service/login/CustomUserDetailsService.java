@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.user.dto.redis.RedisUserDTO;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.LoginBlockException;
 import sky.Sss.domain.user.repository.UserQueryRepository;
@@ -28,6 +29,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         User findUser = userQueryService.getOptUserEntity(userId)
             .orElseThrow(() -> new UsernameNotFoundException("login.NotFound"));
+        // cache 저장
+        userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(findUser));
         return User.UserBuilder(findUser);
     }
 
