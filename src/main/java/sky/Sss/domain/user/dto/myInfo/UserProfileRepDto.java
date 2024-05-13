@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
 import sky.Sss.domain.user.entity.User;
 
 @Getter

@@ -1,14 +1,14 @@
-package sky.Sss.domain.track.dto.track;
+package sky.Sss.domain.track.dto.track.rep;
 
 import static lombok.AccessLevel.PRIVATE;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 

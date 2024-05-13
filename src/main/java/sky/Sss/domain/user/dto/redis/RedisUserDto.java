@@ -13,7 +13,7 @@ import sky.Sss.domain.user.model.UserGrade;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class RedisUserDTO {
+public class RedisUserDto {
 
     private Long id;
     private String userId;
@@ -30,7 +30,7 @@ public class RedisUserDTO {
     private LocalDateTime createdDateTime;
 
     @Builder
-    public RedisUserDTO(Long id, String userId, String userName, String email, String pictureUrl,
+    private RedisUserDto(Long id, String userId, String userName, String email, String pictureUrl,
         LocalDateTime userNameModifiedDate, UserGrade grade, PwSecLevel pwSecLevel, Boolean isEnabled,
         Boolean isLoginBlocked, LocalDateTime lastModifiedDateTime, LocalDateTime createdDateTime, String token) {
         this.id = id;
@@ -48,8 +48,8 @@ public class RedisUserDTO {
         this.token = token;
     }
 
-    public static RedisUserDTO create(User user) {
-        return RedisUserDTO.builder().
+    public static RedisUserDto create(User user) {
+        return RedisUserDto.builder().
             id(user.getId()).
             token(user.getToken()).
             userName(user.getUserName()).userId(user.getUserId())

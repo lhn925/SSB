@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
-import sky.Sss.domain.track.model.PlayStatus;
+import sky.Sss.domain.track.dto.track.req.TrackInfoReqDto;
 
 
 @Getter

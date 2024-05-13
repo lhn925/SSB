@@ -1,8 +1,7 @@
-package sky.Sss.domain.track.dto.track;
+package sky.Sss.domain.track.dto.track.rep;
 
 
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track;
+package sky.Sss.domain.track.dto.track.common;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
-import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;

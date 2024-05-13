@@ -5,9 +5,8 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoReqDto;
 
 
 @Getter

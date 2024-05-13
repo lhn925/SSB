@@ -3,7 +3,7 @@ package sky.Sss.domain.track.dto.playlist;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
 
 @Getter
 @Setter

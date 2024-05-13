@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track;
+package sky.Sss.domain.track.dto.track.rep;
 
 import lombok.Getter;
 import lombok.Setter;

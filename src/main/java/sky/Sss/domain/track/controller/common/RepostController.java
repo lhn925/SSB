@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.common.RepostModifyReqDto;
 import sky.Sss.domain.track.dto.common.RepostRmReqDto;
 import sky.Sss.domain.track.dto.common.RepostSaveReqDto;
-import sky.Sss.domain.track.dto.track.TotalCountRepDto;
+import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
 import sky.Sss.domain.track.service.common.RepostCommonService;
 
 

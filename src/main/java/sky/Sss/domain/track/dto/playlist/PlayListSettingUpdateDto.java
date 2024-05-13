@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.BaseTrackDto;
-import sky.Sss.domain.track.dto.track.BasePlayListDto;
+import sky.Sss.domain.track.dto.track.common.BasePlayListDto;
 
 @Getter
 @Setter

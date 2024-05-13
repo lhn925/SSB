@@ -2,12 +2,9 @@ package sky.Sss.domain.track.controller.track;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -19,17 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
-import sky.Sss.domain.track.dto.track.TrackRmReqDto;
-import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
-import sky.Sss.domain.track.dto.track.TrackInfoModifyReqDto;
-import sky.Sss.domain.track.entity.track.SsbTrackTags;
+import sky.Sss.domain.track.dto.track.req.TrackRmReqDto;
+import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoModifyReqDto;
 import sky.Sss.domain.track.service.track.TrackService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.Result;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisQueryService;
 
 /**

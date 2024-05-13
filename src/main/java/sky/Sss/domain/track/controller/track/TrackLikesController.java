@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.track.TotalCountRepDto;
+import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.model.ContentsType;

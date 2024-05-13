@@ -1,15 +1,13 @@
 package sky.Sss.domain.track.dto.track.log;
 
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
-import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
+import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
 
 
 @Getter

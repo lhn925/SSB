@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track;
+package sky.Sss.domain.track.dto.track.req;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
