@@ -21,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.playlist.PlayListSettingSaveDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;

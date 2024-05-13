@@ -68,6 +68,11 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.userName in (:userNames) and u.isEnabled = :isEnabled")
     Set<User> findAllByUserNames(@Param("userNames") Set<String> userNames,@Param("isEnabled") Boolean isEnabled);
 
+
+    @Query("select u from User u where u.userName = :userName and u.isEnabled = :isEnabled")
+    Optional<User> findAllByUserName(@Param("userName") String userName,@Param("isEnabled") Boolean isEnabled);
+
+
     // 중복 값
     Boolean existsBySalt(String slat);
 

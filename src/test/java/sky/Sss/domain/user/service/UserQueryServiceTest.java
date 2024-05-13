@@ -1,14 +1,12 @@
 package sky.Sss.domain.user.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.Sss.domain.user.dto.redis.RedisUserDTO;
+import sky.Sss.domain.user.dto.redis.RedisUserDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
@@ -48,27 +46,27 @@ class UserQueryServiceTest {
 
         String uid = String.valueOf(userIdMap.get(subKey));
 
-        TypeReference<HashMap<String, RedisUserDTO>> redisDtoType = new TypeReference<>() {};
+        TypeReference<HashMap<String, RedisUserDto>> redisDtoType = new TypeReference<>() {};
 
         String redisUsersInfoMapKey = RedisKeyDto.REDIS_USERS_INFO_MAP_KEY;
 
-        Map<String, RedisUserDTO> userInfoMap = redisCacheService.getData(redisUsersInfoMapKey, redisDtoType);
+        Map<String, RedisUserDto> userInfoMap = redisCacheService.getData(redisUsersInfoMapKey, redisDtoType);
         if (userInfoMap == null || !userInfoMap.containsKey(uid)) {
             return fetchAndSetUserInReds(subKey);
         }
-        RedisUserDTO redisUserDTO = userInfoMap.get(uid);
+        RedisUserDto redisUserDTO = userInfoMap.get(uid);
 
         return User.redisUserDtoToUser(redisUserDTO);
     }
 
     private User fetchAndSetUserInReds(String userId) {
         User entityUser = userQueryService.findOne(userId);
-        RedisUserDTO redisUserDTO = RedisUserDTO.create(entityUser);
+        RedisUserDto redisUserDTO = RedisUserDto.create(entityUser);
         setUserInfoDtoRedis(redisUserDTO);
         return entityUser;
     }
 
-    private void setUserInfoDtoRedis(RedisUserDTO redisUserDTO) {
+    private void setUserInfoDtoRedis(RedisUserDto redisUserDTO) {
         redisCacheService.upsertCacheMapValueByKey(redisUserDTO.getId(), RedisKeyDto.REDIS_USER_IDS_MAP_KEY,
             redisUserDTO.getUserId());
         redisCacheService.upsertCacheMapValueByKey(redisUserDTO.getId(),  RedisKeyDto.REDIS_USER_NAMES_MAP_KEY,

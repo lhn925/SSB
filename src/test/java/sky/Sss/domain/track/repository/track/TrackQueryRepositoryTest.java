@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
+import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 
 @SpringBootTest
 class TrackQueryRepositoryTest {

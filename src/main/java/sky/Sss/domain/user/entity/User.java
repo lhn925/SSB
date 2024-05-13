@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
-import sky.Sss.domain.user.dto.redis.RedisUserDTO;
+import sky.Sss.domain.user.dto.redis.RedisUserDto;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Blocked;
 import sky.Sss.domain.user.model.Enabled;
@@ -197,7 +197,7 @@ public class User extends BaseTimeEntity {
         user.setIsLoginBlocked(userLoginBlockUpdateDto.getIsLoginBlocked());
     }
 
-    public static User redisUserDtoToUser(RedisUserDTO redisUserDTO) {
+    public static User redisUserDtoToUser(RedisUserDto redisUserDTO) {
         User createUser = User.builder().id(redisUserDTO.getId()).
             token(redisUserDTO.getToken()).
             userName(redisUserDTO.getUserName()).userId(redisUserDTO.getUserId())

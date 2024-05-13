@@ -63,7 +63,6 @@ public class UserPushMsgService {
         UserPushMessages userPushMessages) {
         // 현재 유저가 webSocket 에 접속 되어 있는지 확인
         boolean isEmpty = redisCacheService.hasWsStatusOnUser(toUser.getToken());
-
         // redis 에 저장할 실시간 알림 여부
         boolean isPush = false;
 

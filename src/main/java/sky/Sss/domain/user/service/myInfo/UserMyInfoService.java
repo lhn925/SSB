@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
 import sky.Sss.domain.user.dto.myInfo.UserNameUpdateDto;
-import sky.Sss.domain.user.dto.redis.RedisUserDTO;
+import sky.Sss.domain.user.dto.redis.RedisUserDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
@@ -44,7 +44,7 @@ public class UserMyInfoService {
         // 여기 업데이트
         User user = userQueryService.getEntityUser();
 
-        userQueryService.removeUserInfoDtoRedis(RedisUserDTO.create(user));
+        userQueryService.removeUserInfoDtoRedis(RedisUserDto.create(user));
 
         LocalDateTime userNameModifiedDate = user.getUserNameModifiedDate();
 
@@ -68,7 +68,7 @@ public class UserMyInfoService {
             UserInfoDto.createUserInfo(user);
         }
         userNameUpdateDto.setUserNameModifiedDate(plusMonthsDate);
-        userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
+        userQueryService.setUserInfoDtoRedis(RedisUserDto.create(user));
 
     }
 
@@ -88,7 +88,7 @@ public class UserMyInfoService {
                 User.updatePicture(user, uploadFileDto.getStoreFileName());
                 UserInfoDto.createUserInfo(user);
 
-                userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
+                userQueryService.setUserInfoDtoRedis(RedisUserDto.create(user));
             } catch (IOException e) {
                 throw new RuntimeException("error");
             }
@@ -114,7 +114,7 @@ public class UserMyInfoService {
                 UserInfoDto.createUserInfo(user);
 
                 // Redis 초기화
-                userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
+                userQueryService.setUserInfoDtoRedis(RedisUserDto.create(user));
             } catch (IOException e) {
                 throw new RuntimeException("error");
             }
@@ -132,7 +132,7 @@ public class UserMyInfoService {
         // 세션 업데이트
         UserInfoDto.createUserInfo(user);
 
-        userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
+        userQueryService.setUserInfoDtoRedis(RedisUserDto.create(user));
     }
 
 
