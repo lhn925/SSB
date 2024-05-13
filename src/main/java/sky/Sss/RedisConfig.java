@@ -43,10 +43,10 @@ public class RedisConfig {
 //        TCP Keep Alive는 주기적으로 프로브(Probe)나 메시지를 전송하고 Acknowledgment를 수신합니다.
 //            만약 Acknowledgment가 주어진 시간에 오지 않는다면, TCP Connection은 끊어진 걸로 간주되어 종료됩니다.
         // 소켓 설정
-        SocketOptions socketOptions = SocketOptions.builder()
-            .connectTimeout(Duration.ofMillis(100L))
-            .keepAlive(true)
-            .build();
+//        SocketOptions socketOptions = SocketOptions.builder()
+//            .connectTimeout(Duration.ofMillis(100L))
+//            .keepAlive(true)
+//            .build();
         //----------------- (2) Cluster topology refresh 옵션
         ClusterTopologyRefreshOptions clusterTopologyRefreshOptions = ClusterTopologyRefreshOptions
             .builder()
@@ -59,7 +59,7 @@ public class RedisConfig {
             .builder()
             .pingBeforeActivateConnection(true)// 커넥션을 사용하기 위하여 PING 명령어를 사용하여 검증합니다.
             .autoReconnect(true)// 자동 재접속 옵션을 사용합니다.
-            .socketOptions(socketOptions)  // 앞서 생성한 socketOptions 객체를 세팅합니다.
+//            .socketOptions(socketOptions)  // 앞서 생성한 socketOptions 객체를 세팅합니다.
             .topologyRefreshOptions(clusterTopologyRefreshOptions) // 앞서 생성한 clusterTopologyRefreshOptions 객체를 생성합니다.
             .maxRedirects(3).build();
 

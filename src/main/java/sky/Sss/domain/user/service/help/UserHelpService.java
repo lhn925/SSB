@@ -33,7 +33,7 @@ public class UserHelpService {
     @Transactional
     public UserDetails passwordUpdate(UserPwResetFormDto userPwResetFormDto) throws IllegalArgumentException {
 
-        User findUser = userQueryService.findOne(userPwResetFormDto.getUserId());
+        User findUser = userQueryService.getEntityUser(userPwResetFormDto.getUserId());
         //현재 비밀번호 와 대조
         isPasswordSameAsNew(userPwResetFormDto, findUser);
 

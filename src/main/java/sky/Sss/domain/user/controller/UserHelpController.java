@@ -93,7 +93,7 @@ public class UserHelpController {
             session.removeAttribute("emailAuthCodeDto");
             return Result.getErrorResult(new ErrorResultDto("authCode", "join.code.error", ms, request.getLocale()));
         }
-        CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail(), Enabled.ENABLED);
+        CustomUserDetails findOne = userQueryService.findByEmailOne(emailAuthCodeDto.getEmail());
 
         UserIdHelpRepDto userIdHelpRepDto = UserIdHelpRepDto.builder().createdDateTime(findOne.getCreatedDateTime())
             .userId(findOne.getUserId()).build();
@@ -127,8 +127,7 @@ public class UserHelpController {
             if (resetToken != null) {
                 CustomCookie.delete(resetToken, response);
             }
-            CustomUserDetails userDetails = userQueryService.findStatusUserId(userId.getUserId(),
-                Enabled.ENABLED);
+            CustomUserDetails userDetails = userQueryService.findStatusUserId(userId.getUserId());
             // HelpToken 생성 및 세션 저장
             UserHelpDto userHelpDto = UserHelpDto.createUserHelpDto();
             userHelpDto.setUserId(userId.getUserId());

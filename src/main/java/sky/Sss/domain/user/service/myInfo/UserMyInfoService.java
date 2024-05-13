@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserLoginBlockUpdateDto;
 import sky.Sss.domain.user.dto.myInfo.UserNameUpdateDto;
+import sky.Sss.domain.user.dto.redis.RedisUserDTO;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
@@ -43,6 +44,8 @@ public class UserMyInfoService {
         // 여기 업데이트
         User user = userQueryService.getEntityUser();
 
+        userQueryService.removeUserInfoDtoRedis(RedisUserDTO.create(user));
+
         LocalDateTime userNameModifiedDate = user.getUserNameModifiedDate();
 
         // 현재 시간
@@ -59,13 +62,14 @@ public class UserMyInfoService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd E HH:mm");
             throw new ChangeUserNameIsNotAfterException(userNameModifiedDate.format(dateTimeFormatter));
         }
-
         if (!isChange) {
             // 여기 업데이트
             User.updateUserName(user, userNameUpdateDto.getUserName(), plusMonthsDate);
             UserInfoDto.createUserInfo(user);
         }
         userNameUpdateDto.setUserNameModifiedDate(plusMonthsDate);
+        userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
+
     }
 
     @Transactional
@@ -84,6 +88,7 @@ public class UserMyInfoService {
                 User.updatePicture(user, uploadFileDto.getStoreFileName());
                 UserInfoDto.createUserInfo(user);
 
+                userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
             } catch (IOException e) {
                 throw new RuntimeException("error");
             }
@@ -108,6 +113,8 @@ public class UserMyInfoService {
                 User.updatePicture(user, null);
                 UserInfoDto.createUserInfo(user);
 
+                // Redis 초기화
+                userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
             } catch (IOException e) {
                 throw new RuntimeException("error");
             }
@@ -124,6 +131,8 @@ public class UserMyInfoService {
         User.changeIsLoginBlocked(user, userLoginBlockUpdateDto);
         // 세션 업데이트
         UserInfoDto.createUserInfo(user);
+
+        userQueryService.setUserInfoDtoRedis(RedisUserDTO.create(user));
     }
 
 

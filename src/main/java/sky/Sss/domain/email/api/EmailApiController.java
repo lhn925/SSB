@@ -165,8 +165,7 @@ public class EmailApiController {
                 if (userHelpDto == null || !userHelpDto.getUserId().equals(helpEmailSendDto.getUserId())) {
                     throw new UsernameNotFoundException("code.error");
                 }
-                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId(),
-                    Enabled.ENABLED);
+                CustomUserDetails statusUserId = userQueryService.findStatusUserId(userHelpDto.getUserId());
                 /**
                  * 비밀 번호 찾기시
                  *

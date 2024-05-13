@@ -3,6 +3,7 @@ package sky.Sss.domain.user.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,29 +41,24 @@ public class UserQueryService {
     private final RedisCacheService redisCacheService;
 
 
-    public CustomUserDetails findByEmailOne(String email, Enabled enabled)
+    public CustomUserDetails findByEmailOne(String email)
         throws UsernameNotFoundException {
-        Optional<User> findOne = userQueryRepository.findByEmailAndIsEnabled(email, enabled.getValue());
-        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
-
-        return (CustomUserDetails) User.UserBuilder(user);
+//        Optional<User> findOne = userQueryRepository.findByEmailAndIsEnabled(email, enabled.getValue());
+//        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("email.notfound"));
+        User userInfoFromCacheOrDB = getUserInfoFromCacheOrDB(email, RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY);
+        return (CustomUserDetails) User.UserBuilder(userInfoFromCacheOrDB);
     }
 
-    public CustomUserDetails findStatusUserId(String userId, Enabled enabled)
-        throws UsernameNotFoundException {
-        Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
-        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
-
-        return (CustomUserDetails) User.UserBuilder(user);
-    }
-
-
-    //    @Cacheable(value = RedisKeyDto.REDIS_USER_CACHE_TOKEN_KEY,key = "#userId",cacheManager = "contentCacheManager")
-    public String findTokenByUserId(String userId, Enabled enabled)
+    public CustomUserDetails findStatusUserId(String userId)
         throws UsernameNotFoundException {
 //        Optional<User> findOne = userQueryRepository.findByUserIdAndIsEnabled(userId, enabled.getValue());
 //        User user = findOne.orElseThrow(() -> new UsernameNotFoundException("userId.notfound"));
-        return findOne().getToken();
+        User userInfoFromCacheOrDB = getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
+        return (CustomUserDetails) User.UserBuilder(userInfoFromCacheOrDB);
+    }
+    public String findTokenByUserId(String userId, Enabled enabled)
+        throws UsernameNotFoundException {
+        return getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY).getToken();
     }
 
     public UserInfoDto findByUser(UserInfoDto userInfoDto)
@@ -77,7 +73,12 @@ public class UserQueryService {
 
     public Set<User> findUsersByUserNames(Set<String> userNames, Enabled isEnabled)
         throws UsernameNotFoundException {
-        return userQueryRepository.findAllByUserNames(userNames, isEnabled.getValue());
+        Set<User> users = new HashSet<>();
+        for (String userName : userNames) {
+            User user = getUserInfoFromCacheOrDB(userName, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY);
+            users.add(user);
+        }
+        return users;
     }
 
 
@@ -115,14 +116,14 @@ public class UserQueryService {
         return entityUser;
     }
 
-    private void setUserInfoDtoRedis(RedisUserDTO redisUserDTO) {
+    public void setUserInfoDtoRedis(RedisUserDTO redisUserDTO) {
         setUserIdInRedis(redisUserDTO.getId(), redisUserDTO.getUserId());
         setUserEmailInRedis(redisUserDTO.getId(), redisUserDTO.getEmail());
         setUserNameInRedis(redisUserDTO.getId(), redisUserDTO.getUserName());
         setUserInfoInRedis(redisUserDTO);
     }
 
-    private void removeUserInfoDtoRedis(RedisUserDTO redisUserDTO) {
+    public void removeUserInfoDtoRedis(RedisUserDTO redisUserDTO) {
         removeUserIdFromRedis(redisUserDTO.getId(), redisUserDTO.getUserId());
         removeUserEmailFromRedis(redisUserDTO.getId(), redisUserDTO.getEmail());
         removeUserNameFromRedis(redisUserDTO.getId(), redisUserDTO.getUserName());
@@ -147,13 +148,18 @@ public class UserQueryService {
             user.getIsLoginBlocked(), user.getGrade());
     }
 
-    public User findOne(String userId) {
+
+    public Optional<User> getOptUserEntity(String userId) {
+        return userQueryRepository.findByUserId(userId);
+    }
+
+    public User getEntityUser(String userId) {
         Optional<User> optionalUser = userQueryRepository.findByUserId(userId);
         return User.getOptionalUser(optionalUser);
     }
 
-    public Optional<User> getOptUserEntity(String userId) {
-        return userQueryRepository.findByUserId(userId);
+    public User findOne(String userId) {
+        return getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
     }
 
 

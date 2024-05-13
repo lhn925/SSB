@@ -41,7 +41,6 @@ public class WebSocketSessionHandler implements ChannelInterceptor {
 
         SimpMessageType messageType = Objects.requireNonNull(accessor.getCommand()).getMessageType();
         String sessionId = accessor.getSessionId();
-
         if (messageType.equals(SimpMessageType.CONNECT)) {
             Authentication authentication = tokenProvider.getAuthByAuthorizationHeader(accessor);
             Optional.ofNullable(authentication).orElseThrow(() -> {
@@ -56,6 +55,7 @@ public class WebSocketSessionHandler implements ChannelInterceptor {
              *
              */
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
             String userId = userDetails.getUsername();
             String userToken = userQueryService.findTokenByUserId(userId, Enabled.ENABLED);
             /**

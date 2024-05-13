@@ -40,10 +40,6 @@ public class UserLogoutService {
         String accessUserId = (String) accessBody.get("sub");
         String refreshUserId = (String) refreshBody.get("sub");
 
-        log.info("refreshUserId = {}", refreshUserId);
-        log.info("accessUserId = {}", accessUserId);
-
-
         String redisToken = RedisKeyDto.REDIS_LOGIN_KEY + accessBody.get("redis");
         if (!accessUserId.equals(refreshUserId)) {
             throw new BadCredentialsException("error");
