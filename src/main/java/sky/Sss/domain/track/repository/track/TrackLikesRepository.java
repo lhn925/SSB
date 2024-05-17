@@ -15,6 +15,7 @@ public interface TrackLikesRepository extends JpaRepository<SsbTrackLikes, Long>
     Optional<SsbTrackLikes> findBySsbTrackIdAndUser(long trackId,User user);
     Optional<SsbTrackLikes> findBySsbTrackAndUser(SsbTrack ssbTrack,User user);
 
+    List<SsbTrackLikes> findAllByUser(User user);
 
     boolean existsBySsbTrackAndUser(SsbTrack ssbTrack, User user);
 

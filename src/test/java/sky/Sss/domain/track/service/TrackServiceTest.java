@@ -153,5 +153,17 @@ class TrackServiceTest {
     }
 
 
+    @Test
+    public void trackLog() {
+
+    // given
+
+    // when
+
+    // then
+
+    }
+
+
 
 }

@@ -20,14 +20,14 @@ public class RedisKeyDto {
 
     public static final String REDIS_PLY_POSITION_MAP_KEY = "spring:ply:position:";
 
-    public static final String REDIS_USERS_INFO_MAP_KEY = "spring:users:info:";
+    public static final String REDIS_USERS_INFO_MAP_KEY = "spring:users:info:map:";
 
     public static final String REDIS_USER_IDS_MAP_KEY = "spring:user:ids:";
     public static final String REDIS_USER_EMAILS_MAP_KEY = "spring:user:email:";
     public static final String REDIS_USER_PK_ID_MAP_KEY = "spring:user:pk:id:";
     public static final String REDIS_USER_NAMES_MAP_KEY = "spring:user:usernames:";
 
-    public static final String REDIS_TRACKS_INFO_MAP_KEY = "spring:tracks:info:";
+    public static final String REDIS_TRACKS_INFO_MAP_KEY = "spring:tracks:info:map:";
     public static final String REDIS_TRACKS_UID_SET_KEY = "spring:track:uids:";
 
 
@@ -57,6 +57,9 @@ public class RedisKeyDto {
 
     //
     public static final String REDIS_USER_FOLLOWER_TOTAL_MAP_KEY = "spring:user:follower:total";
+
+    public static final String REDIS_USER_TRACK_LIKES_LIST_KEY = "spring:user:track:likes:list";
+    public static final String REDIS_TRACK_LIKES_USER_LIST_KEY = "spring:track:likes:user:list";
 
     public static final String REDIS_TRACK_LIKES_TOTAL_MAP_KEY = "spring:track:likes:total";
     public static final String REDIS_PLY_LIKES_TOTAL_MAP_KEY = "spring:ply:likes:total";

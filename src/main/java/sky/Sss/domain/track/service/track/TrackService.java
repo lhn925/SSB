@@ -26,6 +26,7 @@ import sky.Sss.domain.feed.service.FeedService;
 import sky.Sss.domain.track.dto.BaseTrackDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
+import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
@@ -333,7 +334,6 @@ public class TrackService {
 
         User user = userQueryService.findOne();
 
-        // 여기
         SsbTrack ssbTrack = getEntityTrack(trackInfoModifyReqDto.getId(), trackInfoModifyReqDto.getToken(),
             user, Status.ON);
         // 현재 태그에도 속하지 않고
@@ -381,6 +381,7 @@ public class TrackService {
             UploadFileDto uploadFileDto = getUploadFileDto(coverImgFile);
             SsbTrack.updateCoverImg(uploadFileDto.getStoreFileName(), ssbTrack);
         }
+        trackQueryService.setTrackIdInRedis(RedisTrackDto.create(ssbTrack));
 
     }
 
@@ -532,6 +533,7 @@ public class TrackService {
         redisCacheService.delete(RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY + "::" + user.getUserId());
         SsbTrack.deleteTrackFile(ssbTrack, fileStore);
         SsbTrack.changeStatus(ssbTrack, Status.OFF);
+        trackQueryService.setTrackIdInRedis(RedisTrackDto.create(ssbTrack));
     }
 
     /**

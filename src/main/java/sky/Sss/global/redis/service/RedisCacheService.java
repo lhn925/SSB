@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.global.redis.dto.RedisKeyDto;
@@ -146,7 +148,7 @@ public class RedisCacheService {
      */
     // redis 에 caching 데이터 찾은 후 존재하지 않을 경우 등록
     public <T> void upsertCacheMapValueByKey(T value, String key, String subMapKey) {
-        Map<String, T> objectMap =  new HashMap<>();
+        Map<String, T> objectMap = new HashMap<>();
         // redis 에 존재하는 경우
         if (this.hasRedis(key)) { //
             TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
@@ -283,6 +285,23 @@ public class RedisCacheService {
             return true;
         }
     }
+    public <T> T getCacheMapBySubKey(Class<T> clazz, String subKey, String redisTrackMapKey) {
+        TypeReference<Map<String, T>> redisType = new TypeReference<>() {
+        };
 
+        Map<String, T> redisTrackMap;
+        try {
+            redisTrackMap = getData(redisTrackMapKey, redisType);
+        } catch (Exception e) {
+            // 예외 처리 로직
+            e.printStackTrace();
+            return null;
+        }
 
+        if (redisTrackMap == null || !redisTrackMap.containsKey(subKey)) {
+            return null;
+        }
+        Object subKeyData = redisTrackMap.get(subKey);
+        return objectMapper.convertValue(subKeyData, clazz);
+    }
 }
