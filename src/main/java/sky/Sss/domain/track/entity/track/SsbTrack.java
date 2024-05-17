@@ -24,7 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
+import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
@@ -193,8 +194,45 @@ public class SsbTrack extends BaseTimeEntity {
         return fileStore.getImageDir() + coverUrl;
     }
 
+
     @Builder
-    public SsbTrack(Long id) {
+    public SsbTrack(Long id,User user, String title, MainGenreType mainGenreType, String genre, Boolean isDownload,
+        String description, String coverUrl, Boolean isPrivacy, Long size, Integer trackLength, String token,
+        String originalName, String storeFileName, Boolean isRelease, Boolean isStatus) {
         this.id = id;
+        this.user = user;
+        this.title = title;
+        this.mainGenreType = mainGenreType;
+        this.genre = genre;
+        this.isDownload = isDownload;
+        this.description = description;
+        this.coverUrl = coverUrl;
+        this.isPrivacy = isPrivacy;
+        this.size = size;
+        this.trackLength = trackLength;
+        this.token = token;
+        this.originalName = originalName;
+        this.storeFileName = storeFileName;
+        this.isRelease = isRelease;
+        this.isStatus = isStatus;
+    }
+
+    public static SsbTrack redisTrackDtoToSsbTrack(RedisTrackDto redisTrackDto,User user) {
+        SsbTrack ssbTrack = SsbTrack.builder()
+            .id(redisTrackDto.getId())
+            .user(user)
+            .title(redisTrackDto.getTitle())
+            .mainGenreType(redisTrackDto.getMainGenreType())
+            .genre(redisTrackDto.getGenre()).isDownload(redisTrackDto.getIsDownload())
+            .description(redisTrackDto.getDescription())
+            .coverUrl(redisTrackDto.getCoverUrl()).isPrivacy(redisTrackDto.getIsPrivacy()).size(redisTrackDto.getSize())
+            .trackLength(redisTrackDto.getTrackLength()).token(redisTrackDto.getToken())
+            .originalName(redisTrackDto.getOriginalName())
+            .storeFileName(redisTrackDto.getStoreFileName()).isRelease(redisTrackDto.getIsRelease())
+            .isStatus(redisTrackDto.getIsStatus())
+            .build();
+        ssbTrack.setCreatedDateTime(redisTrackDto.getCreatedDateTime());
+        ssbTrack.setLastModifiedDateTime(redisTrackDto.getLastModifiedDateTime());
+        return ssbTrack;
     }
 }

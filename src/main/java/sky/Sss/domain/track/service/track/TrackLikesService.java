@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.track;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.repository.track.TrackLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
@@ -30,6 +32,8 @@ public class TrackLikesService {
 
     private final TrackLikesRepository trackLikesRepository;
     private final RedisCacheService redisCacheService;
+    private final TrackQueryService trackQueryService;
+
 
     /**
      * Track 좋아요 추가
@@ -59,7 +63,7 @@ public class TrackLikesService {
     @Transactional
     public void cancelLikes(long trackId, String token, User user) {
         // 사용자 검색
-        SsbTrackLikes ssbTrackLikes = findOne(trackId, user);
+        SsbTrackLikes ssbTrackLikes = getEntityTrackLike(trackId, user);
         delete(ssbTrackLikes);
 
         String key = getLikeKey(token);
@@ -69,6 +73,17 @@ public class TrackLikesService {
         // 좋아요 수 업로드
         redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
+    /**
+     * 없을시에 IllegalArgumentException
+     *
+     * @return
+     */
+    public SsbTrackLikes getEntityTrackLike(long trackId, User user) {
+        return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
+
 
     /**
      * 없을시에 IllegalArgumentException
@@ -77,31 +92,29 @@ public class TrackLikesService {
      * @param user
      * @return
      */
-    public SsbTrackLikes findOne(SsbTrack ssbTrack, User user) {
-        return trackLikesRepository.findBySsbTrackAndUser(ssbTrack, user)
-            .orElseThrow(IllegalArgumentException::new);
+    public SsbTrackLikes getTrackLikeCacheFromOrDbByToken(SsbTrack ssbTrack, User user) {
+        TypeReference<HashMap<String,UserSimpleInfoDto>> typeReference = new TypeReference<>() {};
+
+        HashMap<String, UserSimpleInfoDto> simpleMap = redisCacheService.getData(getLikeKey(ssbTrack.getToken()), typeReference);
+
+        if (simpleMap == null || simpleMap.containsKey(user.getToken())) {
+            return trackLikesRepository.findBySsbTrackAndUser(ssbTrack, user)
+                .orElseThrow(IllegalArgumentException::new);
+        }
+        return SsbTrackLikes.create(user);
     }
 
-    /**
-     * 없을시에 IllegalArgumentException
-     *
-     * @return
-     */
-    public SsbTrackLikes findOne(long trackId, User user) {
-        return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user)
-            .orElseThrow(IllegalArgumentException::new);
-    }
 
     public Optional<SsbTrackLikes> findOneAsOpt(long trackId, User user) {
-        return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
-    }
 
+        SsbTrack ssbTrack = trackQueryService.findById(trackId, Status.ON);
+
+        return Optional.ofNullable(getTrackLikeCacheFromOrDbByToken(ssbTrack, user));
+    }
     public List<SsbTrackLikes> findOneAsOpt(Set<Long> ids, User user) {
 //        return trackLikesRepository.findBySsbTrackIdAndUser(0L, user);
         return null;
     }
-
-
 
     /**
      * like 취소
@@ -112,7 +125,6 @@ public class TrackLikesService {
     public void delete(SsbTrackLikes ssbTrackLikes) {
         trackLikesRepository.delete(ssbTrackLikes);
     }
-
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
     public int getTotalCount(String trackToken) {

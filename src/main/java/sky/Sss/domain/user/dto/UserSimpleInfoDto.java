@@ -15,13 +15,11 @@ public class UserSimpleInfoDto {
 
     private Long id;
     private String userId;
-    private String userName;
-    private String pictureUrl;
+//    private String userName;
+//    private String pictureUrl;
 
     public UserSimpleInfoDto(User user) {
         this.id = user.getId();
         this.userId = user.getUserId();
-        this.userName = user.getUserName();
-        this.pictureUrl = user.getPictureUrl();
     }
 }

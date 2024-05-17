@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.user.dto.UserInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.entity.User;
 
@@ -70,7 +69,7 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
 
 
     @Query("select u from User u where u.userName = :userName and u.isEnabled = :isEnabled")
-    Optional<User> findAllByUserName(@Param("userName") String userName,@Param("isEnabled") Boolean isEnabled);
+    Optional<User> findByUserName(@Param("userName") String userName,@Param("isEnabled") Boolean isEnabled);
 
 
     // 중복 값

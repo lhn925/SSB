@@ -3,10 +3,7 @@ package sky.Sss.domain.track.service.track.play;
 
 import static sky.Sss.global.utili.DayTime.millisToLocalDateTime;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.track.TrackInfoReqDto;
-import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoReqDto;
+import sky.Sss.domain.track.dto.track.rep.TrackPlayRepDto;
 import sky.Sss.domain.track.dto.track.chart.DailyPlaysSearchDto;
 import sky.Sss.domain.track.dto.track.chart.TrackTotalPlaysDto;
 import sky.Sss.domain.track.dto.track.chart.TrackChartSaveReqDto;

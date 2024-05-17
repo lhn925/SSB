@@ -93,19 +93,19 @@ public class UserQueryService {
         if (subKeyMap == null || !subKeyMap.containsKey(subKey)) {
             return fetchAndSetSubKeyRedisBySubKey(subKey, redisUidMapKey);
         }
-        String uid = String.valueOf(subKeyMap.get(subKey));
-        return getUserInfoByUidRedisOrDB(uid, subKey, redisUidMapKey);
+        String token = String.valueOf(subKeyMap.get(subKey));
+        return getUserInfoByTokenRedisOrDB(token, subKey, redisUidMapKey);
     }
-    public User getUserInfoByUidRedisOrDB(String uid, String subKey, String redisUidMapKey) {
+    public User getUserInfoByTokenRedisOrDB(String token, String subKey, String redisUidMapKey) {
 
         TypeReference<HashMap<String, RedisUserDto>> redisDtoType = new TypeReference<>() {
         };
         String redisUsersInfoMapKey = RedisKeyDto.REDIS_USERS_INFO_MAP_KEY;
         Map<String, RedisUserDto> userInfoMap = redisCacheService.getData(redisUsersInfoMapKey, redisDtoType);
-        if (userInfoMap == null || !userInfoMap.containsKey(uid)) {
+        if (userInfoMap == null || !userInfoMap.containsKey(token)) {
             return fetchAndSetSubKeyRedisBySubKey(subKey, redisUidMapKey);
         }
-        RedisUserDto redisUserDTO = userInfoMap.get(uid);
+        RedisUserDto redisUserDTO = userInfoMap.get(token);
         return User.redisUserDtoToUser(redisUserDTO);
     }
 
@@ -116,8 +116,8 @@ public class UserQueryService {
             case RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY ->
                 userQueryRepository.findByEmailAndIsEnabled(subKey, Enabled.ENABLED()).orElse(null);
             case RedisKeyDto.REDIS_USER_NAMES_MAP_KEY ->
-                userQueryRepository.findAllByUserName(subKey, Enabled.ENABLED()).orElse(null);
-            case RedisKeyDto.REDIS_USERS_INFO_MAP_KEY ->
+                userQueryRepository.findByUserName(subKey, Enabled.ENABLED()).orElse(null);
+            case RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY ->
                 userQueryRepository.findByIdAndIsEnabled(Long.valueOf(subKey), Enabled.ENABLED()).orElse(null);
             default -> null;
         };
@@ -130,16 +130,18 @@ public class UserQueryService {
     }
 
     public void setUserInfoDtoRedis(RedisUserDto redisUserDTO) {
-        setUserIdInRedis(redisUserDTO.getId(), redisUserDTO.getUserId());
-        setUserEmailInRedis(redisUserDTO.getId(), redisUserDTO.getEmail());
-        setUserNameInRedis(redisUserDTO.getId(), redisUserDTO.getUserName());
+        setUserIdInRedis(redisUserDTO.getToken(), redisUserDTO.getUserId());
+        setUserEmailInRedis(redisUserDTO.getToken(), redisUserDTO.getEmail());
+        setUserNameInRedis(redisUserDTO.getToken(), redisUserDTO.getUserName());
+        setUidInRedis(redisUserDTO.getToken(), redisUserDTO.getId());
         setUserInfoInRedis(redisUserDTO);
     }
 
     public void removeUserInfoDtoRedis(RedisUserDto redisUserDTO) {
-        removeUserIdFromRedis(redisUserDTO.getId(), redisUserDTO.getUserId());
-        removeUserEmailFromRedis(redisUserDTO.getId(), redisUserDTO.getEmail());
-        removeUserNameFromRedis(redisUserDTO.getId(), redisUserDTO.getUserName());
+        removeUserIdFromRedis(redisUserDTO.getToken(), redisUserDTO.getUserId());
+        removeUserEmailFromRedis(redisUserDTO.getToken(), redisUserDTO.getEmail());
+        removeUserNameFromRedis(redisUserDTO.getToken(), redisUserDTO.getUserName());
+        removeUidFromRedis(redisUserDTO.getToken(), redisUserDTO.getId());
         removeUserInfoFromRedis(redisUserDTO);
     }
 
@@ -188,8 +190,8 @@ public class UserQueryService {
     public User findOne(Long uid, Enabled enabled) {
         String uidAndSUb = String.valueOf(uid);
 
-        User findUser = getUserInfoByUidRedisOrDB(uidAndSUb, uidAndSUb,
-            RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
+        User findUser = getUserInfoByTokenRedisOrDB(uidAndSUb, uidAndSUb,
+            RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY);
         if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
             throw new UserInfoNotFoundException("sky.userId.notFind");
         }
@@ -201,39 +203,47 @@ public class UserQueryService {
     }
 
 
-    private void setUserIdInRedis(Long uid, String userId) {
-        redisCacheService.upsertCacheMapValueByKey(uid, RedisKeyDto.REDIS_USER_IDS_MAP_KEY, userId);
+    private void setUserIdInRedis(String token, String userId) {
+        redisCacheService.upsertCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_IDS_MAP_KEY, userId);
     }
 
-    private void setUserNameInRedis(Long uid, String userName) {
-        redisCacheService.upsertCacheMapValueByKey(uid, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY,
+    private void setUserNameInRedis(String token, String userName) {
+        redisCacheService.upsertCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY,
             userName);
     }
 
-    private void setUserEmailInRedis(Long uid, String email) {
-        redisCacheService.upsertCacheMapValueByKey(uid, RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY,
+    private void setUidInRedis(String token, Long uid) {
+        redisCacheService.upsertCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY,
+            String.valueOf(uid));
+    }
+
+    private void setUserEmailInRedis(String token, String email) {
+        redisCacheService.upsertCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY,
             email);
     }
 
     private void setUserInfoInRedis(RedisUserDto redisUserDTO) {
-        redisCacheService.upsertCacheMapValueByKey(redisUserDTO, RedisKeyDto.REDIS_USERS_INFO_MAP_KEY,
-            String.valueOf(redisUserDTO.getId()));
+        redisCacheService.upsertCacheMapValueByKey(redisUserDTO, RedisKeyDto.REDIS_USERS_INFO_MAP_KEY, redisUserDTO.getToken());
     }
 
 
-    private void removeUserIdFromRedis(Long uid, String userId) {
-        redisCacheService.removeCacheMapValueByKey(uid,
+    private void removeUidFromRedis(String token, Long uid) {
+        redisCacheService.removeCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY,
+            String.valueOf(uid));
+    }
+    private void removeUserIdFromRedis(String token, String userId) {
+        redisCacheService.removeCacheMapValueByKey(token,
             RedisKeyDto.REDIS_USER_IDS_MAP_KEY,
             userId);
     }
 
-    private void removeUserNameFromRedis(Long uid, String userName) {
-        redisCacheService.removeCacheMapValueByKey(uid, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY,
+    private void removeUserNameFromRedis(String token, String userName) {
+        redisCacheService.removeCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY,
             userName);
     }
 
-    private void removeUserEmailFromRedis(Long uid, String email) {
-        redisCacheService.removeCacheMapValueByKey(uid, RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY,
+    private void removeUserEmailFromRedis(String token, String email) {
+        redisCacheService.removeCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY,
             email);
     }
 

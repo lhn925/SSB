@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -24,12 +26,12 @@ import sky.Sss.domain.feed.service.FeedService;
 import sky.Sss.domain.track.dto.BaseTrackDto;
 import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
-import sky.Sss.domain.track.dto.track.TrackInfoRepDto;
-import sky.Sss.domain.track.dto.track.TrackInfoSaveReqDto;
+import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.tag.TrackTagsDto;
-import sky.Sss.domain.track.dto.track.TrackInfoModifyReqDto;
-import sky.Sss.domain.track.dto.track.TrackInfoSimpleDto;
-import sky.Sss.domain.track.dto.track.TrackPlayRepDto;
+import sky.Sss.domain.track.dto.track.req.TrackInfoModifyReqDto;
+import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
+import sky.Sss.domain.track.dto.track.rep.TrackPlayRepDto;
 import sky.Sss.domain.track.dto.track.reply.TracksInfoReqDto;
 import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
@@ -143,13 +145,15 @@ public class TrackService {
 
     }
 
-    public SsbTrack findOne(Long id, String token, User user, Status isStatus) {
-        return trackQueryService.findOne(id, token, user, isStatus);
+
+    // 여기
+    public SsbTrack getEntityTrack(Long id, String token, User user, Status isStatus) {
+        return trackQueryService.getEntityTrack(id, token, user, isStatus);
     }
 
-    public SsbTrack findOne(Long id, String token, Status isStatus) {
-        return trackQueryService.findOne(id, token, isStatus);
-    }
+//    public SsbTrack findOne(Long id, String token, Status isStatus) {
+//        return trackQueryService.findOne(id, token, isStatus);
+//    }
 
     public SsbTrack findOneJoinUser(Long id, Status isStatus) {
         return trackQueryService.findOneJoinUser(id, isStatus);
@@ -328,7 +332,9 @@ public class TrackService {
         }
 
         User user = userQueryService.findOne();
-        SsbTrack ssbTrack = findOne(trackInfoModifyReqDto.getId(), trackInfoModifyReqDto.getToken(),
+
+        // 여기
+        SsbTrack ssbTrack = getEntityTrack(trackInfoModifyReqDto.getId(), trackInfoModifyReqDto.getToken(),
             user, Status.ON);
         // 현재 태그에도 속하지 않고
         // 업데이트 태그에도 속하지 않는 놈은 삭제
@@ -492,7 +498,6 @@ public class TrackService {
 
     private void updateIsOwnerAndIsLike(TrackInfoSimpleDto trackInfoSimpleDto, User user, boolean isMember,
         boolean isOwnerPost) {
-
         // coverUrl이 없을 경우 user 프로필 사진으로 대체
         if (trackInfoSimpleDto.getCoverUrl() == null) {
             TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto, user.getPictureUrl());
@@ -503,7 +508,6 @@ public class TrackService {
         if (!isOwnerPost) {
             TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, null);
         }
-
         // 회원일 경우 like 조회
         if (isMember) {
             SsbTrackLikes ssbTrackLikes = trackLikesService.findOneAsOpt(trackInfoSimpleDto.getId(), user).orElse(null);
@@ -515,7 +519,8 @@ public class TrackService {
     @Transactional
     public void deleteTrack(Long id, String token) {
         User user = userQueryService.findOne();
-        SsbTrack ssbTrack = findOne(id, token, user, Status.ON);
+        // 여기
+        SsbTrack ssbTrack =  getEntityTrack(id, token, user, Status.ON);
 
         // Feed 삭제
         feedService.deleteFeed(user, ssbTrack.getId(), ContentsType.TRACK);
@@ -523,6 +528,8 @@ public class TrackService {
         // repost 삭제
         tagLinkCommonService.deleteTagLinksInBatch(ssbTrack.getTags());
 
+        // 캐시삭제
+        redisCacheService.delete(RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY + "::" + user.getUserId());
         SsbTrack.deleteTrackFile(ssbTrack, fileStore);
         SsbTrack.changeStatus(ssbTrack, Status.OFF);
     }

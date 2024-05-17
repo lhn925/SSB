@@ -6,10 +6,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.global.redis.dto.RedisKeyDto;
 
 
 @Slf4j
@@ -21,11 +24,14 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
 
     private final TrackJpaRepository trackJpaRepository;
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     @Transactional
-    public void saveAll(List<SsbTrack> ssbTrackList,LocalDateTime createdDateTime) {
+    @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#ssbTrackList[0].user.userId")
+    public void saveAll(List<SsbTrack> ssbTrackList, LocalDateTime createdDateTime) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO ssb_track (cover_url, created_date_time, description, genre, is_download, is_privacy, is_status, " +
+            "INSERT INTO ssb_track (cover_url, created_date_time, description, genre, is_download, is_privacy, is_status, "
+                +
                 "last_modified_date_time, main_genre_type, original_name, size, store_file_name, title, token, " +
                 "track_length, uid, is_release) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             ssbTrackList, 50,
@@ -52,6 +58,7 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
 
     @Override
     @Transactional
+    @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#entity.user.userId")
     public void save(SsbTrack entity) {
         trackJpaRepository.saveAndFlush(entity);
     }
