@@ -198,6 +198,16 @@ public class UserQueryService {
         return findUser;
     }
 
+
+    public User findByUserName(String userName, Enabled enabled) {
+        User findUser = getUserInfoByTokenRedisOrDB(userName, userName,
+            RedisKeyDto.REDIS_USER_NAMES_MAP_KEY);
+        if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
+            throw new UserInfoNotFoundException("sky.userId.notFind");
+        }
+        return findUser;
+    }
+
     public Optional<User> findOptionalUser(String userId) {
         return userQueryRepository.findByUserId(userId);
     }

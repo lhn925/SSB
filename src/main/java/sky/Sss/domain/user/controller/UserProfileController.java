@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.user.annotation.UserAuthorize;
+import sky.Sss.domain.user.service.profile.UserProfileService;
 
 @Slf4j
 @RestController
@@ -18,6 +19,7 @@ import sky.Sss.domain.user.annotation.UserAuthorize;
 public class UserProfileController {
 
 
+    private UserProfileService userProfileService;
     /**
      *
      *
@@ -37,9 +39,18 @@ public class UserProfileController {
      * @return
      */
 
+    /**
+     * 프로필에 사이드 정보를 반환
+     * @param username
+     * @return
+     */
     @GetMapping("/{username}")
-    public ResponseEntity<?> getUserProfileDto (@PathVariable String username) {
+    public ResponseEntity<?> getUserProfile (@PathVariable String username) {
 
+        return null;
+    }
+    @GetMapping("/{username}/likes")
+    public ResponseEntity<?> getUserLikedTrackListDto (@PathVariable String username) {
         // 본인여부
         // 팔로워 총합
         // 팔로잉 총합
@@ -49,14 +60,22 @@ public class UserProfileController {
         // 가장 최근에 단 댓글
         // 트랙 총합
         // 트랙 & 플레이 리스트
-
-
-
-
         return null;
     }
 
-
+    @GetMapping("/{username}/followings")
+    public ResponseEntity<?> getUserFollowingsListDto (@PathVariable String username) {
+        // 본인여부
+        // 팔로워 총합
+        // 팔로잉 총합
+        // like 갯수
+        // 가장 최근 라이크한 3곡
+        // 가장 최근에 팔로우한 유저
+        // 가장 최근에 단 댓글
+        // 트랙 총합
+        // 트랙 & 플레이 리스트
+        return null;
+    }
 
 
 }
