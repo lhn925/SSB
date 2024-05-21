@@ -19,13 +19,13 @@ public interface PlyLikesRepository extends JpaRepository<SsbPlyLikes, Long> {
     @Query("select s from SsbPlyLikes s where s.ssbPlayListSettings =:settings and s.user =:user ")
     Optional<SsbPlyLikes> findByPlyIdAndUser(@Param("settings") SsbPlayListSettings settings, @Param("user") User user);
 
-    @Query("select count(s.id) from SsbPlyLikes s where s.ssbPlayListSettings.token = :token")
-    Integer countByPlyToken(@Param("token") String token);
+    @Query("select s from SsbPlyLikes s where s.ssbPlayListSettings.token = :token")
+    List<SsbPlyLikes> getListPlyByToken(@Param("token") String token);
 
     @Query("select count(s.id) from SsbPlyLikes s where s.ssbPlayListSettings.id = :trackId")
     Integer countByTrackId(@Param("trackId") String trackId);
 
-    @Query("select s.user from SsbPlyLikes s join fetch User u on s.user = u where s.ssbPlayListSettings.token = :token")
+    @Query("select u from SsbPlyLikes s join s.user u where s.ssbPlayListSettings.token = :token")
     List<User> getUserList(@Param("token") String token);
 
 }

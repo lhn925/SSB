@@ -15,16 +15,15 @@ public interface UserFollowsRepository extends JpaRepository<UserFollows,Long> {
 
 
 
+    // fetch 수정
     // 유저를 팔로워 하고 있는 총 유저 리스트
-    @Query("select f.followerUser from UserFollows f join fetch User u "
-        + " on f.followerUser = u "
-        + "where f.followingUser = :user ")
+    @Query("select f.followerUser from UserFollows f join f.followerUser u where f.followingUser = :user")
     List<User> getMyFollowerUsers(@Param("user") User user);
 
 
+    // fetch 수정
     // 유저가 팔로워 하고 있는 총 유저 리스트
-    @Query("select f.followingUser from UserFollows f join fetch User u "
-        + " on f.followingUser = u "
+    @Query("select f.followingUser from UserFollows f join f.followingUser u "
         + "where f.followerUser = :user ")
     List<User> myFollowingUsers(@Param("user") User user);
 

@@ -8,6 +8,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.track.redis.RedisPlayLogDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
@@ -44,17 +45,16 @@ public class TrackPlayService {
      */
     @Transactional
     public UrlResource getTrackPlayFile(Long id, String playToken) {
-        SsbTrackAllPlayLogs playLogs = trackAllPlayLogService.findOne(id, playToken);
+        RedisPlayLogDto playLogs = trackAllPlayLogService.getPlayDto(id, playToken);
         // 요청시간 서버 기준 으로
         long nowMillis = DayTime.localDateTimeToEpochMillis(LocalDateTime.now()).toEpochMilli();
-        SsbTrack ssbTrack = playLogs.getSsbTrack();
         // 제한시간 지났는지에 대한 여부
         if (nowMillis > playLogs.getExpireTime()) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
 
         return trackService.getSsbTrackFile(
-            ssbTrack.getToken() + "/" + ssbTrack.getStoreFileName());
+            playLogs.getTrackToken() + "/" + playLogs.getStoreFileName());
     }
 }
 

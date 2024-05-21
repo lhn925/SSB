@@ -167,6 +167,37 @@ public class RedisCacheService {
 
     }
 
+    /**
+     * key(String)
+     * value(hashMap)
+     * 형태로 Redis 에 저장
+     * upsert는 "update"와 "insert"를 결합한 용어
+     *
+     * @param value
+     * @param key
+     * @param subMapKey
+     * @param <T>
+     * @return
+     */
+    // redis 에 caching 데이터 찾은 후 존재하지 않을 경우 등록
+    public <T> void upsertAllCacheMapValuesByKey(Map<String,T> addMap, String key) {
+        Map<String, T> objectMap;
+        // redis 에 존재하는 경우
+        if (this.hasRedis(key)) { //
+            TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
+            };
+            objectMap = getData(key, typeReference);
+            if (objectMap == null) {
+                objectMap = new HashMap<>();
+            }
+            objectMap.putAll(addMap);
+        } else {
+            objectMap = new HashMap<>(addMap);
+        }
+        // hashMap -> jsonString 형태로 변환후
+        // redis 에 저장
+        setData(key, objectMap);
+    }
 
     public void updateCacheMapValueByKey(String key, List<User> users) {
         Map<String, UserSimpleInfoDto> dataMap = users.stream()

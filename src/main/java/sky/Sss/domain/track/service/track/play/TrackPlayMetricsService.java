@@ -76,6 +76,9 @@ public class TrackPlayMetricsService {
      */
     public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, String token,
         PlayStatus playStatus) {
+
+
+
         return trackAllPlayLogService.findOne(user, ssbTrack, token, playStatus);
     }
 
@@ -402,6 +405,19 @@ public class TrackPlayMetricsService {
     }
 
     /**
+     * chartIncluded 검색 후 반환
+     *
+     * @param user
+     * @param ssbTrack
+     * @param playDateTime
+     * @return
+     */
+    public boolean existsIncludeChart(User user, SsbTrack ssbTrack, LocalDateTime playDateTime) {
+        return trackChatIncludedService.existsIncludeChart(user, ssbTrack, DayTime.getDayTime(playDateTime));
+    }
+
+
+    /**
      * @param user
      * @param ssbTrack
      * @param id
@@ -416,11 +432,11 @@ public class TrackPlayMetricsService {
     // 현재 시간대에 공식 로그가 있는지 화인
     private void checkChartStatus(User user, SsbTrack ssbTrack, SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
         // 현재 시간대에 공식 로그가 있는지 화인
-        SsbChartIncludedPlays includedLog = getChartIncludedPlay(user, ssbTrack,
+        boolean isChartLog = existsIncludeChart(user, ssbTrack,
             ssbTrackAllPlayLogs.getCreatedDateTime());
         // 공식 재생 여부 확인
         // true : 공식재생, false : 공식 재생 x
-        boolean isChartLog = includedLog == null;
+//        boolean isChartLog = includedLog == null;
         // 차트에 반영 되는 재생인지 저장
         SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, isChartLog);
     }

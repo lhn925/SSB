@@ -2,9 +2,13 @@ package sky.Sss.domain.track.service.track.play;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.track.redis.RedisPlayLogDto;
+import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
@@ -13,6 +17,8 @@ import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.repository.track.play.TrackAllPlayLogRepository;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.global.redis.dto.RedisKeyDto;
+import sky.Sss.global.redis.service.RedisCacheService;
 
 /**
  * 플레이 조회수 관련 서비스
@@ -24,6 +30,7 @@ import sky.Sss.domain.user.entity.User;
 public class TrackAllPlayLogService {
 
     private final TrackAllPlayLogRepository trackAllPlayLogRepository;
+    private final RedisCacheService redisCacheService;
 
     /**
      * "
@@ -44,6 +51,10 @@ public class TrackAllPlayLogService {
     @Transactional
     public void add(SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
         trackAllPlayLogRepository.save(ssbTrackAllPlayLogs);
+        redisCacheService.upsertCacheMapValueByKey(
+            RedisPlayLogDto.create(ssbTrackAllPlayLogs)
+            , RedisKeyDto.REDIS_PLAY_LOG_DTO_MAP_KEY,
+            ssbTrackAllPlayLogs.getToken());
     }
 
     public SsbTrackAllPlayLogs findOne(User user, SsbTrack ssbTrack, String token, ChartStatus chartStatus) {
@@ -60,7 +71,14 @@ public class TrackAllPlayLogService {
         return trackAllPlayLogRepository.findOne(trackId, playToken)
             .orElseThrow(() -> new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN));
     }
-
+    public RedisPlayLogDto getPlayDto(long trackId, String playToken) {
+        RedisPlayLogDto redisPlayLogDto = redisCacheService.getCacheMapBySubKey(RedisPlayLogDto.class, playToken,
+            RedisKeyDto.REDIS_PLAY_LOG_DTO_MAP_KEY);
+        if (redisPlayLogDto == null || redisPlayLogDto.getTrackId() != trackId) {
+            return RedisPlayLogDto.create(findOne(trackId, playToken));
+        }
+        return redisPlayLogDto;
+    }
 
 }
 

@@ -3,7 +3,9 @@ package sky.Sss.domain.track.service.playList;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ public class PlyLikesService {
     @Transactional
     public void addLikes(Long id, String token, User user) {
         SsbPlyLikes ssbPlyLikes = SsbPlyLikes.create(user);
-        SsbPlyLikes.updateSettings(ssbPlyLikes,id);
+        SsbPlyLikes.updateSettings(ssbPlyLikes, id);
 
         plyLikesRepository.save(ssbPlyLikes);
         String key = getLikeKey(token);
@@ -50,7 +52,7 @@ public class PlyLikesService {
      * 좋아요 취소
      */
     @Transactional
-    public void cancelLikes(long plyId,String plyToken, User user) {
+    public void cancelLikes(long plyId, String plyToken, User user) {
         // 좋아요가 있는지 확인
         SsbPlyLikes ssbTrackLikes = findOne(plyId, user);
 
@@ -123,7 +125,7 @@ public class PlyLikesService {
 
         // 만약 레디스에는 없고 디비에는 있으면
         if (plyLikesOptional.isPresent()) {
-            redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getUserId());
+            redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getToken());
         }
         return plyLikesOptional.isPresent();
     }
@@ -148,11 +150,16 @@ public class PlyLikesService {
         // redis 에 total 캐시가 있으면
         int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
 
-        count = count != 0 ? count : getPlyCount(token);
-        // redis 에 저장이 안되어 있을경우 count 후 저장
-        if (count == 0) {
-            redisCacheService.upsertCacheMapValueByKey(count, key, token);
+        if (count > 0) {
+            return count;
         }
+//        count = count != 0 ? count : getPlyListByToken(token);
+        // redis 에 저장이 안되어 있을경우 count 후 저장
+        List<SsbPlyLikes> plyListByToken = getPlyListByToken(token);
+        Map<String, UserSimpleInfoDto> plyLikeMap = plyListByToken.stream()
+            .collect(Collectors.toMap(plyToken -> plyToken.getUser().getToken(),
+                plyToken -> new UserSimpleInfoDto(plyToken.getUser())));
+        redisCacheService.upsertAllCacheMapValuesByKey(plyLikeMap, key);
         return count;
     }
 
@@ -160,8 +167,8 @@ public class PlyLikesService {
         return plyLikesRepository.getUserList(replyToken);
     }
 
-    private Integer getPlyCount(String token) {
-        return plyLikesRepository.countByPlyToken(token);
+    private List<SsbPlyLikes> getPlyListByToken(String token) {
+        return plyLikesRepository.getListPlyByToken(token);
     }
 
 

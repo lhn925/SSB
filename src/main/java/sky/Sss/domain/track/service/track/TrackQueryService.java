@@ -112,7 +112,7 @@ public class TrackQueryService {
     public SsbTrack findById(Long id, Status isStatus) {
         SsbTrack findTrack = getTrackCacheFromOrDbByTrackId(id,
             RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
-        if (findTrack == null || isStatus.getValue().equals(findTrack.getIsStatus())) {
+        if (findTrack == null || !isStatus.getValue().equals(findTrack.getIsStatus())) {
             throw new SsbFileNotFoundException();
         }
 
@@ -128,8 +128,8 @@ public class TrackQueryService {
         return new TrackInfoSimpleDto(ssbTrack.getId(), ssbTrack.getToken(),
             ssbTrack.getTitle(), ssbTrack.getUser(),
             ssbTrack.getTrackLength(), ssbTrack.getCoverUrl(), ssbTrack.getIsPrivacy(), ssbTrack.getCreatedDateTime());
-
     }
+
 
     public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, long likedUserId, Status isStatus) {
         return trackQueryRepository.getTrackInfoSimpleDtoList(ids, likedUserId, isStatus.getValue());
@@ -160,6 +160,7 @@ public class TrackQueryService {
     public SsbTrack findOneJoinUser(Long id, Status isStatus) {
         SsbTrack findTrack = getTrackCacheFromOrDbByTrackId(id,
             RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
+
 
         if (findTrack == null || !findTrack.getIsStatus().equals(isStatus.getValue())) {
             throw new SsbFileNotFoundException();

@@ -503,17 +503,18 @@ public class TrackService {
         if (trackInfoSimpleDto.getCoverUrl() == null) {
             TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto, user.getPictureUrl());
         }
+        // 회원일 경우 like 조회
+        if (isMember) {
+            SsbTrackLikes ssbTrackLikes = trackLikesService.findOneAsOptByToken(trackInfoSimpleDto.getToken(), user).orElse(null);
+            boolean isLike = ssbTrackLikes != null;
+            TrackInfoSimpleDto.updateIsLike(trackInfoSimpleDto, isLike);
+        }
+
         TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwnerPost);
         // 자신의 트랙이 아닐 경우
         // token null
         if (!isOwnerPost) {
             TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, null);
-        }
-        // 회원일 경우 like 조회
-        if (isMember) {
-            SsbTrackLikes ssbTrackLikes = trackLikesService.findOneAsOpt(trackInfoSimpleDto.getId(), user).orElse(null);
-            boolean isLike = ssbTrackLikes != null;
-            TrackInfoSimpleDto.updateIsLike(trackInfoSimpleDto, isLike);
         }
     }
 

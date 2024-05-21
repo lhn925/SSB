@@ -47,6 +47,7 @@ export function PlayList({
     // 현재 셔플 재생이라면
     // Index 위치 값 반환
     if (settingsInfo.shuffle) {
+      console.log(playOrders);
       for (let i = 0; i < playOrders.length; i++) {
         const order = playOrders[i];
         if (order === currOrder) {
@@ -61,6 +62,7 @@ export function PlayList({
       changePlaying(false);
       return;
     }
+    console.log(currOrder);
     // 만약 재생중이지 않을 경우 PlayLog 확인 후 플레이
     changePlaying(true);
     if (trackEq && !isPlaying) {

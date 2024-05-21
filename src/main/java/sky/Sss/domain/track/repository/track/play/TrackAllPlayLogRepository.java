@@ -32,7 +32,7 @@ public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlay
         SsbTrack ssbTrack, @Param("playStatus") PlayStatus playStatus);
 
     @Query(
-        "select s from SsbTrackAllPlayLogs s join fetch SsbTrack t where s.ssbTrack.id = :trackId  and s.token =:playToken ")
+        "select s from SsbTrackAllPlayLogs s join fetch s.ssbTrack where s.ssbTrack.id = :trackId  and s.token =:playToken ")
     Optional<SsbTrackAllPlayLogs> findOne(@Param("trackId") long trackId, @Param("playToken") String playToken);
 
 

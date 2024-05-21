@@ -22,7 +22,7 @@ public interface PlyReplyLikesRepository extends JpaRepository<SsbPlyReplyLikes,
 
 
 
-    @Query("select r.user from SsbPlyReplyLikes r join fetch User u on r.user = u where r.ssbPlyReply.token = :token")
+    @Query("select r.user from SsbPlyReplyLikes r join r.user where r.ssbPlyReply.token = :token")
     List<User> getUserList(@Param("token") String token);
 
     @Query("select count(s.id) from SsbPlyReplyLikes s where s.ssbPlyReply.token = :replyToken")

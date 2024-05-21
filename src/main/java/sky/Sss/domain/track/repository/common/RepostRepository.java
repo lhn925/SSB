@@ -14,7 +14,7 @@ import sky.Sss.domain.user.model.ContentsType;
 public interface RepostRepository extends JpaRepository<SsbRepost, Long> {
 
 
-    @Query("select r.user from SsbRepost r join fetch User u on r.user = u where r.contentsId = :contentsId and r.contentsType = :contentsType")
+    @Query("select r.user from SsbRepost r join r.user where r.contentsId = :contentsId and r.contentsType = :contentsType")
     List<User> getUserList(@Param("contentsId") long contentsId, @Param("contentsType") ContentsType contentsType);
 
     @Query("select r from SsbRepost r where r.contentsId = :contentsId and r.contentsType = :contentsType")

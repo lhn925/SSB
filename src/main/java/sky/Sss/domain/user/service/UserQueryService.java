@@ -96,12 +96,14 @@ public class UserQueryService {
         String token = String.valueOf(subKeyMap.get(subKey));
         return getUserInfoByTokenRedisOrDB(token, subKey, redisUidMapKey);
     }
+
     public User getUserInfoByTokenRedisOrDB(String token, String subKey, String redisUidMapKey) {
 
         TypeReference<HashMap<String, RedisUserDto>> redisDtoType = new TypeReference<>() {
         };
         String redisUsersInfoMapKey = RedisKeyDto.REDIS_USERS_INFO_MAP_KEY;
         Map<String, RedisUserDto> userInfoMap = redisCacheService.getData(redisUsersInfoMapKey, redisDtoType);
+
         if (userInfoMap == null || !userInfoMap.containsKey(token)) {
             return fetchAndSetSubKeyRedisBySubKey(subKey, redisUidMapKey);
         }
@@ -190,7 +192,7 @@ public class UserQueryService {
     public User findOne(Long uid, Enabled enabled) {
         String uidAndSUb = String.valueOf(uid);
 
-        User findUser = getUserInfoByTokenRedisOrDB(uidAndSUb, uidAndSUb,
+        User findUser = getUserInfoFromCacheOrDB(uidAndSUb,
             RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY);
         if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
             throw new UserInfoNotFoundException("sky.userId.notFind");
@@ -200,7 +202,7 @@ public class UserQueryService {
 
 
     public User findByUserName(String userName, Enabled enabled) {
-        User findUser = getUserInfoByTokenRedisOrDB(userName, userName,
+        User findUser = getUserInfoFromCacheOrDB(userName,
             RedisKeyDto.REDIS_USER_NAMES_MAP_KEY);
         if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
             throw new UserInfoNotFoundException("sky.userId.notFind");
@@ -233,7 +235,8 @@ public class UserQueryService {
     }
 
     private void setUserInfoInRedis(RedisUserDto redisUserDTO) {
-        redisCacheService.upsertCacheMapValueByKey(redisUserDTO, RedisKeyDto.REDIS_USERS_INFO_MAP_KEY, redisUserDTO.getToken());
+        redisCacheService.upsertCacheMapValueByKey(redisUserDTO, RedisKeyDto.REDIS_USERS_INFO_MAP_KEY,
+            redisUserDTO.getToken());
     }
 
 
@@ -241,6 +244,7 @@ public class UserQueryService {
         redisCacheService.removeCacheMapValueByKey(token, RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY,
             String.valueOf(uid));
     }
+
     private void removeUserIdFromRedis(String token, String userId) {
         redisCacheService.removeCacheMapValueByKey(token,
             RedisKeyDto.REDIS_USER_IDS_MAP_KEY,
