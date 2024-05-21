@@ -6,7 +6,7 @@ import "css/sc_custom.css"
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 import {
-  durationTime, removeFromLocalStorage,
+  durationTime, removeFromLocalStorage, shufflePlayOrder,
   sorted
 } from "utill/function";
 import {PLUS} from "content/trackplayer/NumberSignTypes";
@@ -46,8 +46,13 @@ export function PlayList({
     let currOrder = index - 1;
     // 현재 셔플 재생이라면
     // Index 위치 값 반환
+    // 선택한 곡이 현재 재생 곡일경우 그리고 재생하고 있을 경우
+    // 일시정지후 return
+    if (trackEq && isPlaying) {
+      changePlaying(false);
+      return;
+    }
     if (settingsInfo.shuffle) {
-      console.log(playOrders);
       for (let i = 0; i < playOrders.length; i++) {
         const order = playOrders[i];
         if (order === currOrder) {
@@ -56,26 +61,22 @@ export function PlayList({
         }
       }
     }
-    // 선택한 곡이 현재 재생 곡일경우 그리고 재생하고 있을 경우
-    // 일시정지후 return
-    if (trackEq && isPlaying) {
-      changePlaying(false);
-      return;
-    }
-    console.log(currOrder);
-    // 만약 재생중이지 않을 경우 PlayLog 확인 후 플레이
-    changePlaying(true);
+
+
     if (trackEq && !isPlaying) {
       if (currPlayLog.trackId !== -1) {
+        changePlaying(true);
         return;
       }
       resetPlayedSeconds();
       createCurrentPlayLog(currOrder, PLUS);
+      changePlaying(true);
       return;
     }
     resetPlayedSeconds();
     // updateSettings("order", currOrder);
     updateOrderAndSign(currOrder, PLUS);
+    changePlaying(true);
   }
 
   function resetPlayedSeconds() {

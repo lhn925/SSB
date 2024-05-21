@@ -39,9 +39,9 @@ import useAuth from "hoks/auth/useAuth";
 import useUpload from "hoks/upload/useUpload";
 import mem from "mem";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
-import {PlayList} from "./components/trackplayer/PlayList";
+import {PlayList} from "components/trackplayer/PlayList";
 import useUserInfo from "./hoks/user/useUserInfo";
-import {resetAll} from "./store/actions";
+import {resetAll} from "store/actions";
 import ProfileContainer from "./content/profile/ProfileContainer";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
@@ -159,6 +159,8 @@ function App() {
               {/*<Route path="/" element={<Profile userInfo={userReducer}/>}>*/}
               {/*</Route>*/}
               <Route path="/feed">
+              </Route>
+              <Route path="/" element={  <div>메인화면</div>}>
               </Route>
               <Route path="/:userName" element={<ProfileContainer/>}>
               </Route>

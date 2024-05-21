@@ -94,7 +94,8 @@ export const TrackPlayer = ({
     }
     // 로컬에 있는 마지막 플레이리스트 로그 찾아서 반환
     localPly.item.map((data, index) => {
-          if (data.createdDateTime === createdDateTime && data.id === localId && data.isStatus !== 0) {
+          if (data.createdDateTime === createdDateTime && data.id === localId
+              && data.isStatus !== 0) {
             localPly.playOrders.map((orderIndex, order) => {
               if (index === orderIndex) {
                 // playOrders 순서 에 맞게 반환
@@ -118,6 +119,7 @@ export const TrackPlayer = ({
     }
     return findOrder;
   }
+
   useEffect(() => {
     if (localPly.userId === null) {
       return;
@@ -168,7 +170,8 @@ export const TrackPlayer = ({
     }
 
     // 현재 플레이로그 트랙아이디가 -1이 아닐 경우
-    if (localPly.item.length > 0 && localPlayLog.item[0] !== -1 && localPlyInfo.length > 0) {
+    if (localPly.item.length > 0 && localPlayLog.item[0] !== -1
+        && localPlyInfo.length > 0) {
       // 트랙아이디
       // const trackId = localPlayLog.item[0];
       // 플레이리스트 Index
@@ -196,7 +199,8 @@ export const TrackPlayer = ({
     // 재생중이면 그대로 유지
     // 플레이 리스트에 변화가 생겼을 경우
     // 플레이
-    if (statusOnLocalPly && statusOnLocalPly.length !== newStatusLocalPly.length) {
+    if (statusOnLocalPly && statusOnLocalPly.length
+        !== newStatusLocalPly.length) {
       if (currentTrack.info.id === -1) {
         // 이전 재생 목록 혹은 다음 재생 목록
         // 비공개가 처리가 됐을 경우 list 재 배치 후 playLog 생성
@@ -205,9 +209,13 @@ export const TrackPlayer = ({
     }
 
     setLocalPlyInfo(localPly.item);
-    setPlayOrders(localPly.playOrders);
+
     setStatusOnLocalPly(newStatusLocalPly);
   }, [localPly.item]);
+
+  useEffect(() => {
+    setPlayOrders(localPly.playOrders);
+  }, [localPly.playOrders]);
 
   useEffect(() => {
     if (trackInfo.id === -1) {
@@ -246,6 +254,7 @@ export const TrackPlayer = ({
       // 현재 재생하고 있는 index 와 추가날짜 TrackId가 같다면
       // playLog를 불러오지 않는다
       const numberSign = playerSettings.item.numberSign;
+
       const plyTrackItem = getPlyTrackByOrder(playerSettings.item.order,
           numberSign);
       if (plyTrackItem) {
@@ -531,7 +540,7 @@ export const TrackPlayer = ({
 
     updateSettings("shuffle", isShuffle);
 
-    const shuffleArray = shufflePlayOrder(playOrders,isShuffle,
+    const shuffleArray = shufflePlayOrder(playOrders, isShuffle,
         localPlyInfo,
         settingsInfo.order);
     shuffleOrders(shuffleArray);
@@ -577,7 +586,7 @@ export const TrackPlayer = ({
     const trackInfo = getPlyTrackByTrackId(id);
     setIsDoubleClick(true);
     ToggleLike(trackInfo.id, trackInfo.title, trackInfo.isLike,
-        updatePlyTrackInfo,t);
+        updatePlyTrackInfo, t);
     setIsDoubleClick(false);
   }
   const toggleFollow = () => {
@@ -585,7 +594,7 @@ export const TrackPlayer = ({
       return;
     }
     setIsDoubleClick(true);
-    ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo,t);
+    ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo, t);
     setIsDoubleClick(false);
   }
 

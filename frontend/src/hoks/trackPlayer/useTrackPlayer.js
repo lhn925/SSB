@@ -151,6 +151,7 @@ const useTrackPlayer = (bc) => {
   const getPlyTrackByOrder = (order, numberSign) => {
     const localPlyItem = calculateOrder(order, localPly.item,
         localPly.playOrders, getStatusOnLocalPly(), numberSign,updateSettings);
+    console.log(localPlyItem);
     if (localPlyItem) {
       const findTrack = localPlyTracks.tracks.filter(
           track => track.id === localPlyItem.id);
