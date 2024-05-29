@@ -2,6 +2,7 @@ package sky.Sss.domain.track.repository.track;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +20,11 @@ public interface TrackLikesRepository extends JpaRepository<SsbTrackLikes, Long>
     @Query("select s from SsbTrackLikes s join fetch s.user u join fetch s.ssbTrack t where s.user.id = :uid and s.ssbTrack.token = :trackToken")
     Optional<SsbTrackLikes> findByLikeByTrackToken(@Param("trackToken") String trackToken, @Param("uid") long uid);
 
-    List<SsbTrackLikes> findAllByUser(User user);
+
+
+
+    @Query("select s.id from SsbTrackLikes s where s.user = :user")
+    List<Long> getUserLikedTrackIds(@Param("user") User user, Sort sort);
 
     boolean existsBySsbTrackAndUser(SsbTrack ssbTrack, User user);
 

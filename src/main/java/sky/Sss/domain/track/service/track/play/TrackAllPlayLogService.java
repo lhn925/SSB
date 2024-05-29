@@ -71,6 +71,7 @@ public class TrackAllPlayLogService {
         return trackAllPlayLogRepository.findOne(trackId, playToken)
             .orElseThrow(() -> new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN));
     }
+
     public RedisPlayLogDto getPlayDto(long trackId, String playToken) {
         RedisPlayLogDto redisPlayLogDto = redisCacheService.getCacheMapBySubKey(RedisPlayLogDto.class, playToken,
             RedisKeyDto.REDIS_PLAY_LOG_DTO_MAP_KEY);
@@ -78,6 +79,17 @@ public class TrackAllPlayLogService {
             return RedisPlayLogDto.create(findOne(trackId, playToken));
         }
         return redisPlayLogDto;
+    }
+
+    // 조회수 캐쉬
+    public void completeLogSaveRedisCache(SsbTrackAllPlayLogs ssbTrackAllPlayLogs) {
+        if (ssbTrackAllPlayLogs.getPlayStatus().equals(PlayStatus.INCOMPLETE)) {
+            return;
+        }
+        String token = ssbTrackAllPlayLogs.getSsbTrack().getToken();
+        String key = RedisKeyDto.REDIS_TRACK_PLAY_LOG_MAP_KEY + token;
+        redisCacheService.upsertCacheMapValueByKey(RedisPlayLogDto.create(ssbTrackAllPlayLogs), key,
+            ssbTrackAllPlayLogs.getToken());
     }
 
 }

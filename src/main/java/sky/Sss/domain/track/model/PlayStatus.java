@@ -7,7 +7,7 @@ public enum PlayStatus {
     //알수없음
     INCOMPLETE("INCOMPLETE");
 
-    private String status;
+    private final String status;
     PlayStatus(String status) {
         this.status = status;
     }

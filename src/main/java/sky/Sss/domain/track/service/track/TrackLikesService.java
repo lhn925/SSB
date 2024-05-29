@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
@@ -40,12 +41,31 @@ public class TrackLikesService {
     private final UserQueryService userQueryService;
 
     /**
+     * 좋아요 취소
+     */
+    @Caching(evict = {
+        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY}, key = "#user.userId")
+    })
+    @Transactional
+    public void cancelLikes(long trackId, String token, User user) {
+        // 사용자 검색
+        SsbTrackLikes ssbTrackLikes = getEntityTrackLike(trackId, user);
+        delete(ssbTrackLikes);
+
+        String key = getLikeKey(token);
+
+        // likesMap 안에 들어갈 user 를 검색하는 key
+        String subUserKey = user.getToken();
+        // 좋아요 수 업로드
+        redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
+    }
+
+    /**
      * Track 좋아요 추가
      */
 
     @Caching(evict = {
-        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY}, key = "#user.userId"),
-        @CacheEvict(value = {RedisKeyDto.REDIS_TRACK_LIKES_USER_LIST_KEY}, key = "#token"),
+        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY}, key = "#user.userId")
     })
     @Transactional
     public void addLikes(long id, String token, User user) {
@@ -65,27 +85,6 @@ public class TrackLikesService {
 //        updateTotalCount(ssbTrack.getToken());
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, subUserKey);
-    }
-
-    /**
-     * 좋아요 취소
-     */
-    @Caching(evict = {
-        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY}, key = "#user.userId"),
-        @CacheEvict(value = {RedisKeyDto.REDIS_TRACK_LIKES_USER_LIST_KEY}, key = "#token"),
-    })
-    @Transactional
-    public void cancelLikes(long trackId, String token, User user) {
-        // 사용자 검색
-        SsbTrackLikes ssbTrackLikes = getEntityTrackLike(trackId, user);
-        delete(ssbTrackLikes);
-
-        String key = getLikeKey(token);
-
-        // likesMap 안에 들어갈 user 를 검색하는 key
-        String subUserKey = user.getToken();
-        // 좋아요 수 업로드
-        redisCacheService.removeCacheMapValueByKey(new UserSimpleInfoDto(), key, subUserKey);
     }
 
     /**
@@ -161,16 +160,16 @@ public class TrackLikesService {
         return listByToken.size();
     }
 
-    @Cacheable(value = RedisKeyDto.REDIS_TRACK_LIKES_USER_LIST_KEY, key = "#trackToken", cacheManager = "contentCacheManager")
     public List<User> getUserList(String trackToken) {
         return trackLikesRepository.getUserList(trackToken);
     }
 
 
     @Cacheable(value = RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY, key = "#user.userId", cacheManager = "contentCacheManager")
-    public List<SsbTrackLikes> getUserLikedTrackList(User user) {
-        return trackLikesRepository.findAllByUser(user);
+    public List<Long> getUserLikedTrackIds(User user, Sort sort) {
+        return trackLikesRepository.getUserLikedTrackIds(user,sort);
     }
+
 
     private List<SsbTrackLikes> getListByToken(String token) {
         return trackLikesRepository.getTrackLikesByToken(token);

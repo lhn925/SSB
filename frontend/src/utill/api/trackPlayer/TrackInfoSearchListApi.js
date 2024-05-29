@@ -4,7 +4,7 @@ import {
 } from "utill/api/ApiEndpoints";
 
 export default async function TrackInfoSearchListApi(ids) {
-  return await authTrackApi(TRACKS_INFO_SEARCH_LIST,{
+  return await authTrackApi.get(TRACKS_INFO_SEARCH_LIST,{
     params: {
       ids:ids
     }

@@ -1,21 +1,21 @@
 package sky.Sss.global.redis.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Set;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Range;
-import org.springframework.data.domain.Range.Bound;
-import org.springframework.data.domain.Range.RangeBuilder;
 import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -86,6 +86,36 @@ public class RedisQueryService {
             return null;
         }
     }
+
+
+    public <T> RedisDataListDto<T> getDataList(List<String> keys, TypeReference<T> typeReference) {
+        try {
+            List<Object> cachedData = redisTemplate.opsForValue().multiGet(keys);
+            Map<String, T> result = new HashMap<>();
+            List<String> missingKeys = new ArrayList<>();
+            // redisKey 값 삭제 후 온전한 토큰 추출
+            int removeIndex = keys.get(0).lastIndexOf(":");
+            for (int i = 0; i < keys.size(); i++) {
+                String data = (String) cachedData.get(i);
+                String key = keys.get(i).substring(removeIndex + 1);
+                if (data != null) {
+                    JavaType javaType = TypeFactory.defaultInstance().constructType(typeReference);
+                    T value = objectMapper.readValue(data, javaType);
+                    result.put(key, value);
+                } else {
+                    missingKeys.add(key);
+                }
+            }
+            return new RedisDataListDto<T>(result, missingKeys);
+        } catch (RedisConnectionFailureException e) {
+            log.error("Redis connection failed", e);
+            return null;
+        } catch (Exception e) {
+            log.error("Error saving data to Redis", e);
+            return null;
+        }
+    }
+
 
     public String getRememberData(String key) {
 

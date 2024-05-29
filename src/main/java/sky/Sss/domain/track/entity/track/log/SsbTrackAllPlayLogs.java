@@ -116,7 +116,6 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setStartTime(removeMillis(startTime));
         ssbTrackAllPlayLogs.setIsValid(false);
 
-
         Integer trackMiniNum = TrackMinimumPlayTime.MINI_NUM_SECOND.getSeconds();
 
         // 전체 트랙길이가 60초보다 작을 경우
@@ -126,25 +125,19 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setMinimumPlayTime(trackMiniNum);
         ssbTrackAllPlayLogs.setCreatedDateTime(createdDateTime);
         // 처음 생성시 플레이 횟수에 반영 안됨 으로 설정
-        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, 0);
-
+        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, PlayStatus.INCOMPLETE);
 
         // 제한 시간 설정 1시간
-        Instant zoneInstant = DayTime.localDateTimeToEpochMillis(createdDateTime.plusHours(DayTime.EXPIRE_FILE_HOUR_TIME));
+        Instant zoneInstant = DayTime.localDateTimeToEpochMillis(
+            createdDateTime.plusHours(DayTime.EXPIRE_FILE_HOUR_TIME));
         ssbTrackAllPlayLogs.setExpireTime(zoneInstant.toEpochMilli());
 
         return ssbTrackAllPlayLogs;
     }
 
 
-
-    public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, int playTime) {
-
-        if (playTime != 0) {
-            ssbTrackAllPlayLogs.setPlayStatus(PlayStatus.getPlayStatus(ssbTrackAllPlayLogs.getMinimumPlayTime() <= playTime));
-            return;
-        }
-        ssbTrackAllPlayLogs.setPlayStatus(PlayStatus.INCOMPLETE);
+    public static void updatePlayStatus(SsbTrackAllPlayLogs ssbTrackAllPlayLogs, PlayStatus playStatus) {
+        ssbTrackAllPlayLogs.setPlayStatus(playStatus);
 
     }
 
@@ -164,7 +157,7 @@ public class SsbTrackAllPlayLogs extends BaseTimeEntity {
         ssbTrackAllPlayLogs.setIsValid(isValid);
     }
 
-    public static long removeMillis (Long millisSeconds) {
+    public static long removeMillis(Long millisSeconds) {
         return (millisSeconds / 1000) * 1000;
     }
 

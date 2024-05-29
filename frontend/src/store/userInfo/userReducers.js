@@ -1,6 +1,6 @@
-import {configureStore, createSlice} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import {PURGE} from "redux-persist/es/constants";
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 
 const initialState = {
   userId: null,
@@ -13,6 +13,9 @@ const userReducers = createSlice({
   name: "user",
   initialState: initialState,
   reducers: {
+    reset(state) {
+      Object.assign(state, initialState)
+    },
     setUserId(state, action) {
       state.userId = action.payload.userId;
     },
@@ -36,6 +39,7 @@ const userReducers = createSlice({
 });
 
 export let userActions = {
+  rest: userReducers.actions.reset,
   setUserId: userReducers.actions.setUserId,
   setEmail: userReducers.actions.setEmail,
   setPictureUrl: userReducers.actions.setPictureUrl,

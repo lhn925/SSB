@@ -1,6 +1,7 @@
 package sky.Sss.domain.track.service.track;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,19 @@ class TrackLikesServiceTest {
 
 
 
+
+    @Test
+    public void like() {
+
+    // given
+        User user = userQueryService.findOne("lim2226");
+
+
+        // when
+
+    // then
+
+    }
 
     public static class UserToken  {
         private String token;

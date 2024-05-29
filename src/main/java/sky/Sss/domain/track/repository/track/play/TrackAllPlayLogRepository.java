@@ -14,7 +14,9 @@ import sky.Sss.domain.user.entity.User;
 public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlayLogs, Long> {
 
 
-    @Query("select s from SsbTrackAllPlayLogs s where s.token =:token "
+    @Query("select s from SsbTrackAllPlayLogs s "
+        + "join fetch s.ssbTrack "
+        + "where s.token =:token "
         + "and s.user =:user "
         + "and s.ssbTrack =:ssbTrack "
         + "and s.chartStatus = :chartStatus")
@@ -22,7 +24,9 @@ public interface TrackAllPlayLogRepository extends JpaRepository<SsbTrackAllPlay
         @Param("ssbTrack")
         SsbTrack ssbTrack, @Param("chartStatus") ChartStatus chartStatus);
 
-    @Query("select s from SsbTrackAllPlayLogs s where s.token =:token "
+    @Query("select s from SsbTrackAllPlayLogs s "
+        + "join fetch s.ssbTrack "
+        + "where s.token =:token "
         + "and s.user =:user "
         + "and s.ssbTrack =:ssbTrack "
         + "and s.playStatus =:playStatus "

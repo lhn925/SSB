@@ -37,12 +37,10 @@ import useModal from "hoks/modal/useModal";
 import useTrackPlayer from "hoks/trackPlayer/useTrackPlayer";
 import useAuth from "hoks/auth/useAuth";
 import useUpload from "hoks/upload/useUpload";
-import mem from "mem";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
-import {PlayList} from "components/trackplayer/PlayList";
 import useUserInfo from "./hoks/user/useUserInfo";
-import {resetAll} from "store/actions";
 import ProfileContainer from "./content/profile/ProfileContainer";
+import {persistor} from "./store/store";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -122,8 +120,15 @@ function App() {
   }, [client.current.client, uploadInfo.tracks])
 
   useEffect(() => {
+   async function userReset() {
+      if (currentAuth.access == null && userReducer.userId != null) {
+        console.error("초기화 문제 발생")
+
+        await persistor.purge()
+      }
+    }
+    userReset().catch(()=>console.log("초기화 에러 발생 error"))
     if (currentAuth.access == null) {
-      // dispatch(resetAll());
       return;
     }
     CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);

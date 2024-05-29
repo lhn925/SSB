@@ -77,8 +77,6 @@ public class TrackPlayMetricsService {
     public SsbTrackAllPlayLogs getSsbTrackAllPlayLogs(User user, SsbTrack ssbTrack, String token,
         PlayStatus playStatus) {
 
-
-
         return trackAllPlayLogService.findOne(user, ssbTrack, token, playStatus);
     }
 
@@ -117,7 +115,12 @@ public class TrackPlayMetricsService {
             isReflected = false;
         }
 
-        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, trackChartSaveReqDto.getPlayTime());
+        PlayStatus playStatus = validPlayTime(ssbTrackAllPlayLogs.getMinimumPlayTime(),
+            trackChartSaveReqDto.getPlayTime());
+        SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs,
+            playStatus);
+
+        trackAllPlayLogService.completeLogSaveRedisCache(ssbTrackAllPlayLogs);
         SsbTrackAllPlayLogs.updateTotalPlayTime(ssbTrackAllPlayLogs, trackChartSaveReqDto.getPlayTime());
         SsbTrackAllPlayLogs.updateChartStatus(ssbTrackAllPlayLogs, isReflected);
 
@@ -129,8 +132,6 @@ public class TrackPlayMetricsService {
         }
         // 세가지 결과가 전부 다 옳다면
     }
-
-
     /**
      * 일반 조회수 생성
      *
@@ -229,10 +230,21 @@ public class TrackPlayMetricsService {
         // 둘다 충족했으면
         // 뒤로감기나 앞으로가기 버튼을 눌렀을 경우
         if (isCloseTime && isMinTime) {
-            SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, trackPlayLogModifyReqDto.getPlayTime());
+            PlayStatus playStatus = validPlayTime(
+                ssbTrackAllPlayLogs.getMinimumPlayTime(), trackPlayLogModifyReqDto.getPlayTime());
+            SsbTrackAllPlayLogs.updatePlayStatus(ssbTrackAllPlayLogs, playStatus);
+            trackAllPlayLogService.completeLogSaveRedisCache(ssbTrackAllPlayLogs);
         } else {
             throw new SsbPlayIncompleteException();
         }
+    }
+
+
+    // 플레이타임 검증
+    public PlayStatus validPlayTime(int minimumPlayTime, int playTime) {
+
+        return PlayStatus.getPlayStatus(minimumPlayTime <= playTime);
+
     }
 
 

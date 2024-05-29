@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {PURGE} from "redux-persist/es/constants";
-import {RESET_ALL} from "../actions/Types";
+import {RESET_ALL} from "store/actions/Types";
 
 const initialState = {
   access: null,

@@ -21,7 +21,7 @@ import {ChartLogSave} from "content/trackplayer/ChartLogSave";
 import {ToggleFollow} from "content/trackplayer/ToggleFollow";
 import {PlayList} from "components/trackplayer/PlayList";
 import {MINUS, PLUS} from "content/trackplayer/NumberSignTypes";
-import {LOCAL_PLY_KEY} from "../../utill/enum/localKeyEnum";
+import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {useTranslation} from "react-i18next";
 
 /**

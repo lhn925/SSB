@@ -191,4 +191,5 @@ public class TrackQueryService {
         return new TargetInfoDto(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser(),
             ssbTrack.getIsPrivacy());
     }
+
 }
