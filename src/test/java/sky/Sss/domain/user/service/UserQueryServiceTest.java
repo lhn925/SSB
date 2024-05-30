@@ -51,14 +51,26 @@ class UserQueryServiceTest {
 
         Set<Long> ids = new HashSet<>();
 
-        ids.add(1L);
-        ids.add(2L);
-        ids.add(3L);
+        ids.add(22L);
+        ids.add(24L);
+        ids.add(5437L);
         List<User> byIds = userQueryRepository.findByIds(ids, Enabled.ENABLED());
 
         Set<String> collect = byIds.stream().map(User::getToken).collect(Collectors.toSet());
         List<User> userListByTokens = userQueryService.getUserListByTokens(collect, Enabled.ENABLED);
         System.out.println(userListByTokens.toString());
+
+    }
+
+
+    @Test
+    public void UserNameTest() {
+        Set<String> userNames = new HashSet<>();
+        userNames.add("_sky_");
+        userNames.add("임하늘");
+        Set<User> usersByUserNames = userQueryService.findUsersByUserNames(userNames, Enabled.ENABLED);
+
+        System.out.println("usersByUserNames = " + usersByUserNames);
 
     }
 

@@ -80,6 +80,11 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     Optional<SsbTrack> findByIdJoinUser(@Param("id") long id,
         @Param("isStatus") boolean isStatus);
 
+    @Query("select s from SsbTrack s join fetch s.user where s.id in (:ids) and s.isStatus =:isStatus ")
+    List<SsbTrack> findAllByIdsJoinUser(@Param("ids") Set<Long> ids,
+        @Param("isStatus") boolean isStatus);
+
+
     @Query("select s from SsbTrack s join fetch s.tags where s.id =:id and s.user =:user and s.token =:token and s.isStatus =:isStatus")
     Optional<SsbTrack> findOneWithTags(@Param("id") Long id, @Param("user") User user, @Param("token") String token,
         @Param("isStatus") boolean isStatus);

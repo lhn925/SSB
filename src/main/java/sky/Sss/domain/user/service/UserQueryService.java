@@ -61,7 +61,7 @@ public class UserQueryService {
         throws UsernameNotFoundException {
         User findUser = getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
 
-        if (findUser == null || !findUser.getIsEnabled()) {
+        if (findUser == null || findUser.getIsEnabled().equals(enabled.getValue())) {
             throw new UsernameNotFoundException("userId.notfound");
         }
         return findUser.getToken();
@@ -69,13 +69,30 @@ public class UserQueryService {
 
     public Set<User> findUsersByUserNames(Set<String> userNames, Enabled isEnabled)
         throws UsernameNotFoundException {
-        Set<User> users = new HashSet<>();
-        for (String userName : userNames) {
-            User user = getUserInfoFromCacheOrDB(userName, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY);
-            users.add(user);
-        }
-        return users;
+        HashSet<User> users = new HashSet<>(getUserListFromCacheOrDB(userNames, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY));
+        return users.stream()
+            .filter(user -> user.getIsEnabled().equals(isEnabled.getValue())).
+            collect(Collectors.collectingAndThen(Collectors.toSet(), list -> {
+                if (list.isEmpty()) {
+                    throw new UserInfoNotFoundException("userId.notFind");
+                }
+                return list;
+            }));
     }
+    public List<User> findUsersByIds(Set<Long> ids, Enabled isEnabled)
+        throws UsernameNotFoundException {
+        Set<String> setIds = ids.stream().map(String::valueOf).collect(Collectors.toSet());
+        List<User> users = getUserListFromCacheOrDB(setIds, RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY);
+        return users.stream()
+            .filter(user -> user.getIsEnabled().equals(isEnabled.getValue())).
+            collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                if (list.isEmpty()) {
+                    throw new UserInfoNotFoundException("userId.notFind");
+                }
+                return list;
+            }));
+    }
+
 
 
     public User findOne() {
@@ -94,15 +111,17 @@ public class UserQueryService {
         return getUserByTokenRedisOrDB(token, subKey, redisUidMapKey);
     }
 
-    public List<User> getUserListFromCacheOrDB(List<String> subKeyList, String redisUidMapKey) {
-        Set<String> setSubKeyList = new HashSet<>(subKeyList);
+    public List<User> getUserListFromCacheOrDB(Set<String> subKeyList, String redisUidMapKey) {
         RedisDataListDto<String> redisDataListDto = redisCacheService.getCacheMapValuesBySubKey(String.class,
-            setSubKeyList, redisUidMapKey);
+            subKeyList, redisUidMapKey);
+        if (subKeyList.isEmpty()) {
+            return new ArrayList<>();
+        }
         // map 널인 경우
         // 혹은 Map 에 없는 경우
 
         if (redisDataListDto.getResult().isEmpty()) {
-            return fetchAllAndSetSubKeyRedisBySubKey(setSubKeyList, redisUidMapKey);
+            return fetchAllAndSetSubKeyRedisBySubKey(subKeyList, redisUidMapKey);
         }
         Map<String, String> result = redisDataListDto.getResult();
 
@@ -114,7 +133,7 @@ public class UserQueryService {
 
         if (!result.isEmpty()) {
             Set<String> tokens = new HashSet<>(result.values());
-            users.addAll(getUserListByTokenRedisOrDB(tokens, setSubKeyList, redisUidMapKey));
+            users.addAll(getUserListByTokenRedisOrDB(tokens, subKeyList, redisUidMapKey));
         }
         return users;
     }
@@ -129,6 +148,9 @@ public class UserQueryService {
     }
 
     public List<User> getUserListByTokenRedisOrDB(Set<String> tokens, Set<String> subKeyList, String redisUidMapKey) {
+        if (subKeyList.isEmpty()) {
+            return new ArrayList<>();
+        }
         RedisDataListDto<RedisUserDto> redisDataListDto = redisCacheService.getCacheMapValuesBySubKey(
             RedisUserDto.class, tokens,
             RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
@@ -175,7 +197,8 @@ public class UserQueryService {
     }
     private List<User> fetchAllAndSetSubKeyRedisBySubKey(Set<String> subKeyList, String redisUidMapKey) {
         List<User> entityUsers = switch (redisUidMapKey) {
-            case RedisKeyDto.REDIS_USER_IDS_MAP_KEY -> userQueryRepository.findByUserIds(subKeyList, Enabled.ENABLED());
+            case RedisKeyDto.REDIS_USER_IDS_MAP_KEY ->
+                userQueryRepository.findByUserIds(subKeyList, Enabled.ENABLED());
             case RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY ->
                 userQueryRepository.findByEmails(subKeyList, Enabled.ENABLED());
             case RedisKeyDto.REDIS_USER_NAMES_MAP_KEY ->

@@ -173,8 +173,6 @@ public class RedisQueryService {
         }
 
     }
-
-
     public Boolean hasRedis(String key) {
         try {
             if (!StringUtils.hasText(key)) {
