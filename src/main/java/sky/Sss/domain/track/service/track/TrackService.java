@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -38,7 +36,6 @@ import sky.Sss.domain.track.entity.temp.TempTrackStorage;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
@@ -49,7 +46,6 @@ import sky.Sss.domain.track.service.common.TagLinkCommonService;
 import sky.Sss.domain.track.service.playList.PlyTracksService;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.play.TrackPlayMetricsService;
-import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.ContentsType;
@@ -443,7 +439,7 @@ public class TrackService {
         // 비회원 플레이 X
         // 해당 트랙에 접근 권한이 없을 경우 플레이 x
         trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
-        updateIsOwnerAndIsLike(trackPlayRepDto, user, isMember, isOwnerPost);
+        updateIsOwner(trackPlayRepDto, user, isOwnerPost);
 
         return trackPlayRepDto;
     }
@@ -493,14 +489,12 @@ public class TrackService {
     }
 
 
-    private void updateIsOwnerAndIsLike(TrackInfoSimpleDto trackInfoSimpleDto, User user, boolean isMember,
+    private void updateIsOwner(TrackInfoSimpleDto trackInfoSimpleDto, User user,
         boolean isOwnerPost) {
         // coverUrl이 없을 경우 user 프로필 사진으로 대체
         if (trackInfoSimpleDto.getCoverUrl() == null) {
             TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto, user.getPictureUrl());
         }
-
-
         TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwnerPost);
         // 자신의 트랙이 아닐 경우
         // token null

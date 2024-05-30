@@ -151,7 +151,6 @@ const useTrackPlayer = (bc) => {
   const getPlyTrackByOrder = (order, numberSign) => {
     const localPlyItem = calculateOrder(order, localPly.item,
         localPly.playOrders, getStatusOnLocalPly(), numberSign,updateSettings);
-    console.log(localPlyItem);
     if (localPlyItem) {
       const findTrack = localPlyTracks.tracks.filter(
           track => track.id === localPlyItem.id);
@@ -227,7 +226,7 @@ const useTrackPlayer = (bc) => {
     TrackPlayApi(trackInfo.id).then((response) => {
       const info = {
         ...response.data,
-        addDateTime: trackInfo.addDateTime,
+        addDateTime: trackInfo.addDateTime, // 재생목록에 추가한 시간
         index: trackInfo.index
       };
       dispatch(currentActions.createPlayLog(

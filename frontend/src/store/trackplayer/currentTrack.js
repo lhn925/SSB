@@ -83,6 +83,7 @@ const currentTrack = createSlice({
       }
       setTrackInfo(state.info, action.payload.info);
     }, createPlayLog(state, action) {
+      console.log(action.payload.info);
       setTrackInfo(state.info, action.payload.info);
       action.payload.playLog.trackId = action.payload.info.id;
       setPlayLog(state.playLog, action.payload.playLog);
