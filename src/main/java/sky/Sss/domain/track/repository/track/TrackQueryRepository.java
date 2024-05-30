@@ -48,6 +48,7 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
      * @param isStatus
      * @return
      */
+/*
     @Query(
         "select new sky.Sss.domain.track.dto.track."
             + "common.TrackInfoSimpleDto(s.id,s.token,s.title,s.trackLength,s.coverUrl,s.isPrivacy,u,:likeUid,l,f,s.createdDateTime)"
@@ -59,8 +60,10 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(@Param("ids") Set<Long> ids,
         @Param("likeUid") long likeUid,
         @Param("isStatus") boolean isStatus);
+*/
 
 
+/*
     @Query(
         "select new sky.Sss.domain.track.dto.track.common."
             + "TrackInfoSimpleDto(s.id,s.title,u,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"
@@ -68,6 +71,7 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
             + "where s.id in (:ids) and s.isStatus =:isStatus and s.isPrivacy = :isPrivacy")
     List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(@Param("ids") Set<Long> ids,
         @Param("isStatus") boolean isStatus, @Param("isPrivacy") boolean isPrivacy);
+*/
 
     @Query("select s from SsbTrack s join fetch s.user where s.id = :id and s.isStatus =:isStatus ")
     Optional<SsbTrack> findByIdAndIsStatus(Long id, boolean isStatus);

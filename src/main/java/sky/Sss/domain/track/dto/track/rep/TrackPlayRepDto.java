@@ -11,6 +11,7 @@ import lombok.Setter;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.log.TrackPlayLogRepDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 
 @Getter
 @Setter(PRIVATE)
@@ -18,15 +19,22 @@ import sky.Sss.domain.track.entity.track.SsbTrack;
 public class TrackPlayRepDto extends TrackInfoSimpleDto implements Serializable {
     private TrackPlayLogRepDto trackPlayLogRepDto;
 
-    @Builder
     private TrackPlayRepDto(SsbTrack ssbTrack) {
-        super(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser(),
-            ssbTrack.getTrackLength(), ssbTrack.getCoverUrl(), ssbTrack.getIsPrivacy(), ssbTrack.getCreatedDateTime());
+        super(
+            ssbTrack.getId(),
+            ssbTrack.getTitle(),
+            ssbTrack.getTrackLength(),
+            TrackInfoSimpleDto.getCoverUrl(ssbTrack.getCoverUrl(), ssbTrack.getUser()),
+            ssbTrack.getIsPrivacy(),
+            ssbTrack.getCreatedDateTime(),
+            new UserProfileRepDto(ssbTrack.getUser())
+        );
     }
 
     public static TrackPlayRepDto create(SsbTrack ssbTrack) {
         // 서버 호출 시간
-        return TrackPlayRepDto.builder().ssbTrack(ssbTrack).build();
+
+        return new TrackPlayRepDto(ssbTrack);
     }
     public static void updateTrackPlayLogRepDto(TrackPlayRepDto trackPlayRepDto,
         TrackPlayLogRepDto trackPlayLogRepDto) {

@@ -13,15 +13,8 @@ import sky.Sss.domain.user.entity.User;
 public class UserProfileRepDto {
     private Long id;
     private String userName;
-    private Boolean isFollow;
-
-
     public UserProfileRepDto(User user) {
         this.id = user.getId();
         this.userName = user.getUserName();
-    }
-
-    public static void updateIsFollow(UserProfileRepDto userProfileRepDto, boolean isFollow) {
-        userProfileRepDto.setIsFollow(isFollow);
     }
 }

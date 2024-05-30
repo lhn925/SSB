@@ -244,10 +244,9 @@ public class LikesCommonService {
         Map<String, Long> data = redisCacheService.getData(contentsType.getUserLikedKey() + user.getToken(),
             typeReference);
         List<Long> ids = new ArrayList<>();
-        if ( !data.isEmpty()) {
+        if ( data != null && !data.isEmpty()) {
             ids.addAll(data.values().stream().toList());
             ids.sort(Comparator.reverseOrder());
-
             return ids;
         }
 

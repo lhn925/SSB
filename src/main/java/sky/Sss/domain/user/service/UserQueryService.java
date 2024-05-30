@@ -61,7 +61,7 @@ public class UserQueryService {
         throws UsernameNotFoundException {
         User findUser = getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
 
-        if (findUser == null || findUser.getIsEnabled().equals(enabled.getValue())) {
+        if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
             throw new UsernameNotFoundException("userId.notfound");
         }
         return findUser.getToken();
@@ -103,6 +103,7 @@ public class UserQueryService {
 
     public User getUserInfoFromCacheOrDB(String subKey, String redisUidMapKey) {
         String token = redisCacheService.getCacheMapValueBySubKey(String.class, subKey, redisUidMapKey);
+
         // map 널인 경우
         // 혹은 Map 에 없는 경우
         if (token == null) {
@@ -139,8 +140,8 @@ public class UserQueryService {
     }
 
     public User getUserByTokenRedisOrDB(String token, String subKey, String redisUidMapKey) {
-        RedisUserDto redisUserDto = redisCacheService.getCacheMapValueBySubKey(RedisUserDto.class,
-            RedisKeyDto.REDIS_USERS_INFO_MAP_KEY, token);
+        RedisUserDto redisUserDto = redisCacheService.getCacheMapValueBySubKey(RedisUserDto.class,token,
+            RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
         if (redisUserDto == null) {
             return fetchAndSetSubKeyRedisBySubKey(subKey, redisUidMapKey);
         }

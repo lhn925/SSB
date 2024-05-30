@@ -13,10 +13,12 @@ import sky.Sss.domain.track.service.track.TrackLikesService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.entity.UserFollows;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.follows.UserFollowsService;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,9 +36,11 @@ public class UserProfileService {
 
         List<Long> userLikedList = likesCommonService.getUserLikedList(user, ContentsType.TRACK);
 
-        userFollowsService.getMyFollowingUsers(user);
+        List<UserFollows> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
+
+        List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(value -> value.getFollowerUser().getId()).toList();
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade(),userLikedList,null);
+            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds);
     }
 
     public void getUserProfileByUserName(String userName) {
@@ -56,10 +60,9 @@ public class UserProfileService {
 
         Sort sort = Sort.by(Order.desc("id"));
 
-
         // 총 Tracks 수 본인이 아닐시에는 비공개 트랙 제외
         // 좋아요한 트랙 총 3개
-        List<Long> userLikedTrackIds = trackLikesService.getUserLikedTrackIds(profileUser,sort);
+        List<Long> userLikedTrackIds = trackLikesService.getUserLikedTrackIds(profileUser, sort);
         // 좋아요한 숫자
         int totalLikedTrackCount = userLikedTrackIds.size();
 
@@ -78,7 +81,6 @@ public class UserProfileService {
 
         // 가장 최근 댓글
         //
-
 
     }
 

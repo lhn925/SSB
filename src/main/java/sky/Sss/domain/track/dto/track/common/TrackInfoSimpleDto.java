@@ -3,10 +3,13 @@ package sky.Sss.domain.track.dto.track.common;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 import sky.Sss.domain.user.entity.User;
@@ -27,106 +30,109 @@ public class TrackInfoSimpleDto {
     private String coverUrl;
     private Boolean isPrivacy;
 
-    // 하트 여부
-    private Boolean isLike;
-
     private Boolean isOwner;
 
     private LocalDateTime createdDateTime;
 
     private UserProfileRepDto postUser;
 
-    public TrackInfoSimpleDto(
-        Long id,
-        String token,
-        String title,
-        User ownerUser,
-        Integer trackLength,
-        String coverUrl,
-        Boolean isPrivacy,
-        LocalDateTime createdDateTime) {
+//    public TrackInfoSimpleDto(
+//        Long id,
+//        String token,
+//        String title,
+//        User ownerUser,
+//        Integer trackLength,
+//        String coverUrl,
+//        Boolean isPrivacy,
+//        LocalDateTime createdDateTime) {
+//        this.id = id;
+//        this.title = title;
+//        this.token = token;
+//        this.postUser = new UserProfileRepDto(ownerUser);
+//        this.trackLength = trackLength;
+//        this.coverUrl = coverUrl;
+//        this.isPrivacy = isPrivacy;
+//        this.createdDateTime = createdDateTime;
+//        this.isOwner = false;
+//    }
+//
+//    public TrackInfoSimpleDto(
+//        Long id,
+//        String title,
+//        User ownerUser,
+//        Integer trackLength,
+//        String coverUrl,
+//        Boolean isPrivacy,
+//        LocalDateTime createdDateTime) {
+//        this.id = id;
+//        this.title = title;
+//        this.postUser = new UserProfileRepDto(ownerUser);
+//        this.trackLength = trackLength;
+//        this.coverUrl = getCoverUrl(coverUrl, ownerUser);
+//        this.isPrivacy = isPrivacy;
+//        this.createdDateTime = createdDateTime;
+//        this.isOwner = false;
+//    }
+//
+//
+//
+//
+//    public TrackInfoSimpleDto(Long id,
+//        String token,
+//        String title,
+//        Integer trackLength,
+//        String coverUrl,
+//        Boolean isPrivacy,
+//        User ownerUser,
+//        Long likedUserId,
+//        LocalDateTime createdDateTime) {
+//        boolean isOwner = Objects.equals(ownerUser.getId(), likedUserId);
+//        this.id = id;
+//        if (isOwner) {
+//            this.token = token;
+//        }
+//        this.title = title;
+//        this.postUser = new UserProfileRepDto(ownerUser);
+//        this.trackLength = trackLength;
+//        this.coverUrl = getCoverUrl(coverUrl, ownerUser);
+//        this.isPrivacy = isPrivacy;
+//        this.isOwner = isOwner;
+//        this.createdDateTime = createdDateTime;
+//    }
+
+    @Builder
+    public TrackInfoSimpleDto(Long id, String title, Integer trackLength, String coverUrl,
+        Boolean isPrivacy, LocalDateTime createdDateTime, UserProfileRepDto postUser) {
         this.id = id;
         this.title = title;
-        this.token = token;
-        this.postUser = new UserProfileRepDto(ownerUser);
         this.trackLength = trackLength;
         this.coverUrl = coverUrl;
         this.isPrivacy = isPrivacy;
         this.createdDateTime = createdDateTime;
-        this.isOwner = false;
-        this.isLike = false;
-    }
-
-    public TrackInfoSimpleDto(
-        Long id,
-        String title,
-        User ownerUser,
-        Integer trackLength,
-        String coverUrl,
-        Boolean isPrivacy,
-        LocalDateTime createdDateTime) {
-        this.id = id;
-        this.title = title;
-        this.postUser = new UserProfileRepDto(ownerUser);
-        this.trackLength = trackLength;
-        this.coverUrl = getCoverUrl(coverUrl, ownerUser);
-        this.isPrivacy = isPrivacy;
-        this.createdDateTime = createdDateTime;
-        this.isOwner = false;
-        this.isLike = false;
-    }
-
-    public TrackInfoSimpleDto(Long id,
-        String token,
-        String title,
-        Integer trackLength,
-        String coverUrl,
-        Boolean isPrivacy,
-        User ownerUser,
-        Long likedUserId,
-        SsbTrackLikes ssbTrackLikes,
-        UserFollows userFollows,
-        LocalDateTime createdDateTime) {
-        boolean isOwner = Objects.equals(ownerUser.getId(), likedUserId);
-        this.id = id;
-        if (isOwner) {
-            this.token = token;
-        }
-        this.title = title;
-        this.postUser = new UserProfileRepDto(ownerUser);
-        this.trackLength = trackLength;
-        this.coverUrl = getCoverUrl(coverUrl, ownerUser);
-        this.isPrivacy = isPrivacy;
-        this.isOwner = isOwner;
-        this.isLike = ssbTrackLikes != null;
-        UserProfileRepDto.updateIsFollow(this.postUser, userFollows != null);
-        this.createdDateTime = createdDateTime;
+        this.postUser = postUser;
     }
 
 
-    public TrackInfoSimpleDto(Long id, String token, String title, Integer trackLength, String coverUrl,
-        Boolean isPrivacy,
-        Boolean isLike, Boolean isOwner, LocalDateTime createdDateTime, UserProfileRepDto userProfileRepDto) {
-        this.id = id;
-        this.token = token;
-        this.title = title;
-        this.trackLength = trackLength;
-        this.coverUrl = coverUrl;
-        this.isPrivacy = isPrivacy;
-        this.isLike = isLike;
-        this.isOwner = isOwner;
-        this.createdDateTime = createdDateTime;
-        this.postUser = userProfileRepDto;
-    }
+
+
 
     // 없으면 해당 사용자의 프로필 사진
-    private static String getCoverUrl(String coverUrl, User ownerUser) {
+    public static String getCoverUrl(String coverUrl, User ownerUser) {
         return coverUrl == null ? ownerUser.getPictureUrl() : coverUrl;
     }
 
-    public static void updateIsLike(TrackInfoSimpleDto trackInfoSimpleDto, boolean isLike) {
-        trackInfoSimpleDto.setIsLike(isLike);
+
+    public static TrackInfoSimpleDto create(SsbTrack ssbTrack) {
+        return TrackInfoSimpleDto.builder()
+            .id(ssbTrack.getId())
+            .title(ssbTrack.getTitle())
+            .trackLength(ssbTrack.getTrackLength())
+            .coverUrl(getCoverUrl(ssbTrack.getCoverUrl(), ssbTrack.getUser()))
+            .isPrivacy(ssbTrack.getIsPrivacy())
+            .createdDateTime(ssbTrack.getCreatedDateTime())
+            .postUser(new UserProfileRepDto(ssbTrack.getUser())).build();
     }
+
 
     public static void updateIsOwner(TrackInfoSimpleDto trackInfoSimpleDto, boolean isOwner) {
         trackInfoSimpleDto.setIsOwner(isOwner);

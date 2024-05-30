@@ -20,19 +20,5 @@ class TrackQueryRepositoryTest {
     @Test
     void getTrackInfoSimpleDtoList() {
 
-        Set<Long> hashSet = new HashSet<>();
-
-        hashSet.add(1L);
-        hashSet.add(2L);
-        hashSet.add(3L);
-        List<TrackInfoSimpleDto> trackInfoSimpleDtoList = trackQueryRepository.getTrackInfoSimpleDtoList(hashSet, 3,
-            true);
-
-        for (TrackInfoSimpleDto trackInfoSimpleDto : trackInfoSimpleDtoList) {
-            System.out.println("trackInfoSimpleDto.getId() = " + trackInfoSimpleDto.getId());
-            System.out.println("trackInfoSimpleDto.getIsLike() = " + trackInfoSimpleDto.getIsLike());
-            System.out.println("trackInfoSimpleDto.getIsOwner() = " + trackInfoSimpleDto.getIsOwner());
-        }
-        Assertions.assertEquals(3, trackInfoSimpleDtoList.size());
     }
 }

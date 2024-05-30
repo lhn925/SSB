@@ -102,9 +102,6 @@ public class TrackQueryService {
             return new ArrayList<>();
         }
         Set<String> trackSubKeys = ids.stream().map(String::valueOf).collect(Collectors.toSet());
-
-        log.info("trackSubKeys = {}", trackSubKeys);
-
         RedisDataListDto<RedisTrackDto> redisDataListDto = redisCacheService.getCacheMapValuesBySubKey(
             RedisTrackDto.class, trackSubKeys,
             RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
@@ -184,20 +181,31 @@ public class TrackQueryService {
         return findTrack;
     }
 
-    public TrackInfoSimpleDto getTrackInfoSimpleDto(Long id, Status isStatus) {
-        SsbTrack ssbTrack = getTrackCacheFromOrDbByTrackId(id
-        );
-        if (ssbTrack == null) {
-            throw new SsbFileNotFoundException();
+
+    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, User likeUser, Status isStatus) {
+
+        List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);
+
+        List<TrackInfoSimpleDto> simpleDtoList = new ArrayList<>();
+        for (SsbTrack ssbTrack : ssbTrackList) {
+            if (!ssbTrack.getIsStatus().equals(isStatus.getValue())) {
+                continue;
+            }
+            boolean isOwner = ssbTrack.getUser().getToken().equals(likeUser.getToken());
+            String token = null;
+            if (isOwner) {
+                token = ssbTrack.getToken();
+            }
+            // owner가 아닌데 비공개 인경우
+            if (!isOwner && ssbTrack.getIsPrivacy()) {
+                continue;
+            }
+            TrackInfoSimpleDto trackInfoSimpleDto = TrackInfoSimpleDto.create(ssbTrack);
+            TrackInfoSimpleDto.updateToken(trackInfoSimpleDto,token);
+            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto,isOwner);
+            simpleDtoList.add(trackInfoSimpleDto);
         }
-        return new TrackInfoSimpleDto(ssbTrack.getId(), ssbTrack.getToken(),
-            ssbTrack.getTitle(), ssbTrack.getUser(),
-            ssbTrack.getTrackLength(), ssbTrack.getCoverUrl(), ssbTrack.getIsPrivacy(), ssbTrack.getCreatedDateTime());
-    }
-
-
-    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, long likedUserId, Status isStatus) {
-        return trackQueryRepository.getTrackInfoSimpleDtoList(ids, likedUserId, isStatus.getValue());
+        return simpleDtoList;
     }
 
     private HashMap<String, RedisTrackDto> getStringRedisTrackDtoHashMap() {
@@ -208,7 +216,7 @@ public class TrackQueryService {
     }
 
     public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, Status isStatus, boolean isPrivacy) {
-        return trackQueryRepository.getTrackInfoSimpleDtoList(ids, isStatus.getValue(), isPrivacy);
+        return null;
     }
 
     public SsbTrack findOneJoinUser(Long id, String token, Status isStatus) {

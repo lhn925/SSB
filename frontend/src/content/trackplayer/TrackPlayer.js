@@ -566,16 +566,16 @@ export const TrackPlayer = ({
   }
 
   const toggleLike = (id) => {
-    // localPlyAddTracks(1);
-    // localPlyAddTracks(3);
-    // localPlyAddTracks(4);
-    // localPlyAddTracks(5);
-    // localPlyAddTracks(6);
-    // localPlyAddTracks(6);
-    // localPlyAddTracks(8);
-    // localPlyAddTracks(9);
-    // localPlyAddTracks(10);
-    // localPlyAddTracks(11);
+    localPlyAddTracks(1);
+    localPlyAddTracks(3);
+    localPlyAddTracks(4);
+    localPlyAddTracks(5);
+    localPlyAddTracks(6);
+    localPlyAddTracks(6);
+    localPlyAddTracks(8);
+    localPlyAddTracks(9);
+    localPlyAddTracks(10);
+    localPlyAddTracks(11);
 
     if (id === -1) {
       return;

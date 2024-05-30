@@ -16,6 +16,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.global.base.BaseTimeEntity;
 
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"follower_uid", "following_uid"})})
@@ -31,18 +32,31 @@ public class UserFollows extends BaseTimeEntity {
 
     // 팔로우를 하는 사람들
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "follower_uid",nullable = false)
+    @JoinColumn(name = "follower_uid", nullable = false)
     private User followerUser;
 
     // 팔로우를 당하는 유저
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "following_uid",nullable = false)
+    @JoinColumn(name = "following_uid", nullable = false)
     private User followingUser;
 
-    public static UserFollows create (User followerUser,User followingUser) {
+    public static UserFollows create(User followerUser, User followingUser) {
         UserFollows userFollows = new UserFollows();
         userFollows.setFollowerUser(followerUser);
         userFollows.setFollowingUser(followingUser);
         return userFollows;
     }
+
+
+    public static UserFollows redisFollowsToUserFollow(RedisFollowsDto redisFollowsDto, User followerUser,
+        User followingUser) {
+        UserFollows userFollows = new UserFollows();
+        userFollows.setId(redisFollowsDto.getId());
+        userFollows.setFollowerUser(followerUser);
+        userFollows.setFollowingUser(followingUser);
+        userFollows.setCreatedDateTime(redisFollowsDto.getCreatedDateTime());
+
+        return userFollows;
+    }
+
 }

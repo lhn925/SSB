@@ -444,11 +444,7 @@ public class TrackService {
         // 해당 트랙에 접근 권한이 없을 경우 플레이 x
         trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
         updateIsOwnerAndIsLike(trackPlayRepDto, user, isMember, isOwnerPost);
-        // 팔로우 여부 확인 후 업데이트
-        if (!isOwnerPost) {
-            boolean isFollow = userFollowsService.existsFollowing(user, ssbTrack.getUser());
-            UserProfileRepDto.updateIsFollow(trackPlayRepDto.getPostUser(), isFollow);
-        }
+
         return trackPlayRepDto;
     }
 
@@ -465,7 +461,7 @@ public class TrackService {
         Set<Long> ids = new HashSet<>();
         ids.add(id);
         if (isMember) {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, user.getId(), Status.ON);
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, user, Status.ON);
         } else {
             simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, Status.ON, false);
         }
@@ -488,7 +484,7 @@ public class TrackService {
         }
         List<TrackInfoSimpleDto> simpleDtoList = null;
         if (isMember) {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, user.getId(), Status.ON);
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, user, Status.ON);
         } else {
             // 비회원일 경우 liked 포함 X
             simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, Status.ON, false);
@@ -503,12 +499,7 @@ public class TrackService {
         if (trackInfoSimpleDto.getCoverUrl() == null) {
             TrackInfoSimpleDto.updateCoverUrl(trackInfoSimpleDto, user.getPictureUrl());
         }
-        // 회원일 경우 like 조회
-        if (isMember) {
-            SsbTrackLikes ssbTrackLikes = trackLikesService.findOneAsOptByToken(trackInfoSimpleDto.getToken(), user).orElse(null);
-            boolean isLike = ssbTrackLikes != null;
-            TrackInfoSimpleDto.updateIsLike(trackInfoSimpleDto, isLike);
-        }
+
 
         TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwnerPost);
         // 자신의 트랙이 아닐 경우
