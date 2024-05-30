@@ -463,7 +463,7 @@ public class TrackService {
         if (isMember) {
             simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, user, Status.ON);
         } else {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, Status.ON, false);
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, Status.ON);
         }
 
         if (simpleDtoList.isEmpty()) {
@@ -487,7 +487,7 @@ public class TrackService {
             simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, user, Status.ON);
         } else {
             // 비회원일 경우 liked 포함 X
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, Status.ON, false);
+            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, Status.ON);
         }
         return simpleDtoList;
     }

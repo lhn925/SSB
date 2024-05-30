@@ -182,7 +182,7 @@ public class TrackQueryService {
     }
 
 
-    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, User likeUser, Status isStatus) {
+    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, User user, Status isStatus) {
 
         List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);
 
@@ -191,7 +191,7 @@ public class TrackQueryService {
             if (!ssbTrack.getIsStatus().equals(isStatus.getValue())) {
                 continue;
             }
-            boolean isOwner = ssbTrack.getUser().getToken().equals(likeUser.getToken());
+            boolean isOwner = ssbTrack.getUser().getToken().equals(user.getToken());
             String token = null;
             if (isOwner) {
                 token = ssbTrack.getToken();
@@ -215,8 +215,23 @@ public class TrackQueryService {
             typeReference);
     }
 
-    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, Status isStatus, boolean isPrivacy) {
-        return null;
+    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, Status isStatus) {
+        List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);
+        List<TrackInfoSimpleDto> simpleDtoList = new ArrayList<>();
+        for (SsbTrack ssbTrack : ssbTrackList) {
+            if (!ssbTrack.getIsStatus().equals(isStatus.getValue())) {
+                continue;
+            }
+            // owner가 아닌데 비공개 인경우
+            if (ssbTrack.getIsPrivacy()) {
+                continue;
+            }
+            TrackInfoSimpleDto trackInfoSimpleDto = TrackInfoSimpleDto.create(ssbTrack);
+            TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, null);
+            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto,false);
+            simpleDtoList.add(trackInfoSimpleDto);
+        }
+        return simpleDtoList;
     }
 
     public SsbTrack findOneJoinUser(Long id, String token, Status isStatus) {
