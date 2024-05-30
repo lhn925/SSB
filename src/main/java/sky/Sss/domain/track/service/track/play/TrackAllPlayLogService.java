@@ -2,16 +2,12 @@ package sky.Sss.domain.track.service.track.play;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.track.redis.RedisPlayLogDto;
-import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.entity.track.log.SsbTrackAllPlayLogs;
 import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.exception.checked.SsbPlayIncompleteException;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
@@ -73,7 +69,7 @@ public class TrackAllPlayLogService {
     }
 
     public RedisPlayLogDto getPlayDto(long trackId, String playToken) {
-        RedisPlayLogDto redisPlayLogDto = redisCacheService.getCacheMapBySubKey(RedisPlayLogDto.class, playToken,
+        RedisPlayLogDto redisPlayLogDto = redisCacheService.getCacheMapValueBySubKey(RedisPlayLogDto.class, playToken,
             RedisKeyDto.REDIS_PLAY_LOG_DTO_MAP_KEY);
         if (redisPlayLogDto == null || redisPlayLogDto.getTrackId() != trackId) {
             return RedisPlayLogDto.create(findOne(trackId, playToken));

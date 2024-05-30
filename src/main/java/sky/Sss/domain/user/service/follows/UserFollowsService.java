@@ -1,8 +1,10 @@
 package sky.Sss.domain.user.service.follows;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;
 import sky.Sss.domain.user.repository.follow.UserFollowsRepository;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
@@ -22,6 +25,9 @@ public class UserFollowsService {
 
     private final UserFollowsRepository userFollowRepository;
     private final RedisCacheService redisCacheService;
+    private final UserQueryService userQueryService;
+
+
 
     @Transactional
     public void addUserFollows(UserFollows userFollows) {
@@ -141,6 +147,18 @@ public class UserFollowsService {
         }
         return count;
     }
+
+
+    public Map<String,UserSimpleInfoDto> getFollowingFromCacheOrDB(User user) {
+        String key = getUserFollowingListKey(user.getToken());
+        TypeReference<Map<String,UserSimpleInfoDto>> typeReference = new TypeReference<>() {};
+
+        Map<String, UserSimpleInfoDto> userMap = redisCacheService.getData(key, typeReference);
+
+        return null;
+    }
+
+
 
     // 유저가 팔로우 하고 있는 following count
     public int getFollowingTotalCount(User user) {

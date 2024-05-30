@@ -53,4 +53,15 @@ public enum ContentsType {
         }
         return key;
     }
+
+    public String getUserLikedKey() {
+        String key = null;
+        switch (this) {
+            case TRACK -> key = RedisKeyDto.REDIS_USER_TRACK_LIKED_LIST_MAP_KEY;
+            case PLAYLIST -> key = RedisKeyDto.REDIS_USER_PLY_LIKED_LIST_MAP_KEY;
+            case REPLY_TRACK -> key = RedisKeyDto.REDIS_USER_TRACK_REPLY_LIKED_MAP_KEY;
+            case REPLY_PLAYLIST -> key = RedisKeyDto.REDIS_USER_PLY_REPLY_LIKED_MAP_KEY;
+        }
+        return key;
+    }
 }

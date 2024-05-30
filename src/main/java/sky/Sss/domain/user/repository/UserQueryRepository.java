@@ -1,6 +1,7 @@
 package sky.Sss.domain.user.repository;
 
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,8 +37,20 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserIdAndIsEnabled(String userId, Boolean isEnabled);
 
 
+    @Query("select u from User u where u.userId in (:userIds) and u.isEnabled = :isEnabled")
+    List<User> findByUserIds(@Param("userIds") Set<String> userIds,@Param("isEnabled")  Boolean isEnabled);
 
+    @Query("select u from User u where u.userName in (:userNames) and u.isEnabled = :isEnabled")
+    List<User> findByUserNames(@Param("userNames") Set<String> userNames,@Param("isEnabled")  Boolean isEnabled);
 
+    @Query("select u from User u where u.email in (:emails) and u.isEnabled = :isEnabled")
+    List<User> findByEmails(@Param("emails") Set<String> emails,@Param("isEnabled")  Boolean isEnabled);
+
+    @Query("select u from User u where u.id in (:ids) and u.isEnabled = :isEnabled")
+    List<User> findByIds(@Param("ids") Set<Long> ids, @Param("isEnabled") Boolean isEnabled);
+
+    @Query("select u from User u where u.token in (:tokens) and u.isEnabled = :isEnabled")
+    List<User> findByTokens(@Param("tokens") Set<String> tokens, @Param("isEnabled")  Boolean isEnabled);
 
     /**
      * 탈퇴 된 회원은 검색하지 않음
@@ -45,8 +58,8 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
      * @param userId
      * @return
      */
-    @Query("select new sky.Sss.domain.user.dto.myInfo.UserMyInfoDto(u.userId,u.email,u.userName,u.pictureUrl,u.isLoginBlocked,u.grade) from User u where u.userId = :userId and u.isEnabled = true")
-    Optional<UserMyInfoDto> getUserMyInfoDto(@Param("userId") String userId);
+//    @Query("select new sky.Sss.domain.user.dto.myInfo.UserMyInfoDto(u.userId,u.email,u.userName,u.pictureUrl,u.isLoginBlocked,u.grade) from User u where u.userId = :userId and u.isEnabled = true")
+//    Optional<UserMyInfoDto> getUserMyInfoDto(@Param("userId") String userId);
 
 
     /**
@@ -61,7 +74,7 @@ public interface UserQueryRepository extends JpaRepository<User, Long> {
     Optional<User> findOne(@Param("userId") String userId, @Param("token") String token);
 
     Optional<User> findByIdAndIsEnabled(Long uid, Boolean isEnabled);
-
+    Optional<User> findByTokenAndIsEnabled(String token, Boolean isEnabled);
 
 
     @Query("select u from User u where u.userName in (:userNames) and u.isEnabled = :isEnabled")

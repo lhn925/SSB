@@ -2,6 +2,7 @@ package sky.Sss.domain.user.dto.myInfo;
 
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,42 +25,19 @@ public class UserMyInfoDto implements Serializable {
     private String pictureUrl;
     private Boolean isLoginBlocked;
     private Boolean isAdmin;
+    private List<Long> trackLikedIds;
+    private List<Long> followingIds;
 
-    @Builder
     public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
-        Boolean isAdmin) {
+        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
         this.pictureUrl = pictureUrl;
         this.isLoginBlocked = isLoginBlocked;
-        this.isAdmin = isAdmin;
-    }
-
-    public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
-        UserGrade userGrade) {
-        this.userId = userId;
-        this.email = email;
-        this.userName = userName;
-        this.pictureUrl = pictureUrl == null ? FileStore.USER_DEFAULT_IMAGE_URL : pictureUrl;
-        this.isLoginBlocked = isLoginBlocked;
         this.isAdmin = userGrade.equals(UserGrade.ADMIN);
+        this.trackLikedIds = trackLikedIds;
+        this.followingIds = followingIds;
     }
-
-    public static UserMyInfoDto createUseProfileDto(UserInfoDto userInfoDto) {
-        Optional<Boolean> isAdmin = userInfoDto.getGrantedAuthority().stream()
-            .map(auth -> {
-                auth.getAuthority();
-                return false;
-            }).findFirst();
-        return UserMyInfoDto.builder()
-            .userId(userInfoDto.getUserId())
-            .email(userInfoDto.getEmail())
-            .pictureUrl(userInfoDto.getPictureUrl())
-            .isLoginBlocked(userInfoDto.getIsLoginBlocked().getValue())
-            .userName(userInfoDto.getUserName())
-            .isAdmin(isAdmin.orElse(false)).build();
-    }
-
 
 }

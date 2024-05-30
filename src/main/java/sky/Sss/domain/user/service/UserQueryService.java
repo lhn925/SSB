@@ -1,12 +1,13 @@
 package sky.Sss.domain.user.service;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -17,13 +18,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.user.dto.login.CustomUserDetails;
-import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.dto.redis.RedisUserDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.UserGrade;
 import sky.Sss.domain.user.repository.UserQueryRepository;
+import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
@@ -84,33 +85,73 @@ public class UserQueryService {
     }
 
     public User getUserInfoFromCacheOrDB(String subKey, String redisUidMapKey) {
-        TypeReference<HashMap<String, String>> type = new TypeReference<>() {
-        };
-
-        HashMap<String, String> subKeyMap = redisCacheService.getData(redisUidMapKey, type);
+        String token = redisCacheService.getCacheMapValueBySubKey(String.class, subKey, redisUidMapKey);
         // map 널인 경우
         // 혹은 Map 에 없는 경우
-        if (subKeyMap == null || !subKeyMap.containsKey(subKey)) {
+        if (token == null) {
             return fetchAndSetSubKeyRedisBySubKey(subKey, redisUidMapKey);
         }
-        String token = String.valueOf(subKeyMap.get(subKey));
-        return getUserInfoByTokenRedisOrDB(token, subKey, redisUidMapKey);
+        return getUserByTokenRedisOrDB(token, subKey, redisUidMapKey);
     }
 
-    public User getUserInfoByTokenRedisOrDB(String token, String subKey, String redisUidMapKey) {
+    public List<User> getUserListFromCacheOrDB(List<String> subKeyList, String redisUidMapKey) {
+        Set<String> setSubKeyList = new HashSet<>(subKeyList);
+        RedisDataListDto<String> redisDataListDto = redisCacheService.getCacheMapValuesBySubKey(String.class,
+            setSubKeyList, redisUidMapKey);
+        // map 널인 경우
+        // 혹은 Map 에 없는 경우
 
-        TypeReference<HashMap<String, RedisUserDto>> redisDtoType = new TypeReference<>() {
-        };
-        String redisUsersInfoMapKey = RedisKeyDto.REDIS_USERS_INFO_MAP_KEY;
-        Map<String, RedisUserDto> userInfoMap = redisCacheService.getData(redisUsersInfoMapKey, redisDtoType);
+        if (redisDataListDto.getResult().isEmpty()) {
+            return fetchAllAndSetSubKeyRedisBySubKey(setSubKeyList, redisUidMapKey);
+        }
+        Map<String, String> result = redisDataListDto.getResult();
 
-        if (userInfoMap == null || !userInfoMap.containsKey(token)) {
+        List<User> users = new ArrayList<>();
+
+        if (!redisDataListDto.getMissingKeys().isEmpty()) {
+            users.addAll(fetchAllAndSetSubKeyRedisBySubKey(redisDataListDto.getMissingKeys(), redisUidMapKey));
+        }
+
+        if (!result.isEmpty()) {
+            Set<String> tokens = new HashSet<>(result.values());
+            users.addAll(getUserListByTokenRedisOrDB(tokens, setSubKeyList, redisUidMapKey));
+        }
+        return users;
+    }
+
+    public User getUserByTokenRedisOrDB(String token, String subKey, String redisUidMapKey) {
+        RedisUserDto redisUserDto = redisCacheService.getCacheMapValueBySubKey(RedisUserDto.class,
+            RedisKeyDto.REDIS_USERS_INFO_MAP_KEY, token);
+        if (redisUserDto == null) {
             return fetchAndSetSubKeyRedisBySubKey(subKey, redisUidMapKey);
         }
-        RedisUserDto redisUserDTO = userInfoMap.get(token);
-        return User.redisUserDtoToUser(redisUserDTO);
+        return User.redisUserDtoToUser(redisUserDto);
     }
 
+    public List<User> getUserListByTokenRedisOrDB(Set<String> tokens, Set<String> subKeyList, String redisUidMapKey) {
+        RedisDataListDto<RedisUserDto> redisDataListDto = redisCacheService.getCacheMapValuesBySubKey(
+            RedisUserDto.class, tokens,
+            RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
+
+        if (redisDataListDto.getResult().isEmpty()) {
+            return fetchAllAndSetSubKeyRedisBySubKey(subKeyList, redisUidMapKey);
+        }
+        Map<String, RedisUserDto> result = redisDataListDto.getResult();
+        List<User> users = new ArrayList<>();
+
+        if (!redisDataListDto.getMissingKeys().isEmpty()) {
+            users.addAll(fetchAllAndSetSubKeyRedisBySubKey(redisDataListDto.getMissingKeys(), redisUidMapKey));
+        }
+
+        if (!result.isEmpty()) {
+            users.addAll(result.values().stream().map(User::redisUserDtoToUser).toList());
+        }
+        return users;
+    }
+
+    public List<User> getUserListByTokenRedisOrDB(Set<String> tokens, String redisUidMapKey) {
+        return getUserListByTokenRedisOrDB(tokens, tokens, redisUidMapKey);
+    }
     private User fetchAndSetSubKeyRedisBySubKey(String subKey, String redisUidMapKey) {
         User entityUser = switch (redisUidMapKey) {
             case RedisKeyDto.REDIS_USER_IDS_MAP_KEY ->
@@ -121,6 +162,8 @@ public class UserQueryService {
                 userQueryRepository.findByUserName(subKey, Enabled.ENABLED()).orElse(null);
             case RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY ->
                 userQueryRepository.findByIdAndIsEnabled(Long.valueOf(subKey), Enabled.ENABLED()).orElse(null);
+            case RedisKeyDto.REDIS_USERS_INFO_MAP_KEY ->
+                userQueryRepository.findByTokenAndIsEnabled(subKey, Enabled.ENABLED()).orElse(null);
             default -> null;
         };
         if (entityUser == null) {
@@ -130,6 +173,26 @@ public class UserQueryService {
         setUserInfoDtoRedis(redisUserDTO);
         return entityUser;
     }
+    private List<User> fetchAllAndSetSubKeyRedisBySubKey(Set<String> subKeyList, String redisUidMapKey) {
+        List<User> entityUsers = switch (redisUidMapKey) {
+            case RedisKeyDto.REDIS_USER_IDS_MAP_KEY -> userQueryRepository.findByUserIds(subKeyList, Enabled.ENABLED());
+            case RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY ->
+                userQueryRepository.findByEmails(subKeyList, Enabled.ENABLED());
+            case RedisKeyDto.REDIS_USER_NAMES_MAP_KEY ->
+                userQueryRepository.findByUserNames(subKeyList, Enabled.ENABLED());
+            case RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY ->
+                userQueryRepository.findByIds(subKeyList.stream().map(Long::valueOf).collect(Collectors.toSet()),
+                    Enabled.ENABLED());
+            case RedisKeyDto.REDIS_USERS_INFO_MAP_KEY ->
+                userQueryRepository.findByTokens(subKeyList, Enabled.ENABLED());
+            default -> new ArrayList<>();
+        };
+        entityUsers.stream()
+            .map(RedisUserDto::create)
+            .forEach(this::setUserInfoDtoRedis);
+        return entityUsers;
+    }
+
 
     public void setUserInfoDtoRedis(RedisUserDto redisUserDTO) {
         setUserIdInRedis(redisUserDTO.getToken(), redisUserDTO.getUserId());
@@ -154,14 +217,6 @@ public class UserQueryService {
             fetchAndSetSubKeyRedisBySubKey(userDetails.getUsername(), RedisKeyDto.REDIS_USER_IDS_MAP_KEY));
         return User.getOptionalUser(optionalUser);
     }
-
-
-    public UserMyInfoDto getUserMyInfoDto() {
-        User user = findOne();
-        return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade());
-    }
-
 
     public User getUserEntity(String userId) {
         return fetchAndSetSubKeyRedisBySubKey(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
@@ -199,8 +254,19 @@ public class UserQueryService {
         }
         return findUser;
     }
-
-
+    public List<User> getUserListByTokens(Set<String> tokens, Enabled enabled) {
+        List<User> userListForm = getUserListByTokenRedisOrDB(tokens,
+            RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
+        // enabled 필터링
+        return userListForm.stream()
+            .filter(user -> user.getIsEnabled().equals(enabled.getValue())).
+            collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                if (list.isEmpty()) {
+                throw new UserInfoNotFoundException("sky.userId.notFind");
+            }
+            return list;
+        }));
+    }
     public User findByUserName(String userName, Enabled enabled) {
         User findUser = getUserInfoFromCacheOrDB(userName,
             RedisKeyDto.REDIS_USER_NAMES_MAP_KEY);

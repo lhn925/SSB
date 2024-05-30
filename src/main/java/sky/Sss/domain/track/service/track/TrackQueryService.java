@@ -2,28 +2,21 @@ package sky.Sss.domain.track.service.track;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
-import sky.Sss.domain.track.dto.common.TrackInfoDto;
 import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
-import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.track.TrackQueryRepository;
-import sky.Sss.domain.user.dto.redis.RedisUserDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.Status;
@@ -79,7 +72,7 @@ public class TrackQueryService {
     // 유저아이디로 찾는거
     private SsbTrack getTrackCacheFromOrDbByTrackId(Long trackId, String redisTrackMapKey) {
         String trackSubKey = String.valueOf(trackId);
-        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapBySubKey(RedisTrackDto.class, trackSubKey,
+        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapValueBySubKey(RedisTrackDto.class, trackSubKey,
             redisTrackMapKey);
 
         if (redisTrackDto == null) {

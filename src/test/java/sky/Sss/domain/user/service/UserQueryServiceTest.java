@@ -1,13 +1,20 @@
 package sky.Sss.domain.user.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sky.Sss.domain.user.dto.redis.RedisUserDto;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Enabled;
+import sky.Sss.domain.user.repository.UserQueryRepository;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
@@ -20,6 +27,9 @@ class UserQueryServiceTest {
     @Autowired
     UserQueryService userQueryService;
 
+
+    @Autowired
+    UserQueryRepository userQueryRepository;
     @Test
     void findOne() {
 
@@ -30,6 +40,25 @@ class UserQueryServiceTest {
 
         getUserInfoFromCacheOrDB(userId,RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
         User userInfoFromCacheOrDB = getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_EMAILS_MAP_KEY);
+
+    }
+
+
+    @Test
+    public void RedisTest() {
+
+
+
+        Set<Long> ids = new HashSet<>();
+
+        ids.add(1L);
+        ids.add(2L);
+        ids.add(3L);
+        List<User> byIds = userQueryRepository.findByIds(ids, Enabled.ENABLED());
+
+        Set<String> collect = byIds.stream().map(User::getToken).collect(Collectors.toSet());
+        List<User> userListByTokens = userQueryService.getUserListByTokens(collect, Enabled.ENABLED);
+        System.out.println(userListByTokens.toString());
 
     }
 

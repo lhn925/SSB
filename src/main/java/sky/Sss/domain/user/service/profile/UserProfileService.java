@@ -8,9 +8,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.track.TrackLikesService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
+import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.follows.UserFollowsService;
@@ -24,7 +27,17 @@ public class UserProfileService {
     private final TrackQueryService trackQueryService;
     private final UserFollowsService userFollowsService;
     private final TrackLikesService trackLikesService;
+    private final LikesCommonService likesCommonService;
 
+    public UserMyInfoDto getUserMyInfoDto() {
+        User user = userQueryService.findOne();
+
+        List<Long> userLikedList = likesCommonService.getUserLikedList(user, ContentsType.TRACK);
+
+        userFollowsService.getMyFollowingUsers(user);
+        return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
+            user.getIsLoginBlocked(), user.getGrade(),userLikedList,null);
+    }
 
     public void getUserProfileByUserName(String userName) {
         // 본인 정보

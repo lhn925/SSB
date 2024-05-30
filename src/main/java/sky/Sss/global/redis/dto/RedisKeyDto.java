@@ -2,6 +2,7 @@ package sky.Sss.global.redis.dto;
 
 
 public class RedisKeyDto {
+
     public static final String REDIS_SESSION_KEY = "spring:session:sessions:";
 
     public static final String REDIS_TAGS_KEY = "spring:tags:";
@@ -47,8 +48,10 @@ public class RedisKeyDto {
     public static final String REDIS_PLAY_LOG_DTO_MAP_KEY = "spring:play:log:dto:map:";
 
 
-
-
+    public static final String REDIS_USER_TRACK_LIKED_LIST_MAP_KEY = "spring:user:track:liked:list:";
+    public static final String REDIS_USER_PLY_LIKED_LIST_MAP_KEY = "spring:user:ply:liked:list:";
+    public static final String REDIS_USER_TRACK_REPLY_LIKED_MAP_KEY = "spring:user:track:reply:liked:list:";
+    public static final String REDIS_USER_PLY_REPLY_LIKED_MAP_KEY = "spring:user:ply:reply:liked:list:";
 
 
 }

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +94,7 @@ public class RedisQueryService {
         try {
             List<Object> cachedData = redisTemplate.opsForValue().multiGet(keys);
             Map<String, T> result = new HashMap<>();
-            List<String> missingKeys = new ArrayList<>();
+            Set<String> missingKeys = new HashSet<>();
             // redisKey 값 삭제 후 온전한 토큰 추출
             int removeIndex = keys.get(0).lastIndexOf(":");
             for (int i = 0; i < keys.size(); i++) {

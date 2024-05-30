@@ -55,6 +55,7 @@ import sky.Sss.domain.user.service.log.UserActivityLogService;
 import sky.Sss.domain.user.service.log.UserLoginLogService;
 import sky.Sss.domain.user.service.login.UserLoginStatusService;
 import sky.Sss.domain.user.service.myInfo.UserMyInfoService;
+import sky.Sss.domain.user.service.profile.UserProfileService;
 import sky.Sss.domain.user.utili.PwChecker;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.FieldErrorCustom;
@@ -77,6 +78,7 @@ public class UserMyInfoController {
     private final UserHelpService userHelpService;
     private final UserLoginStatusService userLoginStatusService;
     private final UserLoginLogService userLoginLogService;
+    private final UserProfileService userProfileService;
 
 
     /**
@@ -87,7 +89,7 @@ public class UserMyInfoController {
     @GetMapping
     public ResponseEntity<UserMyInfoDto> userProfileForm() {
         // 유저 정보 조회
-        return new ResponseEntity<>(userQueryService.getUserMyInfoDto(), HttpStatus.OK);
+        return new ResponseEntity<>(userProfileService.getUserMyInfoDto(), HttpStatus.OK);
     }
 
     /**

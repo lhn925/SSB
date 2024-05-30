@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -82,7 +81,6 @@ public class TrackLikesService {
         String subUserKey = user.getToken();
 
         // redis 좋아요 수 업로드
-//        updateTotalCount(ssbTrack.getToken());
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, subUserKey);
     }
@@ -105,7 +103,7 @@ public class TrackLikesService {
      * @return
      */
     public Optional<SsbTrackLikes> getLikeCacheFromOrDbByToken(String trackToken, User user) {
-        UserSimpleInfoDto cacheMapBySubKey = redisCacheService.getCacheMapBySubKey(UserSimpleInfoDto.class,
+        UserSimpleInfoDto cacheMapBySubKey = redisCacheService.getCacheMapValueBySubKey(UserSimpleInfoDto.class,
             user.getToken(),
             getLikeKey(trackToken));
         if (cacheMapBySubKey == null) {
@@ -115,7 +113,7 @@ public class TrackLikesService {
     }
 
     public Optional<SsbTrackLikes> findOneAsOpt(long trackId, User user) {
-        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapBySubKey(RedisTrackDto.class,
+        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapValueBySubKey(RedisTrackDto.class,
             String.valueOf(trackId),
             RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
 
@@ -165,7 +163,6 @@ public class TrackLikesService {
     }
 
 
-    @Cacheable(value = RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY, key = "#user.userId", cacheManager = "contentCacheManager")
     public List<Long> getUserLikedTrackIds(User user, Sort sort) {
         return trackLikesRepository.getUserLikedTrackIds(user,sort);
     }

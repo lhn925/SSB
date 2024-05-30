@@ -3,6 +3,7 @@ package sky.Sss.global.redis.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,10 +15,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
-import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -173,18 +173,16 @@ public class RedisCacheService {
      * 형태로 Redis 에 저장
      * upsert는 "update"와 "insert"를 결합한 용어
      *
-     * @param value
+     * @param addMap
      * @param key
-     * @param subMapKey
      * @param <T>
-     * @return
      */
     // redis 에 caching 데이터 찾은 후 존재하지 않을 경우 등록
-    public <T> void upsertAllCacheMapValuesByKey(Map<String,T> addMap, String key) {
+    public <T> void upsertAllCacheMapValuesByKey(Map<String, T> addMap, String key) {
         Map<String, T> objectMap;
         // redis 에 존재하는 경우
         if (this.hasRedis(key)) { //
-            TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
+            TypeReference<Map<String, T>> typeReference = new TypeReference<>() {
             };
             objectMap = getData(key, typeReference);
             if (objectMap == null) {
@@ -316,23 +314,53 @@ public class RedisCacheService {
             return true;
         }
     }
-    public <T> T getCacheMapBySubKey(Class<T> clazz, String subKey, String redisTrackMapKey) {
-        TypeReference<Map<String, T>> redisType = new TypeReference<>() {
-        };
 
-        Map<String, T> redisTrackMap;
-        try {
-            redisTrackMap = getData(redisTrackMapKey, redisType);
-        } catch (Exception e) {
-            // 예외 처리 로직
-            e.printStackTrace();
-            return null;
-        }
-
+    public <T> T getCacheMapValueBySubKey(Class<T> clazz, String subKey, String redisMapKey) {
+        Map<String, T> redisTrackMap = getRedisTrackMap(redisMapKey);
         if (redisTrackMap == null || !redisTrackMap.containsKey(subKey)) {
             return null;
         }
         Object subKeyData = redisTrackMap.get(subKey);
         return objectMapper.convertValue(subKeyData, clazz);
     }
+
+
+    public <T> RedisDataListDto<T> getCacheMapValuesBySubKey(Class<T> clazz, Set<String> subKeyList,
+        String redisMapKey) {
+
+        Map<String, T> redisTrackMap = getRedisTrackMap(redisMapKey);
+
+        Map<String, T> result = new HashMap<>();
+        if (redisTrackMap == null) {
+            return new RedisDataListDto<>(result, new HashSet<>(subKeyList));
+        }
+
+        Set<String> missingKeys = new HashSet<>();
+        for (String subKey : subKeyList) {
+            Object subKeyData = redisTrackMap.get(subKey);
+            if (subKeyData == null) {
+                missingKeys.add(subKey);
+            } else {
+                result.put(subKey, objectMapper.convertValue(subKeyData, clazz));
+            }
+        }
+        return new RedisDataListDto<>(result, missingKeys);
+    }
+
+    private <T> Map<String, T> getRedisTrackMap(String redisMapKey) {
+        TypeReference<Map<String, T>> redisType = new TypeReference<>() {
+        };
+
+        Map<String, T> redisTrackMap;
+        try {
+            redisTrackMap = getData(redisMapKey, redisType);
+        } catch (Exception e) {
+            // 예외 처리 로직
+            e.printStackTrace();
+            return null;
+        }
+        return redisTrackMap;
+    }
+
+
 }
