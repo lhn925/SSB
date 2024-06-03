@@ -52,10 +52,6 @@ public class ReplyCommonService {
 
     // reply
     private final UserPushMsgService userPushMsgService;
-
-
-
-
     /**
      *
      * Reply 추가
@@ -152,22 +148,21 @@ public class ReplyCommonService {
         }
 
     }
-
     private List<ReplyRmInfoDto> getReplyRmInfoDtoList(Long replyId, String replyToken, ContentsType contentsType) {
         if (contentsType.equals(ContentsType.TRACK)) {
             return trackReplyService.getReplyRmInfoDtoList(replyId, replyToken);
         }
         return plyReplyService.getReplyRmInfoDtoList(replyId, replyToken);
     }
-
-
     public static void checkPrivacy(boolean isPrivacy, boolean isOwner) {
         if (isPrivacy && !isOwner) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
     }
 
-    // like
+
+
+
 
 
 }

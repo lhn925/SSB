@@ -186,6 +186,11 @@ public class TrackQueryService {
 
         List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);
 
+        return createTrackInfoSimpleDtoList(user, isStatus, ssbTrackList);
+    }
+
+    public static List<TrackInfoSimpleDto> createTrackInfoSimpleDtoList(User user, Status isStatus,
+        List<SsbTrack> ssbTrackList) {
         List<TrackInfoSimpleDto> simpleDtoList = new ArrayList<>();
         for (SsbTrack ssbTrack : ssbTrackList) {
             if (!ssbTrack.getIsStatus().equals(isStatus.getValue())) {

@@ -238,7 +238,6 @@ public class LikesCommonService {
 
 
     public List<Long> getUserLikedList(User user, ContentsType contentsType) {
-
         TypeReference<HashMap<String, Long>> typeReference = new TypeReference<>() {
         };
         Map<String, Long> data = redisCacheService.getData(contentsType.getUserLikedKey() + user.getToken(),
@@ -249,7 +248,6 @@ public class LikesCommonService {
             ids.sort(Comparator.reverseOrder());
             return ids;
         }
-
         switch (contentsType) {
             case TRACK -> {
                 ids.addAll(trackLikesService.getUserLikedTrackIds(user, Sort.by(Order.desc("id"))));
@@ -278,6 +276,9 @@ public class LikesCommonService {
         }
         return count;
     }
+
+
+
 
 
 }

@@ -38,7 +38,8 @@ public class UserProfileService {
 
         List<UserFollows> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
 
-        List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(value -> value.getFollowerUser().getId()).toList();
+        List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(value -> value.getFollowerUser().getId())
+            .toList();
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
             user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds);
     }
@@ -54,15 +55,17 @@ public class UserProfileService {
         // 회원 닉네임
         // 회원 프로필 사진
         // 총 팔로워 수
-        int followerTotalCount = userFollowsService.getFollowerTotalCount(profileUser);
-        // 총 팔로잉 수
-        int followingTotalCount = userFollowsService.getFollowingTotalCount(profileUser);
+        List<UserFollows> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
+        int totalFollowerCount = userFollowsList.size();
+        // 팔로잉 리스트
+        List<UserFollows> userFollowingList = userFollowsService.getFollowingUsersFromCacheOrDB(profileUser);
+        int totalFollowingCount = userFollowingList.size();
 
         Sort sort = Sort.by(Order.desc("id"));
 
         // 총 Tracks 수 본인이 아닐시에는 비공개 트랙 제외
         // 좋아요한 트랙 총 3개
-        List<Long> userLikedTrackIds = trackLikesService.getUserLikedTrackIds(profileUser, sort);
+        List<Long> userLikedTrackIds = likesCommonService.getUserLikedList(profileUser, ContentsType.TRACK);
         // 좋아요한 숫자
         int totalLikedTrackCount = userLikedTrackIds.size();
 
@@ -72,8 +75,9 @@ public class UserProfileService {
         // report 수
         // reply 수
         if (totalLikedTrackCount > 0) {
-            List<Long> ids = userLikedTrackIds.subList(0, 3);
-
+            // 가장 최근 상위 3개
+            int recentSize = Math.min(userLikedTrackIds.size(), 3);
+            List<Long> ids = userLikedTrackIds.subList(0, recentSize);
 
         }
 

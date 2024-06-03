@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
-import sky.Sss.domain.track.dto.track.reply.TrackReplyCacheDto;
+import sky.Sss.domain.track.dto.track.reply.RedisTrackReplyDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
@@ -55,7 +55,7 @@ public class TrackReplyService {
         trackReplyRepository.save(ssbTrackReply);
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken();
 
-        redisCacheService.upsertCacheMapValueByKey(new TrackReplyCacheDto(ssbTrackReply), key, replyToken);
+        redisCacheService.upsertCacheMapValueByKey(new RedisTrackReplyDto(ssbTrackReply), key, replyToken);
 
     }
 
@@ -71,7 +71,7 @@ public class TrackReplyService {
         trackReplyRepository.delete(ssbTrackReply);
 
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken();
-        redisCacheService.removeCacheMapValueByKey(new TrackReplyCacheDto(), key, ssbTrackReply.getToken());
+        redisCacheService.removeCacheMapValueByKey(new RedisTrackReplyDto(), key, ssbTrackReply.getToken());
     }
 
     /**
@@ -84,7 +84,7 @@ public class TrackReplyService {
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + trackToken;
         // 캐쉬 삭제
         replyRmDtoList.forEach(reply -> {
-            redisCacheService.removeCacheMapValueByKey(new TrackReplyCacheDto(), key, reply.getReplyToken());
+            redisCacheService.removeCacheMapValueByKey(new RedisTrackReplyDto(), key, reply.getReplyToken());
         });
     }
 
