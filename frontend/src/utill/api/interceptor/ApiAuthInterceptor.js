@@ -104,6 +104,7 @@ authApi.interceptors.response.use(
           window.location.href = "/404";
         }
       } else {
+
         return error.response;
       }
     }

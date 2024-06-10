@@ -29,6 +29,9 @@ public interface TrackReplyRepository extends JpaRepository<SsbTrackReply, Long>
     List<SsbTrackReply> findListAndSubReplies(@Param("id") Long id, @Param("token") String token);
 
 
+    @Query("select r from SsbTrackReply r join fetch  r.ssbTrack where r.ssbTrack.token = :trackToken")
+    List<SsbTrackReply> getRepliesByTrackToken(@Param("trackToken") String trackToken);
+
     Optional<SsbTrackReply> findByIdAndSsbTrack(Long id, SsbTrack ssbTrack);
 
     List<SsbTrackReply> findAllByParentId(Long parentId);

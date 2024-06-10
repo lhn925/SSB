@@ -1,9 +1,7 @@
 package sky.Sss.domain.track.service.common;
 
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,13 +22,12 @@ import sky.Sss.domain.track.service.playList.reply.PlyReplyService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.track.service.track.reply.TrackReplyService;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.entity.UserPushMessages;
 import sky.Sss.domain.user.model.ContentsType;
-import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.push.UserPushMsgService;
+import sky.Sss.global.redis.service.RedisCacheService;
 
 
 /**
@@ -46,10 +43,8 @@ public class ReplyCommonService {
     private final UserQueryService userQueryService;
     private final TrackQueryService trackQueryService;
     private final PlyQueryService plyQueryService;
-
     private final PlyReplyService plyReplyService;
     private final TrackReplyService trackReplyService;
-
     // reply
     private final UserPushMsgService userPushMsgService;
     /**

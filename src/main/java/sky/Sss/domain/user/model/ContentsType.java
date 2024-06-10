@@ -42,6 +42,16 @@ public enum ContentsType {
         }
         return key;
     }
+
+    public String getReplyKey() {
+        String key = null;
+        switch (this) {
+            case TRACK -> key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY;
+            case PLAYLIST -> key = RedisKeyDto.REDIS_PLY_REPLY_MAP_KEY;
+            default -> throw new IllegalArgumentException();
+        }
+        return key;
+    }
     
     public String getLikeKey() {
         String key = null;

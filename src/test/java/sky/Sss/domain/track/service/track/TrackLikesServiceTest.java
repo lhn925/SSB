@@ -1,14 +1,23 @@
 package sky.Sss.domain.track.service.track;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import sky.Sss.domain.track.dto.common.LikeSimpleInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
+import sky.Sss.domain.track.repository.track.TrackLikesRepository;
+import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -28,6 +37,8 @@ class TrackLikesServiceTest {
 
     @Autowired
     RedisQueryService redisQueryService;
+    @Autowired
+    TrackLikesRepository trackLikesRepository;
 
     @Autowired
     RedisTemplate redisTemplate;
@@ -37,6 +48,52 @@ class TrackLikesServiceTest {
 
 
 
+    
+    @Test
+    public void getUserList() {
+        List<User> userList = trackLikesService.getUserList("0aac203d6b51f3840d40");
+
+        for (User user : userList) {
+            System.out.println("user.getUserId() = " + user.getUserId());
+
+        }
+    }
+
+    @Test
+    public void getLikeListByTokens() {
+
+        Set<String> keys = new HashSet<>();
+
+        keys.add("0aac203d6b51f3840d40");
+        keys.add("22d182fe5d2d9b09667b");
+        keys.add("ebb90c922de3f3082dc8");
+
+        List<SsbTrackLikes> ssbTrackLikes = trackLikesRepository.getLikeListByTokens(keys);
+
+    }
+
+
+
+
+    @Test
+    public void getLikeSimpleListByTokens() {
+
+        Set<String> keys = new HashSet<>();
+
+        keys.add("0aac203d6b51f3840d40");
+        keys.add("22d182fe5d2d9b09667b");
+        keys.add("ebb90c922de3f3082dc8");
+
+        List<LikeSimpleInfoDto> likeSimpleListByTokens = trackLikesRepository.getLikeSimpleListByTokens(keys);
+
+        Map<String, List<UserSimpleInfoDto>> findMap = likeSimpleListByTokens.stream()
+            .collect(Collectors.groupingBy(LikeSimpleInfoDto::getToken,
+                Collectors.mapping(LikeSimpleInfoDto::getUserSimpleInfoDto, Collectors.toList())));
+
+        for (String findKey : findMap.keySet()) {
+            System.out.println("s = " + findKey);
+        }
+    }
 
     @Test
     public void like() {

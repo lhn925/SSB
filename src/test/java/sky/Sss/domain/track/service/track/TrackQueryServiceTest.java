@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sky.Sss.domain.track.entity.track.SsbTrack;
+import sky.Sss.domain.track.service.common.LikesCommonService;
+import sky.Sss.domain.user.model.ContentsType;
 
 @SpringBootTest
 class TrackQueryServiceTest {
@@ -18,7 +20,8 @@ class TrackQueryServiceTest {
     TrackQueryService trackQueryService;
 
 
-
+    @Autowired
+    LikesCommonService likesCommonService;
 
     @Test
     public void fetchTest() {
@@ -33,7 +36,10 @@ class TrackQueryServiceTest {
 
         for (SsbTrack trackListFromOrDbById : trackListFromOrDbByIds) {
 
+            int totalCount = likesCommonService.getTotalCount(trackListFromOrDbById.getToken(), ContentsType.TRACK);
             System.out.println("trackListFromOrDbById.getTitle() = " + trackListFromOrDbById.getTitle());
+            System.out.println("totalCount = " + totalCount);
+
         }
     }
 

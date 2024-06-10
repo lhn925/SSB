@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.LikeSimpleInfoDto;
 import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
@@ -113,16 +115,16 @@ public class TrackLikesService {
     }
 
     public Optional<SsbTrackLikes> findOneAsOpt(long trackId, User user) {
-        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapValueBySubKey(RedisTrackDto.class,
-            String.valueOf(trackId),
-            RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
+//        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapValueBySubKey(RedisTrackDto.class,
+//            String.valueOf(trackId),
+//            RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
 
-        if (redisTrackDto == null) {
+//        if (redisTrackDto == null) {
             return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
-        }
-        User ownerUser = userQueryService.findOne(redisTrackDto.getUid(), Enabled.ENABLED);
-        SsbTrack ssbTrack = SsbTrack.redisTrackDtoToSsbTrack(redisTrackDto, ownerUser);
-        return getLikeCacheFromOrDbByToken(ssbTrack.getToken(), user);
+//        }
+//        User ownerUser = userQueryService.findOne(redisTrackDto.getUid(), Enabled.ENABLED);
+//        SsbTrack ssbTrack = SsbTrack.redisTrackDtoToSsbTrack(redisTrackDto, ownerUser);
+//        return getLikeCacheFromOrDbByToken(ssbTrack.getToken(), user);
     }
 
     public Optional<SsbTrackLikes> findOneAsOptByToken(String trackToken, User user) {
@@ -156,6 +158,17 @@ public class TrackLikesService {
                 ssbTrackLikes -> new UserSimpleInfoDto(ssbTrackLikes.getUser())));
         redisCacheService.upsertAllCacheMapValuesByKey(addDataMap, key);
         return listByToken.size();
+    }
+
+    // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
+    public List<SsbTrackLikes> getLikeListByTokens(Set<String> tokens) {
+        return trackLikesRepository.getLikeListByTokens(tokens);
+    }
+
+
+    // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
+    public List<LikeSimpleInfoDto> getLikeSimpleListByTokens(Set<String> tokens) {
+        return trackLikesRepository.getLikeSimpleListByTokens(tokens);
     }
 
     public List<User> getUserList(String trackToken) {

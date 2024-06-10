@@ -3,7 +3,6 @@ package sky.Sss.domain.track.service.track;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bytedeco.javacpp.presets.opencv_core.Str;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,9 +92,11 @@ public class TrackQueryService {
     }
 
 
-    // 토큰으로 찾는거와
-    // 트랙아이디로 찾는거
-    // 유저아이디로 찾는거
+    /**
+     * 다중 검색 Redis에 없을 경우 DB로 가져온 뒤 저장
+     * @param ids
+     * @return
+     */
     public List<SsbTrack> getTrackListFromOrDbByIds(Set<Long> ids) {
         if (ids.isEmpty()) {
             return new ArrayList<>();
@@ -160,7 +160,6 @@ public class TrackQueryService {
     }
 
     public void setRedisTracksDtoRedis(List<SsbTrack> ssbTrackList) {
-
         Map<String, RedisTrackDto> cacheMap = ssbTrackList.stream()
             .collect(Collectors.toMap(key -> String.valueOf(key.getId()), RedisTrackDto::create));
         setTracksIdInRedis(cacheMap);

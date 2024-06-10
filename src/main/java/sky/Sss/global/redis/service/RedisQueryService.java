@@ -90,16 +90,26 @@ public class RedisQueryService {
     }
 
 
-    public <T> RedisDataListDto<T> getDataList(List<String> keys, TypeReference<T> typeReference) {
+    /**
+     *
+     * redis 다중검색
+     * @param keys
+     * @param typeReference
+     * @param redisKeyDto
+     * @return
+     * @param <T>
+     */
+    public <T> RedisDataListDto<T> getDataList(List<String> keys, TypeReference<T> typeReference, String redisKeyDto) {
         try {
-            List<Object> cachedData = redisTemplate.opsForValue().multiGet(keys);
+
+            List<Object> cachedData = redisTemplate.opsForValue()
+                .multiGet(keys.stream().map(value -> redisKeyDto + value).toList());
             Map<String, T> result = new HashMap<>();
             Set<String> missingKeys = new HashSet<>();
             // redisKey 값 삭제 후 온전한 토큰 추출
-            int removeIndex = keys.get(0).lastIndexOf(":");
             for (int i = 0; i < keys.size(); i++) {
                 String data = (String) cachedData.get(i);
-                String key = keys.get(i).substring(removeIndex + 1);
+                String key = keys.get(i);
                 if (data != null) {
                     JavaType javaType = TypeFactory.defaultInstance().constructType(typeReference);
                     T value = objectMapper.readValue(data, javaType);
@@ -173,6 +183,7 @@ public class RedisQueryService {
         }
 
     }
+
     public Boolean hasRedis(String key) {
         try {
             if (!StringUtils.hasText(key)) {

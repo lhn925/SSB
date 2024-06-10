@@ -42,6 +42,10 @@ public class RedisCacheService {
         return redisQueryService.getData(key, typeReference);
     }
 
+    public <T> RedisDataListDto<T> getDataList(List<String> keys, TypeReference<T> typeReference,String redisKeyDto) {
+        return redisQueryService.getDataList(keys, typeReference,redisKeyDto);
+    }
+
     public String getData(String key) {
         return redisQueryService.getData(key);
     }

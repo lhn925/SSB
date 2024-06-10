@@ -2,6 +2,7 @@ package sky.Sss.domain.track.service.common;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,8 +17,10 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.LikeSimpleInfoDto;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
+import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
@@ -35,6 +38,7 @@ import sky.Sss.domain.user.model.PushMsgType;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.push.UserPushMsgService;
+import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
 
@@ -243,7 +247,7 @@ public class LikesCommonService {
         Map<String, Long> data = redisCacheService.getData(contentsType.getUserLikedKey() + user.getToken(),
             typeReference);
         List<Long> ids = new ArrayList<>();
-        if ( data != null && !data.isEmpty()) {
+        if (data != null && !data.isEmpty()) {
             ids.addAll(data.values().stream().toList());
             ids.sort(Comparator.reverseOrder());
             return ids;
@@ -278,7 +282,62 @@ public class LikesCommonService {
     }
 
 
+    // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 map 형태로 반환
+    public Map<String, Integer> getTotalCountList(List<String> tokens, ContentsType contentsType) {
 
+        int count = 0;
+        TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
+        };
+        RedisDataListDto<HashMap<String, UserSimpleInfoDto>> dataList = redisCacheService.getDataList(tokens,
+            typeReference, contentsType.getLikeKey());
+
+        // 총 like수를 모을 맵
+        Map<String, Integer> countMap = new HashMap<>();
+
+        Map<String, HashMap<String, UserSimpleInfoDto>> likesMap = dataList.getResult();
+
+        // 레디스에 있는 좋아요 수 countMap 에 put
+        for (String trackToken : tokens) {
+            count = 0;
+            Map<String, UserSimpleInfoDto> simpleInfoDtoHashMap = likesMap.get(trackToken);
+            if (simpleInfoDtoHashMap != null) {
+                count = simpleInfoDtoHashMap.size();
+            }
+            countMap.put(trackToken, count);
+
+        }
+
+        // redis에 트랙 좋아요 수가 다 있을경우 그대로 반환
+        if (dataList.getMissingKeys().isEmpty()) {
+            return countMap;
+        }
+        List<LikeSimpleInfoDto> likeSimpleList = new ArrayList<>();
+
+        // contentsType 에 따라 sql 쿼리 구분
+        // 토큰 으로 좋아요 수 검색 후
+        // map 으로 변경후 캐쉬에 저장하고 좋아요 map 담은 후 반환
+        if (contentsType.equals(ContentsType.TRACK)) {
+            likeSimpleList.addAll(trackLikesService.getLikeSimpleListByTokens(
+                dataList.getMissingKeys()));
+        }
+
+        // DB에서 탐색한 좋아요 수 저장
+        if (!likeSimpleList.isEmpty()) {
+            Map<String, Map<String, UserSimpleInfoDto>> findMap = likeSimpleList.stream()
+                .collect(Collectors.groupingBy(LikeSimpleInfoDto::getToken,
+                    Collectors.mapping(LikeSimpleInfoDto::getUserSimpleInfoDto, Collectors.toMap(
+                        UserSimpleInfoDto::getToken, value -> value))));
+
+            // 레디스 저장
+            // 하트 총 갯수 저장
+            for (String findKey : findMap.keySet()) {
+                Map<String, UserSimpleInfoDto> dtoMap = findMap.get(findKey);
+                redisCacheService.upsertAllCacheMapValuesByKey(dtoMap, contentsType.getLikeKey() + findKey);
+                countMap.put(findKey, dtoMap.size());
+            }
+        }
+        return countMap;
+    }
 
 
 }
