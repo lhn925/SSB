@@ -6,16 +6,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.track.dto.common.BaseSearchInfoDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
-public class TrackSearchInfoDto {
-
+public class TrackSearchInfoDto extends BaseSearchInfoDto {
     private TrackInfoSimpleDto trackInfo;
-    private Integer likeCount;
-    private Integer replyCount;
-    private Integer repostCount;
     private Integer playCount;
 }

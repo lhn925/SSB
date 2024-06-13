@@ -5,19 +5,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.redis.RedisBaseReplyDto;
+import sky.Sss.domain.track.dto.track.redis.BaseRedisReplyDto;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class RedisTrackReplyDto extends RedisBaseReplyDto {
+public class TrackRedisReplyDto extends BaseRedisReplyDto {
 
     // 댓글 아이디
     // 댓글 토큰
     private int timeLine;
 
-    public RedisTrackReplyDto(SsbTrackReply ssbTrackReply) {
+    public TrackRedisReplyDto(SsbTrackReply ssbTrackReply) {
         super(ssbTrackReply.getId()
             ,ssbTrackReply.getToken()
             ,ssbTrackReply.getUser().getId()
@@ -25,7 +25,7 @@ public class RedisTrackReplyDto extends RedisBaseReplyDto {
             ,ssbTrackReply.getContents()
             ,ssbTrackReply.getParentId()
             ,ssbTrackReply.getReplyOrder()
-            ,ssbTrackReply.getCreatedDateTime());
+            ,ssbTrackReply.getCreatedDateTime(),ssbTrackReply.getSsbTrack().getToken());
         this.timeLine = ssbTrackReply.getTimeLine();
     }
 }

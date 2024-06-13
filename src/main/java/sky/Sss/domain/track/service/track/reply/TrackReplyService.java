@@ -2,13 +2,15 @@ package sky.Sss.domain.track.service.track.reply;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +18,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
-import sky.Sss.domain.track.dto.track.reply.RedisTrackReplyDto;
+import sky.Sss.domain.track.dto.track.redis.BaseRedisReplyDto;
+import sky.Sss.domain.track.dto.track.reply.TrackRedisReplyDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.track.reply.TrackReplyRepository;
+import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.model.ContentsType;
+import sky.Sss.domain.user.model.Enabled;
+import sky.Sss.domain.user.model.Status;
+import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.utili.TokenUtil;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
@@ -36,6 +42,8 @@ public class TrackReplyService {
 
     private final TrackReplyRepository trackReplyRepository;
     private final RedisCacheService redisCacheService;
+    private final TrackQueryService trackQueryService;
+    private final UserQueryService userQueryService;
 
     @Transactional
     public void addReply(SsbTrackReply ssbTrackReply, SsbTrack ssbTrack) {
@@ -64,24 +72,24 @@ public class TrackReplyService {
         trackReplyRepository.save(ssbTrackReply);
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken();
 
-        redisCacheService.upsertCacheMapValueByKey(new RedisTrackReplyDto(ssbTrackReply), key, replyToken);
+        redisCacheService.upsertCacheMapValueByKey(new TrackRedisReplyDto(ssbTrackReply), key, replyToken);
 
     }
 
-    /**
+    /*    *//**
      * 댓글 삭제
      *
      * @param ssbTrackReply
      * @param ssbTrack
-     */
+     *//*
     @Transactional
     public void removeReply(SsbTrackReply ssbTrackReply, SsbTrack ssbTrack) {
 
         trackReplyRepository.delete(ssbTrackReply);
 
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken();
-        redisCacheService.removeCacheMapValueByKey(new RedisTrackReplyDto(), key, ssbTrackReply.getToken());
-    }
+        redisCacheService.removeCacheMapValueByKey(new TrackRedisReplyDto(), key, ssbTrackReply.getToken());
+    }*/
 
     /**
      * 대댓글 삭제
@@ -93,7 +101,7 @@ public class TrackReplyService {
         String key = RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + trackToken;
         // 캐쉬 삭제
         replyRmDtoList.forEach(reply -> {
-            redisCacheService.removeCacheMapValueByKey(new RedisTrackReplyDto(), key, reply.getReplyToken());
+            redisCacheService.removeCacheMapValueByKey(new TrackRedisReplyDto(), key, reply.getReplyToken());
         });
     }
 
@@ -133,18 +141,63 @@ public class TrackReplyService {
             .orElseThrow(SsbFileNotFoundException::new);
     }
 
-    private String getReplyKey(String trackToken) {
-        return RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + trackToken;
+
+    public List<SsbTrackReply> getReplyCacheFromOrDbByToken(String trackToken) {
+        TypeReference<HashMap<String, TrackRedisReplyDto>> typeReference = new TypeReference<>() {
+        };
+        HashMap<String, TrackRedisReplyDto> replyDataMap = redisCacheService.getData(getReplyKey(trackToken), typeReference);
+        if (replyDataMap == null || replyDataMap.isEmpty()) {
+            return getTrackReplies(trackToken);
+        }
+        SsbTrack ssbTrack = null;
+        List<SsbTrackReply> ssbTrackReplies = new ArrayList<>();
+        // 검색할 uidList 생성
+        Set<Long> userIds = replyDataMap.values().stream()
+            .map(BaseRedisReplyDto::getUid)
+            .collect(Collectors.toSet());
+        // 검색후 Map 으로 변경
+        Map<Long, User> userMap = userQueryService.findUsersByIds(userIds, Enabled.ENABLED).stream().collect(Collectors.
+            toMap(User::getId, val -> val));
+
+        for (Map.Entry<String, TrackRedisReplyDto> entry : replyDataMap.entrySet()) {
+            TrackRedisReplyDto dto = entry.getValue();
+
+            // ssbTrack이 null 인 경우 검색
+            if (ssbTrack == null) {
+                ssbTrack = trackQueryService.findOneJoinUser(dto.getTargetId(), Status.ON);
+            }
+            // uid 검색
+            User user = userMap.get(dto.getUid());
+            SsbTrackReply ssbTrackReply = SsbTrackReply.redisDtoToSsbTrackReply(dto, ssbTrack, user);
+            ssbTrackReplies.add(ssbTrackReply);
+        }
+        return ssbTrackReplies;
     }
 
+
+
+    public List<TrackRedisReplyDto> getTrackRedisDtoListByTokens(Set<String> tokens) {
+        return trackReplyRepository.getRepliesByTokens(tokens);
+    }
+
+
+    public int getTotalCount(String trackToken) {
+        String key = getReplyKey(trackToken);
+        // redis 에 total 캐시가 있으면
+        int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
+
+        // redis 에 저장이 안되어 있을경우 count 후 저장
+        if (count == 0) {
+            count = getTrackReplies(trackToken).size();
+        }
+        return count;
+    }
 
     public List<SsbTrackReply> getTrackReplies(String trackToken) {
         // 트랙 토큰에 대한 리플 목록 가져오기
         List<SsbTrackReply> ssbTrackReplies = fetchTrackReplies(trackToken);
-
         // Redis 캐시에 리플 목록 업데이트
         updateRedisCache(trackToken, ssbTrackReplies);
-
         return ssbTrackReplies;
     }
 
@@ -154,35 +207,13 @@ public class TrackReplyService {
     }
 
     private void updateRedisCache(String trackToken, List<SsbTrackReply> ssbTrackReplies) {
-        Map<String, RedisTrackReplyDto> redisReplyMap = ssbTrackReplies.stream()
-            .collect(Collectors.toMap(SsbTrackReply::getToken, RedisTrackReplyDto::new));
-
+        Map<String, TrackRedisReplyDto> redisReplyMap = ssbTrackReplies.stream()
+            .collect(Collectors.toMap(SsbTrackReply::getToken, TrackRedisReplyDto::new));
         redisCacheService.upsertAllCacheMapValuesByKey(redisReplyMap, getReplyKey(trackToken));
     }
 
-    public List<SsbTrackReply> getReplyCacheFromOrDbByToken(String trackToken) {
-
-        TypeReference<HashMap<String, RedisTrackReplyDto>> typeReference = new TypeReference<>() {
-        };
-        HashMap<String, RedisTrackReplyDto> replyDataMap = redisCacheService.getData(trackToken, typeReference);
-        if (replyDataMap == null || replyDataMap.isEmpty()) {
-            return getTrackReplies(trackToken);
-        }
-
-
-        return null;
-    }
-
-
-    public int getTotalCount(long trackId, String trackToken) {
-        String key = getReplyKey(trackToken);
-        // redis 에 total 캐시가 있으면
-        int count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
-        // redis 에 저장이 안되어 있을경우 count 후 저장
-        if (count == 0) {
-
-        }
-        return count;
+    private String getReplyKey(String trackToken) {
+        return RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + trackToken;
     }
 
 

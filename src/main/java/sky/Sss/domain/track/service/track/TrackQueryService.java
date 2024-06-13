@@ -94,6 +94,7 @@ public class TrackQueryService {
 
     /**
      * 다중 검색 Redis에 없을 경우 DB로 가져온 뒤 저장
+     *
      * @param ids
      * @return
      */
@@ -181,6 +182,27 @@ public class TrackQueryService {
     }
 
 
+    /**
+     * 오너 여부 판단후 오너가 아닌경우 삭제
+     *
+     * @param ids
+     * @param user
+     * @param isStatus
+     * @return
+     */
+    public List<SsbTrack> searchTrackInfoByIds(Set<Long> ids, User user, Status isStatus) {
+        List<SsbTrack> tracks = getTrackListFromOrDbByIds(ids);
+        for (SsbTrack ssbTrack : tracks) {
+            boolean statusEq = !ssbTrack.getIsStatus().equals(isStatus.getValue());
+            boolean isOwner = ssbTrack.getUser().getToken().equals(user.getToken());
+            //  owner가 아닌데 비공개 인경우 혹은 Status가 일치하지 않는 경우 list에서 삭제
+            if (statusEq || (!isOwner && ssbTrack.getIsPrivacy())) {
+                tracks.remove(ssbTrack);
+            }
+        }
+        return tracks;
+    }
+
     public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, User user, Status isStatus) {
 
         List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);
@@ -205,18 +227,11 @@ public class TrackQueryService {
                 continue;
             }
             TrackInfoSimpleDto trackInfoSimpleDto = TrackInfoSimpleDto.create(ssbTrack);
-            TrackInfoSimpleDto.updateToken(trackInfoSimpleDto,token);
-            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto,isOwner);
+            TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, token);
+            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwner);
             simpleDtoList.add(trackInfoSimpleDto);
         }
         return simpleDtoList;
-    }
-
-    private HashMap<String, RedisTrackDto> getStringRedisTrackDtoHashMap() {
-        TypeReference<HashMap<String, RedisTrackDto>> typeReference = new TypeReference<>() {
-        };
-        return redisCacheService.getData(RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY,
-            typeReference);
     }
 
     public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, Status isStatus) {
@@ -232,7 +247,7 @@ public class TrackQueryService {
             }
             TrackInfoSimpleDto trackInfoSimpleDto = TrackInfoSimpleDto.create(ssbTrack);
             TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, null);
-            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto,false);
+            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, false);
             simpleDtoList.add(trackInfoSimpleDto);
         }
         return simpleDtoList;
@@ -250,8 +265,7 @@ public class TrackQueryService {
     }
 
     public SsbTrack findOneJoinUser(Long id, Status isStatus) {
-        SsbTrack findTrack = getTrackCacheFromOrDbByTrackId(id
-        );
+        SsbTrack findTrack = getTrackCacheFromOrDbByTrackId(id);
 
         if (findTrack == null || !findTrack.getIsStatus().equals(isStatus.getValue())) {
             throw new SsbFileNotFoundException();
@@ -285,6 +299,14 @@ public class TrackQueryService {
         }
         return new TargetInfoDto(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser(),
             ssbTrack.getIsPrivacy());
+    }
+
+
+    private HashMap<String, RedisTrackDto> getStringRedisTrackDtoHashMap() {
+        TypeReference<HashMap<String, RedisTrackDto>> typeReference = new TypeReference<>() {
+        };
+        return redisCacheService.getData(RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY,
+            typeReference);
     }
 
 }

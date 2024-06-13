@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
-import sky.Sss.domain.track.dto.playlist.reply.RedisPlyReplyDto;
-import sky.Sss.domain.track.dto.track.reply.RedisTrackReplyDto;
+import sky.Sss.domain.track.dto.playlist.reply.PlyRedisReplyDto;
+import sky.Sss.domain.track.dto.track.reply.TrackRedisReplyDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
@@ -57,7 +57,7 @@ public class PlyReplyService {
 
         String key = RedisKeyDto.REDIS_PLY_REPLY_MAP_KEY + ssbPlayListSettings.getToken();
 
-        redisCacheService.upsertCacheMapValueByKey(new RedisPlyReplyDto(ssbPlyReply), key, replyToken);
+        redisCacheService.upsertCacheMapValueByKey(new PlyRedisReplyDto(ssbPlyReply), key, replyToken);
 
     }
 
@@ -73,7 +73,7 @@ public class PlyReplyService {
         plyReplyRepository.delete(ssbPlyReply);
 
         String key = RedisKeyDto.REDIS_PLY_REPLY_MAP_KEY + SsbPlayListSettings.getToken();
-        redisCacheService.removeCacheMapValueByKey(new RedisTrackReplyDto(), key, ssbPlyReply.getToken());
+        redisCacheService.removeCacheMapValueByKey(new TrackRedisReplyDto(), key, ssbPlyReply.getToken());
     }
 
     /**
@@ -88,7 +88,7 @@ public class PlyReplyService {
         String key = RedisKeyDto.REDIS_PLY_REPLY_MAP_KEY + settingToken;
         // 캐쉬 삭제
         replyRmInfoDtoList.forEach(reply -> {
-            redisCacheService.removeCacheMapValueByKey(new RedisTrackReplyDto(), key, reply.getReplyToken());
+            redisCacheService.removeCacheMapValueByKey(new TrackRedisReplyDto(), key, reply.getReplyToken());
         });
     }
 

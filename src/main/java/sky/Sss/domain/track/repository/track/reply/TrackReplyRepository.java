@@ -2,11 +2,13 @@ package sky.Sss.domain.track.repository.track.reply;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.dto.common.TargetInfoDto;
 import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
+import sky.Sss.domain.track.dto.track.reply.TrackRedisReplyDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 
@@ -29,8 +31,14 @@ public interface TrackReplyRepository extends JpaRepository<SsbTrackReply, Long>
     List<SsbTrackReply> findListAndSubReplies(@Param("id") Long id, @Param("token") String token);
 
 
-    @Query("select r from SsbTrackReply r join fetch  r.ssbTrack where r.ssbTrack.token = :trackToken")
+    @Query("select r from SsbTrackReply r join fetch r.ssbTrack where r.ssbTrack.token = :trackToken")
     List<SsbTrackReply> getRepliesByTrackToken(@Param("trackToken") String trackToken);
+
+
+    @Query("select new sky.Sss.domain.track.dto.track.reply.TrackRedisReplyDto(r) from "
+        + "SsbTrackReply r join fetch r.ssbTrack where r.ssbTrack.token in (:tokens)")
+    List<TrackRedisReplyDto> getRepliesByTokens(@Param("tokens") Set<String> tokens);
+
 
     Optional<SsbTrackReply> findByIdAndSsbTrack(Long id, SsbTrack ssbTrack);
 
@@ -48,6 +56,9 @@ public interface TrackReplyRepository extends JpaRepository<SsbTrackReply, Long>
             + " on r.user.id = u.id "
             + " where r.id = :id and r.token =:token ")
     Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id, @Param("token") String token);
+
+
+
 
 
 //

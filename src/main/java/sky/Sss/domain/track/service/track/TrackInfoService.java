@@ -1,5 +1,6 @@
 package sky.Sss.domain.track.service.track;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,11 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.BaseSearchInfoDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.rep.TrackSearchInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.common.LikesCommonService;
+import sky.Sss.domain.track.service.common.ReplyCommonService;
 import sky.Sss.domain.track.service.common.RepostCommonService;
+import sky.Sss.domain.track.service.track.play.TrackAllPlayLogService;
 import sky.Sss.domain.track.service.track.reply.TrackReplyService;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
@@ -26,34 +30,37 @@ public class TrackInfoService {
 
 
     private final TrackQueryService trackQueryService;
-    private final TrackLikesService trackLikesService;
     private final LikesCommonService likesCommonService;
+    private final ReplyCommonService replyCommonService;
+    private final TrackAllPlayLogService trackAllPlayLogService;
     private final RepostCommonService repostCommonService;
-    private final TrackReplyService trackReplyService;
-    private final RedisQueryService redisQueryService;
 
     /**
-     *
      * 트랙 정보 및 좋아요수,댓글수,repost,재생 수 반환
-     * @param trackIds
+     *
+     * @param ids
      * @param user
      * @return
      */
-    public List<TrackSearchInfoDto> getTrackSearchInfoDtoList(Set<Long> trackIds, User user){
-        List<SsbTrack> ssbTrackList = trackQueryService.getTrackListFromOrDbByIds(trackIds);
-        List<String> tokens = ssbTrackList.stream().map(SsbTrack::getToken).toList();
+    public List<TrackSearchInfoDto> getTrackSearchInfoDtoList(Set<Long> ids, User user) {
+
+        List<TrackSearchInfoDto> searchInfoList = new ArrayList<>();
+
+        List<SsbTrack> trackInfoSimpleDtoList = trackQueryService.searchTrackInfoByIds(ids, user,
+            Status.ON);
+        List<String> tokens = trackInfoSimpleDtoList.stream().map(SsbTrack::getToken).toList();
 
         // 좋아요 수 반환
-        Map<String, Integer> totalCountList = likesCommonService.getTotalCountList(tokens, ContentsType.TRACK);
+        Map<String, Integer> likeTotalMap = likesCommonService.getTotalCountList(tokens, ContentsType.TRACK);
 
         // 댓글 수
-
+        Map<String, Integer> replyTotalMap = replyCommonService.getTotalCountList(tokens, ContentsType.TRACK);
 
         // 재생 수
+        Map<String, Integer> playTotalMap = trackAllPlayLogService.getTotalCountList(tokens);
 
 
         // repost 수
-
 
         return null;
     }

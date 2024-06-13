@@ -95,6 +95,9 @@ public class UserPushMsgService {
                 //  작성자 추가
                 users.add(ownerUser);
             }
+            if (userTagSet.isEmpty()) {
+                return;
+            }
             users.addAll(userQueryService.findUsersByUserNames(userTagSet, Enabled.ENABLED));
 
             users.forEach(toUser -> {
@@ -104,7 +107,7 @@ public class UserPushMsgService {
                 this.sendOrCacheMessages(linkUrl, contents, toUser, userPushMessages);
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("sendPushToUserSet e.getMessage() = {}", e.getMessage());
         }
     }
 

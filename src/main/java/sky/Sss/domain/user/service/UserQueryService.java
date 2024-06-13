@@ -69,11 +69,11 @@ public class UserQueryService {
 
     public Set<User> findUsersByUserNames(Set<String> userNames, Enabled isEnabled)
         throws UsernameNotFoundException {
-        HashSet<User> users = new HashSet<>(getUserListFromCacheOrDB(userNames, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY));
+        Set<User> users = new HashSet<>(getUserListFromCacheOrDB(userNames, RedisKeyDto.REDIS_USER_NAMES_MAP_KEY));
         return users.stream()
             .filter(user -> user.getIsEnabled().equals(isEnabled.getValue())).
             collect(Collectors.collectingAndThen(Collectors.toSet(), list -> {
-                if (list.isEmpty()) {
+                if (!list.isEmpty()) {
                     throw new UserInfoNotFoundException("userId.notFind");
                 }
                 return list;
@@ -92,8 +92,6 @@ public class UserQueryService {
                 return list;
             }));
     }
-
-
 
     public User findOne() {
         Authentication authentication = getAuthentication();
@@ -156,6 +154,8 @@ public class UserQueryService {
             RedisUserDto.class, tokens,
             RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
 
+
+        //
         if (redisDataListDto.getResult().isEmpty()) {
             return fetchAllAndSetSubKeyRedisBySubKey(subKeyList, redisUidMapKey);
         }

@@ -115,17 +115,16 @@ public class LikesCommonService {
 
         try {
             // 같은 사용자 인지 확인
-            if (!isOwner) {
-                // userPushMessages Table insert
-                userPushMsgService.addUserPushMsg(userPushMessages);
-                // push messages
-                userPushMsgService.sendOrCacheMessages(linkUrl.toString(),
-                    likeTargetInfoDto.getTargetContents(),
-                    toUser,
-                    userPushMessages);
-            }
+            // userPushMessages Table insert
+            userPushMsgService.addUserPushMsg(userPushMessages);
+            // push messages
+            userPushMsgService.sendOrCacheMessages(linkUrl.toString(),
+                likeTargetInfoDto.getTargetContents(),
+                toUser,
+                userPushMessages);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.info("ex.getMessage() = {}", ex.getMessage());
+
         }
         // Redis 알림 리스트에 추가
         return new TotalCountRepDto(totalLikesCount);
@@ -285,7 +284,7 @@ public class LikesCommonService {
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 map 형태로 반환
     public Map<String, Integer> getTotalCountList(List<String> tokens, ContentsType contentsType) {
 
-        int count = 0;
+        int count;
         TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
         };
         RedisDataListDto<HashMap<String, UserSimpleInfoDto>> dataList = redisCacheService.getDataList(tokens,
@@ -304,8 +303,9 @@ public class LikesCommonService {
                 count = simpleInfoDtoHashMap.size();
             }
             countMap.put(trackToken, count);
-
         }
+
+
 
         // redis에 트랙 좋아요 수가 다 있을경우 그대로 반환
         if (dataList.getMissingKeys().isEmpty()) {
@@ -320,7 +320,6 @@ public class LikesCommonService {
             likeSimpleList.addAll(trackLikesService.getLikeSimpleListByTokens(
                 dataList.getMissingKeys()));
         }
-
         // DB에서 탐색한 좋아요 수 저장
         if (!likeSimpleList.isEmpty()) {
             Map<String, Map<String, UserSimpleInfoDto>> findMap = likeSimpleList.stream()

@@ -44,7 +44,8 @@ public class PlyTagLinkRepositoryImpl implements JdbcRepository<SsbPlayListTagLi
             // 테스트 도중 Redis 와 DB 사이에 태그 데이터 차이가 날 경우
             // 외래키 제약조건 예외 발생 처리
             redisQueryService.delete(RedisKeyDto.REDIS_TAGS_KEY);
-            e.printStackTrace();
+            log.info("e.getMessage() = {}", e.getMessage());
+            
         }
     }
 
