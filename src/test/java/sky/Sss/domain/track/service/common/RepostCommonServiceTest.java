@@ -42,7 +42,7 @@ class RepostCommonServiceTest {
         keys.add("ebb90c922de3f3082dc8");
 
         // when
-        Map<String, Integer> totalCountMap = repostCommonService.getTotalCountList(keys,
+        Map<String, Integer> totalCountMap = repostCommonService.getTotalCountMap(keys,
             ContentsType.TRACK);
         // then
         for (String key : totalCountMap.keySet()) {

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.rep.TrackSearchInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.common.LikesCommonService;
@@ -38,13 +39,12 @@ public class TrackInfoService {
      * @param user
      * @return
      */
-    public List<TrackSearchInfoDto> getTrackSearchInfoDtoList(Set<Long> ids, User user) {
-
+    public List<TrackSearchInfoDto> getTrackSearchInfoList(Set<Long> ids, User user) {
         List<TrackSearchInfoDto> searchInfoList = new ArrayList<>();
 
-        List<SsbTrack> trackInfoSimpleDtoList = trackQueryService.searchTrackInfoByIds(ids, user,
+        List<SsbTrack> trackInfoList = trackQueryService.searchTrackInfoByIds(ids, user,
             Status.ON);
-        List<String> tokens = trackInfoSimpleDtoList.stream().map(SsbTrack::getToken).toList();
+        List<String> tokens = trackInfoList.stream().map(SsbTrack::getToken).toList();
 
         // 좋아요 수 반환
         Map<String, Integer> likeTotalMap = likesCommonService.getTotalCountMap(tokens, ContentsType.TRACK);
@@ -56,13 +56,27 @@ public class TrackInfoService {
         Map<String, Integer> playTotalMap = trackAllPlayLogService.getTotalCountMap(tokens);
 
         // repost 수
-        Map<String, Integer> totalCountMap = repostCommonService.getTotalCountMap(tokens, ContentsType.TRACK);
+        Map<String, Integer> repostTotalMap = repostCommonService.getTotalCountMap(tokens, ContentsType.TRACK);
 
+        for (SsbTrack track : trackInfoList) {
+            String token = track.getToken();
+            int likeCount = likeTotalMap.get(token);
+            int replyCount = replyTotalMap.get(token);
+            int playCount = playTotalMap.get(token);
+            int repostCount = repostTotalMap.get(token);
 
+            TrackInfoSimpleDto trackInfoSimpleDto = TrackInfoSimpleDto.create(track);
 
-
-        
-        return null;
+            boolean isOwner = user.getToken().equals(track.getUser().getToken());
+            TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwner);
+            // owner 일경우
+            if (isOwner) {
+                TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, token);
+            }
+            searchInfoList.add(
+                new TrackSearchInfoDto(trackInfoSimpleDto, likeCount, replyCount, repostCount, playCount));
+        }
+        return searchInfoList;
     }
 
 

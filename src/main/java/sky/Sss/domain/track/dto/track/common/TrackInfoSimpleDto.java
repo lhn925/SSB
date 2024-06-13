@@ -30,10 +30,9 @@ public class TrackInfoSimpleDto {
     private String coverUrl;
     private Boolean isPrivacy;
 
-    private Boolean isOwner;
-
     private LocalDateTime createdDateTime;
 
+    private Boolean isOwner;
     private UserProfileRepDto postUser;
 
 //    public TrackInfoSimpleDto(

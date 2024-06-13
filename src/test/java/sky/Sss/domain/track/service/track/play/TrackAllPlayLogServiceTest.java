@@ -43,7 +43,7 @@ class TrackAllPlayLogServiceTest {
         keys.add("0aac203d6b51f3840d40");
         keys.add("22d182fe5d2d9b09667b");
         keys.add("ebb90c922de3f3082dc8");
-        Map<String, Integer> totalCountList = trackAllPlayLogService.getTotalCountList(keys);
+        Map<String, Integer> totalCountList = trackAllPlayLogService.getTotalCountMap(keys);
         for (String s : totalCountList.keySet()) {
             Integer integer = totalCountList.get(s);
             System.out.println("token = " + s);
