@@ -1,13 +1,12 @@
-package sky.Sss.domain.track.dto;
+package sky.Sss.domain.track.dto.track.req;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
+import sky.Sss.domain.track.dto.tag.rep.TrackTagsDto;
 import sky.Sss.global.utili.validation.regex.RegexPatterns;
 
 @Getter

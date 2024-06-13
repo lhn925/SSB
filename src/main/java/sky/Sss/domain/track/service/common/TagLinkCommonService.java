@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTagLink;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackTagLink;
@@ -18,8 +16,6 @@ import sky.Sss.domain.track.repository.playList.PlayListTagLinkRepository;
 import sky.Sss.domain.track.repository.playList.PlyTagLinkRepositoryImpl;
 import sky.Sss.domain.track.repository.track.TrackTagLinkRepository;
 import sky.Sss.domain.track.repository.track.TrackTagLinkRepositoryImpl;
-import sky.Sss.domain.track.service.track.TrackTagService;
-import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisQueryService;
 
 @Slf4j

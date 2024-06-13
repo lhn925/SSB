@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.tag;
+package sky.Sss.domain.track.dto.tag.rep;
 
 
 import jakarta.validation.constraints.Pattern;

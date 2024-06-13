@@ -13,7 +13,7 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
+import sky.Sss.domain.track.dto.tag.rep.TrackTagsDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Component

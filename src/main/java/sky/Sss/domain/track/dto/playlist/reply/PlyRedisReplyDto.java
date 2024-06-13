@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.track.redis.BaseRedisReplyDto;
+import sky.Sss.domain.track.dto.common.BaseRedisReplyDto;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 
 @Getter

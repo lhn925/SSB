@@ -1,9 +1,10 @@
-package sky.Sss.domain.track.dto.temp;
+package sky.Sss.domain.track.dto.temp.req;
 
 
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import sky.Sss.domain.track.dto.temp.req.TempTrackDeleteDto;
 
 @Getter
 @Setter

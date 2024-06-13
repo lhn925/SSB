@@ -19,12 +19,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import sky.Sss.domain.track.dto.temp.TempTrackInfoDto;
+import sky.Sss.domain.track.dto.temp.rep.TempTrackInfoDto;
 import sky.Sss.domain.track.dto.playlist.req.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.track.req.TrackInfoSaveReqDto;
 import sky.Sss.domain.track.dto.playlist.req.PlayListSettingSaveDto;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
-import sky.Sss.domain.track.dto.temp.TempTrackFileUploadDto;
+import sky.Sss.domain.track.dto.tag.rep.TrackTagsDto;
+import sky.Sss.domain.track.dto.temp.req.TempTrackFileUploadDto;
 import sky.Sss.domain.track.model.SubMusicGenre;
 import sky.Sss.domain.track.service.temp.TempTrackStorageService;
 import sky.Sss.domain.track.service.track.TrackService;

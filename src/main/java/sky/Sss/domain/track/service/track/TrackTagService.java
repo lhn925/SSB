@@ -10,15 +10,11 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.data.domain.Range;
-import org.springframework.data.redis.connection.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.tag.TrackTagsDto;
+import sky.Sss.domain.track.dto.tag.rep.TrackTagsDto;
 import sky.Sss.domain.track.entity.track.SsbTrackTags;
 import sky.Sss.domain.track.repository.track.TrackTagRepositoryImpl;
-import sky.Sss.global.redis.dto.RedisKeyDto;
-import sky.Sss.global.redis.service.RedisQueryService;
 import sky.Sss.global.redis.service.RedisTagService;
 
 

@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.track.redis;
+package sky.Sss.domain.track.dto.common;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
