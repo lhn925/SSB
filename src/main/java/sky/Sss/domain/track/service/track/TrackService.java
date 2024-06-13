@@ -507,16 +507,27 @@ public class TrackService {
     public void deleteTrack(Long id, String token) {
         User user = userQueryService.findOne();
         // 여기
-        SsbTrack ssbTrack =  getEntityTrack(id, token, user, Status.ON);
+        SsbTrack ssbTrack = getEntityTrack(id, token, user, Status.ON);
 
         // Feed 삭제
         feedService.deleteFeed(user, ssbTrack.getId(), ContentsType.TRACK);
 
-        // repost 삭제
+        // tagLink 삭제
         tagLinkCommonService.deleteTagLinksInBatch(ssbTrack.getTags());
 
         // 캐시삭제
         redisCacheService.delete(RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY + "::" + user.getUserId());
+
+        redisCacheService.delete(RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + ssbTrack.getToken());
+        redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPOST_MAP_KEY + ssbTrack.getToken());
+        redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken());
+        redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPLY_LIKES_MAP_KEY + ssbTrack.getToken());
+        redisCacheService.delete(RedisKeyDto.REDIS_TRACK_PLAY_LOG_MAP_KEY + ssbTrack.getToken());
+        /**
+         *
+         * Repost 삭제
+         * like 삭제
+         */
         SsbTrack.deleteTrackFile(ssbTrack, fileStore);
         SsbTrack.changeStatus(ssbTrack, Status.OFF);
         trackQueryService.setTrackIdInRedis(RedisTrackDto.create(ssbTrack));

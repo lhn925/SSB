@@ -79,6 +79,7 @@ public class TrackAllPlayLogService {
     public RedisPlayLogDto getPlayDto(long trackId, String playToken) {
         RedisPlayLogDto redisPlayLogDto = redisCacheService.getCacheMapValueBySubKey(RedisPlayLogDto.class, playToken,
             RedisKeyDto.REDIS_PLAY_LOG_DTO_MAP_KEY);
+
         if (redisPlayLogDto == null || redisPlayLogDto.getTrackId() != trackId) {
             return RedisPlayLogDto.create(findOne(trackId, playToken));
         }
