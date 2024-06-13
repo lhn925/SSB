@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.dto.common.LikeSimpleInfoDto;
+import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.user.entity.User;
@@ -39,7 +39,7 @@ public interface TrackLikesRepository extends JpaRepository<SsbTrackLikes, Long>
     List<SsbTrackLikes> getLikeListByTokens(@Param("tokens") Set<String> tokens);
 
     @Query(
-        "select new sky.Sss.domain.track.dto.common.LikeSimpleInfoDto(t.token,u) from SsbTrackLikes s "
+        "select new sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto(t.token,u) from SsbTrackLikes s "
             + " join  User u "
             + " join SsbTrack t "
             + " on s.user = u and s.ssbTrack = t"

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.dto.common.RepostInfoDto;
+import sky.Sss.domain.track.dto.common.repost.RepostInfoDto;
 import sky.Sss.domain.track.entity.SsbRepost;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
@@ -33,13 +33,13 @@ public interface RepostRepository extends JpaRepository<SsbRepost, Long> {
     Optional<SsbRepost> findOne(@Param("id") long id, @Param("token") String token, @Param("user") User user);
 
     @Query(
-        "select new sky.Sss.domain.track.dto.common.RepostInfoDto(s.token,s.id,r) from SsbRepost r join SsbTrack s "
+        "select new sky.Sss.domain.track.dto.common.repost.RepostInfoDto(s.token,s.id,r) from SsbRepost r join SsbTrack s "
             + " on r.contentsId = s.id "
             + "where r.id = :id and r.token = :token and r.user = :user ")
     Optional<RepostInfoDto> findOneJoinType(@Param("id") long id, @Param("token") String token,
         @Param("user") User user);
 
-    @Query("select new sky.Sss.domain.track.dto.common.RepostInfoDto(s.token,s.id,r) from SsbRepost r join SsbPlayListSettings s on r.contentsId = s.id where r.id = :id and r.token = :token and r.user = :user ")
+    @Query("select new sky.Sss.domain.track.dto.common.repost.RepostInfoDto(s.token,s.id,r) from SsbRepost r join SsbPlayListSettings s on r.contentsId = s.id where r.id = :id and r.token = :token and r.user = :user ")
     Optional<RepostInfoDto> findOneJoinPlayList(@Param("id") long id, @Param("token") String token,
         @Param("user") User user);
 }

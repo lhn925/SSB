@@ -1,10 +1,11 @@
-package sky.Sss.domain.track.dto.common;
+package sky.Sss.domain.track.dto.track.rep;
 
 
 import static lombok.AccessLevel.PROTECTED;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
 

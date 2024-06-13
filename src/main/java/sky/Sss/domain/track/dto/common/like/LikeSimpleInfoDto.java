@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.common;
+package sky.Sss.domain.track.dto.common.like;
 
 
 import static lombok.AccessLevel.PRIVATE;

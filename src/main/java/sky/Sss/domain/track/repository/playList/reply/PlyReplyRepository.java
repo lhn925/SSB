@@ -5,15 +5,15 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.dto.common.TargetInfoDto;
-import sky.Sss.domain.track.dto.common.ReplyRmInfoDto;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
+import sky.Sss.domain.track.dto.common.reply.ReplyRmInfoDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 
 public interface PlyReplyRepository extends JpaRepository<SsbPlyReply, Long> {
 
 
-    @Query(" select new sky.Sss.domain.track.dto.common.ReplyRmInfoDto(r.id,r.token,r.user.id,s.id,s.token) "
+    @Query(" select new sky.Sss.domain.track.dto.common.reply.ReplyRmInfoDto(r.id,r.token,r.user.id,s.id,s.token) "
         + " from SsbPlyReply r join fetch SsbPlayListSettings s "
         + " on r.ssbPlayListSettings.id = s.id "
         + " where r.token = :token "
@@ -40,7 +40,7 @@ public interface PlyReplyRepository extends JpaRepository<SsbPlyReply, Long> {
 
 
     @Query(
-        "select new sky.Sss.domain.track.dto.common.TargetInfoDto(r.id,r.token,r.contents,r.user,r.ssbPlayListSettings.id) "
+        "select new sky.Sss.domain.track.dto.common.rep.TargetInfoDto(r.id,r.token,r.contents,r.user,r.ssbPlayListSettings.id) "
             + " from SsbPlyReply r join fetch User u "
             + " on r.user.id = u.id "
             + " where r.id = :id and r.token =:token ")

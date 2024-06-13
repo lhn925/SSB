@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.track.dto.common.BaseSearchInfoDto;
+import sky.Sss.domain.track.dto.common.rep.BaseSearchInfoDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 
 @Getter

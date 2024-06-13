@@ -2,9 +2,7 @@ package sky.Sss.domain.track.service.common;
 
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +15,9 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.common.LikeSimpleInfoDto;
-import sky.Sss.domain.track.dto.common.TargetInfoDto;
+import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
-import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;

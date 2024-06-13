@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.dto.common.TargetInfoDto;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.user.entity.User;
 
@@ -37,7 +37,7 @@ public interface PlyQueryRepository extends JpaRepository<SsbPlayListSettings, L
         @Param("isStatus") Boolean isStatus);
 
 
-    @Query("select new sky.Sss.domain.track.dto.common.TargetInfoDto(s.id,s.token,s.title,u,s.isPrivacy) from SsbPlayListSettings s "
+    @Query("select new sky.Sss.domain.track.dto.common.rep.TargetInfoDto(s.id,s.token,s.title,u,s.isPrivacy) from SsbPlayListSettings s "
         + "join fetch User u on s.user = u where s.id = :id and s.token =:token and s.isStatus =:isStatus")
     Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id, @Param("token") String token,
         @Param("isStatus") boolean isStatus);

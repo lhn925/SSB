@@ -8,19 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.common.BaseSearchInfoDto;
-import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.rep.TrackSearchInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.common.ReplyCommonService;
 import sky.Sss.domain.track.service.common.RepostCommonService;
 import sky.Sss.domain.track.service.track.play.TrackAllPlayLogService;
-import sky.Sss.domain.track.service.track.reply.TrackReplyService;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Status;
-import sky.Sss.global.redis.service.RedisQueryService;
 
 @Slf4j
 @RequiredArgsConstructor

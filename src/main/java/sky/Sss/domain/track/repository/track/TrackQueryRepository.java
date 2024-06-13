@@ -6,8 +6,7 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import sky.Sss.domain.track.dto.common.TargetInfoDto;
-import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
 
@@ -32,11 +31,11 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
 
     List<SsbTrack> findAllByIdInAndIsStatus(Set<Long> ids, Boolean isStatus);
 
-    @Query(
-        "select new sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto(s.id,s.token,s.title,u,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"
-            + " from SsbTrack s join fetch User u on s.user = u where s.id =:id and s.isStatus =:isStatus")
-    Optional<TrackInfoSimpleDto> getTrackInfoSimpleDto(@Param("id") Long id,
-        @Param("isStatus") boolean isStatus);
+//    @Query(
+//        "select new sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto(s.id,s.token,s.title,u,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"
+//            + " from SsbTrack s join fetch User u on s.user = u where s.id =:id and s.isStatus =:isStatus")
+//    Optional<TrackInfoSimpleDto> getTrackInfoSimpleDto(@Param("id") Long id,
+//        @Param("isStatus") boolean isStatus);
 
 
     /*
@@ -102,14 +101,14 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
         @Param("isStatus") boolean isStatus);
 
     @Query(
-        "select new sky.Sss.domain.track.dto.common.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "
+        "select new sky.Sss.domain.track.dto.common.rep.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "
             + " on s.user.id = u.id "
             + " where s.id = :id and s.token =:token and s.isStatus =:isStatus")
     Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id, @Param("token") String token,
         @Param("isStatus") boolean isStatus);
 
     @Query(
-        "select new sky.Sss.domain.track.dto.common.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "
+        "select new sky.Sss.domain.track.dto.common.rep.TargetInfoDto(s.id,s.token,s.title,s.user,s.isPrivacy) from SsbTrack s join fetch User u "
             + " on s.user.id = u.id "
             + " where s.id = :id and s.isStatus =:isStatus")
     Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id,

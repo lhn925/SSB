@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.common;
+package sky.Sss.domain.track.dto.common.reply;
 
 import java.time.LocalDateTime;
 import lombok.AccessLevel;

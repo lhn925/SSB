@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.common.TargetInfoDto;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
