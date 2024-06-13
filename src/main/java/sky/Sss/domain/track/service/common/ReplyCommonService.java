@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -163,33 +164,17 @@ public class ReplyCommonService {
         }
     }
     public Map<String, Integer>  getTotalCountList(List<String> tokens, ContentsType contentsType) {
-        int count;
-        TypeReference<HashMap<String, BaseRedisReplyDto>> typeReference = new TypeReference<>() {
-        };
-        RedisDataListDto<HashMap<String, BaseRedisReplyDto>> dataList =
-            redisCacheService.getDataList(tokens,
-            typeReference, contentsType.getReplyKey());
-
-
-        Map<String, HashMap<String, BaseRedisReplyDto>> replyMap = dataList.getResult();
         // 총 리플 수를 모을 맵
         Map<String, Integer> countMap = new HashMap<>();
+        List<BaseRedisReplyDto> baseRedisReplyList = new ArrayList<>();
 
-        // 레디스에 있는 좋아요 수 countMap 에 put
-        for (String targetToken : tokens) {
-            count = 0;
-            Map<String, BaseRedisReplyDto> simpleInfoDtoHashMap = replyMap.get(targetToken);
-            if (simpleInfoDtoHashMap != null) {
-                count = simpleInfoDtoHashMap.size();
-            }
-            countMap.put(targetToken, count);
-        }
+        RedisDataListDto<Map<String, BaseRedisReplyDto>> dataList = redisCacheService.fetchAndCountFromRedis(tokens, contentsType.getReplyKey(), countMap);
 
         // redis에 트랙 리플 수가 다 있을경우 그대로 반환
         if (dataList.getMissingKeys().isEmpty()) {
             return countMap;
         }
-        List<BaseRedisReplyDto> baseRedisReplyList = new ArrayList<>();
+
         // contentsType 에 따라 sql 쿼리 구분
         // 토큰 으로 리플 수 검색 후
         // map 으로 변경후 캐쉬에 저장하고 좋아요 map 담은 후 반환
@@ -209,10 +194,14 @@ public class ReplyCommonService {
             // 리플 총 갯수 저장
             for (String findKey : findMap.keySet()) {
                 Map<String, BaseRedisReplyDto> dtoMap = findMap.get(findKey);
-                redisCacheService.upsertAllCacheMapValuesByKey(dtoMap, contentsType.getReplyKey() + findKey);
                 countMap.put(findKey, dtoMap.size());
+                redisCacheService.upsertAllCacheMapValuesByKey(dtoMap, contentsType.getReplyKey() + findKey);
             }
         }
         return countMap;
     }
+
+
+
+
 }

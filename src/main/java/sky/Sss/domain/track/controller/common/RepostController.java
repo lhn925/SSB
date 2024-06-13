@@ -43,12 +43,8 @@ public class RepostController {
         if (bindingResult.hasErrors()) {
             throw new IllegalArgumentException();
         }
-
-        repostCommonService.addRepost(repostSaveReqDto);
         // repost 통합 갯수 전달
-        return ResponseEntity.ok(new TotalCountRepDto(
-            repostCommonService.getTotalCount(repostSaveReqDto.getTargetId(), repostSaveReqDto.getTargetToken(),
-                repostSaveReqDto.getContentsType())));
+        return ResponseEntity.ok(repostCommonService.addRepost(repostSaveReqDto));
     }
 
     /**

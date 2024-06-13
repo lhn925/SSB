@@ -28,7 +28,16 @@ public class RedisKeyDto {
     public static final String REDIS_TRACKS_INFO_MAP_KEY = "spring:tracks:info:map:";
     public static final String REDIS_TRACK_REPOST_MAP_KEY = "spring:track:repost:";
     public static final String REDIS_PLY_REPOST_MAP_KEY = "spring:ply:repost:";
+
+
+    public static final String REDIS_REPOST_IDS_INFO_MAP_KEY = "spring:repost:ids:";
+
+
     public static final String REDIS_PLY_REPLY_MAP_KEY = "spring:ply:reply:";
+
+
+
+
     public static final String REDIS_TRACK_REPLY_MAP_KEY = "spring:track:reply:";
     public static final String REDIS_TRACK_PLAY_LOG_MAP_KEY = "spring:track:play:log:";
     // 특정 유저가 팔로우 하고 있는 유저들의 목록

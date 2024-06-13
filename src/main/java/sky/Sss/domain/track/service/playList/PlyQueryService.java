@@ -49,4 +49,9 @@ public class PlyQueryService {
         return plyQueryRepository.getTargetInfoDto(id, token, isStatus.getValue())
             .orElseThrow(SsbFileNotFoundException::new);
     }
+
+    public TargetInfoDto getTargetInfoDto(long id,Status isStatus) {
+        return plyQueryRepository.getTargetInfoDto(id, isStatus.getValue())
+            .orElseThrow(SsbFileNotFoundException::new);
+    }
 }

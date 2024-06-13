@@ -42,4 +42,10 @@ public interface PlyQueryRepository extends JpaRepository<SsbPlayListSettings, L
     Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id, @Param("token") String token,
         @Param("isStatus") boolean isStatus);
 
+
+    @Query("select new sky.Sss.domain.track.dto.common.rep.TargetInfoDto(s.id,s.token,s.title,u,s.isPrivacy) from SsbPlayListSettings s "
+        + "join fetch User u on s.user = u where s.id = :id  and s.isStatus =:isStatus")
+    Optional<TargetInfoDto> getTargetInfoDto(@Param("id") long id,
+        @Param("isStatus") boolean isStatus);
+
 }

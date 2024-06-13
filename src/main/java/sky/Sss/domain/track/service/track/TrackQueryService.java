@@ -278,18 +278,6 @@ public class TrackQueryService {
         return trackQueryRepository.getTotalTrackLength(user, Status.ON.getValue());
     }
 
-    public TargetInfoDto getTargetInfoDto(long id, String token, Status isStatus) {
-        SsbTrack ssbTrack = getTrackCacheFromOrDbByTrackId(id
-        );
-
-        if (ssbTrack == null || !ssbTrack.getToken().equals(token) || !ssbTrack.getIsStatus()
-            .equals(isStatus.getValue())) {
-            throw new SsbFileNotFoundException();
-        }
-        return new TargetInfoDto(ssbTrack.getId(), ssbTrack.getToken(), ssbTrack.getTitle(), ssbTrack.getUser(),
-            ssbTrack.getIsPrivacy());
-    }
-
     public TargetInfoDto getTargetInfoDto(long id, Status isStatus) {
         SsbTrack ssbTrack = getTrackCacheFromOrDbByTrackId(id
         );

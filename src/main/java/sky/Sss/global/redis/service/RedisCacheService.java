@@ -42,8 +42,8 @@ public class RedisCacheService {
         return redisQueryService.getData(key, typeReference);
     }
 
-    public <T> RedisDataListDto<T> getDataList(List<String> keys, TypeReference<T> typeReference,String redisKeyDto) {
-        return redisQueryService.getDataList(keys, typeReference,redisKeyDto);
+    public <T> RedisDataListDto<T> getDataList(List<String> keys, TypeReference<T> typeReference, String redisKeyDto) {
+        return redisQueryService.getDataList(keys, typeReference, redisKeyDto);
     }
 
     public String getData(String key) {
@@ -326,6 +326,33 @@ public class RedisCacheService {
         }
         Object subKeyData = redisTrackMap.get(subKey);
         return objectMapper.convertValue(subKeyData, clazz);
+    }
+
+
+
+    // 레디스에서 데이터를 가져와서 카운트를 설정하는 기능
+    public <T> RedisDataListDto<Map<String, T>> fetchAndCountFromRedis(
+        List<String> tokens,
+        String redisKeyDto,
+
+        Map<String, Integer> countMap
+    ) {
+        int count;
+        TypeReference<Map<String, T>> typeReference = new TypeReference<>() {
+        };
+
+        RedisDataListDto<Map<String, T>> dataList = getDataList(tokens, typeReference, redisKeyDto);
+
+        // 레디스에 있는 좋아요 수 countMap 에 put
+        for (String targetToken : tokens) {
+            count = 0;
+            Map<String, T> simpleInfoDtoHashMap = dataList.getResult().get(targetToken);
+            if (simpleInfoDtoHashMap != null) {
+                count = simpleInfoDtoHashMap.size();
+            }
+            countMap.put(targetToken, count);
+        }
+        return dataList;
     }
 
 

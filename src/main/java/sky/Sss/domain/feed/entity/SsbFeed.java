@@ -25,7 +25,11 @@ import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.global.base.BaseTimeEntity;
 
-
+/**
+ *
+ * 트랙,플레이리스트,Repost 활동정보를 담는
+ * feedTable
+ */
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @Setter(AccessLevel.PRIVATE)
