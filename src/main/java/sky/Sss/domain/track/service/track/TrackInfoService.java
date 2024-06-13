@@ -47,20 +47,21 @@ public class TrackInfoService {
         List<String> tokens = trackInfoSimpleDtoList.stream().map(SsbTrack::getToken).toList();
 
         // 좋아요 수 반환
-        Map<String, Integer> likeTotalMap = likesCommonService.getTotalCountList(tokens, ContentsType.TRACK);
+        Map<String, Integer> likeTotalMap = likesCommonService.getTotalCountMap(tokens, ContentsType.TRACK);
 
         // 댓글 수
-        Map<String, Integer> replyTotalMap = replyCommonService.getTotalCountList(tokens, ContentsType.TRACK);
+        Map<String, Integer> replyTotalMap = replyCommonService.getTotalCountMap(tokens, ContentsType.TRACK);
 
         // 재생 수
-        Map<String, Integer> playTotalMap = trackAllPlayLogService.getTotalCountList(tokens);
+        Map<String, Integer> playTotalMap = trackAllPlayLogService.getTotalCountMap(tokens);
 
         // repost 수
+        Map<String, Integer> totalCountMap = repostCommonService.getTotalCountMap(tokens, ContentsType.TRACK);
 
 
 
 
-
+        
         return null;
     }
 

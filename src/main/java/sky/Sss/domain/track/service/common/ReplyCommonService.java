@@ -1,12 +1,10 @@
 package sky.Sss.domain.track.service.common;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -163,7 +161,7 @@ public class ReplyCommonService {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
     }
-    public Map<String, Integer>  getTotalCountList(List<String> tokens, ContentsType contentsType) {
+    public Map<String, Integer> getTotalCountMap(List<String> tokens, ContentsType contentsType) {
         // 총 리플 수를 모을 맵
         Map<String, Integer> countMap = new HashMap<>();
         List<BaseRedisReplyDto> baseRedisReplyList = new ArrayList<>();

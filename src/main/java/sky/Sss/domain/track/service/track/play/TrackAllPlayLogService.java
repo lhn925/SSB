@@ -102,7 +102,7 @@ public class TrackAllPlayLogService {
             ssbTrackAllPlayLogs.getToken());
     }
 
-    public Map<String, Integer> getTotalCountList(List<String> tokens) {
+    public Map<String, Integer> getTotalCountMap(List<String> tokens) {
         int count;
         TypeReference<HashMap<String, RedisPlayLogDto>> typeReference = new TypeReference<>() {
         };

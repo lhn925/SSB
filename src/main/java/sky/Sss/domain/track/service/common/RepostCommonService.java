@@ -180,7 +180,7 @@ public class RepostCommonService {
     }
 
 
-    public Map<String, Integer> getTotalCountList(List<String> tokens, ContentsType contentsType) {
+    public Map<String, Integer> getTotalCountMap(List<String> tokens, ContentsType contentsType) {
         Map<String, Integer> countMap = new HashMap<>();
         List<RepostSimpleInfoDto> simpleInfoDtos = new ArrayList<>();
 

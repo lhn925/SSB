@@ -66,7 +66,7 @@ class TrackReplyServiceTest {
         keys.add("22d182fe5d2d9b09667b");
         keys.add("ebb90c922de3f3082dc8");
 
-        Map<String, Integer> totalCountList = replyCommonService.getTotalCountList(keys, ContentsType.TRACK);
+        Map<String, Integer> totalCountList = replyCommonService.getTotalCountMap(keys, ContentsType.TRACK);
 
         for (String targetToken : totalCountList.keySet()) {
             Integer count = totalCountList.get(targetToken);

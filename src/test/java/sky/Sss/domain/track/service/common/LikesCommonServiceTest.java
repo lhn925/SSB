@@ -1,12 +1,8 @@
 package sky.Sss.domain.track.service.common;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +25,7 @@ class LikesCommonServiceTest {
         keys.add("ebb90c922de3f3082dc8");
 
         // when
-        Map<String, Integer> totalCountMap = likesCommonService.getTotalCountList(keys, ContentsType.TRACK);
+        Map<String, Integer> totalCountMap = likesCommonService.getTotalCountMap(keys, ContentsType.TRACK);
 
         // then
 

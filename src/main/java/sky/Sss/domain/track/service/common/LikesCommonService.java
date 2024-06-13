@@ -279,7 +279,7 @@ public class LikesCommonService {
 
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 map 형태로 반환
-    public Map<String, Integer> getTotalCountList(List<String> tokens, ContentsType contentsType) {
+    public Map<String, Integer> getTotalCountMap(List<String> tokens, ContentsType contentsType) {
 
         int count;
         TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
