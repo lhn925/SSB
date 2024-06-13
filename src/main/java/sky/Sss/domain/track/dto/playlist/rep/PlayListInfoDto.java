@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.playlist;
+package sky.Sss.domain.track.dto.playlist.rep;
 
 
 import static lombok.AccessLevel.PRIVATE;

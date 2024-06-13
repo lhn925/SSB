@@ -1,4 +1,4 @@
-package sky.Sss.domain.track.dto.playlist;
+package sky.Sss.domain.track.dto.playlist.req;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

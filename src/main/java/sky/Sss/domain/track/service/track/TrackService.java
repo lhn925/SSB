@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.domain.feed.entity.SsbFeed;
 import sky.Sss.domain.feed.service.FeedService;
 import sky.Sss.domain.track.dto.BaseTrackDto;
-import sky.Sss.domain.track.dto.playlist.PlayListTrackInfoReqDto;
+import sky.Sss.domain.track.dto.playlist.req.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
 import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;

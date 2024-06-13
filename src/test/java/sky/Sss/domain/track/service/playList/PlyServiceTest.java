@@ -1,6 +1,5 @@
 package sky.Sss.domain.track.service.playList;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import sky.Sss.domain.track.dto.playlist.PlayListTrackDeleteDto;
-import sky.Sss.domain.track.dto.playlist.PlayListTrackUpdateDto;
+import sky.Sss.domain.track.dto.playlist.req.PlayListTrackDeleteDto;
+import sky.Sss.domain.track.dto.playlist.req.PlayListTrackUpdateDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlayListTracks;
 import sky.Sss.domain.track.repository.playList.PlyTracksRepository;
