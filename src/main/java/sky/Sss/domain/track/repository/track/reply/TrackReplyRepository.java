@@ -16,7 +16,7 @@ public interface TrackReplyRepository extends JpaRepository<SsbTrackReply, Long>
 
 
     @Query(
-        "select new sky.Sss.domain.track.dto.common.ReplyRmInfoDto(r.id,r.token,r.user.id ,s.id,s.token) "
+        "select new sky.Sss.domain.track.dto.common.reply.ReplyRmInfoDto(r.id,r.token,r.user.id ,s.id,s.token) "
             + " from SsbTrackReply r join fetch SsbTrack s "
             + " on r.ssbTrack.id = s.id "
             + " where r.token = :token "
