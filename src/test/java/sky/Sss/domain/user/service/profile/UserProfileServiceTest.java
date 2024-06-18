@@ -4,8 +4,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto;
 import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto.targetInfo;
+import sky.Sss.domain.user.dto.rep.UserProfileHeaderDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
 
@@ -40,6 +42,26 @@ class UserProfileServiceTest {
         }
 
         System.out.println("recentLikedTracksWithCount.getTotalCount() = " + recentLikedTracksWithCount.getTotalCount());
+    }
+
+
+
+    @Test
+    public void getProfileHeaderByUserName () {
+        User user = userQueryService.findOne("lim2226");
+
+        String userName = user.getUserName();
+
+//        UserProfileHeaderDto headerByUserName = userProfileService.test("임하늘",user);
+//
+//        System.out.println("headerByUserName.getUid() = " + headerByUserName.getUid());
+//        System.out.println("headerByUserName.getUserName() = " + headerByUserName.getUserName());
+//        System.out.println("headerByUserName.getFollowerCount() = " + headerByUserName.getFollowerCount());
+//        System.out.println("headerByUserName.getFollowingCount() = " + headerByUserName.getFollowingCount());
+//
+//        System.out.println("headerByUserName.getTrackTotalCount() = " + headerByUserName.getTrackTotalCount());
+//        System.out.println("headerByUserName.getPictureUrl() = " + headerByUserName.getPictureUrl());
 
     }
+
 }

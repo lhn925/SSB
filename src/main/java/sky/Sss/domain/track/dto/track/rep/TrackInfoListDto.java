@@ -8,7 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sky.Sss.domain.user.dto.rep.UserDetailDto;
+import sky.Sss.domain.user.dto.rep.UserProfileHeaderDto;
 
 
 
@@ -20,9 +20,9 @@ public class TrackInfoListDto {
 
     private List<TrackDetailDto> tracks;
 
-    private List<UserDetailDto> users;
+    private List<UserProfileHeaderDto> users;
 
-    public TrackInfoListDto(List<TrackDetailDto> tracks, List<UserDetailDto> users) {
+    public TrackInfoListDto(List<TrackDetailDto> tracks, List<UserProfileHeaderDto> users) {
         this.tracks = tracks;
         this.users = users;
     }

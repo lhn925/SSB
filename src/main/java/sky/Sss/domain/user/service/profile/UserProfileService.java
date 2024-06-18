@@ -17,7 +17,7 @@ import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.track.TrackInfoService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
-import sky.Sss.domain.user.dto.rep.UserDetailDto;
+import sky.Sss.domain.user.dto.rep.UserProfileHeaderDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;
 import sky.Sss.domain.user.model.ContentsType;
@@ -52,9 +52,10 @@ public class UserProfileService {
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
             user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds);
     }
-
-
-    public void getUserProfileByUserName(String userName) {
+    /**
+     * 유저 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
+     */
+    public UserProfileHeaderDto getProfileHeaderByUserName(String userName) {
         // 본인 정보
         User user = userQueryService.findOne();
 
@@ -64,7 +65,6 @@ public class UserProfileService {
         boolean isMyProfile = user.getToken().equals(profileUser.getToken());
 
         // 내프로필이 아닐경우 팔로우 여부 확인
-
         int trackTotalCount = 0;
 
         // 총 Tracks 수 본인이 아닐시에는 비공개 트랙 제외
@@ -78,17 +78,20 @@ public class UserProfileService {
         List<UserFollows> userFollowingList = userFollowsService.getFollowingUsersFromCacheOrDB(profileUser);
         int totalFollowingCount = userFollowingList.size();
 
-        // 팔로윙 한 유저 최대 3명
-        if (totalFollowingCount > 0) {
-        }
-
         // 팔로워 유저 전부
         // 회원 닉네임
         // 회원 프로필 사진
         // 팔로워 리스트
         List<UserFollows> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
         int totalFollowerCount = userFollowsList.size();
+        return UserProfileHeaderDto.builder().uid(profileUser.getId())
+            .userName(profileUser.getUserName())
+            .followerCount(totalFollowerCount)
+            .followingCount(totalFollowingCount)
+            .trackTotalCount(trackTotalCount)
+            .pictureUrl(profileUser.getPictureUrl()).build();
     }
+
 
     /**
      * 가장 최근 좋아요한 트랙 3개 및 like 수
@@ -145,7 +148,7 @@ public class UserProfileService {
      *
      * @return
      */
-    public List<UserDetailDto> getUserSearchInfoList(Set<Long> userIds) {
+    public List<UserProfileHeaderDto> getUserSearchInfoList(Set<Long> userIds) {
 
         List<User> usersByIds = userQueryService.findUsersByIds(userIds, Enabled.ENABLED);
 
