@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
+import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReply;
 import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.track.repository.track.reply.TrackReplyLikesRepository;
@@ -107,6 +109,18 @@ public class TrackReplyLikesService {
         return trackReplyLikesRepository.findBySsbTrackReplyIdAndUser(
             replyId, user);
     }
+
+    public LikedRedisDto getLikedRedisDto(long trackId, User user) {
+        Optional<SsbTrackReplyLikes> oneAsOpt = findOneAsOpt(trackId, user);
+        if (oneAsOpt.isPresent()) {
+            SsbTrackReplyLikes ssbTrackReplyLikes = oneAsOpt.get();
+            return new LikedRedisDto(ssbTrackReplyLikes.getId(), ssbTrackReplyLikes.getSsbTrackReply().getId(),
+                ssbTrackReplyLikes.getUser().getId(), ssbTrackReplyLikes.getCreatedDateTime());
+        }
+        return null;
+    }
+
+
     /*
      */
 

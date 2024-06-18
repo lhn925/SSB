@@ -514,10 +514,9 @@ public class TrackService {
 
         // tagLink 삭제
         tagLinkCommonService.deleteTagLinksInBatch(ssbTrack.getTags());
-
+        
         // 캐시삭제
         redisCacheService.delete(RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY + "::" + user.getUserId());
-
         redisCacheService.delete(RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + ssbTrack.getToken());
         redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPOST_MAP_KEY + ssbTrack.getToken());
         redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken());

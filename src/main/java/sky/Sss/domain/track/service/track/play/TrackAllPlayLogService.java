@@ -19,7 +19,9 @@ import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.model.ChartStatus;
 import sky.Sss.domain.track.model.PlayStatus;
 import sky.Sss.domain.track.repository.track.play.TrackAllPlayLogRepository;
+import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Status;
 import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
@@ -35,6 +37,7 @@ public class TrackAllPlayLogService {
 
     private final TrackAllPlayLogRepository trackAllPlayLogRepository;
     private final RedisCacheService redisCacheService;
+    private final TrackQueryService trackQueryService;
 
     /**
      * "
@@ -77,9 +80,10 @@ public class TrackAllPlayLogService {
     }
 
     public RedisPlayLogDto getPlayDto(long trackId, String playToken) {
+        // 삭제처리
+        trackQueryService.findById(trackId, Status.ON);
         RedisPlayLogDto redisPlayLogDto = redisCacheService.getCacheMapValueBySubKey(RedisPlayLogDto.class, playToken,
             RedisKeyDto.REDIS_PLAY_LOG_DTO_MAP_KEY);
-
         if (redisPlayLogDto == null || redisPlayLogDto.getTrackId() != trackId) {
             return RedisPlayLogDto.create(findOne(trackId, playToken));
         }

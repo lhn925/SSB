@@ -16,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
+import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
@@ -80,13 +82,11 @@ public class LikesCommonService {
 
         // 같은 사용자인지 확인
         boolean isOwner = fromUser.getToken().equals(toUser.getToken());
-        if (isOwner) {
-            throw new IllegalArgumentException("code.error");
-        }
+
         boolean isLikeType = contentsType.equals(ContentsType.TRACK) || contentsType.equals(ContentsType.PLAYLIST);
 
-        // 트랙혹은 플레이리스트 like 인데 like 할려는 트랙이 비공개이며, 그리고 작성자가 본인것이 아닌 경우
-        if (isLikeType && likeTargetInfoDto.getIsPrivacy()) {
+        // 트랙 혹은 플레이리스트가 비공개이며 자신의 것이 아닐경우
+        if (isLikeType && likeTargetInfoDto.getIsPrivacy() && !isOwner) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
         long targetId = likeTargetInfoDto.getTargetId();
@@ -152,33 +152,39 @@ public class LikesCommonService {
             plyReplyLikesService.cancelLikes(targetId, targetToken, user);
         }
         // 유저 like 리스트 삭제
-        redisCacheService.removeCacheMapValueByKey(targetId, contentsType.getUserLikedKey() + user.getToken(),
+        redisCacheService.removeCacheMapValueByKey(new LikedRedisDto(),
+            contentsType.getUserLikedKey() + user.getToken(),
             String.valueOf(targetId));
     }
 
     private void addLikeAndType(ContentsType contentsType, User fromUser, long targetId, String targetToken) {
         boolean isLikes = existsLikes(targetToken, targetId, fromUser, contentsType);
+
+        LikedRedisDto likedRedisDto = null;
         if (isLikes) {
             // 좋아요가 있는지 확인
             // 좋아요가 이미 있는 경우 예외 처리
             throw new IllegalArgumentException();
         }
         if (contentsType.equals(ContentsType.TRACK)) {
-            trackLikesService.addLikes(targetId, targetToken, fromUser);
+            likedRedisDto = trackLikesService.addLikes(targetId, targetToken, fromUser);
         } else if (contentsType.equals(ContentsType.PLAYLIST)) {
-            plyLikesService.addLikes(targetId, targetToken, fromUser);
+            likedRedisDto = plyLikesService.addLikes(targetId, targetToken, fromUser);
         } else if (contentsType.equals(ContentsType.REPLY_TRACK)) {
             trackReplyLikesService.addLikes(targetId, targetToken, fromUser);
         } else {
             plyReplyLikesService.addLikes(targetId, targetToken, fromUser);
         }
-        cacheUserLikedAdd(contentsType, fromUser, targetId);
+        if (likedRedisDto != null) {
+            cacheUserLikedAdd(contentsType, fromUser, likedRedisDto);
+        }
     }
 
     // 유저가 좋아요한 목록 추가
-    private void cacheUserLikedAdd(ContentsType contentsType, User fromUser, long targetId) {
+    private void cacheUserLikedAdd(ContentsType contentsType, User fromUser, LikedRedisDto likedRedisDto) {
         redisCacheService.upsertCacheMapValueByKey(
-            targetId, contentsType.getUserLikedKey() + fromUser.getToken(), String.valueOf(targetId));
+            likedRedisDto, contentsType.getUserLikedKey() + fromUser.getToken(),
+            String.valueOf(likedRedisDto.getTargetId()));
     }
 
     /**
@@ -186,29 +192,30 @@ public class LikesCommonService {
      */
     public boolean existsLikes(String targetToken, long targetId, User user, ContentsType contentsType) {
 
-        boolean isExists = false;
+        boolean isExists;
         String key = contentsType.getLikeKey() + targetToken;
         // redis 에 있는지 확인
-        if (redisCacheService.hasRedis(key)) {
-            isExists = redisCacheService.existsBySubKey(user.getToken(), key);
-        }
+        isExists = redisCacheService.existsBySubKey(user.getToken(), key);
+
+
+        LikedRedisDto likedRedisDto;
         if (!isExists) {
             if (contentsType.equals(ContentsType.TRACK)) {
-                isExists = trackLikesService.findOneAsOpt(targetId, user).isPresent();
+                likedRedisDto = trackLikesService.getLikedRedisDto(targetId, user);
             } else if (contentsType.equals(ContentsType.PLAYLIST)) {
-                isExists = plyLikesService.findOneAsOpt(targetId, user).isPresent();
+                likedRedisDto = plyLikesService.getLikedRedisDto(targetId, user);
             } else if (contentsType.equals(ContentsType.REPLY_TRACK)) {
-                isExists = trackReplyLikesService.findOneAsOpt(targetId, user).isPresent();
+                likedRedisDto = trackReplyLikesService.getLikedRedisDto(targetId, user);
             } else {
-                isExists = plyReplyLikesService.findOneAsOpt(targetId, user).isPresent();
+                likedRedisDto = plyReplyLikesService.getLikedRedisDto(targetId, user);
             }
             // 만약 레디스에는 없고 디비에는 있으면
+            isExists = likedRedisDto != null;
             if (isExists) {
                 redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, user.getToken());
-                cacheUserLikedAdd(contentsType, user, targetId);
+                cacheUserLikedAdd(contentsType, user, likedRedisDto);
             }
         }
-
         return isExists;
     }
 
@@ -237,7 +244,7 @@ public class LikesCommonService {
     }
 
 
-    public List<Long> getUserLikedList(User user, ContentsType contentsType) {
+    public List<Long> getLikeTrackIds(User user, ContentsType contentsType) {
         TypeReference<HashMap<String, Long>> typeReference = new TypeReference<>() {
         };
         Map<String, Long> data = redisCacheService.getData(contentsType.getUserLikedKey() + user.getToken(),
@@ -280,29 +287,11 @@ public class LikesCommonService {
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 map 형태로 반환
     public Map<String, Integer> getTotalCountMap(List<String> tokens, ContentsType contentsType) {
-
-        int count;
-        TypeReference<HashMap<String, UserSimpleInfoDto>> typeReference = new TypeReference<>() {
-        };
-        RedisDataListDto<HashMap<String, UserSimpleInfoDto>> dataList = redisCacheService.getDataList(tokens,
-            typeReference, contentsType.getLikeKey());
-
         // 총 like수를 모을 맵
         Map<String, Integer> countMap = new HashMap<>();
 
-        Map<String, HashMap<String, UserSimpleInfoDto>> likesMap = dataList.getResult();
-
-        // 레디스에 있는 좋아요 수 countMap 에 put
-        for (String trackToken : tokens) {
-            count = 0;
-            Map<String, UserSimpleInfoDto> simpleInfoDtoHashMap = likesMap.get(trackToken);
-            if (simpleInfoDtoHashMap != null) {
-                count = simpleInfoDtoHashMap.size();
-            }
-            countMap.put(trackToken, count);
-        }
-
-
+        RedisDataListDto<Map<String, UserSimpleInfoDto>> dataList = redisCacheService.fetchAndCountFromRedis(tokens,
+            contentsType.getLikeKey(), countMap);
 
         // redis에 트랙 좋아요 수가 다 있을경우 그대로 반환
         if (dataList.getMissingKeys().isEmpty()) {

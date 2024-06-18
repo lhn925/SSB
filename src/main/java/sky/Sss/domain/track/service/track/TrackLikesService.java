@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.repository.track.TrackLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
@@ -66,7 +67,7 @@ public class TrackLikesService {
         @CacheEvict(value = {RedisKeyDto.REDIS_USER_TRACK_LIKES_LIST_KEY}, key = "#user.userId")
     })
     @Transactional
-    public void addLikes(long id, String token, User user) {
+    public LikedRedisDto addLikes(long id, String token, User user) {
         // 저장
         SsbTrackLikes ssbTrackLikes = SsbTrackLikes.create(user);
 
@@ -82,6 +83,9 @@ public class TrackLikesService {
         // redis 좋아요 수 업로드
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, subUserKey);
+
+        return new LikedRedisDto(ssbTrackLikes.getId(), ssbTrackLikes.getSsbTrack().getId(),
+            ssbTrackLikes.getUser().getId(), ssbTrackLikes.getCreatedDateTime());
     }
 
     /**
@@ -112,21 +116,24 @@ public class TrackLikesService {
     }
 
     public Optional<SsbTrackLikes> findOneAsOpt(long trackId, User user) {
-//        RedisTrackDto redisTrackDto = redisCacheService.getCacheMapValueBySubKey(RedisTrackDto.class,
-//            String.valueOf(trackId),
-//            RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY);
+        return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
+    }
 
-//        if (redisTrackDto == null) {
-            return trackLikesRepository.findBySsbTrackIdAndUser(trackId, user);
-//        }
-//        User ownerUser = userQueryService.findOne(redisTrackDto.getUid(), Enabled.ENABLED);
-//        SsbTrack ssbTrack = SsbTrack.redisTrackDtoToSsbTrack(redisTrackDto, ownerUser);
-//        return getLikeCacheFromOrDbByToken(ssbTrack.getToken(), user);
+    public LikedRedisDto getLikedRedisDto(long trackId, User user) {
+
+        Optional<SsbTrackLikes> oneAsOpt = findOneAsOpt(trackId, user);
+        if (oneAsOpt.isPresent()) {
+            SsbTrackLikes ssbTrackLikes = oneAsOpt.get();
+            return new LikedRedisDto(ssbTrackLikes.getId(), ssbTrackLikes.getSsbTrack().getId(),
+                ssbTrackLikes.getUser().getId(), ssbTrackLikes.getCreatedDateTime());
+        }
+        return null;
     }
 
     public Optional<SsbTrackLikes> findOneAsOptByToken(String trackToken, User user) {
         return getLikeCacheFromOrDbByToken(trackToken, user);
     }
+
     /**
      * like 취소
      *
@@ -174,7 +181,7 @@ public class TrackLikesService {
 
 
     public List<Long> getUserLikedTrackIds(User user, Sort sort) {
-        return trackLikesRepository.getUserLikedTrackIds(user,sort);
+        return trackLikesRepository.getUserLikedTrackIds(user, sort);
     }
 
 

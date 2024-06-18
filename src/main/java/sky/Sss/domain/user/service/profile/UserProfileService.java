@@ -34,7 +34,7 @@ public class UserProfileService {
     public UserMyInfoDto getUserMyInfoDto() {
         User user = userQueryService.findOne();
 
-        List<Long> userLikedList = likesCommonService.getUserLikedList(user, ContentsType.TRACK);
+        List<Long> userLikedList = likesCommonService.getLikeTrackIds(user, ContentsType.TRACK);
 
         List<UserFollows> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
 
@@ -63,9 +63,14 @@ public class UserProfileService {
 
         Sort sort = Sort.by(Order.desc("id"));
 
+
         // 총 Tracks 수 본인이 아닐시에는 비공개 트랙 제외
-        // 좋아요한 트랙 총 3개
-        List<Long> userLikedTrackIds = likesCommonService.getUserLikedList(profileUser, ContentsType.TRACK);
+
+        // 좋아요한 트랙 최대 3개
+        // 비공개는 제외
+        // 좋아요 누른순으로 가져와야 되고
+        // 좋아요 총 갯수에 비공개 제외 해야하고
+        List<Long> userLikedTrackIds = likesCommonService.getLikeTrackIds(profileUser, ContentsType.TRACK);
         // 좋아요한 숫자
         int totalLikedTrackCount = userLikedTrackIds.size();
 
@@ -79,11 +84,16 @@ public class UserProfileService {
             int recentSize = Math.min(userLikedTrackIds.size(), 3);
             List<Long> ids = userLikedTrackIds.subList(0, recentSize);
 
-        }
 
-        // 팔로윙 한 사람 3명 총 수
+
+        }
+        // 팔로윙 한 유저 최대 3명
+
 
         // 가장 최근 댓글
+
+
+
         //
 
     }

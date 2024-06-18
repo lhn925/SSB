@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReply;
 import sky.Sss.domain.track.entity.playList.reply.SsbPlyReplyLikes;
+import sky.Sss.domain.track.entity.track.reply.SsbTrackReplyLikes;
 import sky.Sss.domain.track.repository.playList.reply.PlyReplyLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
@@ -99,6 +101,15 @@ public class PlyReplyLikesService {
      */
     public Optional<SsbPlyReplyLikes> findOneAsOpt(long replyId, User user) {
         return plyReplyLikesRepository.findBySsbPlyReplyIdAndUser(replyId, user);
+    }
+    public LikedRedisDto getLikedRedisDto(long trackId, User user) {
+        Optional<SsbPlyReplyLikes> oneAsOpt = findOneAsOpt(trackId, user);
+        if (oneAsOpt.isPresent()) {
+            SsbPlyReplyLikes ssbPlyReplyLikes = oneAsOpt.get();
+            return new LikedRedisDto(ssbPlyReplyLikes.getId(), ssbPlyReplyLikes.getSsbPlyReply().getId(),
+                ssbPlyReplyLikes.getUser().getId(), ssbPlyReplyLikes.getCreatedDateTime());
+        }
+        return null;
     }
 
     /**

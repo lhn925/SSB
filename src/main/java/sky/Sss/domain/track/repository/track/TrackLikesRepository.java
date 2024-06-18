@@ -24,7 +24,7 @@ public interface TrackLikesRepository extends JpaRepository<SsbTrackLikes, Long>
     Optional<SsbTrackLikes> findByLikeByTrackToken(@Param("trackToken") String trackToken, @Param("uid") long uid);
 
 
-    @Query("select s.id from SsbTrackLikes s where s.user = :user")
+    @Query("select s.ssbTrack.id from SsbTrackLikes s where s.user = :user")
     List<Long> getUserLikedTrackIds(@Param("user") User user, Sort sort);
 
     boolean existsBySsbTrackAndUser(SsbTrack ssbTrack, User user);

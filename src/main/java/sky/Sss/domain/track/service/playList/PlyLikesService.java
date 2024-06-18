@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.entity.playList.SsbPlayListSettings;
 import sky.Sss.domain.track.entity.playList.SsbPlyLikes;
+import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.repository.playList.PlyLikesRepository;
 import sky.Sss.domain.user.dto.UserSimpleInfoDto;
 import sky.Sss.domain.user.entity.User;
@@ -36,7 +38,7 @@ public class PlyLikesService {
      * Track 좋아요 추가
      */
     @Transactional
-    public void addLikes(Long id, String token, User user) {
+    public LikedRedisDto addLikes(Long id, String token, User user) {
         SsbPlyLikes ssbPlyLikes = SsbPlyLikes.create(user);
         SsbPlyLikes.updateSettings(ssbPlyLikes, id);
 
@@ -46,6 +48,9 @@ public class PlyLikesService {
         // likesMap 안에 들어갈 user 를 검색하는 key
         String subUserKey = ssbPlyLikes.getUser().getToken();
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(ssbPlyLikes.getUser()), key, subUserKey);
+
+        return new LikedRedisDto(ssbPlyLikes.getId(), ssbPlyLikes.getSsbPlayListSettings().getId(),
+            ssbPlyLikes.getUser().getId(), ssbPlyLikes.getCreatedDateTime());
     }
 
     /**
@@ -100,6 +105,18 @@ public class PlyLikesService {
         return plyLikesRepository.findBySettingsIdAndUser(plyId, user);
 
     }
+
+    public LikedRedisDto getLikedRedisDto(long trackId, User user) {
+
+        Optional<SsbPlyLikes> oneAsOpt = findOneAsOpt(trackId, user);
+        if (oneAsOpt.isPresent()) {
+            SsbPlyLikes ssbPlyLikes = oneAsOpt.get();
+            return new LikedRedisDto(ssbPlyLikes.getId(), ssbPlyLikes.getSsbPlayListSettings().getId(),
+                ssbPlyLikes.getUser().getId(), ssbPlyLikes.getCreatedDateTime());
+        }
+        return null;
+    }
+
 
     /**
      * like 취소
