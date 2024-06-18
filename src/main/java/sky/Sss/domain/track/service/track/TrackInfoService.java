@@ -9,7 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
-import sky.Sss.domain.track.dto.track.rep.TrackSearchInfoDto;
+import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
+import sky.Sss.domain.track.dto.track.rep.TrackInfoListDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.common.ReplyCommonService;
@@ -39,8 +40,8 @@ public class TrackInfoService {
      * @param user
      * @return
      */
-    public List<TrackSearchInfoDto> getTrackSearchInfoList(Set<Long> ids, User user) {
-        List<TrackSearchInfoDto> searchInfoList = new ArrayList<>();
+    public List<TrackDetailDto> getTrackInfoList(Set<Long> ids, User user) {
+        List<TrackDetailDto> detailDtoList = new ArrayList<>();
 
         List<SsbTrack> trackInfoList = trackQueryService.searchTrackInfoByIds(ids, user,
             Status.ON);
@@ -73,10 +74,10 @@ public class TrackInfoService {
             if (isOwner) {
                 TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, token);
             }
-            searchInfoList.add(
-                new TrackSearchInfoDto(trackInfoSimpleDto, likeCount, replyCount, repostCount, playCount));
+            detailDtoList.add(new TrackDetailDto(trackInfoSimpleDto, likeCount, replyCount, repostCount, playCount));
         }
-        return searchInfoList;
+
+        return detailDtoList;
     }
 
 

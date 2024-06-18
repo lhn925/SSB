@@ -1,12 +1,16 @@
 package sky.Sss.domain.track.service.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
+import sky.Sss.domain.track.entity.chart.SsbChartHourly;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -35,8 +39,9 @@ class LikesCommonServiceTest {
 
         // then
 
+        likeTrackIds.sort(Comparator.comparing(LikedRedisDto::getId).reversed());
         for (LikedRedisDto likedRedisDto : likeTrackIds) {
-            System.out.println("likeTrackId = " + likedRedisDto.getTargetId());
+            System.out.println("likeTrackId = " + likedRedisDto.getId());
         }
 
 

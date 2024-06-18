@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -144,6 +146,11 @@ public class TrackService {
 
 
     // 여기
+    @Caching(evict = {
+        @CacheEvict(value = RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, key = "#user.userId"),
+        @CacheEvict(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#user.userId"),
+        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#user.userId"),
+    })
     public SsbTrack getEntityTrack(Long id, String token, User user, Status isStatus) {
         return trackQueryService.getEntityTrack(id, token, user, isStatus);
     }
@@ -506,17 +513,17 @@ public class TrackService {
     @Transactional
     public void deleteTrack(Long id, String token) {
         User user = userQueryService.findOne();
+        removeTrack(id, token, user);
+    }
+    @Transactional
+    public void removeTrack(Long id, String token, User user) {
         // 여기
         SsbTrack ssbTrack = getEntityTrack(id, token, user, Status.ON);
-
         // Feed 삭제
         feedService.deleteFeed(user, ssbTrack.getId(), ContentsType.TRACK);
-
         // tagLink 삭제
         tagLinkCommonService.deleteTagLinksInBatch(ssbTrack.getTags());
-        
         // 캐시삭제
-        redisCacheService.delete(RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY + "::" + user.getUserId());
         redisCacheService.delete(RedisKeyDto.REDIS_TRACK_LIKES_MAP_KEY + ssbTrack.getToken());
         redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPOST_MAP_KEY + ssbTrack.getToken());
         redisCacheService.delete(RedisKeyDto.REDIS_TRACK_REPLY_MAP_KEY + ssbTrack.getToken());

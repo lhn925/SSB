@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,7 +28,14 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
 
     @Override
     @Transactional
-    @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#ssbTrackList[0].user.userId")
+
+
+    @Caching(evict = {
+        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#ssbTrackList[0].user.userId"),
+        @CacheEvict(value = RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, key = "#ssbTrackList[0].user.userId"),
+        @CacheEvict(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#ssbTrackList[0].user.userId")
+    })
+
     public void saveAll(List<SsbTrack> ssbTrackList, LocalDateTime createdDateTime) {
         jdbcTemplate.batchUpdate(
             "INSERT INTO ssb_track (cover_url, created_date_time, description, genre, is_download, is_privacy, is_status, "
@@ -58,7 +66,11 @@ public class TrackRepositoryImpl implements JdbcRepository<SsbTrack> {
 
     @Override
     @Transactional
-    @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#entity.user.userId")
+    @Caching(evict = {
+        @CacheEvict(value = {RedisKeyDto.REDIS_USER_TOTAL_LENGTH_MAP_KEY}, key = "#entity.user.userId"),
+        @CacheEvict(value = RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, key = "#entity.user.userId"),
+        @CacheEvict(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#entity.user.userId")
+    })
     public void save(SsbTrack entity) {
         trackJpaRepository.saveAndFlush(entity);
     }

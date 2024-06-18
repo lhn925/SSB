@@ -2,6 +2,7 @@ package sky.Sss.domain.track.dto.common.like;
 
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,4 +25,5 @@ public class LikedRedisDto {
         this.uid = uid;
         this.createdDateTime = createdDateTime;
     }
+    public static final Comparator<LikedRedisDto> BY_ID_ASCENDING = Comparator.comparing(LikedRedisDto::getId);
 }

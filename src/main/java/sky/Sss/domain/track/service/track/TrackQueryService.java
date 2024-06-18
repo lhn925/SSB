@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ public class TrackQueryService {
     private final TrackQueryRepository trackQueryRepository;
     private final RedisCacheService redisCacheService;
     private final UserQueryService userQueryService;
+
 
     public SsbTrack getEntityTrack(Long id, String token, User user, Status isStatus) {
         SsbTrack ssbTrack = fetchAndSetSubKeyRedisBySubKey(id);
@@ -204,7 +206,6 @@ public class TrackQueryService {
     }
 
 
-
     public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, User user, Status isStatus) {
 
         List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);
@@ -292,11 +293,23 @@ public class TrackQueryService {
     }
 
 
+    @Cacheable(value = RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, key = "#user.userId", cacheManager = "contentCacheManager")
+    public int getUserUploadCount(User user, Status isStatus) {
+        return trackQueryRepository.getUserUploadCount(user, isStatus.getValue());
+    }
+
+    @Cacheable(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#user.userId", cacheManager = "contentCacheManager")
+    public int getMyUploadCount(User user, Status isStatus) {
+        return trackQueryRepository.getMyUploadCount(user, isStatus.getValue());
+    }
+
+
     private HashMap<String, RedisTrackDto> getStringRedisTrackDtoHashMap() {
         TypeReference<HashMap<String, RedisTrackDto>> typeReference = new TypeReference<>() {
         };
         return redisCacheService.getData(RedisKeyDto.REDIS_TRACKS_INFO_MAP_KEY,
             typeReference);
     }
+
 
 }

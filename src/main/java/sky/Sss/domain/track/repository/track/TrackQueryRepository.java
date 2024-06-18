@@ -1,5 +1,6 @@
 package sky.Sss.domain.track.repository.track;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.user.entity.User;
+import sky.Sss.domain.user.model.Status;
 
 public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
 
@@ -30,6 +32,15 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
         @Param("isStatus") boolean isStatus);
 
     List<SsbTrack> findAllByIdInAndIsStatus(Set<Long> ids, Boolean isStatus);
+
+
+
+    @Query("select count(s.id) from SsbTrack s where s.user = :user and s.isStatus =:isStatus and s.isPrivacy = false")
+    Integer getUserUploadCount(@Param("user") User user,@Param("isStatus") boolean isStatus);
+
+
+    @Query("select count(s.id) from SsbTrack s where s.user = :user and s.isStatus =:isStatus ")
+    Integer getMyUploadCount(@Param("user") User user,@Param("isStatus") boolean isStatus);
 
 //    @Query(
 //        "select new sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto(s.id,s.token,s.title,u,s.trackLength,s.coverUrl,s.isPrivacy,s.createdDateTime)"

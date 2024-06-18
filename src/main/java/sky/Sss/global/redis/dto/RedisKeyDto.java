@@ -36,8 +36,6 @@ public class RedisKeyDto {
     public static final String REDIS_PLY_REPLY_MAP_KEY = "spring:ply:reply:";
 
 
-
-
     public static final String REDIS_TRACK_REPLY_MAP_KEY = "spring:track:reply:";
     public static final String REDIS_TRACK_PLAY_LOG_MAP_KEY = "spring:track:play:log:";
     // 특정 유저가 팔로우 하고 있는 유저들의 목록
@@ -46,8 +44,12 @@ public class RedisKeyDto {
     public static final String REDIS_USER_FOLLOWER_MAP_KEY = "spring:user:follower:";
     public static final String REDIS_PUSH_MSG_LIST_KEY = "spring:push:msg:list:";
     public static final String REDIS_USER_KEY = "USER_ID";
-    // 특정 유저가 팔로우 하는 있는 유저들의 총 합
+
     public static final String REDIS_USER_TOTAL_LENGTH_MAP_KEY = "spring:user:total:length";
+
+
+    public static final String REDIS_USER_TRACK_UPLOAD_COUNT = "spring:user:track:upload:count:";
+    public static final String REDIS_USER_MY_TRACK_UPLOAD_COUNT = "spring:user:my:track:upload:count:";
 
     public static final String REDIS_USER_TRACK_LIKES_LIST_KEY = "spring:user:track:likes:list";
 

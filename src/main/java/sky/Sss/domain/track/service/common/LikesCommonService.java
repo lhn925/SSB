@@ -252,9 +252,10 @@ public class LikesCommonService {
             contentsType.getUserLikedKey() + user.getToken(),
             typeReference);
 
+
         if (likedRedisMap != null && !likedRedisMap.isEmpty()) {
             // 비공개 및 status off 제외
-            return filterPrivateAndStatus(user, contentsType, likedRedisMap).values().stream().toList();
+            return new ArrayList<>(filterPrivateAndStatus(user, contentsType, likedRedisMap).values());
         }
 
         List<LikedRedisDto> likedRedisDtoList = new ArrayList<>();
@@ -274,7 +275,7 @@ public class LikesCommonService {
 
         redisCacheService.upsertAllCacheMapValuesByKey(redisDtoMap,
             contentsType.getUserLikedKey() + user.getToken());
-        return redisDtoMap.values().stream().toList();
+        return new ArrayList<>(redisDtoMap.values());
     }
 
 

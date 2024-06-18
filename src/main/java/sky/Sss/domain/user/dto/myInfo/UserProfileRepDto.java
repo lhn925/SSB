@@ -12,9 +12,7 @@ import sky.Sss.domain.user.entity.User;
 @NoArgsConstructor
 public class UserProfileRepDto {
     private Long id;
-    private String userName;
     public UserProfileRepDto(User user) {
         this.id = user.getId();
-        this.userName = user.getUserName();
     }
 }

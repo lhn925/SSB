@@ -10,13 +10,13 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
-public class BaseSearchInfoDto {
+public class BaseDetailDto {
 
     private Integer likeCount;
     private Integer replyCount;
     private Integer repostCount;
 
-    public BaseSearchInfoDto(Integer likeCount, Integer replyCount, Integer repostCount) {
+    public BaseDetailDto(Integer likeCount, Integer replyCount, Integer repostCount) {
         this.likeCount = likeCount;
         this.replyCount = replyCount;
         this.repostCount = repostCount;

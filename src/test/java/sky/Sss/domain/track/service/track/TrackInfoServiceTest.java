@@ -1,14 +1,12 @@
 package sky.Sss.domain.track.service.track;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.Sss.domain.track.dto.track.rep.TrackSearchInfoDto;
+import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -45,18 +43,18 @@ class TrackInfoServiceTest {
         ids.add(222L);
 
         // when
-        List<TrackSearchInfoDto> trackSearchInfoList = trackInfoService.getTrackSearchInfoList(ids, user);
+        List<TrackDetailDto> trackSearchInfoList = trackInfoService.getTrackInfoList(ids, user);
         // then
 
-        for (TrackSearchInfoDto trackSearchInfoDto : trackSearchInfoList) {
+        for (TrackDetailDto trackDetailDto : trackSearchInfoList) {
             System.out.println(" ===================== ===================== =====================");
-            System.out.println("trackSearchInfoDto.getTrackInfo().getId() = " + trackSearchInfoDto.getTrackInfo().getId());
-            System.out.println("trackSearchInfoDto.getTrackInfo().getToken() = " + trackSearchInfoDto.getTrackInfo().getToken());
-            System.out.println("trackSearchInfoDto.getTrackInfo().getTitle() = " + trackSearchInfoDto.getTrackInfo().getTitle());
-            System.out.println("trackSearchInfoDto.getPlayCount() = " + trackSearchInfoDto.getPlayCount());
-            System.out.println("trackSearchInfoDto.getLikeCount() = " + trackSearchInfoDto.getLikeCount());
-            System.out.println("trackSearchInfoDto.getReplyCount() = " + trackSearchInfoDto.getReplyCount());
-            System.out.println("trackSearchInfoDto.getRepostCount() = " + trackSearchInfoDto.getRepostCount());
+            System.out.println("trackDetailDto.getTrackInfo().getId() = " + trackDetailDto.getTrackInfo().getId());
+            System.out.println("trackDetailDto.getTrackInfo().getToken() = " + trackDetailDto.getTrackInfo().getToken());
+            System.out.println("trackDetailDto.getTrackInfo().getTitle() = " + trackDetailDto.getTrackInfo().getTitle());
+            System.out.println("trackDetailDto.getPlayCount() = " + trackDetailDto.getPlayCount());
+            System.out.println("trackDetailDto.getLikeCount() = " + trackDetailDto.getLikeCount());
+            System.out.println("trackDetailDto.getReplyCount() = " + trackDetailDto.getReplyCount());
+            System.out.println("trackDetailDto.getRepostCount() = " + trackDetailDto.getRepostCount());
         }
 
     }
