@@ -6,7 +6,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
+import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
+import sky.Sss.domain.user.service.UserQueryService;
 
 @SpringBootTest
 class LikesCommonServiceTest {
@@ -15,7 +18,29 @@ class LikesCommonServiceTest {
     @Autowired
     LikesCommonService likesCommonService;
 
+    @Autowired
+    UserQueryService userQueryService;
 
+
+
+
+    @Test
+    public void getLikeTrackIds() {
+
+        // given
+        User user = userQueryService.findOne("lim2226");
+
+        // when
+        List<LikedRedisDto> likeTrackIds = likesCommonService.getLikeTrackIds(user, ContentsType.TRACK);
+
+        // then
+
+        for (LikedRedisDto likedRedisDto : likeTrackIds) {
+            System.out.println("likeTrackId = " + likedRedisDto.getTargetId());
+        }
+
+
+    }
     @Test
     public void getCountList() {
         // given

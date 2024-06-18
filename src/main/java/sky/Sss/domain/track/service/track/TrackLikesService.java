@@ -180,7 +180,7 @@ public class TrackLikesService {
     }
 
 
-    public List<Long> getUserLikedTrackIds(User user, Sort sort) {
+    public List<LikedRedisDto> getLikedRedisDtoList(User user, Sort sort) {
         return trackLikesRepository.getUserLikedTrackIds(user, sort);
     }
 

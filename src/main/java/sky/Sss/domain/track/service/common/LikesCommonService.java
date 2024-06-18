@@ -7,9 +7,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bytedeco.javacpp.presets.opencv_core.Str;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
+import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
-import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
@@ -171,9 +173,9 @@ public class LikesCommonService {
         } else if (contentsType.equals(ContentsType.PLAYLIST)) {
             likedRedisDto = plyLikesService.addLikes(targetId, targetToken, fromUser);
         } else if (contentsType.equals(ContentsType.REPLY_TRACK)) {
-            trackReplyLikesService.addLikes(targetId, targetToken, fromUser);
+            likedRedisDto = trackReplyLikesService.addLikes(targetId, targetToken, fromUser);
         } else {
-            plyReplyLikesService.addLikes(targetId, targetToken, fromUser);
+            likedRedisDto = plyReplyLikesService.addLikes(targetId, targetToken, fromUser);
         }
         if (likedRedisDto != null) {
             cacheUserLikedAdd(contentsType, fromUser, likedRedisDto);
@@ -196,7 +198,6 @@ public class LikesCommonService {
         String key = contentsType.getLikeKey() + targetToken;
         // redis 에 있는지 확인
         isExists = redisCacheService.existsBySubKey(user.getToken(), key);
-
 
         LikedRedisDto likedRedisDto;
         if (!isExists) {
@@ -244,28 +245,56 @@ public class LikesCommonService {
     }
 
 
-    public List<Long> getLikeTrackIds(User user, ContentsType contentsType) {
-        TypeReference<HashMap<String, Long>> typeReference = new TypeReference<>() {
+    public List<LikedRedisDto> getLikeTrackIds(User user, ContentsType contentsType) {
+        TypeReference<Map<String, LikedRedisDto>> typeReference = new TypeReference<>() {
         };
-        Map<String, Long> data = redisCacheService.getData(contentsType.getUserLikedKey() + user.getToken(),
+        Map<String, LikedRedisDto> likedRedisMap = redisCacheService.getData(
+            contentsType.getUserLikedKey() + user.getToken(),
             typeReference);
-        List<Long> ids = new ArrayList<>();
-        if (data != null && !data.isEmpty()) {
-            ids.addAll(data.values().stream().toList());
-            ids.sort(Comparator.reverseOrder());
-            return ids;
+
+        if (likedRedisMap != null && !likedRedisMap.isEmpty()) {
+            // 비공개 및 status off 제외
+            return filterPrivateAndStatus(user, contentsType, likedRedisMap).values().stream().toList();
         }
+
+        List<LikedRedisDto> likedRedisDtoList = new ArrayList<>();
         switch (contentsType) {
             case TRACK -> {
-                ids.addAll(trackLikesService.getUserLikedTrackIds(user, Sort.by(Order.desc("id"))));
+                likedRedisDtoList.addAll(trackLikesService.getLikedRedisDtoList(user, Sort.by(Order.desc("id"))));
             }
         }
-        if (!ids.isEmpty()) {
-            Map<String, Long> collect = ids.stream().collect(Collectors.toMap(String::valueOf, id -> id));
-            redisCacheService.upsertAllCacheMapValuesByKey(collect, contentsType.getUserLikedKey() + user.getToken());
+        if (likedRedisDtoList.isEmpty()) {
+            return likedRedisDtoList;
         }
-        return ids;
+        //
+        Map<String, LikedRedisDto> filterMap = likedRedisDtoList.stream()
+            .collect(Collectors.toMap(key -> String.valueOf(key.getTargetId()), value -> value));
+        // 비공개 및 status off 제외
+        Map<String, LikedRedisDto> redisDtoMap = filterPrivateAndStatus(user, contentsType, filterMap);
+
+        redisCacheService.upsertAllCacheMapValuesByKey(redisDtoMap,
+            contentsType.getUserLikedKey() + user.getToken());
+        return redisDtoMap.values().stream().toList();
     }
+
+
+    // 비공개 및 status off 제외
+    private Map<String, LikedRedisDto> filterPrivateAndStatus(User user, ContentsType contentsType,
+        Map<String, LikedRedisDto> likedRedisDtoMap) {
+        Set<Long> setIds = likedRedisDtoMap.values().stream().map(LikedRedisDto::getTargetId)
+            .collect(Collectors.toSet());
+        List<String> ids = new ArrayList<>();
+        if (contentsType.equals(ContentsType.TRACK)) {
+            // 비공개 및 status off 제외
+            List<TrackInfoSimpleDto> trackInfoSimpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(
+                setIds, user, Status.ON);
+            ids.addAll(trackInfoSimpleDtoList.stream().map(dto -> String.valueOf(dto.getId())).toList());
+        }
+        return ids.stream()
+            .filter(likedRedisDtoMap::containsKey)
+            .collect(Collectors.toMap(id -> id, likedRedisDtoMap::get));
+    }
+
 
     // likes Total 레디스에서 검색 후 존재하지 않으면 DB 검색 후 반환 검색
     public int getTotalCount(String targetToken, ContentsType contentsType) {

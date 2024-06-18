@@ -9,8 +9,11 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.track.repository.track.TrackLikesRepository;
@@ -68,10 +71,18 @@ class TrackLikesServiceTest {
         List<SsbTrackLikes> ssbTrackLikes = trackLikesRepository.getLikeListByTokens(keys);
 
     }
+    @Test
+    public void getLikedRedisDtoList() {
 
+        User user = userQueryService.findOne("lim2226");
 
+        List<LikedRedisDto> dtoList = trackLikesService.getLikedRedisDtoList(user, Sort.by(Order.desc("id")));
 
+        for (LikedRedisDto likedRedisDto : dtoList) {
 
+            System.out.println("likedRedisDto = " + likedRedisDto);
+        }
+    }
     @Test
     public void getLikeSimpleListByTokens() {
 

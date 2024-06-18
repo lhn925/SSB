@@ -203,6 +203,8 @@ public class TrackQueryService {
         return tracks;
     }
 
+
+
     public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(Set<Long> ids, User user, Status isStatus) {
 
         List<SsbTrack> ssbTrackList = getTrackListFromOrDbByIds(ids);

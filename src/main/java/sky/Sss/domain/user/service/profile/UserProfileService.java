@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.track.TrackLikesService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
@@ -34,8 +35,10 @@ public class UserProfileService {
     public UserMyInfoDto getUserMyInfoDto() {
         User user = userQueryService.findOne();
 
-        List<Long> userLikedList = likesCommonService.getLikeTrackIds(user, ContentsType.TRACK);
+        List<LikedRedisDto> likeTrackIds = likesCommonService.getLikeTrackIds(user, ContentsType.TRACK);
 
+        // 좋아하는 트랙리스트
+        List<Long> userLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
         List<UserFollows> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
 
         List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(value -> value.getFollowerUser().getId())
@@ -70,9 +73,9 @@ public class UserProfileService {
         // 비공개는 제외
         // 좋아요 누른순으로 가져와야 되고
         // 좋아요 총 갯수에 비공개 제외 해야하고
-        List<Long> userLikedTrackIds = likesCommonService.getLikeTrackIds(profileUser, ContentsType.TRACK);
+        List<LikedRedisDto> likeTrackIds = likesCommonService.getLikeTrackIds(profileUser, ContentsType.TRACK);
         // 좋아요한 숫자
-        int totalLikedTrackCount = userLikedTrackIds.size();
+        int totalLikedTrackCount = likeTrackIds.size();
 
         // 트랙 정보 불러오기
         // like
@@ -81,9 +84,9 @@ public class UserProfileService {
         // reply 수
         if (totalLikedTrackCount > 0) {
             // 가장 최근 상위 3개
-            int recentSize = Math.min(userLikedTrackIds.size(), 3);
-            List<Long> ids = userLikedTrackIds.subList(0, recentSize);
 
+            
+            int recentSize = Math.min(likeTrackIds.size(), 3);
 
 
         }

@@ -36,7 +36,7 @@ public class PlyReplyLikesService {
      * Track 좋아요 추가
      */
     @Transactional
-    public void addLikes(long id, String token, User user) {
+    public LikedRedisDto addLikes(long id, String token, User user) {
         // 저장
         SsbPlyReplyLikes ssbPlyReplyLikes = SsbPlyReplyLikes.create(user);
 
@@ -53,6 +53,9 @@ public class PlyReplyLikesService {
 //        updateTotalCount(ssbTrack.getToken());
         // redis 에 저장
         redisCacheService.upsertCacheMapValueByKey(new UserSimpleInfoDto(user), key, subUserKey);
+
+        return new LikedRedisDto(ssbPlyReplyLikes.getId(), ssbPlyReplyLikes.getSsbPlyReply().getId(),
+            ssbPlyReplyLikes.getUser().getId(), ssbPlyReplyLikes.getCreatedDateTime());
     }
 
     /**

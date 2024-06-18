@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
+import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.entity.track.SsbTrackLikes;
 import sky.Sss.domain.user.entity.User;
@@ -24,8 +25,9 @@ public interface TrackLikesRepository extends JpaRepository<SsbTrackLikes, Long>
     Optional<SsbTrackLikes> findByLikeByTrackToken(@Param("trackToken") String trackToken, @Param("uid") long uid);
 
 
-    @Query("select s.ssbTrack.id from SsbTrackLikes s where s.user = :user")
-    List<Long> getUserLikedTrackIds(@Param("user") User user, Sort sort);
+    @Query("select new sky.Sss.domain.track.dto.common.like.LikedRedisDto(s.id,s.ssbTrack.id,s.user.id,s.createdDateTime) "
+        + "from SsbTrackLikes s where s.user = :user and s.ssbTrack.isStatus = true ")
+    List<LikedRedisDto> getUserLikedTrackIds(@Param("user") User user, Sort sort);
 
     boolean existsBySsbTrackAndUser(SsbTrack ssbTrack, User user);
 
