@@ -1,6 +1,7 @@
 package sky.Sss.domain.user.service.profile;
 
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -18,16 +19,16 @@ import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.track.TrackInfoService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
-import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
-import sky.Sss.domain.user.dto.rep.UserProfileHeaderDto;
+import sky.Sss.domain.user.dto.rep.UserProfileDto;
+import sky.Sss.domain.user.dto.rep.UserProfileDto.UserProfileDtoBuilder;
 import sky.Sss.domain.user.entity.User;
-import sky.Sss.domain.user.entity.UserFollows;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.follows.UserFollowsService;
+import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
 @Service
@@ -62,7 +63,7 @@ public class UserProfileService {
     }
 
 
-    public UserProfileHeaderDto getProfileHeaderByUserName(String userName) {
+    public UserProfileDto getProfileHeaderByUserName(String userName) {
         User profileUser = userQueryService.findByUserName(userName, Enabled.ENABLED);
         return getProfileHeader(profileUser);
     }
@@ -70,7 +71,7 @@ public class UserProfileService {
     /**
      * 유저 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
      */
-    public UserProfileHeaderDto getProfileHeader(User profileUser) {
+    public UserProfileDto getProfileHeader(User profileUser) {
         // 본인 정보
         User user = userQueryService.findOne();
         // 본인 프로필 여부
@@ -96,7 +97,7 @@ public class UserProfileService {
         // 팔로워 리스트
         List<RedisFollowsDto> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
         int totalFollowerCount = userFollowsList.size();
-        return UserProfileHeaderDto.builder().uid(profileUser.getId())
+        return UserProfileDto.builder().uid(profileUser.getId())
             .userName(profileUser.getUserName())
             .followerCount(totalFollowerCount)
             .followingCount(totalFollowingCount)
@@ -105,6 +106,52 @@ public class UserProfileService {
     }
 
 
+
+    /**
+     * 유저의 아이디 리스트 다중 검색 후 해당 유저아이디의 해당하는 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
+     */
+    public List<UserProfileDto> getUserInfoListByIds(Set<Long> uidList) {
+        List<User> users = userQueryService.findUsersByIds(uidList, Enabled.ENABLED);
+
+        List<String> tokens = users.stream().map(User::getToken).toList();
+
+        // 트랙 수
+        Map<String, TrackUploadCountDto> usersUploadCount = trackQueryService.getUsersUploadCount(users, Status.ON);
+
+        // 팔로워 수
+        Map<String, List<RedisFollowsDto>> followerMap = userFollowsService.getFollowMapFromCacheOrDBByType(
+            tokens, RedisKeyDto.REDIS_USER_FOLLOWER_MAP_KEY);
+
+        // 팔로잉 수
+        Map<String, List<RedisFollowsDto>> followingMap = userFollowsService.getFollowMapFromCacheOrDBByType(
+            tokens, RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY);
+
+        List<UserProfileDto> userProfileDtoList = new ArrayList<>();
+
+
+        for (User user : users) {
+            TrackUploadCountDto uploadCountDto = usersUploadCount.get(String.valueOf(user.getId()));
+
+            int trackTotalCount = Math.toIntExact(uploadCountDto.getTotalCount());
+
+            List<RedisFollowsDto> followerList = followerMap.get(user.getToken());
+
+            int followerCount = followerList != null ? followerList.size() : 0;
+
+            List<RedisFollowsDto> followingList = followingMap.get(user.getToken());
+
+            int followingCount = followingList != null ? followingList.size() : 0;
+            UserProfileDto userProfileDto = UserProfileDto.builder()
+                .userName(user.getUserName()).uid(user.getId())
+                .pictureUrl(user.getPictureUrl())
+                .trackTotalCount(trackTotalCount)
+                .followerCount(followerCount)
+                .followingCount(followingCount).build();
+            userProfileDtoList.add(userProfileDto);
+        }
+        return userProfileDtoList;
+
+    }
     /**
      * 가장 최근 좋아요한 트랙 3개 및 like 수
      *
@@ -160,7 +207,7 @@ public class UserProfileService {
      *
      * @return
      */
-    public List<UserProfileHeaderDto> getUserSearchInfoList(Set<Long> ids) {
+    public List<UserProfileDto> getUserSearchInfoList(Set<Long> ids) {
 
         List<User> usersByIds = userQueryService.findUsersByIds(ids, Enabled.ENABLED);
 

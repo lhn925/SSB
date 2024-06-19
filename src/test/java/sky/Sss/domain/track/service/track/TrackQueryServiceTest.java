@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,12 +62,10 @@ class TrackQueryServiceTest {
         users.add(user2);
         users.add(user3);
 
-        List<TrackUploadCountDto> usersUploadCount = trackQueryService.getUsersUploadCount(users, Status.ON);
+        Map<String, TrackUploadCountDto> usersUploadCount = trackQueryService.getUsersUploadCount(users, Status.ON);
 
-        for (TrackUploadCountDto uploadCountDto : usersUploadCount) {
-            System.out.println("uploadCountDto.getUid() = " + uploadCountDto.getUid());
-            System.out.println("uploadCountDto.getTotalCount() = " + uploadCountDto.getTotalCount());
-
+        for (String s : usersUploadCount.keySet()) {
+            System.out.println("s = " + s);
         }
     }
 

@@ -51,14 +51,12 @@ class UserQueryServiceTest {
 
         Set<Long> ids = new HashSet<>();
 
-        ids.add(22L);
-        ids.add(24L);
+        ids.add(1L);
+        ids.add(2L);
         ids.add(5437L);
-        List<User> byIds = userQueryRepository.findByIds(ids, Enabled.ENABLED());
+        List<User> byIds = userQueryService.findUsersByIds(ids, Enabled.ENABLED);
 
-        Set<String> collect = byIds.stream().map(User::getToken).collect(Collectors.toSet());
-        List<User> userListByTokens = userQueryService.getUserListByTokens(collect, Enabled.ENABLED);
-        System.out.println(userListByTokens.toString());
+        System.out.println("byIds.size() = " + byIds.size());
 
     }
 
@@ -105,6 +103,18 @@ class UserQueryServiceTest {
         RedisUserDto redisUserDTO = RedisUserDto.create(entityUser);
         setUserInfoDtoRedis(redisUserDTO);
         return entityUser;
+    }
+
+
+    @Test
+    public void findUsersByIds() {
+
+    // given
+
+    // when
+
+    // then
+
     }
 
     private void setUserInfoDtoRedis(RedisUserDto redisUserDTO) {

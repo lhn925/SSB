@@ -305,7 +305,9 @@ public class TrackQueryService {
         return trackQueryRepository.getUserUploadCount(user, isStatus.getValue());
     }
 
-    public List<TrackUploadCountDto> getUsersUploadCount(List<User> users, Status isStatus) {
+
+    // k:uid v:TrackUploadCountDto
+    public Map<String,TrackUploadCountDto> getUsersUploadCount(List<User> users, Status isStatus) {
         Set<String> ids = users.stream().map(user -> String.valueOf(user.getId())).collect(Collectors.toSet());
 
         // 개선된 getCachingData 메서드를 사용하여 캐시된 데이터 가져오기
@@ -313,7 +315,7 @@ public class TrackQueryService {
 
         // 캐쉬에 전부 있을 경우
         if (users.size() == cachingDataMap.size()) {
-            return new ArrayList<>(cachingDataMap.values());
+            return cachingDataMap;
         }
 
         // 캐시되지 않은 유저 ID 추출
@@ -331,7 +333,7 @@ public class TrackQueryService {
             cachingDataMap.putAll(newCachingMap);
         }
 
-        return new ArrayList<>(cachingDataMap.values());
+        return cachingDataMap;
     }
 
     @Cacheable(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#user.id", cacheManager = "contentCacheManager")
