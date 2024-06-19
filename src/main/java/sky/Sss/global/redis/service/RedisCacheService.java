@@ -280,6 +280,41 @@ public class RedisCacheService {
             };
             objectMap = getData(key, typeReference);
             objectMap.remove(subValueKey);
+
+        }
+        // hashMap -> jsonString 형태로 변환후
+        // redis 에 저장
+        // size 가 0 이면 자동으로 삭제
+        if (objectMap == null || objectMap.isEmpty()) {
+            redisQueryService.delete(key);
+        } else {
+            setData(key, objectMap);
+        }
+
+    }
+
+    /**
+     * key(String)
+     * value(hashMap)
+     * subValueKey 에 해당하는 값 삭제
+     *
+     * @param o
+     * @param key
+     * @param subValueKey
+     * @param <T>
+     */
+    // redis 에 caching 데이터 찾은 후 존재하지 않을 경우 등록
+    public <T> void removeCacheMapValuesByKey(T o, String key, List<String> subValueKey) {
+        Map<String, T> objectMap = null;
+        // redis 에 존재하는 경우
+        if (hasRedis(key)) { //
+            TypeReference<HashMap<String, T>> typeReference = new TypeReference<>() {
+            };
+            objectMap = getData(key, typeReference);
+            for (String subKey : subValueKey) {
+                objectMap.remove(subKey);
+            }
+
         }
         // hashMap -> jsonString 형태로 변환후
         // redis 에 저장
@@ -334,7 +369,6 @@ public class RedisCacheService {
     public <T> RedisDataListDto<Map<String, T>> fetchAndCountFromRedis(
         List<String> tokens,
         String redisKeyDto,
-
         Map<String, Integer> countMap
     ) {
         int count;
@@ -342,7 +376,6 @@ public class RedisCacheService {
         };
 
         RedisDataListDto<Map<String, T>> dataList = getDataList(tokens, typeReference, redisKeyDto);
-
         // 레디스에 있는 좋아요 수 countMap 에 put
         for (String targetToken : tokens) {
             count = 0;
@@ -350,7 +383,35 @@ public class RedisCacheService {
             if (simpleInfoDtoHashMap != null) {
                 count = simpleInfoDtoHashMap.size();
             }
-            countMap.put(targetToken, count);
+            if (countMap != null) {
+                countMap.put(targetToken, count);
+            }
+        }
+        return dataList;
+    }
+
+
+
+    public <T> RedisDataListDto<List<T>> fetchArrayAndCountFromRedis(
+        List<String> tokens,
+        String redisKeyDto,
+        Map<String, Integer> countMap
+    ) {
+        int count;
+        TypeReference<List<T>> typeReference = new TypeReference<>() {
+        };
+
+        RedisDataListDto<List<T>> dataList = getDataList(tokens, typeReference, redisKeyDto);
+        // 레디스에 있는 좋아요 수 countMap 에 put
+        for (String targetToken : tokens) {
+            count = 0;
+            List<T> dataArray = dataList.getResult().get(targetToken);
+            if (dataArray != null && !dataArray.isEmpty()) {
+                count = dataArray.size();
+            }
+            if (countMap != null) {
+                countMap.put(targetToken, count);
+            }
         }
         return dataList;
     }

@@ -19,6 +19,7 @@ import sky.Sss.domain.track.service.track.TrackInfoService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
+import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.domain.user.dto.rep.UserProfileHeaderDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;
@@ -47,12 +48,17 @@ public class UserProfileService {
 
         // 좋아하는 트랙리스트
         List<Long> userLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
-        List<UserFollows> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
+        List<RedisFollowsDto> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
+        List<RedisFollowsDto> followerUsersFromCacheOrDB = userFollowsService.getFollowersUsersFromCacheOrDB(user);
 
-        List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(value -> value.getFollowerUser().getId())
+        List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowingUid)
             .toList();
+        List<Long> followerIds = followerUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowerUid)
+            .toList();
+
+
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds);
+            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds,followerIds);
     }
 
 
@@ -81,14 +87,14 @@ public class UserProfileService {
         }
 
         // 팔로잉 리스트
-        List<UserFollows> userFollowingList = userFollowsService.getFollowingUsersFromCacheOrDB(profileUser);
+        List<RedisFollowsDto> userFollowingList = userFollowsService.getFollowingUsersFromCacheOrDB(profileUser);
         int totalFollowingCount = userFollowingList.size();
 
         // 팔로워 유저 전부
         // 회원 닉네임
         // 회원 프로필 사진
         // 팔로워 리스트
-        List<UserFollows> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
+        List<RedisFollowsDto> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
         int totalFollowerCount = userFollowsList.size();
         return UserProfileHeaderDto.builder().uid(profileUser.getId())
             .userName(profileUser.getUserName())

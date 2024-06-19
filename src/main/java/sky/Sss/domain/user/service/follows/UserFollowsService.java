@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import sky.Sss.domain.user.entity.UserFollows;
 import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.repository.follow.UserFollowsRepository;
 import sky.Sss.domain.user.service.UserQueryService;
+import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 import sky.Sss.global.redis.service.RedisCacheService;
 
@@ -144,14 +146,14 @@ public class UserFollowsService {
         // redis 에 total 캐시가 있으면
         count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
         if (count == 0) {
-            List<UserFollows> myFollowerUsers = getMyFollowerUsers(user);
+            List<RedisFollowsDto> myFollowerUsers = getMyFollowerUsers(user);
             count = myFollowerUsers.size();
         }
         return count;
     }
 
 
-    public List<UserFollows> getFollowersUsersFromCacheOrDB(User user) {
+    public List<RedisFollowsDto> getFollowersUsersFromCacheOrDB(User user) {
         String key = getUserFollowerListKey(user.getToken());
         TypeReference<Map<String, RedisFollowsDto>> typeReference = new TypeReference<>() {
         };
@@ -159,49 +161,98 @@ public class UserFollowsService {
         if (followersMap == null || followersMap.isEmpty()) {
             return getMyFollowerUsers(user);
         }
-        Map<String, User> followerUserMap = userQueryService.getUserListByTokens(followersMap.keySet(), Enabled.ENABLED)
-            .stream().collect(
-                Collectors.toMap(User::getToken, Function.identity()));
-        List<UserFollows> users = new ArrayList<>();
-        for (String follower : followersMap.keySet()) {
-            RedisFollowsDto redisFollowsDto = followersMap.get(follower);
-            // 팔로윙 유저 list에 추가
-            if (followerUserMap.containsKey(follower)) {
-                users.add(UserFollows.redisFollowsToUserFollow(redisFollowsDto, followerUserMap.get(follower), user));
-            } else { // DB에 검색되지않는  User redis 에서 삭제
-                redisCacheService.removeCacheMapValueByKey(new RedisFollowsDto(), key, follower);
-            }
-        }
-        return users;
+        enabledUserFilter(key, followersMap);
+        return followersMap.values().stream().toList();
     }
 
-    public List<UserFollows> getFollowingUsersFromCacheOrDB(User user) {
+    public List<RedisFollowsDto> getFollowingUsersFromCacheOrDB(User user) {
         String key = getUserFollowingListKey(user.getToken());
         TypeReference<Map<String, RedisFollowsDto>> typeReference = new TypeReference<>() {
         };
+
+        // redis에서 가져온 followingMap
         Map<String, RedisFollowsDto> followingMap = redisCacheService.getData(key, typeReference);
         if (followingMap == null || followingMap.isEmpty()) {
             return getMyFollowingUsers(user);
         }
 
-        Map<String, User> followingUserMap = userQueryService.getUserListByTokens(followingMap.keySet(),
+        enabledUserFilter(key, followingMap);
+        return followingMap.values().stream().toList();
+    }
+
+    /**
+     * DB에 검색 되지 않는 User 삭제
+     *
+     * @param key
+     * @param followMap
+     */
+    private void enabledUserFilter(String key, Map<String, RedisFollowsDto> followMap) {
+        Map<String, User> followingUserMap = userQueryService.getUserListByTokens(followMap.keySet(),
                 Enabled.ENABLED)
             .stream().collect(
                 Collectors.toMap(User::getToken, Function.identity()));
 
-        List<UserFollows> users = new ArrayList<>();
-        for (String followings : followingMap.keySet()) {
-            RedisFollowsDto redisFollowsDto = followingMap.get(followings);
-            // 팔로윙 유저 list에 추가
-            if (followingUserMap.containsKey(followings)) {
-                users.add(
-                    UserFollows.redisFollowsToUserFollow(redisFollowsDto, user, followingUserMap.get(followings)));
-            } else { // DB에 검색되지않는  User redis 에서 삭제
-                redisCacheService.removeCacheMapValueByKey(new RedisFollowsDto(), key, followings);
+        List<String> removeKey = new ArrayList<>();
+        for (String followings : followMap.keySet()) {
+            // DB에 검색되지않는  User redis 에서 삭제
+            if (!followingUserMap.containsKey(followings)) {
+                followMap.remove(followings);
+                removeKey.add(followings);
             }
         }
-        return users;
+        if (!removeKey.isEmpty()) {
+            redisCacheService.removeCacheMapValuesByKey(new RedisFollowsDto(), key, removeKey);
+        }
     }
+    // 유저들이 팔로우 하고 있는 map
+    // 유저토큰,FollowerList
+    public Map<String, List<RedisFollowsDto>> getFollowMapFromCacheOrDBByType(List<String> tokens, String redisKeyDto) {
+
+        Map<String, List<RedisFollowsDto>> userFollowsMap = new HashMap<>();
+        RedisDataListDto<Map<String, RedisFollowsDto>> mapRedisData = redisCacheService.fetchAndCountFromRedis(tokens,
+            redisKeyDto, null);
+
+        // 아예 없을 경우
+        if (mapRedisData.getResult().isEmpty()) {
+            return getStringListMapByType(tokens, redisKeyDto);
+
+        }
+        Map<String, Map<String, RedisFollowsDto>> result = mapRedisData.getResult();
+
+        for (String userToken : result.keySet()) {
+
+            Map<String, RedisFollowsDto> redisFollowsDtoMap = result.get(userToken);
+
+            // 검색되지 않은 회원 삭제
+            enabledUserFilter(redisKeyDto + userToken, redisFollowsDtoMap);
+
+            userFollowsMap.put(userToken, redisFollowsDtoMap.values().stream().toList());
+        }
+
+        // 찾고자하는 Key 가 없을 경우
+        if (mapRedisData.getMissingKeys().isEmpty()) {
+            return userFollowsMap;
+        }
+
+        Set<String> missingTokens = mapRedisData.getMissingKeys();
+
+        Map<String, List<RedisFollowsDto>> followUsersByTokens = getStringListMapByType(new ArrayList<>(missingTokens),
+            redisKeyDto);
+
+
+        userFollowsMap.putAll(followUsersByTokens);
+
+        return userFollowsMap;
+    }
+
+    private Map<String, List<RedisFollowsDto>> getStringListMapByType(List<String> tokens, String redisKeyDto) {
+        if (redisKeyDto.equals(RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY)) {
+            return getFollowingUsersByTokens(tokens);
+        } else {
+            return getFollowerUsersByTokens(tokens);
+        }
+    }
+
 
     public List<User> getFollowerListFromCacheOrDB(User user) {
         String key = getUserFollowerListKey(user.getToken());
@@ -222,7 +273,7 @@ public class UserFollowsService {
         count = redisCacheService.getTotalCountByKey(new HashMap<>(), key);
         // redis 에 저장이 안되어 있을경우 count 후 저장
         if (count == 0) {
-            List<UserFollows> myFollowingUsers = getMyFollowingUsers(user);
+            List<RedisFollowsDto> myFollowingUsers = getMyFollowingUsers(user);
             count = myFollowingUsers.size();
         }
         return count;
@@ -230,23 +281,86 @@ public class UserFollowsService {
 
 
     // 유저를 팔로우 하고 있는 총 유저 수 총합
-    public List<UserFollows> getMyFollowerUsers(User user) {
-        List<UserFollows> myFollowerUsers = userFollowRepository.getMyFollowerUsers(user);
-        Map<String, RedisFollowsDto> map = myFollowerUsers.stream().collect(
+    public List<RedisFollowsDto> getMyFollowerUsers(User user) {
+        List<UserFollows> myFollowerUsers = userFollowRepository.getMyFollowerUsers(user, Enabled.ENABLED());
+        Map<String, RedisFollowsDto> redisFollowsDtoMap = myFollowerUsers.stream().collect(
             Collectors.toMap(mapKey -> mapKey.getFollowerUser().getToken(),
                 RedisFollowsDto::create));
-        redisCacheService.upsertAllCacheMapValuesByKey(map, getUserFollowerListKey(user.getToken()));
-        return myFollowerUsers;
+        redisCacheService.upsertAllCacheMapValuesByKey(redisFollowsDtoMap, getUserFollowerListKey(user.getToken()));
+        return redisFollowsDtoMap.values().stream().toList();
     }
 
     // 유저가 총 팔로우 하고 있는 유저 수 총합
-    public List<UserFollows> getMyFollowingUsers(User user) {
-        List<UserFollows> myFollowingUsers = userFollowRepository.myFollowingUsers(user);
+    public List<RedisFollowsDto> getMyFollowingUsers(User user) {
+        List<UserFollows> myFollowingUsers = userFollowRepository.myFollowingUsers(user, Enabled.ENABLED());
         Map<String, RedisFollowsDto> map = myFollowingUsers.stream().collect(
             Collectors.toMap(mapKey -> mapKey.getFollowingUser().getToken(),
                 RedisFollowsDto::create));
         redisCacheService.upsertAllCacheMapValuesByKey(map, getUserFollowingListKey(user.getToken()));
-        return myFollowingUsers;
+        return map.values().stream().toList();
+    }
+
+    // 유저들이 팔로우 하고 있는 유저 검색
+    public Map<String, List<RedisFollowsDto>> getFollowingUsersByTokens(List<String> tokens) {
+        List<UserFollows> followingList = userFollowRepository.followingUsersByTokens(tokens, Enabled.ENABLED());
+        // Step 1: Create userFollowsMap
+        return setRedisFollowingMap(followingList);
+    }
+
+    // 유저들을 팔로우 하고 있는 유저 검색
+    public Map<String, List<RedisFollowsDto>> getFollowerUsersByTokens(List<String> tokens) {
+        List<UserFollows> followerList = userFollowRepository.followerUsersByTokens(tokens, Enabled.ENABLED());
+        return setRedisFollowerMap(followerList);
+    }
+
+
+    private Map<String, List<RedisFollowsDto>> setRedisFollowingMap(List<UserFollows> followingList) {
+        Map<String, List<UserFollows>> userFollowsMap = followingList.stream()
+            .collect(Collectors.groupingBy(key1 -> key1.getFollowerUser().getToken(),
+                Collectors.mapping(val -> val, Collectors.toList())));
+        // Step 2: Create userMap using userFollowsMap
+        Map<String, Map<String, RedisFollowsDto>> userMap = userFollowsMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Entry::getKey, // key1: FollowerUser token
+                entry -> entry.getValue().stream()
+                    .collect(Collectors.toMap(
+                        uf -> uf.getFollowingUser().getToken(), // key2: FollowingUser token
+                        RedisFollowsDto::create
+                    ))
+            ));
+        // 결과 사용
+        Map<String, List<RedisFollowsDto>> keyValList = new HashMap<>();
+        for (Entry<String, Map<String, RedisFollowsDto>> entry : userMap.entrySet()) {
+            Map<String, RedisFollowsDto> cachingData = entry.getValue();
+            keyValList.put(entry.getKey(), cachingData.values().stream().toList());
+            redisCacheService.upsertAllCacheMapValuesByKey(cachingData, getUserFollowingListKey(entry.getKey()));
+        }
+        return keyValList;
+    }
+
+    private Map<String, List<RedisFollowsDto>> setRedisFollowerMap(List<UserFollows> followerList) {
+        // Step 1: Create userFollowsMap
+        Map<String, List<UserFollows>> userFollowsMap = followerList.stream()
+            .collect(Collectors.groupingBy(key1 -> key1.getFollowingUser().getToken(),
+                Collectors.mapping(val -> val, Collectors.toList())));
+        // Step 2: Create userMap using userFollowsMap
+        Map<String, Map<String, RedisFollowsDto>> userMap = userFollowsMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Entry::getKey, // key1: FollowerUser token
+                entry -> entry.getValue().stream()
+                    .collect(Collectors.toMap(
+                        uf -> uf.getFollowerUser().getToken(), // key2: FollowingUser token
+                        RedisFollowsDto::create
+                    ))
+            ));
+        Map<String, List<RedisFollowsDto>> keyValList = new HashMap<>();
+        // 결과 사용
+        for (Entry<String, Map<String, RedisFollowsDto>> entry : userMap.entrySet()) {
+            Map<String, RedisFollowsDto> cachingData = entry.getValue();
+            keyValList.put(entry.getKey(), cachingData.values().stream().toList());
+            redisCacheService.upsertAllCacheMapValuesByKey(cachingData, getUserFollowerListKey(entry.getKey()));
+        }
+        return keyValList;
     }
 
 

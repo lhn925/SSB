@@ -27,9 +27,10 @@ public class UserMyInfoDto implements Serializable {
     private Boolean isAdmin;
     private List<Long> trackLikedIds;
     private List<Long> followingIds;
+    private List<Long> followerIds;
 
     public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
-        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds) {
+        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds,List<Long> followerIds) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
@@ -38,6 +39,9 @@ public class UserMyInfoDto implements Serializable {
         this.isAdmin = userGrade.equals(UserGrade.ADMIN);
         this.trackLikedIds = trackLikedIds;
         this.followingIds = followingIds;
+        this.followerIds = followerIds;
     }
+
+
 
 }
