@@ -3,14 +3,18 @@ package sky.Sss.domain.track.service.track;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.redis.RedisTrackDto;
 import sky.Sss.domain.track.dto.track.rep.TrackInfoRepDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
+import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.exception.checked.SsbFileNotFoundException;
 import sky.Sss.domain.track.repository.track.TrackQueryRepository;
@@ -28,6 +33,7 @@ import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.global.redis.dto.RedisDataListDto;
 import sky.Sss.global.redis.dto.RedisKeyDto;
+import sky.Sss.global.redis.service.CacheManagerService;
 import sky.Sss.global.redis.service.RedisCacheService;
 
 @Slf4j
@@ -39,6 +45,7 @@ public class TrackQueryService {
     private final TrackQueryRepository trackQueryRepository;
     private final RedisCacheService redisCacheService;
     private final UserQueryService userQueryService;
+    private final CacheManagerService cacheManagerService;
 
 
     public SsbTrack getEntityTrack(Long id, String token, User user, Status isStatus) {
@@ -293,13 +300,42 @@ public class TrackQueryService {
     }
 
 
-    @Cacheable(value = RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, key = "#user.userId", cacheManager = "contentCacheManager")
-    public int getUserUploadCount(User user, Status isStatus) {
+    @Cacheable(value = RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, key = "#user.id", cacheManager = "contentCacheManager")
+    public TrackUploadCountDto getUserUploadCount(User user, Status isStatus) {
         return trackQueryRepository.getUserUploadCount(user, isStatus.getValue());
     }
 
-    @Cacheable(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#user.userId", cacheManager = "contentCacheManager")
-    public int getMyUploadCount(User user, Status isStatus) {
+    public List<TrackUploadCountDto> getUsersUploadCount(List<User> users, Status isStatus) {
+        Set<String> ids = users.stream().map(user -> String.valueOf(user.getId())).collect(Collectors.toSet());
+
+        // 개선된 getCachingData 메서드를 사용하여 캐시된 데이터 가져오기
+        Map<String, TrackUploadCountDto> cachingDataMap = cacheManagerService.getCachingData(ids, RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, TrackUploadCountDto.class);
+
+        // 캐쉬에 전부 있을 경우
+        if (users.size() == cachingDataMap.size()) {
+            return new ArrayList<>(cachingDataMap.values());
+        }
+
+        // 캐시되지 않은 유저 ID 추출
+        Set<String> cachedUserIds = cachingDataMap.keySet();
+        List<User> uncachedUsers = users.stream()
+            .filter(user -> !cachedUserIds.contains(String.valueOf(user.getId())))
+            .collect(Collectors.toList());
+
+        // 캐시되지 않은 유저 데이터 가져오기
+        List<TrackUploadCountDto> usersUploadCount = trackQueryRepository.getUsersUploadCount(uncachedUsers, isStatus.getValue());
+        if (!usersUploadCount.isEmpty()) {
+            Map<String, TrackUploadCountDto> newCachingMap = usersUploadCount.stream()
+                .collect(Collectors.toMap(key -> String.valueOf(key.getUid()), value -> value));
+            cacheManagerService.addCachingData(newCachingMap, RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT);
+            cachingDataMap.putAll(newCachingMap);
+        }
+
+        return new ArrayList<>(cachingDataMap.values());
+    }
+
+    @Cacheable(value = RedisKeyDto.REDIS_USER_MY_TRACK_UPLOAD_COUNT, key = "#user.id", cacheManager = "contentCacheManager")
+    public TrackUploadCountDto getMyUploadCount(User user, Status isStatus) {
         return trackQueryRepository.getMyUploadCount(user, isStatus.getValue());
     }
 

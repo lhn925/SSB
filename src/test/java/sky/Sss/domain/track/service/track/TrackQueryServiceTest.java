@@ -2,12 +2,14 @@ package sky.Sss.domain.track.service.track;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.user.entity.User;
@@ -33,19 +35,19 @@ class TrackQueryServiceTest {
     @Test
     public void uploadTotalCount() {
 
-        User user = userQueryService.findOne("lim2226");
+        User user1 = userQueryService.findOne("lim2226");
+        User user2 = userQueryService.findOne("lim222");
+//        User user3 = userQueryService.findOne("lim22262");
 
-        int userUploadCount = trackQueryService.getUserUploadCount(user, Status.ON);
+        List<User> users = new ArrayList<>();
 
-        System.out.println("userUploadCount = " + userUploadCount);
+        users.add(user1);
+        users.add(user2);
+//        users.add(user3);
 
-
-        int myUploadCount = trackQueryService.getMyUploadCount(user, Status.ON);
-
-        System.out.println("myUploadCount = " + myUploadCount);
-
-
+        TrackUploadCountDto userUploadCount = trackQueryService.getUserUploadCount(user1, Status.ON);
     }
+
     @Test
     public void fetchTest() {
 

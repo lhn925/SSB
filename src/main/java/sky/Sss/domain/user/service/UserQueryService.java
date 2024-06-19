@@ -254,7 +254,12 @@ public class UserQueryService {
 
 
     public User findOne(String userId) {
-        return getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
+        User user = getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
+
+        if (user == null || user.getIsEnabled().equals(Enabled.UNABlED())) {
+            throw new UserInfoNotFoundException("userId.notFind");
+        }
+        return user;
     }
 
     public User findOne(String userId, String token) {

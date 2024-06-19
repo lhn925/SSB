@@ -13,10 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto;
 import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
+import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.track.TrackInfoService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
+import sky.Sss.domain.user.dto.myInfo.UserProfileRepDto;
 import sky.Sss.domain.user.dto.rep.UserProfileHeaderDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.entity.UserFollows;
@@ -52,26 +54,30 @@ public class UserProfileService {
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
             user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds);
     }
+
+
+    public UserProfileHeaderDto getProfileHeaderByUserName(String userName) {
+        User profileUser = userQueryService.findByUserName(userName, Enabled.ENABLED);
+        return getProfileHeader(profileUser);
+    }
+
     /**
      * 유저 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
      */
-    public UserProfileHeaderDto getProfileHeaderByUserName(String userName) {
+    public UserProfileHeaderDto getProfileHeader(User profileUser) {
         // 본인 정보
         User user = userQueryService.findOne();
-
-        User profileUser = userQueryService.findByUserName(userName, Enabled.ENABLED);
-
         // 본인 프로필 여부
         boolean isMyProfile = user.getToken().equals(profileUser.getToken());
 
         // 내프로필이 아닐경우 팔로우 여부 확인
-        int trackTotalCount = 0;
+        TrackUploadCountDto uploadCountDto = null;
 
         // 총 Tracks 수 본인이 아닐시에는 비공개 트랙 제외
         if (isMyProfile) {
-            trackTotalCount = trackQueryService.getMyUploadCount(profileUser, Status.ON);
+            uploadCountDto = trackQueryService.getMyUploadCount(profileUser, Status.ON);
         } else {
-            trackTotalCount = trackQueryService.getUserUploadCount(profileUser, Status.ON);
+            uploadCountDto = trackQueryService.getUserUploadCount(profileUser, Status.ON);
         }
 
         // 팔로잉 리스트
@@ -88,7 +94,7 @@ public class UserProfileService {
             .userName(profileUser.getUserName())
             .followerCount(totalFollowerCount)
             .followingCount(totalFollowingCount)
-            .trackTotalCount(trackTotalCount)
+            .trackTotalCount(Math.toIntExact(uploadCountDto.getTotalCount()))
             .pictureUrl(profileUser.getPictureUrl()).build();
     }
 
@@ -148,9 +154,9 @@ public class UserProfileService {
      *
      * @return
      */
-    public List<UserProfileHeaderDto> getUserSearchInfoList(Set<Long> userIds) {
+    public List<UserProfileHeaderDto> getUserSearchInfoList(Set<Long> ids) {
 
-        List<User> usersByIds = userQueryService.findUsersByIds(userIds, Enabled.ENABLED);
+        List<User> usersByIds = userQueryService.findUsersByIds(ids, Enabled.ENABLED);
 
         return null;
     }
