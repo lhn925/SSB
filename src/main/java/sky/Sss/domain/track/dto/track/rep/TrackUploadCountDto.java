@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.user.entity.User;
 
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
@@ -19,4 +20,5 @@ public class TrackUploadCountDto {
         this.uid = uid;
         this.totalCount = totalCount;
     }
+
 }

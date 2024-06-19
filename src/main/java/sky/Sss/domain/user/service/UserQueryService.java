@@ -257,7 +257,7 @@ public class UserQueryService {
         User user = getUserInfoFromCacheOrDB(userId, RedisKeyDto.REDIS_USER_IDS_MAP_KEY);
 
         if (user == null || user.getIsEnabled().equals(Enabled.UNABlED())) {
-            throw new UserInfoNotFoundException("userId.notFind");
+            throw new UserInfoNotFoundException("sky.user.notFind");
         }
         return user;
     }
@@ -268,7 +268,7 @@ public class UserQueryService {
         User findUser = User.getOptionalUser(optionalUser);
 
         if (!findUser.getToken().equals(token)) {
-            throw new UserInfoNotFoundException("sky.userId.notFind");
+            throw new UserInfoNotFoundException("sky.user.notFind");
         }
         return findUser;
     }
@@ -279,7 +279,7 @@ public class UserQueryService {
         User findUser = getUserInfoFromCacheOrDB(uidAndSUb,
             RedisKeyDto.REDIS_USER_PK_ID_MAP_KEY);
         if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
-            throw new UserInfoNotFoundException("sky.userId.notFind");
+            throw new UserInfoNotFoundException("sky.user.notFind");
         }
         return findUser;
     }
@@ -291,7 +291,7 @@ public class UserQueryService {
             .filter(user -> user.getIsEnabled().equals(enabled.getValue())).
             collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
                 if (list.isEmpty()) {
-                throw new UserInfoNotFoundException("sky.userId.notFind");
+                throw new UserInfoNotFoundException("sky.user.notFind");
             }
             return list;
         }));
@@ -366,7 +366,7 @@ public class UserQueryService {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority
         ).findFirst().orElse(null);
         if (authorities == null || authorities.equals(UserGrade.ANONYMOUS.getRole())) {
-            throw new UserInfoNotFoundException("sky.userId.notFind");
+            throw new UserInfoNotFoundException("sky.user.notFind");
         }
         return authentication;
     }

@@ -48,8 +48,8 @@ public class RedisKeyDto {
     public static final String REDIS_USER_TOTAL_LENGTH_MAP_KEY = "spring:user:total:length";
 
 
-    public static final String REDIS_USER_TRACK_UPLOAD_COUNT = "spring:user:track:upload:count:";
-    public static final String REDIS_USER_MY_TRACK_UPLOAD_COUNT = "spring:user:my:track:upload:count:";
+    public static final String REDIS_USER_TRACK_UPLOAD_COUNT = "spring:user:track:upload:count";
+    public static final String REDIS_USER_MY_TRACK_UPLOAD_COUNT = "spring:user:my:track:upload:count";
 
     public static final String REDIS_USER_TRACK_LIKES_LIST_KEY = "spring:user:track:likes:list";
 

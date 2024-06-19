@@ -35,17 +35,39 @@ class TrackQueryServiceTest {
     @Test
     public void uploadTotalCount() {
 
-        User user1 = userQueryService.findOne("lim2226");
-        User user2 = userQueryService.findOne("lim222");
-//        User user3 = userQueryService.findOne("lim22262");
+        User user1 = userQueryService.findOne("1221325");
+
+        List<User> users = new ArrayList<>();
+
+        users.add(user1);
+//        users.add(user3);
+
+        TrackUploadCountDto userUploadCount = trackQueryService.getMyUploadCount(user1, Status.ON);
+
+        System.out.println("userUploadCount.getUid() = " + userUploadCount.getUid());
+        System.out.println("userUploadCount.getTotalCount() = " + userUploadCount.getTotalCount());
+    }
+
+    @Test
+    public void getUsersUploadCount() {
+
+        User user1 = userQueryService.findOne("0221325");
+        User user2 = userQueryService.findOne("1221325");
+        User user3 = userQueryService.findOne("lim222");
 
         List<User> users = new ArrayList<>();
 
         users.add(user1);
         users.add(user2);
-//        users.add(user3);
+        users.add(user3);
 
-        TrackUploadCountDto userUploadCount = trackQueryService.getUserUploadCount(user1, Status.ON);
+        List<TrackUploadCountDto> usersUploadCount = trackQueryService.getUsersUploadCount(users, Status.ON);
+
+        for (TrackUploadCountDto uploadCountDto : usersUploadCount) {
+            System.out.println("uploadCountDto.getUid() = " + uploadCountDto.getUid());
+            System.out.println("uploadCountDto.getTotalCount() = " + uploadCountDto.getTotalCount());
+
+        }
     }
 
     @Test

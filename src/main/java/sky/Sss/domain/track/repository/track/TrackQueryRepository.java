@@ -35,15 +35,25 @@ public interface TrackQueryRepository extends JpaRepository<SsbTrack, Long> {
     List<SsbTrack> findAllByIdInAndIsStatus(Set<Long> ids, Boolean isStatus);
 
 
-    @Query("select new sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto(s.user.id,count(s.id)) from SsbTrack s where s.user = :user and s.isStatus =:isStatus and s.isPrivacy = false")
+
+    @Query("select new sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto(u.id, count(s.id)) " +
+        "from User u left join SsbTrack s on u = s.user " +
+        "where u = :user and (s.isStatus = :isStatus or s.id is null) and (s.isPrivacy = false or s.id is null) " +
+        "group by u.id")
     TrackUploadCountDto getUserUploadCount(@Param("user") User user, @Param("isStatus") boolean isStatus);
 
 
-    @Query("select new sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto(s.user.id,count(s.id)) from SsbTrack s where s.user in (:users) and s.isStatus =:isStatus and s.isPrivacy = false group by s.user ")
+    @Query("select new sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto(u.id,COALESCE(count(s.id),0)) "
+        + " from User u left join SsbTrack s"
+        + " on u = s.user "
+        + "where u in (:users) and (s.isStatus = :isStatus or s.id is null) and  (s.isPrivacy = false or s.id is null) group by u.id ")
     List<TrackUploadCountDto> getUsersUploadCount(@Param("users") List<User> users, @Param("isStatus") boolean isStatus);
 
 
-    @Query("select new sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto(s.user.id,count(s.id)) from SsbTrack s where s.user = :user and s.isStatus =:isStatus ")
+    @Query("select new sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto(u.id, count(s.id)) " +
+        "from User u left join SsbTrack s on u = s.user " +
+        "where u = :user and (s.isStatus = :isStatus or s.id is null) " +
+        "group by u.id")
     TrackUploadCountDto getMyUploadCount(@Param("user") User user, @Param("isStatus") boolean isStatus);
 
 //    @Query(
