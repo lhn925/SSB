@@ -18,10 +18,10 @@ import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
 import sky.Sss.domain.track.service.track.TrackInfoService;
 import sky.Sss.domain.track.service.track.TrackQueryService;
+import sky.Sss.domain.user.dto.follows.FollowsUserListDto;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
-import sky.Sss.domain.user.dto.rep.UserProfileDto.UserProfileDtoBuilder;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Enabled;
@@ -69,7 +69,7 @@ public class UserProfileService {
     }
 
     /**
-     * 유저 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
+     * 유저 팔로잉 , 팔로우 , 업로드 트랙 수를 가져오는 API
      */
     public UserProfileDto getProfileHeader(User profileUser) {
         // 본인 정보
@@ -200,18 +200,60 @@ public class UserProfileService {
         return trackTargetWithCountDto;
     }
 
+    /**
+     *
+     * 유저가 가장 최근 팔로우한 유저아이디 Top3 및 followTotal 을 반환
+     * UserFollowing Recent Top3 List API
+     *
+     */
+    public FollowsUserListDto getRecentTop3FollowingUser(Long uid) {
+        User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
+
+        List<RedisFollowsDto> followingList = new ArrayList<>(
+            userFollowsService.getFollowingUsersFromCacheOrDB(profileUser));
+
+        List<RedisFollowsDto> recentFollows = new ArrayList<>();
+
+        if (followingList.size() > 0) {
+
+            int recentSize = Math.min(followingList.size(), 3);
+
+            // 가장 상위 3개 내림차순으로 정렬
+            followingList.sort(Comparator.comparing(RedisFollowsDto::getId).reversed());
+
+            recentFollows.addAll(followingList.subList(0, recentSize));
+        }
+        return new FollowsUserListDto(recentFollows, followingList.size());
+    }
+
 
     /**
-     * 해당 유저의 간단정보
-     * 업로드 트랙 수 및 팔로워 수
      *
-     * @return
+     * 유저를 팔로우 하고 있는 유저 리스트 전부 출력
+     *
      */
-    public List<UserProfileDto> getUserSearchInfoList(Set<Long> ids) {
+    public FollowsUserListDto getFollowerUserList(Long uid) {
+        User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
 
-        List<User> usersByIds = userQueryService.findUsersByIds(ids, Enabled.ENABLED);
+        List<RedisFollowsDto> followerList = new ArrayList<>(
+            userFollowsService.getFollowersUsersFromCacheOrDB(profileUser));
 
-        return null;
+        return new FollowsUserListDto(followerList,followerList.size());
+    }
+
+
+    /**
+     *
+     * 유저가 팔로우 하고 있는 유저 리스트 전부 출력
+     *
+     */
+    public FollowsUserListDto getFollowingUserList(Long uid) {
+        User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
+
+        List<RedisFollowsDto> followingList = new ArrayList<>(
+            userFollowsService.getFollowingUsersFromCacheOrDB(profileUser));
+
+        return new FollowsUserListDto(followingList,followingList.size());
     }
 
 

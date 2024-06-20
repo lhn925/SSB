@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto;
 import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto.targetInfo;
+import sky.Sss.domain.user.dto.follows.FollowsUserListDto;
+import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -31,7 +33,8 @@ class UserProfileServiceTest {
         User user = userQueryService.findOne("lim2226");
 
         // when
-        TrackTargetWithCountDto recentLikedTracksWithCount = userProfileService.getRecentLikedTracksWithCount(user, user);
+        TrackTargetWithCountDto recentLikedTracksWithCount = userProfileService.getRecentLikedTracksWithCount(user,
+            user);
 
         // then
 
@@ -39,16 +42,17 @@ class UserProfileServiceTest {
 
         for (targetInfo likeInfo : likeInfos) {
             System.out.println("likeInfo.getId() = " + likeInfo.getId());
-            System.out.println("likeInfo.getTrackInfo().getTrackInfo().getId() = " + likeInfo.getDetails().getTrackInfo().getId());
+            System.out.println(
+                "likeInfo.getTrackInfo().getTrackInfo().getId() = " + likeInfo.getDetails().getTrackInfo().getId());
         }
 
-        System.out.println("recentLikedTracksWithCount.getTotalCount() = " + recentLikedTracksWithCount.getTotalCount());
+        System.out.println(
+            "recentLikedTracksWithCount.getTotalCount() = " + recentLikedTracksWithCount.getTotalCount());
     }
 
 
-
     @Test
-    public void getProfileHeaderByUserName () {
+    public void getProfileHeaderByUserName() {
         User user = userQueryService.findOne("lim2226");
 
         String userName = user.getUserName();
@@ -67,9 +71,46 @@ class UserProfileServiceTest {
 
 
     @Test
+    public void getRecentTop3FollowUser() {
+
+        // given
+        FollowsUserListDto recentTop3FollowUser = userProfileService.getRecentTop3FollowingUser(4L);
+
+        List<RedisFollowsDto> followsInfoList = recentTop3FollowUser.getFollowsInfoList();
+
+        Integer totalCount = recentTop3FollowUser.getTotalCount();
+
+        for (RedisFollowsDto redisFollowsDto : followsInfoList) {
+            System.out.println("redisFollowsDto.getId() = " + redisFollowsDto.getId());
+
+            System.out.println("redisFollowsDto.getFollowingUid() = " + redisFollowsDto.getFollowingUid());
+
+        }
+        System.out.println("totalCount = " + totalCount);
+
+    }
+
+    @Test
+    public void getFollowerUserList() {
+
+        // given
+        FollowsUserListDto followerUserList = userProfileService.getFollowerUserList(1L);
+
+        List<RedisFollowsDto> followsInfoList = followerUserList.getFollowsInfoList();
+
+        Integer totalCount = followerUserList.getTotalCount();
+
+        System.out.println("totalCount = " + totalCount);
+
+        for (RedisFollowsDto redisFollowsDto : followsInfoList) {
+            System.out.println("redisFollowsDto.getFollowerUid() = " + redisFollowsDto.getFollowerUid());
+        }
+    }
+
+    @Test
     public void getUserInfoListByIds() {
 
-    // given
+        // given
 
         Set<Long> ids = new HashSet<>();
 
