@@ -16,23 +16,23 @@ import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
-public class TrackTargetWithCountDto {
+public class TrackWithCountDto {
     // trackLike
 
-    private List<targetInfo> targetInfos = new ArrayList<>();
+    private List<TrackInfo> targetInfos = new ArrayList<>();
     private Integer totalCount;
 
-    public TrackTargetWithCountDto(int totalCount) {
+    public TrackWithCountDto(int totalCount) {
         this.totalCount = totalCount;
     }
 
     public void addTarget(long id, TrackDetailDto trackDetailDto, LocalDateTime createdDateTime) {
-        this.targetInfos.add(new targetInfo(id, trackDetailDto, createdDateTime));
+        this.targetInfos.add(new TrackInfo(id, trackDetailDto, createdDateTime));
     }
 
     @Getter
     @Setter(PRIVATE)
-    public static class targetInfo {
+    public static class TrackInfo {
 
         private Long id;
 
@@ -40,7 +40,7 @@ public class TrackTargetWithCountDto {
 
         private LocalDateTime createdDateTime;
 
-        public targetInfo(long id, TrackDetailDto trackInfo, LocalDateTime createdDateTime) {
+        public TrackInfo(long id, TrackDetailDto trackInfo, LocalDateTime createdDateTime) {
             this.id = id;
             this.details = trackInfo;
             this.createdDateTime = createdDateTime;

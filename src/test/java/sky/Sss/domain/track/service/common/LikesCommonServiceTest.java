@@ -1,16 +1,13 @@
 package sky.Sss.domain.track.service.common;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
-import sky.Sss.domain.track.entity.chart.SsbChartHourly;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.service.UserQueryService;
@@ -26,7 +23,29 @@ class LikesCommonServiceTest {
     UserQueryService userQueryService;
 
 
+    @Test
+    public void filterAndCacheLikedItems() {
 
+        // given
+
+        // given
+        User currentUser = userQueryService.findOne("lim2226");
+
+
+        User profileUser = userQueryService.findOne("lim2226");
+
+        List<LikedRedisDto> visibleLikeTracksForUser = likesCommonService.getVisibleLikeTracksForUser(currentUser,
+            profileUser, ContentsType.TRACK);
+        // then
+
+        for (LikedRedisDto likedRedisDto : visibleLikeTracksForUser) {
+            System.out.println("likedRedisDto.getId() = " + likedRedisDto.getId());
+            System.out.println("likedRedisDto.getTargetId() = " + likedRedisDto.getTargetId());
+        }
+
+
+
+    }
 
     @Test
     public void getLikeTrackIds() {
@@ -35,7 +54,8 @@ class LikesCommonServiceTest {
         User user = userQueryService.findOne("lim2226");
 
         // when
-        List<LikedRedisDto> likeTrackIds = likesCommonService.getLikeTrackIds(user, ContentsType.TRACK);
+        List<LikedRedisDto> likeTrackIds = likesCommonService.getVisibleLikeTracksForUser(user, user,
+            ContentsType.TRACK);
 
         // then
 
@@ -46,6 +66,7 @@ class LikesCommonServiceTest {
 
 
     }
+
     @Test
     public void getCountList() {
         // given

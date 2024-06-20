@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sky.Sss.domain.track.dto.common.like.TrackWithCountDto;
 import sky.Sss.domain.user.annotation.UserAuthorize;
+import sky.Sss.domain.user.dto.rep.UserProfileDto;
 import sky.Sss.domain.user.service.profile.UserProfileService;
 
 @Slf4j
@@ -40,26 +42,29 @@ public class UserProfileController {
      */
 
     /**
-     * 프로필에 사이드 정보를 반환
+     * 유저 프로필 페이지에 header 정보 반환
      * @param username
      * @return
      */
     @GetMapping("/{username}")
-    public ResponseEntity<?> getUserProfile (@PathVariable String username) {
-
-        return null;
+    public ResponseEntity<UserProfileDto> getUserProfileHeader (@PathVariable String username) {
+        if (username.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(userProfileService.getProfileHeaderByUserName(username));
     }
-    @GetMapping("/{username}/likes")
-    public ResponseEntity<?> getUserLikedTrackListDto (@PathVariable String username) {
-        // 본인여부
-        // 팔로워 총합
-        // 팔로잉 총합
-        // like 갯수
-        // 가장 최근 라이크한 3곡
-        // 가장 최근에 팔로우한 유저
-        // 가장 최근에 단 댓글
-        // 트랙 총합
-        // 트랙 & 플레이 리스트
+
+    /**
+     *
+     * 사용자가
+     * @param uid
+     * @return
+     */
+    @GetMapping("/recent/like/tracks/{uid}")
+    public ResponseEntity<TrackWithCountDto> getUserRecentLikeTracks (@PathVariable Long uid) {
+
+
+
         return null;
     }
 

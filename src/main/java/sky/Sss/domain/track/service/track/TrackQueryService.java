@@ -224,18 +224,19 @@ public class TrackQueryService {
         List<SsbTrack> ssbTrackList) {
         List<TrackInfoSimpleDto> simpleDtoList = new ArrayList<>();
         for (SsbTrack ssbTrack : ssbTrackList) {
-            if (!ssbTrack.getIsStatus().equals(isStatus.getValue())) {
-                continue;
-            }
             boolean isOwner = ssbTrack.getUser().getToken().equals(user.getToken());
             String token = null;
+
+
+            // 해당트랙이 비공개인데 오너가 아닌경우
+            // 해당트랙이 status 가 false 인 경우
+            if ((!isOwner && ssbTrack.getIsPrivacy()) || (!ssbTrack.getIsStatus().equals(isStatus.getValue()))) {
+                continue;
+            }
             if (isOwner) {
                 token = ssbTrack.getToken();
             }
             // owner가 아닌데 비공개 인경우
-            if (!isOwner && ssbTrack.getIsPrivacy()) {
-                continue;
-            }
             TrackInfoSimpleDto trackInfoSimpleDto = TrackInfoSimpleDto.create(ssbTrack);
             TrackInfoSimpleDto.updateToken(trackInfoSimpleDto, token);
             TrackInfoSimpleDto.updateIsOwner(trackInfoSimpleDto, isOwner);
@@ -307,11 +308,12 @@ public class TrackQueryService {
 
 
     // k:uid v:TrackUploadCountDto
-    public Map<String,TrackUploadCountDto> getUsersUploadCount(List<User> users, Status isStatus) {
+    public Map<String, TrackUploadCountDto> getUsersUploadCount(List<User> users, Status isStatus) {
         Set<String> ids = users.stream().map(user -> String.valueOf(user.getId())).collect(Collectors.toSet());
 
         // 개선된 getCachingData 메서드를 사용하여 캐시된 데이터 가져오기
-        Map<String, TrackUploadCountDto> cachingDataMap = cacheManagerService.getCachingData(ids, RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, TrackUploadCountDto.class);
+        Map<String, TrackUploadCountDto> cachingDataMap = cacheManagerService.getCachingData(ids,
+            RedisKeyDto.REDIS_USER_TRACK_UPLOAD_COUNT, TrackUploadCountDto.class);
 
         // 캐쉬에 전부 있을 경우
         if (users.size() == cachingDataMap.size()) {
@@ -325,7 +327,8 @@ public class TrackQueryService {
             .collect(Collectors.toList());
 
         // 캐시되지 않은 유저 데이터 가져오기
-        List<TrackUploadCountDto> usersUploadCount = trackQueryRepository.getUsersUploadCount(uncachedUsers, isStatus.getValue());
+        List<TrackUploadCountDto> usersUploadCount = trackQueryRepository.getUsersUploadCount(uncachedUsers,
+            isStatus.getValue());
         if (!usersUploadCount.isEmpty()) {
             Map<String, TrackUploadCountDto> newCachingMap = usersUploadCount.stream()
                 .collect(Collectors.toMap(key -> String.valueOf(key.getUid()), value -> value));

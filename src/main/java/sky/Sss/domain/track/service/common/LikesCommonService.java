@@ -3,7 +3,6 @@ package sky.Sss.domain.track.service.common;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bytedeco.javacpp.presets.opencv_core.Str;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
@@ -20,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikeSimpleInfoDto;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
-import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
 import sky.Sss.domain.track.dto.track.rep.TotalCountRepDto;
+import sky.Sss.domain.track.entity.track.SsbTrack;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.playList.PlyLikesService;
 import sky.Sss.domain.track.service.playList.PlyQueryService;
@@ -87,10 +85,11 @@ public class LikesCommonService {
 
         boolean isLikeType = contentsType.equals(ContentsType.TRACK) || contentsType.equals(ContentsType.PLAYLIST);
 
-        // 트랙 혹은 플레이리스트가 비공개이며 자신의 것이 아닐경우
-        if (isLikeType && likeTargetInfoDto.getIsPrivacy() && !isOwner) {
+        // 트랙 혹은 플레이리스트인데 비공개일 경우 Like 불가
+        if (isLikeType && likeTargetInfoDto.getIsPrivacy()) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
+
         long targetId = likeTargetInfoDto.getTargetId();
         String targetToken = likeTargetInfoDto.getTargetToken();
 
@@ -245,23 +244,32 @@ public class LikesCommonService {
     }
 
 
-    public List<LikedRedisDto> getLikeTrackIds(User user, ContentsType contentsType) {
+    /**
+     * profileUser 가 좋아요한 트랙을 가져오는 method
+     * 다만, currentUser 소유가 아닌 비공개 트랙 좋아요는 제외한다
+     * @param currentUser
+     * @param profileUser
+     * @param contentsType
+     * @return
+     */
+    public List<LikedRedisDto> getVisibleLikeTracksForUser(User currentUser, User profileUser,
+        ContentsType contentsType) {
         TypeReference<Map<String, LikedRedisDto>> typeReference = new TypeReference<>() {
         };
         Map<String, LikedRedisDto> likedRedisMap = redisCacheService.getData(
-            contentsType.getUserLikedKey() + user.getToken(),
+            contentsType.getUserLikedKey() + profileUser.getToken(),
             typeReference);
-
 
         if (likedRedisMap != null && !likedRedisMap.isEmpty()) {
             // 비공개 및 status off 제외
-            return new ArrayList<>(filterPrivateAndStatus(user, contentsType, likedRedisMap).values());
+            return new ArrayList<>(filterAndCacheLikedItems(currentUser, profileUser, contentsType, likedRedisMap).values());
         }
 
         List<LikedRedisDto> likedRedisDtoList = new ArrayList<>();
         switch (contentsType) {
             case TRACK -> {
-                likedRedisDtoList.addAll(trackLikesService.getLikedRedisDtoList(user, Sort.by(Order.desc("id"))));
+                likedRedisDtoList.addAll(
+                    trackLikesService.getLikedRedisDtoList(profileUser, Sort.by(Order.desc("id"))));
             }
         }
         if (likedRedisDtoList.isEmpty()) {
@@ -271,29 +279,50 @@ public class LikesCommonService {
         Map<String, LikedRedisDto> filterMap = likedRedisDtoList.stream()
             .collect(Collectors.toMap(key -> String.valueOf(key.getTargetId()), value -> value));
         // 비공개 및 status off 제외
-        Map<String, LikedRedisDto> redisDtoMap = filterPrivateAndStatus(user, contentsType, filterMap);
+        Map<String, LikedRedisDto> redisDtoMap = filterAndCacheLikedItems(currentUser, profileUser, contentsType,
+            filterMap);
 
-        redisCacheService.upsertAllCacheMapValuesByKey(redisDtoMap,
-            contentsType.getUserLikedKey() + user.getToken());
         return new ArrayList<>(redisDtoMap.values());
     }
 
 
-    // 비공개 및 status off 제외
-    private Map<String, LikedRedisDto> filterPrivateAndStatus(User user, ContentsType contentsType,
+    // 비공개 및 status off 제외 후
+    // redis에 저장
+    private Map<String, LikedRedisDto> filterAndCacheLikedItems(User currentUser,
+        User profileUser,
+        ContentsType contentsType,
         Map<String, LikedRedisDto> likedRedisDtoMap) {
-        Set<Long> setIds = likedRedisDtoMap.values().stream().map(LikedRedisDto::getTargetId)
-            .collect(Collectors.toSet());
-        List<String> ids = new ArrayList<>();
+
+        Set<Long> likedItemIds = likedRedisDtoMap.keySet().stream().map(Long::valueOf).collect(Collectors.toSet());
+        // redis 에 저장할 Map statusOff 제외
+        Map<String, LikedRedisDto> cachingMap = new HashMap<>();
+        Map<String, LikedRedisDto> filteredLikedMap = new HashMap<>();
+
+        // status 제외
         if (contentsType.equals(ContentsType.TRACK)) {
+            List<SsbTrack> ssbTrackList = trackQueryService.getTrackListFromOrDbByIds(likedItemIds);
+            for (SsbTrack ssbTrack : ssbTrackList) {
+                String targetId = String.valueOf(ssbTrack.getId());
+                boolean isOwner = ssbTrack.getUser().getToken().equals(currentUser.getToken());
+
+                // status가 false인 항목은 제외
+                if (!ssbTrack.getIsStatus()) {
+                    continue;
+                }
+                LikedRedisDto likedRedisDto = likedRedisDtoMap.get(targetId);
+
+                // 필터링 조건: 오너이면서 자신의 트랙, 또는 오너가 아닌 공개 트랙
+                if (isOwner || !ssbTrack.getIsPrivacy()) {
+                    filteredLikedMap.put(targetId, likedRedisDto);
+                }
+                // Redis에 저장할 Map 구성
+                cachingMap.put(targetId, likedRedisDto);
+            }
             // 비공개 및 status off 제외
-            List<TrackInfoSimpleDto> trackInfoSimpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(
-                setIds, user, Status.ON);
-            ids.addAll(trackInfoSimpleDtoList.stream().map(dto -> String.valueOf(dto.getId())).toList());
         }
-        return ids.stream()
-            .filter(likedRedisDtoMap::containsKey)
-            .collect(Collectors.toMap(id -> id, likedRedisDtoMap::get));
+        redisCacheService.upsertAllCacheMapValuesByKey(cachingMap,
+            contentsType.getUserLikedKey() + profileUser.getToken());
+        return filteredLikedMap;
     }
 
 

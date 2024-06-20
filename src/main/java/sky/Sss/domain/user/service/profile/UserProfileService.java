@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
-import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto;
+import sky.Sss.domain.track.dto.common.like.TrackWithCountDto;
 import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
@@ -45,7 +45,8 @@ public class UserProfileService {
     public UserMyInfoDto getUserMyInfoDto() {
         User user = userQueryService.findOne();
 
-        List<LikedRedisDto> likeTrackIds = likesCommonService.getLikeTrackIds(user, ContentsType.TRACK);
+        List<LikedRedisDto> likeTrackIds = likesCommonService.getVisibleLikeTracksForUser(user, user,
+            ContentsType.TRACK);
 
         // 좋아하는 트랙리스트
         List<Long> userLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
@@ -57,9 +58,8 @@ public class UserProfileService {
         List<Long> followerIds = followerUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowerUid)
             .toList();
 
-
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds,followerIds);
+            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds, followerIds);
     }
 
 
@@ -106,7 +106,6 @@ public class UserProfileService {
     }
 
 
-
     /**
      * 유저의 아이디 리스트 다중 검색 후 해당 유저아이디의 해당하는 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
      */
@@ -127,7 +126,6 @@ public class UserProfileService {
             tokens, RedisKeyDto.REDIS_USER_FOLLOWING_MAP_KEY);
 
         List<UserProfileDto> userProfileDtoList = new ArrayList<>();
-
 
         for (User user : users) {
             TrackUploadCountDto uploadCountDto = usersUploadCount.get(String.valueOf(user.getId()));
@@ -152,23 +150,32 @@ public class UserProfileService {
         return userProfileDtoList;
 
     }
+
     /**
      * 가장 최근 좋아요한 트랙 3개 및 like 수
      *
-     * @param user
-     * @param profileUser
      * @return
      */
-    public TrackTargetWithCountDto getRecentLikedTracksWithCount(User user, User profileUser) {
+    public TrackWithCountDto getRecentLikedTracksWithCount(Long uid) {
         // 좋아요한 트랙 최대 3개
         // 비공개는 제외
         // 좋아요 누른순으로 가져와야 되고
         // 좋아요 총 갯수에 비공개 제외 해야하고
-        List<LikedRedisDto> likedRedisDtoList = likesCommonService.getLikeTrackIds(profileUser, ContentsType.TRACK);
+
+        User user = userQueryService.findOne();
+
+        User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
+        /**
+         * 프로필 유저의 좋아요 트랙 곡 중 자신의 비공개곡이 있는 경우엔 허용
+         * 프로필 유저의 자신의 트랙곡은 허용
+         *
+         */
+        List<LikedRedisDto> likedRedisDtoList = likesCommonService.getVisibleLikeTracksForUser(profileUser, profileUser,
+            ContentsType.TRACK);
         // 좋아요한 숫자
         int totalLikedTrackCount = likedRedisDtoList.size();
 
-        TrackTargetWithCountDto trackTargetWithCountDto = new TrackTargetWithCountDto(totalLikedTrackCount);
+        TrackWithCountDto trackTargetWithCountDto = new TrackWithCountDto(totalLikedTrackCount);
 
         // 트랙 정보 불러오기
         // like
@@ -201,10 +208,8 @@ public class UserProfileService {
     }
 
     /**
-     *
      * 유저가 가장 최근 팔로우한 유저아이디 Top3 및 followTotal 을 반환
      * UserFollowing Recent Top3 List API
-     *
      */
     public FollowsUserListDto getRecentTop3FollowingUser(Long uid) {
         User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
@@ -228,9 +233,7 @@ public class UserProfileService {
 
 
     /**
-     *
      * 유저를 팔로우 하고 있는 유저 리스트 전부 출력
-     *
      */
     public FollowsUserListDto getFollowerUserList(Long uid) {
         User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
@@ -238,14 +241,11 @@ public class UserProfileService {
         List<RedisFollowsDto> followerList = new ArrayList<>(
             userFollowsService.getFollowersUsersFromCacheOrDB(profileUser));
 
-        return new FollowsUserListDto(followerList,followerList.size());
+        return new FollowsUserListDto(followerList, followerList.size());
     }
 
-
     /**
-     *
      * 유저가 팔로우 하고 있는 유저 리스트 전부 출력
-     *
      */
     public FollowsUserListDto getFollowingUserList(Long uid) {
         User profileUser = userQueryService.findOne(uid, Enabled.ENABLED);
@@ -253,7 +253,7 @@ public class UserProfileService {
         List<RedisFollowsDto> followingList = new ArrayList<>(
             userFollowsService.getFollowingUsersFromCacheOrDB(profileUser));
 
-        return new FollowsUserListDto(followingList,followingList.size());
+        return new FollowsUserListDto(followingList, followingList.size());
     }
 
 

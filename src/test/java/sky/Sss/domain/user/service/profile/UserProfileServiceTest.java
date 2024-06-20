@@ -6,8 +6,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto;
-import sky.Sss.domain.track.dto.common.like.TrackTargetWithCountDto.targetInfo;
+import sky.Sss.domain.track.dto.common.like.TrackWithCountDto;
 import sky.Sss.domain.user.dto.follows.FollowsUserListDto;
 import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
@@ -33,21 +32,20 @@ class UserProfileServiceTest {
         User user = userQueryService.findOne("lim2226");
 
         // when
-        TrackTargetWithCountDto recentLikedTracksWithCount = userProfileService.getRecentLikedTracksWithCount(user,
-            user);
+        TrackWithCountDto recentLikedTracksWithCount = userProfileService.getRecentLikedTracksWithCount(1L);
 
         // then
+/*
+        List<TargetInfo> likeInfos = recentLikedTracksWithCount.getTargetInfos();
 
-        List<targetInfo> likeInfos = recentLikedTracksWithCount.getTargetInfos();
-
-        for (targetInfo likeInfo : likeInfos) {
+        for (TargetInfo likeInfo : likeInfos) {
             System.out.println("likeInfo.getId() = " + likeInfo.getId());
             System.out.println(
                 "likeInfo.getTrackInfo().getTrackInfo().getId() = " + likeInfo.getDetails().getTrackInfo().getId());
         }
 
         System.out.println(
-            "recentLikedTracksWithCount.getTotalCount() = " + recentLikedTracksWithCount.getTotalCount());
+            "recentLikedTracksWithCount.getTotalCount() = " + recentLikedTracksWithCount.getTotalCount());*/
     }
 
 
