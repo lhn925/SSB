@@ -6,7 +6,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sky.Sss.domain.track.dto.common.like.TrackWithCountDto;
+import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto;
 import sky.Sss.domain.user.dto.follows.FollowsUserListDto;
 import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
@@ -32,7 +32,7 @@ class UserProfileServiceTest {
         User user = userQueryService.findOne("lim2226");
 
         // when
-        TrackWithCountDto recentLikedTracksWithCount = userProfileService.getRecentLikedTracksWithCount(1L);
+        TrackLikedWithCountDto recentLikedTracksWithCount = userProfileService.getRecentLikedTracksWithCount(1L);
 
         // then
 /*

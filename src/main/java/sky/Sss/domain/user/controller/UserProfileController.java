@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sky.Sss.domain.track.dto.common.like.TrackWithCountDto;
+import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
 import sky.Sss.domain.user.service.profile.UserProfileService;
@@ -56,31 +56,51 @@ public class UserProfileController {
 
     /**
      *
-     * 사용자가
+     * 사용자가 최근에 좋아요한 트랙 3개 및
+     * 좋아요 총합
+     *
      * @param uid
      * @return
      */
-    @GetMapping("/recent/like/tracks/{uid}")
-    public ResponseEntity<TrackWithCountDto> getUserRecentLikeTracks (@PathVariable Long uid) {
-
-
-
-        return null;
+    @GetMapping("/like/recent/tracks/{uid}")
+    public ResponseEntity<TrackLikedWithCountDto> getUserRecentLikeTracks (@PathVariable Long uid) {
+        if (uid == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(userProfileService.getRecentLikedTracksWithCount(uid));
     }
 
-    @GetMapping("/{username}/followings")
-    public ResponseEntity<?> getUserFollowingsListDto (@PathVariable String username) {
-        // 본인여부
-        // 팔로워 총합
-        // 팔로잉 총합
-        // like 갯수
-        // 가장 최근 라이크한 3곡
-        // 가장 최근에 팔로우한 유저
-        // 가장 최근에 단 댓글
-        // 트랙 총합
-        // 트랙 & 플레이 리스트
-        return null;
+    /**
+     * 유저가 가장 최근 팔로우한 유저아이디 Top3 및 followTotal 을 반환
+     * UserFollowing Recent Top3 List API
+     */
+    @GetMapping("/followings/recent/{uid}")
+    public ResponseEntity<?> getUserRecentFollowingsList (@PathVariable Long uid) {
+        if (uid == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(userProfileService.getRecentTop3FollowingUser(uid));
     }
 
 
+    /**
+     * 유저를 팔로우 하고 있는 유저 리스트 전부 반환
+     */
+    @GetMapping("/followers/{uid}")
+    public ResponseEntity<?> getUserFollowerList (@PathVariable Long uid) {
+        if (uid == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(userProfileService.getFollowerUserList(uid));
+    }
+    /**
+     * 유저가 팔로우 하고 있는 유저 리스트 전부 반환
+     */
+    @GetMapping("/following/{uid}")
+    public ResponseEntity<?> getUserFollowingList (@PathVariable Long uid) {
+        if (uid == 0) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(userProfileService.getFollowingUserList(uid));
+    }
 }

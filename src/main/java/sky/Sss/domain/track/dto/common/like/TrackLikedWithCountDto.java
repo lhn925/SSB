@@ -16,13 +16,13 @@ import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = PROTECTED)
-public class TrackWithCountDto {
+public class TrackLikedWithCountDto {
     // trackLike
 
     private List<TrackInfo> targetInfos = new ArrayList<>();
     private Integer totalCount;
 
-    public TrackWithCountDto(int totalCount) {
+    public TrackLikedWithCountDto(int totalCount) {
         this.totalCount = totalCount;
     }
 

@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
-import sky.Sss.domain.track.dto.common.like.TrackWithCountDto;
+import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto;
 import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
@@ -156,7 +156,7 @@ public class UserProfileService {
      *
      * @return
      */
-    public TrackWithCountDto getRecentLikedTracksWithCount(Long uid) {
+    public TrackLikedWithCountDto getRecentLikedTracksWithCount(Long uid) {
         // 좋아요한 트랙 최대 3개
         // 비공개는 제외
         // 좋아요 누른순으로 가져와야 되고
@@ -175,7 +175,7 @@ public class UserProfileService {
         // 좋아요한 숫자
         int totalLikedTrackCount = likedRedisDtoList.size();
 
-        TrackWithCountDto trackTargetWithCountDto = new TrackWithCountDto(totalLikedTrackCount);
+        TrackLikedWithCountDto trackTargetWithCountDto = new TrackLikedWithCountDto(totalLikedTrackCount);
 
         // 트랙 정보 불러오기
         // like
