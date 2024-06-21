@@ -74,7 +74,7 @@ public class UserQueryService {
             .filter(user -> user.getIsEnabled().equals(isEnabled.getValue())).
             collect(Collectors.collectingAndThen(Collectors.toSet(), list -> {
                 if (!list.isEmpty()) {
-                    throw new UserInfoNotFoundException("userId.notFind");
+                    throw new UserInfoNotFoundException("sky.user.notFind ");
                 }
                 return list;
             }));
@@ -87,7 +87,7 @@ public class UserQueryService {
             .filter(user -> user.getIsEnabled().equals(isEnabled.getValue())).
             collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
                 if (list.isEmpty()) {
-                    throw new UserInfoNotFoundException("userId.notFind");
+                    throw new UserInfoNotFoundException("sky.user.notFind");
                 }
                 return list;
             }));
@@ -284,8 +284,6 @@ public class UserQueryService {
         return findUser;
     }
     public List<User> getUserListByTokens(Set<String> tokens, Enabled enabled) {
-
-        log.info("tokens = {}", tokens);
 
         List<User> userListForm = getUserListByTokenRedisOrDB(tokens,
             RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);

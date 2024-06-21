@@ -24,6 +24,8 @@ class TrackInfoServiceTest {
     @Test
     public void getTrackSearchInfoList() {
 
+
+
         User user = userQueryService.findOne(4L, Enabled.ENABLED);
         Set<Long> ids = new HashSet<>();
         // given

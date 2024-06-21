@@ -85,7 +85,7 @@ public class UserProfileController {
     /**
      *
      * 사용자가 최근에 좋아요한 트랙 3개 및
-     * 좋아요 총합
+     * 좋아요 총합ㅌ
      *
      * @param uid
      * @return
@@ -102,7 +102,7 @@ public class UserProfileController {
      * 유저가 가장 최근 팔로우한 유저아이디 Top3 및 followTotal 을 반환
      * UserFollowing Recent Top3 List API
      */
-    @GetMapping("/followings/recent/{uid}")
+    @GetMapping("/following/recent/{uid}")
     public ResponseEntity<?> getUserRecentFollowingsList (@PathVariable Long uid) {
         if (uid == 0) {
             throw new IllegalArgumentException();
@@ -124,7 +124,7 @@ public class UserProfileController {
     /**
      * 유저가 팔로우 하고 있는 유저 리스트 전부 반환
      */
-    @GetMapping("/following/{uid}")
+    @GetMapping("/followings/{uid}")
     public ResponseEntity<?> getUserFollowingList (@PathVariable Long uid) {
         if (uid == 0) {
             throw new IllegalArgumentException();

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto;
+import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto.TrackInfo;
+import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
@@ -204,6 +206,8 @@ public class UserProfileService {
                         likedRedisDto.getCreatedDateTime());
                 }
             }
+
+            trackTargetWithCountDto.getTargetInfos().sort(Comparator.comparing(TrackInfo::getId).reversed());
         }
         return trackTargetWithCountDto;
     }
