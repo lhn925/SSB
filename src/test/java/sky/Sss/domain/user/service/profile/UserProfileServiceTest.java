@@ -55,15 +55,17 @@ class UserProfileServiceTest {
 
         String userName = user.getUserName();
 
-//        UserProfileDto headerByUserName = userProfileService.test("임하늘",user);
-//
-//        System.out.println("headerByUserName.getUid() = " + headerByUserName.getUid());
-//        System.out.println("headerByUserName.getUserName() = " + headerByUserName.getUserName());
-//        System.out.println("headerByUserName.getFollowerCount() = " + headerByUserName.getFollowerCount());
-//        System.out.println("headerByUserName.getFollowingCount() = " + headerByUserName.getFollowingCount());
-//
-//        System.out.println("headerByUserName.getTrackTotalCount() = " + headerByUserName.getTrackTotalCount());
-//        System.out.println("headerByUserName.getPictureUrl() = " + headerByUserName.getPictureUrl());
+
+
+        UserProfileDto headerByUserName = userProfileService.getProfileHeaderByUserName("_sky_");
+
+        System.out.println("headerByUserName.getUid() = " + headerByUserName.getUid());
+        System.out.println("headerByUserName.getUserName() = " + headerByUserName.getUserName());
+        System.out.println("headerByUserName.getFollowerCount() = " + headerByUserName.getFollowerCount());
+        System.out.println("headerByUserName.getFollowingCount() = " + headerByUserName.getFollowingCount());
+
+        System.out.println("headerByUserName.getTrackTotalCount() = " + headerByUserName.getTrackTotalCount());
+        System.out.println("headerByUserName.getPictureUrl() = " + headerByUserName.getPictureUrl());
 
     }
 

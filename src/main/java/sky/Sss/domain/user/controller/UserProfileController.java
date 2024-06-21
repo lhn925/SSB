@@ -1,16 +1,23 @@
 package sky.Sss.domain.user.controller;
 
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto;
 import sky.Sss.domain.user.annotation.UserAuthorize;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
+import sky.Sss.domain.user.dto.req.UidListSearchReqDto;
 import sky.Sss.domain.user.service.profile.UserProfileService;
 
 @Slf4j
@@ -21,7 +28,7 @@ import sky.Sss.domain.user.service.profile.UserProfileService;
 public class UserProfileController {
 
 
-    private UserProfileService userProfileService;
+    private final UserProfileService userProfileService;
     /**
      *
      *
@@ -48,11 +55,32 @@ public class UserProfileController {
      */
     @GetMapping("/{username}")
     public ResponseEntity<UserProfileDto> getUserProfileHeader (@PathVariable String username) {
-        if (username.isEmpty()) {
+        if (Objects.equals(username, "")) {
             throw new IllegalArgumentException();
         }
         return ResponseEntity.ok(userProfileService.getProfileHeaderByUserName(username));
     }
+
+
+    @GetMapping("/list")
+    public ResponseEntity<List<UserProfileDto>> getUserProfileInfoList (@ModelAttribute UidListSearchReqDto uidListSearchReqDto) {
+        if (uidListSearchReqDto == null || uidListSearchReqDto.getIds().isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok(userProfileService.getUserInfoListByIds(
+            new HashSet<>(uidListSearchReqDto.getIds())));
+    }
+
+//    @GetMapping("/list")
+//    public ResponseEntity<List<UserProfileDto>> getUserProfileInfoList(
+//        @RequestParam <Long> ids) {
+//
+//        if (ids == null || ids.isEmpty()) {
+//            throw new IllegalArgumentException("Ids cannot be null or empty");
+//        }
+//
+//        return ResponseEntity.ok(userProfileService.getUserInfoListByIds(ids));
+//    }
 
     /**
      *

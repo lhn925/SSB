@@ -284,6 +284,9 @@ public class UserQueryService {
         return findUser;
     }
     public List<User> getUserListByTokens(Set<String> tokens, Enabled enabled) {
+
+        log.info("tokens = {}", tokens);
+
         List<User> userListForm = getUserListByTokenRedisOrDB(tokens,
             RedisKeyDto.REDIS_USERS_INFO_MAP_KEY);
         // enabled 필터링
@@ -300,7 +303,7 @@ public class UserQueryService {
         User findUser = getUserInfoFromCacheOrDB(userName,
             RedisKeyDto.REDIS_USER_NAMES_MAP_KEY);
         if (findUser == null || !findUser.getIsEnabled().equals(enabled.getValue())) {
-            throw new UserInfoNotFoundException("sky.userId.notFind");
+            throw new UserInfoNotFoundException("sky.user.notFind");
         }
         return findUser;
     }

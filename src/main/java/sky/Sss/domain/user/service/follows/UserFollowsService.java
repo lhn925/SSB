@@ -224,7 +224,10 @@ public class UserFollowsService {
             Map<String, RedisFollowsDto> redisFollowsDtoMap = result.get(userToken);
 
             // 검색되지 않은 회원 삭제
-            enabledUserFilter(redisKeyDto + userToken, redisFollowsDtoMap);
+            if (!redisFollowsDtoMap.isEmpty()) {
+                enabledUserFilter(redisKeyDto + userToken, redisFollowsDtoMap);
+            }
+
 
             userFollowsMap.put(userToken, redisFollowsDtoMap.values().stream().toList());
         }

@@ -109,10 +109,11 @@ public class UserProfileService {
     /**
      * 유저의 아이디 리스트 다중 검색 후 해당 유저아이디의 해당하는 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
      */
-    public List<UserProfileDto> getUserInfoListByIds(Set<Long> uidList) {
-        List<User> users = userQueryService.findUsersByIds(uidList, Enabled.ENABLED);
+    public List<UserProfileDto> getUserInfoListByIds(Set<Long> uIds) {
+        List<User> users = userQueryService.findUsersByIds(uIds, Enabled.ENABLED);
 
         List<String> tokens = users.stream().map(User::getToken).toList();
+
 
         // 트랙 수
         Map<String, TrackUploadCountDto> usersUploadCount = trackQueryService.getUsersUploadCount(users, Status.ON);
