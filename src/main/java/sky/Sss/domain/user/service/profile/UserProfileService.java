@@ -52,8 +52,13 @@ public class UserProfileService {
 
         // 좋아하는 트랙리스트
         List<Long> userLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
+
+        // 유저가 팔로우 하고 있는 유저 idList
         List<RedisFollowsDto> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
+        // 유저를 팔로우 하고 있는 유저 idList
         List<RedisFollowsDto> followerUsersFromCacheOrDB = userFollowsService.getFollowersUsersFromCacheOrDB(user);
+
+        TrackUploadCountDto myUploadCount = trackQueryService.getMyUploadCount(user, Status.ON);
 
         List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowingUid)
             .toList();
@@ -61,7 +66,8 @@ public class UserProfileService {
             .toList();
 
         return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds, followerIds);
+            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds, followerIds,
+            Math.toIntExact(myUploadCount.getTotalCount()));
     }
 
 

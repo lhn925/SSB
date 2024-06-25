@@ -38,9 +38,9 @@ import useTrackPlayer from "hoks/trackPlayer/useTrackPlayer";
 import useAuth from "hoks/auth/useAuth";
 import useUpload from "hoks/upload/useUpload";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
-import useUserInfo from "./hoks/user/useUserInfo";
-import ProfileContainer from "./content/profile/ProfileContainer";
-import {persistor} from "./store/store";
+import useMyUserInfo from "hoks/user/useMyUserInfo";
+import ProfileContainer from "content/profile/ProfileContainer";
+import {persistor} from "store/store";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -67,7 +67,7 @@ function App() {
       createUploadActions(coverImgFiles, setCoverImgFiles)
   ), []);
   const currentAuth = useAuth();
-  const userReducer = useUserInfo();
+  const userReducer = useMyUserInfo();
   const uploadInfo = useUpload();
   const bc = new BroadcastChannel(`my_chanel`);
   const dispatch = useDispatch();

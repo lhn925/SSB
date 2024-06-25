@@ -8,6 +8,10 @@ const initialState = {
   pictureUrl: null,
   userName: null,
   isLoginBlocked: null,
+  trackLikedIds: [],
+  followingIds: [],
+  followerIds: [],
+  trackUploadCount: []
 }
 const userReducers = createSlice({
   name: "user",

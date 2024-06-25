@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 
-const useUserInfo = () => {
+const useMyUserInfo = () => {
   return useSelector((state) => state?.userReducer);
 };
-export default useUserInfo;
+export default useMyUserInfo;

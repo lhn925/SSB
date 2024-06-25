@@ -28,9 +28,10 @@ public class UserMyInfoDto implements Serializable {
     private List<Long> trackLikedIds;
     private List<Long> followingIds;
     private List<Long> followerIds;
+    private Integer trackUploadCount;
 
     public UserMyInfoDto(String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
-        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds,List<Long> followerIds) {
+        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds,List<Long> followerIds,Integer trackUploadCount) {
         this.userId = userId;
         this.email = email;
         this.userName = userName;
@@ -40,6 +41,7 @@ public class UserMyInfoDto implements Serializable {
         this.trackLikedIds = trackLikedIds;
         this.followingIds = followingIds;
         this.followerIds = followerIds;
+        this.trackUploadCount = trackUploadCount;
     }
 
 

@@ -23,7 +23,7 @@ const persistConfig = {
   key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
   version: 1,
   storage,
-  whitelist:["authReducer","userReducer"]
+  whitelist:["authReducer"]
 };
 
 const rootReducer = combineReducers({
