@@ -12,6 +12,9 @@ const initialState = {
   followingIds: [],
   followerIds: [],
   trackUploadCount: []
+
+
+  
 }
 const userReducers = createSlice({
   name: "user",
