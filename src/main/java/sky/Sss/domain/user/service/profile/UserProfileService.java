@@ -46,13 +46,10 @@ public class UserProfileService {
 
     public UserMyInfoDto getUserMyInfoDto() {
         User user = userQueryService.findOne();
-
         List<LikedRedisDto> likeTrackIds = likesCommonService.getVisibleLikeTracksForUser(user, user,
             ContentsType.TRACK);
-
         // 좋아하는 트랙리스트
         List<Long> userLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
-
         // 유저가 팔로우 하고 있는 유저 idList
         List<RedisFollowsDto> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
         // 유저를 팔로우 하고 있는 유저 idList

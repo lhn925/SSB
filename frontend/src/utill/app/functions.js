@@ -15,11 +15,13 @@ export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
     if (client.current.client) {
       client.current.client.deactivate();
     }
+
     dispatch(userActions.setUserId(userData));
     dispatch(userActions.setEmail(userData));
     dispatch(userActions.setPictureUrl(userData));
     dispatch(userActions.setUserName(userData));
     dispatch(userActions.setIsLoginBlocked(userData))
+    dispatch(userActions.addTrackLikedId(userData));
     Connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
         bc);
   }).catch(() => {
@@ -39,7 +41,6 @@ function Connect(client, accessToken, refreshToken, userId, t, bc) {
     }, debug: function (message) {
     }, onStompError: function (message) {
     },
-
     heartbeatIncoming: 4000,
     heartbeatOutgoing: 4000,
   })

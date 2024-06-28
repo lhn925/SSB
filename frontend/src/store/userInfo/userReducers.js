@@ -11,10 +11,7 @@ const initialState = {
   trackLikedIds: [],
   followingIds: [],
   followerIds: [],
-  trackUploadCount: []
-
-
-  
+  trackUploadCount: 0
 }
 const userReducers = createSlice({
   name: "user",
@@ -26,7 +23,6 @@ const userReducers = createSlice({
     setUserId(state, action) {
       state.userId = action.payload.userId;
     },
-
     setIsLoginBlocked(state, action) {
       state.isLoginBlocked = action.payload.isLoginBlocked;
     },
@@ -38,6 +34,10 @@ const userReducers = createSlice({
     },
     setUserName(state, action) {
       state.userName = action.payload.userName;
+    }, addTrackLikedId(state, action) {
+      state.trackLikedIds.concat(action.payload.trackLikedIds);
+
+      console.log(state.trackLikedIds);
     }
   }, extraReducers(builder) {
     builder.addCase(PURGE, () => initialState);
@@ -52,6 +52,7 @@ export let userActions = {
   setPictureUrl: userReducers.actions.setPictureUrl,
   setUserName: userReducers.actions.setUserName,
   setIsLoginBlocked: userReducers.actions.setIsLoginBlocked,
+  addTrackLikedId: userReducers.actions.addTrackLikedId,
 };
 
 export default userReducers.reducer;
