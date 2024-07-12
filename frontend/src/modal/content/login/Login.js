@@ -26,6 +26,15 @@ function Login(props) {
     isDoubleClick: false // 더블 클릭 방지
   })
   const navigate = useNavigate();
+
+
+  const activeEnter = (e) => {
+    if (e.key === "Enter") {
+      Submit().catch(e => console.error(e));
+    }
+  }
+
+
   const Submit = async () => {
     let rmUserId = userId.split(" ").join("");
     let rmPassword = password.split(" ").join("");
@@ -92,7 +101,7 @@ function Login(props) {
     });
   }
   return (
-      <div className="card mainCard">
+      <div className="card mainCard" onKeyDown={activeEnter}>
         <div className="card-body">
           <h4 className="card-title logo-text mainLogo">{t(
               `msg.common.sky.logo`)}</h4>
