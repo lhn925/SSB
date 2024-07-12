@@ -16,7 +16,6 @@ import {
   SECURITY_LOGIN_STATUS
 } from "modal/content/ModalContent";
 import {UserLogApi} from "utill/api/settings/history/UserLogApi";
-import {setElement} from "react-modal/lib/helpers/ariaAppHider";
 
 function UserSettingModal({type}) {
   const {t} = useTranslation();
@@ -133,6 +132,7 @@ function UserSettingModal({type}) {
     variable.current.isDoubleClick = false;
     const contentsList = await getContentsList(offset, type, startDateValue,
         endDateValue);
+
     updatePageable(setPageable, contentsList.pageable);
     updateContents(setContents, contentsList.contents);
   };
@@ -160,6 +160,11 @@ function UserSettingModal({type}) {
 
       const contentsList = await getContentsList(offset, type,
           dateObject.startDateValue, dateObject.endDateValue);
+
+      if (contentsList?.contents == null) {
+        return;
+      }
+
       updatePageable(setPageable, contentsList.pageable);
       updateContents(setContents, contentsList.contents);
     }
@@ -251,6 +256,8 @@ async function getContentsList(offset, type, startDateValue, endDateValue) {
         totalPages: values.totalPages
       }
     return {contents: values.content, pageable: copyPageable};
+  } else if (response.code === 500) {
+    toast.error(response.data);
   }
 }
 

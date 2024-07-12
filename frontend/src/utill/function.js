@@ -5,11 +5,6 @@ import {useState} from "react";
 import profile2 from "css/image/profile2.png";
 import {GenreTypes} from "content/upload/UploadTypes";
 import {useLocation, useNavigate} from "react-router";
-import TrackChartLogApi from "./api/trackPlayer/TrackChartLogApi";
-import TrackLogModifyApi from "./api/trackPlayer/TrackLogModifyApi";
-import TrackLikeApi from "./api/trackPlayer/TrackLikeApi";
-import {toast} from "react-toastify";
-import TrackLikeCancelApi from "./api/trackPlayer/TrackLikeCancelApi";
 import {
   LOCAL_PLAYER_SETTINGS,
   LOCAL_PLY_KEY,
@@ -17,6 +12,8 @@ import {
 } from "./enum/localKeyEnum";
 import {shuffle} from "lodash";
 import {PLUS} from "../content/trackplayer/NumberSignTypes";
+import {authApi} from "./api/interceptor/ApiAuthInterceptor";
+import {USERS_PROFILE_LIST} from "./api/ApiEndpoints";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -228,7 +225,7 @@ export function validateUserName(value) {
   }
 
   // 조건 4: 마침표는 문자열의 시작과 끝에 위치할 수 없다.
-  if (isRegex &&(/^\./.test(value) || /\.$/.test(value))){
+  if (isRegex && (/^\./.test(value) || /\.$/.test(value))) {
     isRegex = false;
     messageCode += `3`;
   }
@@ -243,7 +240,7 @@ export function validateUserName(value) {
     messageCode = ``;
   }
   // 모든 조건이 충족된 경우
-  return {isRegex,messageCode};
+  return {isRegex, messageCode};
 }
 
 export function StartCountdown( // 유효시간 5분 알림
@@ -392,7 +389,7 @@ export function RegexCheck(name, input_value, setErrors, t) {
   if (name === "userName") {
     const regexResult = validateUserName(input_value);
     isRegex = !regexResult.isRegex;
-    message = isRegex ? t(regexResult.messageCode): '';
+    message = isRegex ? t(regexResult.messageCode) : '';
   } else {
     isRegex = !Regex(name, input_value);
     message = Regex ? t(`msg.userJoinForm.` + name) : '';
@@ -731,7 +728,7 @@ export function calculateOrder(order,
     localPlyInfo, playOrders,
     statusOnLocalPly, numberSign, updateSettings) {
   let calOrder = order;
-  if (localPlyInfo.length === 0 ) {
+  if (localPlyInfo.length === 0) {
     updateSettings("order", 0);
     return undefined;
   }
@@ -746,7 +743,7 @@ export function calculateOrder(order,
   if (localPlyItem.isStatus === 0) {
     let searchOrder = 0;
     while (statusOnLocalPly.length > 0) {
-       searchOrder = numberSign === PLUS ? calOrder++ : calOrder--;
+      searchOrder = numberSign === PLUS ? calOrder++ : calOrder--;
 
       if (searchOrder >= localPlyInfo.length || searchOrder < 0) {
         searchOrder = numberSign === PLUS ? 0 : localPlyInfo.length - 1;
@@ -762,3 +759,23 @@ export function calculateOrder(order,
     return localPlyItem;
   }
 }
+
+export function getFutureTimeInMilliseconds(minutes) {
+// 현재 시간을 가져옵니다.
+  const now = new Date();
+
+  // 매개변수를 밀리세컨드로 변환합니다. 예 minutes 가 15면  (15분 * 60초/분 * 1000밀리세컨드/초)
+  const fifteenMinutesInMilliseconds = minutes * 60 * 1000;
+
+  // 현재 시간에 15분을 더합니다.
+  const futureTime = new Date(now.getTime() + fifteenMinutesInMilliseconds);
+
+  // 밀리세컨드 값을 가져옵니다.
+  return futureTime.getTime();
+}
+
+
+export function getMinutes(num) {
+  return 1000 * 60 * num;
+}
+

@@ -3,12 +3,7 @@ import {persistor, store} from "store/store";
 import {authActions} from "store/auth/authReducers";
 import mem from "mem";
 import {LOGIN_REFRESH, USERS_INFO} from "utill/api/ApiEndpoints";
-import {removeFromLocalStorage, removeLocalStorage} from "utill/function";
-import {
-  LOCAL_PLAYER_SETTINGS,
-  LOCAL_PLY_KEY,
-  LOCAL_PLY_LOG
-} from "utill/enum/localKeyEnum";
+import {removeLocalStorage} from "utill/function";
 import {resetAll} from "store/actions";
 
 // get 배열 쿼리를 위한 설정
@@ -96,7 +91,7 @@ authApi.interceptors.response.use(
           return error;
         }
       } else if (status === HttpStatusCode.InternalServerError) {
-        // window.location.href = "/500";
+        return Promise.reject({response:{status:500,data:{messages:`errorMsg.server`}}})
       } else if (status === HttpStatusCode.NotFound) {
         if (config.url === USERS_INFO) {
           return error.response;

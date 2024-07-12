@@ -2,10 +2,10 @@ import {TrackPlayer} from "content/trackplayer/TrackPlayer";
 import {useEffect} from "react";
 import useTrackPlayer from "hoks/trackPlayer/useTrackPlayer";
 
-const TrackPlayerContainer = ({bc}) => {
+const TrackPlayerContainer = ({bc,userReducer}) => {
   // 재생 여부
 
-  const useTrackObject = useTrackPlayer(bc);
+  const useTrackObject = useTrackPlayer(bc,userReducer);
   useEffect(() => {
     // settings 생성
     useTrackObject.settingsCreate();
@@ -14,7 +14,7 @@ const TrackPlayerContainer = ({bc}) => {
       useTrackObject.localPlyCreate();
     }
 
-  }, [])
+  }, [userReducer])
   return (
       <TrackPlayer
           {...useTrackObject}

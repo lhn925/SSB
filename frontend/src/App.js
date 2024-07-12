@@ -88,7 +88,6 @@ function App() {
 
   BeforeUnload(t, uploadInfo, client.current.client, playingClear,
       changePlaying);
-
   useEffect(() => {
     playingClear();
     const setWebLog = () => {
@@ -99,7 +98,6 @@ function App() {
     }
     setWebLog();
   }, [])
-
   useEffect(() => {
     const currentClient = client.current.client;
     const handleWebSocketClose = () => {
@@ -200,7 +198,7 @@ function App() {
         </div>
 
         {
-            currentAuth.access && <TrackPlayerContainer bc={bc}/>
+            currentAuth.access && <TrackPlayerContainer bc={bc} userReducer={userReducer}/>
         }
 
 

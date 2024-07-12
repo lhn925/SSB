@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter(value = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserProfileDto {
-    private Long uid;
+    private Long id;
     private String userName;
     private Integer followerCount;
     private Integer trackTotalCount;
@@ -19,12 +19,12 @@ public class UserProfileDto {
     private String pictureUrl;
 
     @Builder
-    public UserProfileDto(Long uid, String userName,
+    public UserProfileDto(Long id, String userName,
         int followerCount,
         int followingCount,
         int trackTotalCount,
         String pictureUrl) {
-        this.uid = uid;
+        this.id = id;
         this.userName = userName;
         this.followerCount = followerCount;
         this.trackTotalCount = trackTotalCount;

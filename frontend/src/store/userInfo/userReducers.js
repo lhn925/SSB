@@ -2,7 +2,11 @@ import {createSlice} from '@reduxjs/toolkit';
 import {PURGE} from "redux-persist/es/constants";
 import {RESET_ALL} from "store/actions/Types";
 
+export const TRACK_LIKED_IDS = "TRACK_LIKED_IDS";
+export const FOLLOWING_IDS = "FOLLOWING_IDS";
+export const FOLLOWER_IDS = "FOLLOWER_IDS";
 const initialState = {
+  id: 0,
   userId: null,
   email: null,
   pictureUrl: null,
@@ -20,6 +24,9 @@ const userReducers = createSlice({
     reset(state) {
       Object.assign(state, initialState)
     },
+    setUid(state,action){
+      state.id = action.payload.id;
+    },
     setUserId(state, action) {
       state.userId = action.payload.userId;
     },
@@ -34,10 +41,31 @@ const userReducers = createSlice({
     },
     setUserName(state, action) {
       state.userName = action.payload.userName;
-    }, addTrackLikedId(state, action) {
-      state.trackLikedIds.concat(action.payload.trackLikedIds);
-
-      console.log(state.trackLikedIds);
+    }, setArrayByType(state, action) {
+      switch (action.payload.type) {
+        case TRACK_LIKED_IDS:
+          state.trackLikedIds = action.payload.ids;
+          break;
+        case FOLLOWING_IDS:
+          state.followingIds = action.payload.ids;
+          break;
+        case FOLLOWER_IDS:
+          state.followerIds = action.payload.ids;
+          break;
+      }
+    }, addArrayValueByType(state, action) {
+      const id = action.payload.id;
+      switch (action.payload.type) {
+        case TRACK_LIKED_IDS:
+          state.trackLikedIds.push(id);
+          break;
+        case FOLLOWING_IDS:
+          state.followingIds.push(id);
+          break;
+        case FOLLOWER_IDS:
+          state.followerIds.push(id);
+          break;
+      }
     }
   }, extraReducers(builder) {
     builder.addCase(PURGE, () => initialState);
@@ -47,12 +75,13 @@ const userReducers = createSlice({
 
 export let userActions = {
   rest: userReducers.actions.reset,
+  setUid: userReducers.actions.setUid,
   setUserId: userReducers.actions.setUserId,
   setEmail: userReducers.actions.setEmail,
   setPictureUrl: userReducers.actions.setPictureUrl,
   setUserName: userReducers.actions.setUserName,
   setIsLoginBlocked: userReducers.actions.setIsLoginBlocked,
-  addTrackLikedId: userReducers.actions.addTrackLikedId,
+  setArrayByType: userReducers.actions.setArrayByType,
 };
 
 export default userReducers.reducer;

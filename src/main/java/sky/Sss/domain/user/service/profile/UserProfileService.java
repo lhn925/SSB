@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.Sss.domain.track.dto.common.like.LikedRedisDto;
 import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto;
 import sky.Sss.domain.track.dto.common.like.TrackLikedWithCountDto.TrackInfo;
-import sky.Sss.domain.track.dto.common.rep.TargetInfoDto;
 import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.track.dto.track.rep.TrackUploadCountDto;
 import sky.Sss.domain.track.service.common.LikesCommonService;
@@ -49,7 +48,7 @@ public class UserProfileService {
         List<LikedRedisDto> likeTrackIds = likesCommonService.getVisibleLikeTracksForUser(user, user,
             ContentsType.TRACK);
         // 좋아하는 트랙리스트
-        List<Long> userLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
+        List<Long> userTrackLikedList = likeTrackIds.stream().map(LikedRedisDto::getTargetId).toList();
         // 유저가 팔로우 하고 있는 유저 idList
         List<RedisFollowsDto> followingUsersFromCacheOrDB = userFollowsService.getFollowingUsersFromCacheOrDB(user);
         // 유저를 팔로우 하고 있는 유저 idList
@@ -62,8 +61,9 @@ public class UserProfileService {
         List<Long> followerIds = followerUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowerUid)
             .toList();
 
-        return new UserMyInfoDto(user.getUserId(), user.getEmail(), user.getUserName(), user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade(), userLikedList, followingIds, followerIds,
+        return new UserMyInfoDto(user.getId(), user.getUserId(), user.getEmail(), user.getUserName(),
+            user.getPictureUrl(),
+            user.getIsLoginBlocked(), user.getGrade(), userTrackLikedList, followingIds, followerIds,
             Math.toIntExact(myUploadCount.getTotalCount()));
     }
 
@@ -102,7 +102,7 @@ public class UserProfileService {
         // 팔로워 리스트
         List<RedisFollowsDto> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
         int totalFollowerCount = userFollowsList.size();
-        return UserProfileDto.builder().uid(profileUser.getId())
+        return UserProfileDto.builder().id(profileUser.getId())
             .userName(profileUser.getUserName())
             .followerCount(totalFollowerCount)
             .followingCount(totalFollowingCount)
@@ -118,7 +118,6 @@ public class UserProfileService {
         List<User> users = userQueryService.findUsersByIds(uIds, Enabled.ENABLED);
 
         List<String> tokens = users.stream().map(User::getToken).toList();
-
 
         // 트랙 수
         Map<String, TrackUploadCountDto> usersUploadCount = trackQueryService.getUsersUploadCount(users, Status.ON);
@@ -146,7 +145,7 @@ public class UserProfileService {
 
             int followingCount = followingList != null ? followingList.size() : 0;
             UserProfileDto userProfileDto = UserProfileDto.builder()
-                .userName(user.getUserName()).uid(user.getId())
+                .userName(user.getUserName()).id(user.getId())
                 .pictureUrl(user.getPictureUrl())
                 .trackTotalCount(trackTotalCount)
                 .followerCount(followerCount)

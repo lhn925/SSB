@@ -4,7 +4,6 @@ import TrackInfoApi from "utill/api/trackPlayer/TrackInfoApi";
 import {currentActions} from "store/trackplayer/currentTrack";
 import {toast} from "react-toastify";
 import TrackPlayApi from "utill/api/trackPlayer/TrackPlayApi";
-import {useEffect} from "react";
 import {settingsActions} from "store/trackplayer/playerSettings";
 import {localPlyActions} from "store/trackplayer/localPly";
 import {playLogActions} from "store/trackplayer/localPlayLog";
@@ -14,7 +13,6 @@ import {
   createPlyInfo,
   loadFromLocalStorage,
   removeFromLocalStorage,
-  removeLocalPlyByIndex,
   shufflePlayOrder
 } from "utill/function";
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
@@ -22,10 +20,10 @@ import TrackInfoSearchListApi
   from "utill/api/trackPlayer/TrackInfoSearchListApi";
 import {localPlyTracksActions} from "store/trackplayer/localPlyTracks";
 import {resetCurrentTrack, resetLocalPlyTrack} from "store/actions/index";
-import {PLUS} from "content/trackplayer/NumberSignTypes";
 import {useTranslation} from "react-i18next";
+import useCachedUsers from "hoks/cachedUsers/useCachedUsers";
 
-const useTrackPlayer = (bc) => {
+const useTrackPlayer = (bc, userReducer) => {
   const dispatch = useDispatch();
   const playing = useSelector(state => state?.playingReducer);
   const currentTrack = useSelector(state => state?.currentTrack);
@@ -34,7 +32,7 @@ const useTrackPlayer = (bc) => {
   const localPlayLog = useSelector(state => state?.localPlayLog);
   const localPlyTracks = useSelector(state => state?.localPlyTracks);
   const {t} = useTranslation();
-  const userInfo = useSelector(state => state?.userReducer);
+  const {addUsers, cachedUsers, fetchUsers, removeUser} = useCachedUsers();
 
   const playingClear = () => {
     dispatch(playingActions.clear());
@@ -87,12 +85,17 @@ const useTrackPlayer = (bc) => {
   }
 
   const localPlyAddTracks = (trackId) => {
-    TrackInfoApi(trackId).then((response) => {
-      response.data.userId = userInfo.userId;
+    TrackInfoApi(trackId).then(async (response) => {
+      response.data.userId = userReducer.userId;
       response.data.createdDateTime = new Date().getTime();
       response.data.playIndex = playerSettings.item.order;
-      dispatch(localPlyActions.addTracks({data: response.data,text:t(`msg.player.local.limit`)}));
-      localPlyAddTrackInfo(response.data);
+      const postUser = await fetchUsers(response.data.postUser.id);
+      if (postUser.length > 0) {
+        response.data.postUser = postUser[0];
+        localPlyAddTrackInfo(response.data);
+        dispatch(localPlyActions.addTracks(
+            {data: response.data, text: t(`msg.player.local.limit`)}));
+      }
     }).catch((error) => {
       toast.error(error.message);
     })
@@ -105,14 +108,32 @@ const useTrackPlayer = (bc) => {
   const localPlyCreate = () => {
     const localPly = loadFromLocalStorage(LOCAL_PLY_KEY);
 
+    // userId 가 null일 경우
+    if (userReducer.userId === null) {
+      return;
+    }
     const statusList = localPly?.list.filter(
         track => Number.parseInt(track.isStatus) === 1);
     if (statusList && statusList.length > 0) {
       const searchIds = statusList.map(item => item.id);
       const updatePly = [];
-      TrackInfoSearchListApi(searchIds).then((r) => {
+      TrackInfoSearchListApi(searchIds).then(async (r) => {
         const searchTracks = r.data;
+        const uIds = searchTracks.map(track => track.postUser.id);
+
+        const users = await fetchUsers(uIds);
+        if (users.length === 0) {
+          removeFromLocalStorage(LOCAL_PLY_KEY);
+          return;
+        }
+
+        const userMap = await users.reduce((map, val) => {
+          map.set(val.id, val);
+          return map;
+        }, new Map());
+
         searchTracks.map(search => {
+          search.postUser = userMap.get(search.postUser.id);
           localPlyAddTrackInfo(search);
           const findInfo = statusList.filter(
               local => search.id === local.id);
@@ -123,12 +144,12 @@ const useTrackPlayer = (bc) => {
           })
         })
         localPly.list = updatePly;
-        localPlyActionsCreate({userId: userInfo.userId, localPly: localPly})
+        localPlyActionsCreate({userId: userReducer.userId, localPly: localPly})
       }).catch((e) => {
         console.error(e);
       })
     } else {
-      localPlyActionsCreate({userId: userInfo.userId});
+      localPlyActionsCreate({userId: userReducer.userId});
     }
   }
   const localPlyActionsCreate = (data) => {
@@ -141,16 +162,17 @@ const useTrackPlayer = (bc) => {
     dispatch(resetLocalPlyTrack());
   }
   const getStatusOnLocalPly = () => {
-    const statusOnLocalPly = localPly.item.filter((data) => data.isStatus === 1);
+    const statusOnLocalPly = localPly.item.filter(
+        (data) => data.isStatus === 1);
     if (statusOnLocalPly.length === 0) {
       resetPlyTrack();
-      localPlyActionsCreate({userId:userInfo.userId});
+      localPlyActionsCreate({userId: userReducer.userId});
     }
     return statusOnLocalPly;
   }
   const getPlyTrackByOrder = (order, numberSign) => {
     const localPlyItem = calculateOrder(order, localPly.item,
-        localPly.playOrders, getStatusOnLocalPly(), numberSign,updateSettings);
+        localPly.playOrders, getStatusOnLocalPly(), numberSign, updateSettings);
     if (localPlyItem) {
       const findTrack = localPlyTracks.tracks.filter(
           track => track.id === localPlyItem.id);
@@ -160,6 +182,7 @@ const useTrackPlayer = (bc) => {
         const findTrackElement = {...findTrack[0]};
         findTrackElement.index = localPlyItem.index;
         findTrackElement.addDateTime = localPlyItem.createdDateTime;
+
         return findTrackElement;
       }
     }

@@ -6,7 +6,12 @@ import {useContext, useEffect} from "react";
 import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
 import {uploadInfoActions} from "store/upload/uploadInfo";
 import {UploadActionsContext, UploadValueContext} from "App";
-import {SESSION_ID} from "../enum/localKeyEnum";
+import {SESSION_ID} from "utill/enum/localKeyEnum";
+import userReducers, {
+  FOLLOWER_IDS,
+  FOLLOWING_IDS,
+  TRACK_LIKED_IDS
+} from "store/userInfo/userReducers";
 
 export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
     bc) {
@@ -16,12 +21,18 @@ export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
       client.current.client.deactivate();
     }
 
+    dispatch(userActions.setUid(userData));
     dispatch(userActions.setUserId(userData));
     dispatch(userActions.setEmail(userData));
     dispatch(userActions.setPictureUrl(userData));
     dispatch(userActions.setUserName(userData));
     dispatch(userActions.setIsLoginBlocked(userData))
-    dispatch(userActions.addTrackLikedId(userData));
+    dispatch(userActions.setArrayByType(
+        {ids: userData.trackLikedIds, type: TRACK_LIKED_IDS}));
+    dispatch(userActions.setArrayByType(
+        {ids: userData.followingIds, type: FOLLOWING_IDS}));
+    dispatch(userActions.setArrayByType(
+        {ids: userData.followerIds, type: FOLLOWER_IDS}));
     Connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
         bc);
   }).catch(() => {
@@ -116,7 +127,7 @@ export const disConnectEvent = async (uploadInfo) => {
 }
 
 export function BroadCast(bc, dispatch, location, changePlaying,
-    playing,t) {
+    playing, t) {
   bc.onmessage = (e) => {
     let data = e.data;
     if (data.type === "logout") {
@@ -126,7 +137,7 @@ export function BroadCast(bc, dispatch, location, changePlaying,
       if (playing.key && playing.key !== data.key) {
         changePlaying(false);
       }
-    } else if (data.type === "login"){
+    } else if (data.type === "login") {
       const currSessionId = sessionStorage.getItem(SESSION_ID);
       if (data.sessionId !== currSessionId) {
         window.location.replace(location.pathname);

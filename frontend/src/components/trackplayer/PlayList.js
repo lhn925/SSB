@@ -155,7 +155,7 @@ export function PlayList({
                   backgroundPosition: '0px 0px, 0px 0px'
                 }}>
                   <div className="queue__itemsContainer">
-                    {<DragDropContext
+                    {localPlyInfo.length > 0 && <DragDropContext
                         onDragEnd={(e) => handleOnDragEnd(e, changeOrder,
                             localPlyInfo, localPlayLog,
                             changePlayLog, updateSettings)}>

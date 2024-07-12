@@ -59,7 +59,7 @@ class UserProfileServiceTest {
 
         UserProfileDto headerByUserName = userProfileService.getProfileHeaderByUserName("_sky_");
 
-        System.out.println("headerByUserName.getUid() = " + headerByUserName.getUid());
+        System.out.println("headerByUserName.getUid() = " + headerByUserName.getId());
         System.out.println("headerByUserName.getUserName() = " + headerByUserName.getUserName());
         System.out.println("headerByUserName.getFollowerCount() = " + headerByUserName.getFollowerCount());
         System.out.println("headerByUserName.getFollowingCount() = " + headerByUserName.getFollowingCount());
@@ -127,7 +127,7 @@ class UserProfileServiceTest {
         for (UserProfileDto userInfoListById : userInfoListByIds) {
 
             System.out.println(" ==================== ");
-            System.out.println("userInfoListById.getUid() = " + userInfoListById.getUid());
+            System.out.println("userInfoListById.getUid() = " + userInfoListById.getId());
             System.out.println("userInfoListById.getUserName() = " + userInfoListById.getUserName());
             System.out.println("userInfoListById.getPictureUrl() = " + userInfoListById.getPictureUrl());
             System.out.println("userInfoListById.getTrackTotalCount() = " + userInfoListById.getTrackTotalCount());

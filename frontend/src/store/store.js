@@ -19,6 +19,7 @@ import playerSettings from "store/trackplayer/playerSettings";
 import localPly from "store/trackplayer/localPly";
 import localPlayLog from "store/trackplayer/localPlayLog";
 import localPlyTracks from "store/trackplayer/localPlyTracks";
+import cachedUsers from "store/cachedUsers/cachedUsers";
 const persistConfig = {
   key: 'root',//reducer의 어느 지점에서부터 데이터를 저장할 것 인지,
   version: 1,
@@ -37,7 +38,8 @@ const rootReducer = combineReducers({
   playerSettings,
   localPly,
   localPlayLog ,
-  localPlyTracks
+  localPlyTracks,
+  cachedUsers
 })
 
 

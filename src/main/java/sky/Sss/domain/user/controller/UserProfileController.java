@@ -30,6 +30,8 @@ public class UserProfileController {
     /**
      *
      *
+     *
+     *
      * 캐시 미스 발생 시 처리 전략
      * 데이터베이스에서 직접 쿼리: 캐시에 데이터가 없거나 레디스 서비스 자체에 장애가 발생한 경우, 데이터베이스에서 직접 데이터를 쿼리하는 것이 기본적인 대응 방법입니다. 이는 데이터베이스의 부하를 증가시킬 수 있지만, 데이터의 정확성과 서비스의 가용성을 유지할 수 있습니다.
      * 캐시와 데이터베이스의 일관성 유지: 캐시에 데이터를 저장할 때는 데이터베이스와의 일관성을 유지하기 위한 전략이 필요합니다. 예를 들어, 댓글이 추가되거나 좋아요 수가 변경될 때 캐시와 데이터베이스를 동시에 업데이트하여 일관성을 유지합니다.
@@ -65,6 +67,9 @@ public class UserProfileController {
         if (uidListSearchReqDto == null || uidListSearchReqDto.getIds().isEmpty()) {
             throw new IllegalArgumentException();
         }
+
+        log.info("uidListSearchReqDto.getIds().get(0) = {}", uidListSearchReqDto.getIds().get(0));
+        
         return ResponseEntity.ok(userProfileService.getUserInfoListByIds(
             new HashSet<>(uidListSearchReqDto.getIds())));
     }
