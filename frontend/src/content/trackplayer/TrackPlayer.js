@@ -23,6 +23,8 @@ import {PlayList} from "components/trackplayer/PlayList";
 import {MINUS, PLUS} from "content/trackplayer/NumberSignTypes";
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {useTranslation} from "react-i18next";
+import {useSelector} from "react-redux";
+import useMyUserInfo from "../../hoks/user/useMyUserInfo";
 
 /**
  *
@@ -73,6 +75,7 @@ export const TrackPlayer = ({
   const [isEnd, setIsEnd] = useState(false);
   const [statusOnLocalPly, setStatusOnLocalPly] = useState(null);
   const {t} = useTranslation();
+  const useMyInfo = useMyUserInfo();
 
   const [isVisible, setVisible] = useState(localPlyTracks.isVisible);
   const variable = useRef({
@@ -566,16 +569,16 @@ export const TrackPlayer = ({
   }
 
   const toggleLike = (id) => {
-    localPlyAddTracks(1);
-    localPlyAddTracks(3);
-    localPlyAddTracks(4);
-    localPlyAddTracks(5);
-    localPlyAddTracks(6);
-    localPlyAddTracks(6);
-    localPlyAddTracks(8);
-    localPlyAddTracks(9);
-    localPlyAddTracks(10);
-    localPlyAddTracks(11);
+    // localPlyAddTracks(1);
+    // localPlyAddTracks(3);
+    // localPlyAddTracks(4);
+    // localPlyAddTracks(5);
+    // localPlyAddTracks(6);
+    // localPlyAddTracks(6);
+    // localPlyAddTracks(8);
+    // localPlyAddTracks(9);
+    // localPlyAddTracks(10);
+    // localPlyAddTracks(11);
 
     if (id === -1) {
       return;
@@ -585,7 +588,7 @@ export const TrackPlayer = ({
     }
     const trackInfo = getPlyTrackByTrackId(id);
     setIsDoubleClick(true);
-    ToggleLike(trackInfo.id, trackInfo.title, trackInfo.isLike,
+    ToggleLike(trackInfo.id, trackInfo.title, useMyInfo,
         updatePlyTrackInfo, t);
     setIsDoubleClick(false);
   }
@@ -594,7 +597,8 @@ export const TrackPlayer = ({
       return;
     }
     setIsDoubleClick(true);
-    ToggleFollow(trackInfo.id, trackInfo.postUser, updatePlyTrackInfo, t);
+    ToggleFollow(trackInfo.id, trackInfo.postUser, useMyInfo,
+        updatePlyTrackInfo, t);
     setIsDoubleClick(false);
   }
 
@@ -633,7 +637,8 @@ export const TrackPlayer = ({
     setIsDoubleClick,
     resetPlyTrack,
     updateCurrPlayLog,
-    t
+    t,
+    useMyInfo
   }
   return (
       <div id='track-player-bar'>
@@ -708,12 +713,14 @@ export const TrackPlayer = ({
               </a>
             </div>
             {!trackInfo.isOwner && <>
-              <div className={'controller-btn ' + (trackInfo.isLike
+              <div className={'controller-btn ' + (useMyInfo.isTrackLike(
+                  trackInfo.id)
                   ? 'liked-button-t' : 'liked-button')}
                    data-id={currentTrack.info.id}
                    onClick={(e) => toggleLike(currentTrack.info.id)}></div>
               <div className={'controller-btn bg_player ' + (
-                  trackInfo.postUser.isFollow ? 'follow-button-t'
+                  useMyInfo.isFollowing(trackInfo.postUser.id)
+                      ? 'follow-button-t'
                       : 'follow-button')}
                    onClick={(e) => toggleFollow(e)}></div>
             </>}

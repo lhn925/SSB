@@ -37,7 +37,7 @@ export function PlayList({
   shuffleOrders,
   setIsDoubleClick,
   resetPlyTrack,
-    t
+  t, useMyInfo
 }) {
 
   const onClickPlayButtonHandler = (e) => {
@@ -62,7 +62,6 @@ export function PlayList({
       }
     }
 
-
     if (trackEq && !isPlaying) {
       if (currPlayLog.trackId !== -1) {
         changePlaying(true);
@@ -74,7 +73,6 @@ export function PlayList({
       return;
     }
     resetPlayedSeconds();
-    // updateSettings("order", currOrder);
     updateOrderAndSign(currOrder, PLUS);
     changePlaying(true);
   }
@@ -109,7 +107,6 @@ export function PlayList({
     // 플레이 리스트
   }
 
-
   // 전체 클리어
   const onClickClearHandler = () => {
     if (variable.current.isDoubleClick) {
@@ -125,7 +122,6 @@ export function PlayList({
     setIsDoubleClick(false);
     // 플레이 리스트
   }
-
 
   return (
       <>
@@ -163,9 +159,7 @@ export function PlayList({
                         {(provided) => getDragAndDrop(provided, localPlyInfo,
                             getPlyTrackByTrackId, trackInfo, isPlaying,
                             onClickPlayButtonHandler, toggleLike,
-                            onClickRmBtnHandler,t)}
-
-
+                            onClickRmBtnHandler, t,useMyInfo)}
                       </Droppable>
                     </DragDropContext>
                     }
@@ -191,7 +185,7 @@ export function PlayList({
 }
 
 function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
-    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler,t) {
+    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler, t,useMyInfo) {
 
   const infoTracks = localPlyInfo.map((item) => ({
     ...item, info: getPlyTrackByTrackId(item.id)
@@ -205,7 +199,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
     {infoTracks.map((data, index) => (
 
         data.isStatus !== 0 && <Draggable key={data.index}
-                   draggableId={data.index + ""} index={index}>
+                                          draggableId={data.index + ""}
+                                          index={index}>
           {(provided) => (
               <>
                 <div ref={provided.innerRef}{...provided.draggableProps}>
@@ -269,7 +264,7 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                             !data.info.isOwner &&
                             <button type="button"
                                     className={"sc-button-like"
-                                        + (data.info.isLike ? "-t" : "") +
+                                        + (useMyInfo.isTrackLike(data.id) ? "-t" : "") +
                                         " queueItemView__like sc-button sc-button-small sc-button-icon sc-button-nostyle"}
                                     aria-describedby="tooltip-10505"
                                     tabIndex={0}

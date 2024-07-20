@@ -16,7 +16,6 @@ import React, {
   useState
 } from "react";
 import {useDispatch} from "react-redux";
-import {userActions} from "store/userInfo/userReducers";
 import {useTranslation} from "react-i18next";
 import {URL_SETTINGS} from "content/UrlEndpoints";
 import {Upload} from "content/upload/Upload";
@@ -129,7 +128,7 @@ function App() {
     if (currentAuth.access == null) {
       return;
     }
-    CheckUserInfo(currentAuth, userActions, client, t, dispatch, bc);
+    CheckUserInfo(currentAuth, client, t, bc,userReducer.setUserData);
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
 
   return (
@@ -137,7 +136,8 @@ function App() {
         <Header modal={modal}
                 dispatch={dispatch}
                 openModal={openModal}
-                userReducer={userReducer}
+                {...userReducer}
+
                 changeModalType={changeModalType}
                 bc={bc}
                 currentAuth={currentAuth}

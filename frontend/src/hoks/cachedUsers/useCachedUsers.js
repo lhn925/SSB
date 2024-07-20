@@ -4,7 +4,6 @@ import FetchUsersProfileApi from "utill/api/users/FetchUsersProfileApi";
 import {toast} from "react-toastify";
 
 const useCachedUsers = () => {
-
   /**
    * cacheTime: 캐시된 데이터를 메모리에 얼마나 오래 유지할지 결정.
    * staleTime: 데이터가 신선한 상태로 간주되는 시간.
@@ -29,6 +28,8 @@ const useCachedUsers = () => {
     }
     const staleTime = cachedUsers.staleTime;
     const cacheTime = cachedUsers.cacheTime;
+
+
     const fetchUsers = [];
     const userMap = new Map(cachedUsers.users);
     const findIds = [];// 캐쉬에 없거나 cacheTime 이 지나버린 경우
@@ -39,9 +40,7 @@ const useCachedUsers = () => {
         findIds.push(id);
         continue;
       }
-
       const lastFetched = user.lastFetched;
-
       const isCacheExpired = now - lastFetched > cacheTime;
       const isStaleExpired = now - lastFetched > staleTime;
 

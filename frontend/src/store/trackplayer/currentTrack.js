@@ -20,14 +20,12 @@ const setPlayLog = (playLog, data) => {
   playLog.playTime=1;
 
 };
-
 const setTrackInfo = (info, data) => {
   info.index = data.index
   info.id = Number.parseInt(data.id)
   info.title = data.title
   info.postUser.userName = data.postUser.userName
   info.postUser.id = data.postUser.id
-  info.postUser.isFollow = data.postUser.isFollow
   info.trackLength = Number.parseInt(data.trackLength);
   info.coverUrl = data.coverUrl
   info.isOwner = data.isOwner
@@ -36,7 +34,6 @@ const setTrackInfo = (info, data) => {
   info.createdDateTime = data.addDateTime
 
 };
-
 const playLog = {
   trackId: -1,
   token: null,
@@ -46,8 +43,6 @@ const playLog = {
   playTime: 1, // playTime Seconds
   isReflected: false
 }
-
-
 const trackInfo = {
   index:-1,
   id: -1,
@@ -60,7 +55,6 @@ const trackInfo = {
   postUser:{
     userName: null,
     id:-1,
-    isFollow:false,
   },
   createdDateTime: null,// 재생 목록에 추가한 날짜
 }

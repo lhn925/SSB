@@ -633,7 +633,6 @@ export function createTrackInfo(data) {
     postUser: {
       id: data.postUser.id,
       userName: data.postUser.userName,
-      isFollow: data.postUser.isFollow,
     },
     createdDateTime: data.createdDateTime, // 재생목록에 추가한 날짜
   }

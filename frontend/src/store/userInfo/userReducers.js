@@ -24,7 +24,7 @@ const userReducers = createSlice({
     reset(state) {
       Object.assign(state, initialState)
     },
-    setUid(state,action){
+    setUid(state, action) {
       state.id = action.payload.id;
     },
     setUserId(state, action) {
@@ -55,15 +55,34 @@ const userReducers = createSlice({
       }
     }, addArrayValueByType(state, action) {
       const id = action.payload.id;
+      console.log(action.payload.type)
       switch (action.payload.type) {
         case TRACK_LIKED_IDS:
+          console.log("before :" + state.trackLikedIds.length)
           state.trackLikedIds.push(id);
+          console.log("after :" + state.trackLikedIds.length)
           break;
         case FOLLOWING_IDS:
           state.followingIds.push(id);
           break;
         case FOLLOWER_IDS:
           state.followerIds.push(id);
+          break;
+      }
+    }, removeArrayValueByType(state, action) {
+      const id = action.payload.id;
+      function removeId(array,id) {
+        return array.filter(val => val !== id);
+      }
+      switch (action.payload.type) {
+        case TRACK_LIKED_IDS:
+          state.trackLikedIds = removeId(state.trackLikedIds,id);
+          break;
+        case FOLLOWING_IDS:
+          state.followingIds = removeId(state.followingIds,id);
+          break;
+        case FOLLOWER_IDS:
+          state.followerIds = removeId(state.followerIds,id);
           break;
       }
     }
@@ -82,6 +101,8 @@ export let userActions = {
   setUserName: userReducers.actions.setUserName,
   setIsLoginBlocked: userReducers.actions.setIsLoginBlocked,
   setArrayByType: userReducers.actions.setArrayByType,
+  addArrayValueByType: userReducers.actions.addArrayValueByType,
+  removeArrayValueByType: userReducers.actions.removeArrayValueByType,
 };
 
 export default userReducers.reducer;

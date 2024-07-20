@@ -5,26 +5,34 @@ import {UserUnFollowingApi} from "utill/api/follow/UserUnFollowingApi";
 import {UserFollowingApi} from "utill/api/follow/UserFollowingApi";
 import {HttpStatusCode} from "axios";
 import {useTranslation} from "react-i18next";
+import {FOLLOWING_IDS} from "../../store/userInfo/userReducers";
 
-export function ToggleFollow(trackId, postUser, updatePlyTrackInfo,t) {
+export function ToggleFollow(trackId, postUser,useMyInfo, updatePlyTrackInfo,t) {
 
   if (trackId === -1 || postUser.id === -1) {
     return;
   }
 
-  const isFollow = postUser.isFollow;
+  const isFollow = useMyInfo.isFollowing(postUser.id);
   const userName = postUser.userName;
   const uid = postUser.id;
 
   const toastText = !isFollow ? `msg.follow.save` : `msg.follow.cancel`;
 
+
+  if (!isFollow) {
+    useMyInfo.addArrayValueByType(uid, FOLLOWING_IDS);
+  } else {
+    useMyInfo.removeArrayValueByType(uid, FOLLOWING_IDS);
+  }
+
   handleFollowUser(isFollow, uid)
   .then((r) => {
     toast.success(t(toastText,{userName:userName}));
-    updatePlyTrackInfo(trackId, "postUser", {...postUser,isFollow:!isFollow});
+    // updatePlyTrackInfo(trackId, "postUser", {...postUser,isFollow:!isFollow});
   }).catch((error) => {
     if (error.status === HttpStatusCode.BadRequest) {
-      updatePlyTrackInfo(trackId, "isFollow", !isFollow);
+      // updatePlyTrackInfo(trackId, "isFollow", !isFollow);
     }
     toast.error(error.data?.errorDetails[0].message);
   })

@@ -12,27 +12,16 @@ import userReducers, {
   FOLLOWING_IDS,
   TRACK_LIKED_IDS
 } from "store/userInfo/userReducers";
+import useMyUserInfo from "hoks/user/useMyUserInfo";
 
-export function CheckUserInfo(currentAuth, userActions, client, t, dispatch,
-    bc) {
+export function CheckUserInfo(currentAuth, client, t,
+    bc, setUserData) {
   authApi.get(USERS_INFO).then(data => {
     const userData = data.data;
     if (client.current.client) {
       client.current.client.deactivate();
     }
-
-    dispatch(userActions.setUid(userData));
-    dispatch(userActions.setUserId(userData));
-    dispatch(userActions.setEmail(userData));
-    dispatch(userActions.setPictureUrl(userData));
-    dispatch(userActions.setUserName(userData));
-    dispatch(userActions.setIsLoginBlocked(userData))
-    dispatch(userActions.setArrayByType(
-        {ids: userData.trackLikedIds, type: TRACK_LIKED_IDS}));
-    dispatch(userActions.setArrayByType(
-        {ids: userData.followingIds, type: FOLLOWING_IDS}));
-    dispatch(userActions.setArrayByType(
-        {ids: userData.followerIds, type: FOLLOWER_IDS}));
+    setUserData(userData);
     Connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
         bc);
   }).catch(() => {

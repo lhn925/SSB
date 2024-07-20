@@ -246,11 +246,30 @@ const useTrackPlayer = (bc, userReducer) => {
     if (trackInfo === undefined) {
       return;
     }
-    TrackPlayApi(trackInfo.id).then((response) => {
+
+    function removeTrackAndShuffleOrders(trackId,localPly,playerSettings) {
+      removePlyByTrackId(trackId);
+      const shuffleArray = shufflePlayOrder(localPly.playOrders,
+          playerSettings.item.shuffle,
+          localPly.item, playerSettings.item.order);
+      shuffleOrders(shuffleArray);
+      updateCurrTrackInfo("id", -1);
+    }
+
+    TrackPlayApi(trackInfo.id).then(async (response) => {
+
+      const postUser = await fetchUsers(trackInfo.postUser.id);
+
+      // 사용자가 검색되지 않는다면 예외발생
+      if (postUser.length === 0) {
+        removeTrackAndShuffleOrders(trackInfo.id,localPly,playerSettings);
+        return;
+      }
       const info = {
         ...response.data,
         addDateTime: trackInfo.addDateTime, // 재생목록에 추가한 시간
-        index: trackInfo.index
+        index: trackInfo.index,
+        postUser: postUser[0]
       };
       dispatch(currentActions.createPlayLog(
           {info: info, playLog: response.data.trackPlayLogRepDto}));
@@ -258,12 +277,7 @@ const useTrackPlayer = (bc, userReducer) => {
       if (error.status === HttpStatusCode.Forbidden || error.status
           === HttpStatusCode.NotFound) {
         // 현재 재생 할려던 트랙에 접근 권한이 없을 경우 -1 부여
-        removePlyByTrackId(trackInfo.id);
-        const shuffleArray = shufflePlayOrder(localPly.playOrders,
-            playerSettings.item.shuffle,
-            localPly.item, playerSettings.item.order);
-        shuffleOrders(shuffleArray);
-        updateCurrTrackInfo("id", -1);
+        removeTrackAndShuffleOrders(trackInfo.id,localPly,playerSettings);
         toast.error(error.data?.errorDetails[0].message);
       }
 

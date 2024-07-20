@@ -30,9 +30,7 @@ const cachedUsers = createSlice({
       const userMap = new Map(state.users);
       userMap.delete(id);
       state.users = Array.from(userMap.entries());
-
     }
-
   }, extraReducers(builder) {
     builder.addCase(RESET_ALL, () => initialState);
   }
