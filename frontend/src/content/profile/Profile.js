@@ -19,9 +19,11 @@ import {encodeFileToBase64, ssbConfirm} from "utill/function";
 import PictureUpdateApi from "utill/api/picture/PictureUpdateApi";
 import {toast} from "react-toastify";
 import profile2 from "css/image/profile2.png";
-import PictureDeleteApi from "../../utill/api/picture/PictureDeleteApi";
+import PictureDeleteApi from "utill/api/picture/PictureDeleteApi";
+import useModal from "hoks/modal/useModal";
+import {PROFILE_EDIT} from "../../modal/content/ModalContent";
 
-export function Profile({header, setHeader, myUserInfo,cachedUser}) {
+export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
 
   const {t} = useTranslation();
   const {isDropdownOpen, handleClick} = useDropdown();
@@ -36,21 +38,37 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
     {id: "Reposts", title: "Reposts", url: URL_SETTINGS_HISTORY},
   ];
   useEffect(() => {
+
     if (header.id === -1) {
       return;
     }
+
+    // 닉네임 변경시 즉시 반영
+    const isUserNameChange = header.userName !== myUserInfo.userReducer.userName;
+    if (isMyProfile && isUserNameChange) {
+       const newHeader = {...header,userName:myUserInfo.userReducer.userName}
+      cachedUser.addUsers(newHeader);
+      setHeader(newHeader);
+      return;
+    }
+
     cachedUser.addUsers(header);
-  },[header])
+  }, [header,myUserInfo.userReducer.userName])
   // 파일 btn event
   const clickImgUploadBtnEvent = () => {
     pictureFileRef.current.click();
+  }
+
+  const clickEditBtnEvent = () => {
+    useModal1.changeModalType(PROFILE_EDIT);
+    useModal1.openModal();
   }
   const changePictureUploadEvent = () => {
     const {files} = pictureFileRef.current;
     if (files.length === 0) {
       return;
     }
-    ssbConfirm("", "프로필 사진을 정말 변경하시겠습니까?", true, "변경", "취소",
+    ssbConfirm("", "t) 프로필 사진을 정말 변경하시겠습니까?", true, "t) 변경", "t) 취소",
         async () => {
           const formData = new FormData();
           formData.append("file", files[0]);
@@ -59,6 +77,7 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
             const pictureUrl = response.data.storeFileName;
             myUserInfo.updatePictureUrl(pictureUrl);
             setHeader({...header, pictureUrl: pictureUrl})
+            toast.success(t(`프로필 사진이 변경 되었습니다.`));
           } else {
             toast.error(t(response.data?.errorDetails[0].message))
           }
@@ -71,12 +90,13 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
     if (!header.pictureUrl) {
       return;
     }
-    ssbConfirm("Are you sure?", "사진을 정말 삭제 하시겠습니까?", true, "삭제", "취소",
+    ssbConfirm("t) Are you sure?", "t)  사진을 정말 삭제 하시겠습니까?", true, "t) 삭제", "t) 취소",
         async () => {
           const response = await PictureDeleteApi();
           if (response.code === 200) {
             myUserInfo.updatePictureUrl(null);
             setHeader({...header, pictureUrl: null})
+            toast.success(t(`t) 프로필 사진이 삭제 되었습니다.`));
           } else {
             toast.error(t(response.data?.errorDetails[0].message))
           }
@@ -100,13 +120,13 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
                     </button>
                   </li>
                   {
-                   header.pictureUrl &&  <li className="list-group-item">
-                      <button className="btn btn-upload" onClick={() => {
-                        pictureDeleteClickEvent();
-                      }}>
-                        Delete Image
-                      </button>
-                    </li>
+                      header.pictureUrl && <li className="list-group-item">
+                        <button className="btn btn-upload" onClick={() => {
+                          pictureDeleteClickEvent();
+                        }}>
+                          Delete Image
+                        </button>
+                      </li>
                   }
                 </ul>
               </div>
@@ -114,7 +134,8 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
           <div className='user-show-container'>
             <div className='user-show-image-container'>
               <div style={{
-                backgroundImage: `url(${header.pictureUrl ? USERS_FILE_IMAGE + header.pictureUrl : profile2})`,
+                backgroundImage: `url(${header.pictureUrl ? USERS_FILE_IMAGE
+                    + header.pictureUrl : profile2})`,
                 width: `240px`,
                 height: `200px`,
                 backgroundSize: `cover`,
@@ -161,7 +182,7 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
                    <BtnOutLine text={"Following"}/>
                    <Btn text={"share"}/>
                    <BtnOutLine text={"안녕"}/>
-                   <Btn text={"안녕"}/></> : <BtnOutLine text="Edit"/>
+                   <Btn text={"안녕"}/></> : <BtnOutLine text="Edit" event={clickEditBtnEvent }/>
 
                }
               </div>
@@ -177,19 +198,19 @@ export function Profile({header, setHeader, myUserInfo,cachedUser}) {
             <div className="sidebar-placeholder">
               <div className="user-stats">
                 <div className="us-track-num">
-                  <p>Followers</p>
+                  <p>t) Followers</p>
                   {/*<p>{parseInt(tracks.length)}</p>*/}
                   <p>{header.followerCount}</p>
                 </div>
                 <div className="vertical-line"></div>
                   <div className="us-track-num">
-                  <p>following</p>
+                  <p>t) following</p>
                     {/*<p>{parseInt(tracks.length)}</p>*/}
                     <p>{header.followingCount}</p>
                 </div>
                 <div className="vertical-line"></div>
                   <div className="us-track-num">
-                  <p>Tracks</p>
+                  <p>t) Tracks</p>
                     <p>{header.trackTotalCount}</p>
                 </div>
 

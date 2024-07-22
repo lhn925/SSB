@@ -10,6 +10,7 @@ import IdQuery from "modal/content/help/IdQuery";
 import {useSelector} from "react-redux";
 import Modal from "modal/Modal";
 import UserSettingModal from "modal/content/settings/UserSettingModal";
+import ProfileEdit from "modal/content/profile/ProfileEdit";
 
 export const JOIN = "JOIN";
 export const HELP = "HELP";
@@ -22,33 +23,38 @@ export const HISTORY_LOGIN_LOG = "HISTORY_LOGIN_LOG";
 export const HISTORY_ACTIVITY_LOG = "HISTORY_ACTIVITY_LOG";
 export const ID = "ID";
 export const PW = "PW";
+export const PROFILE_EDIT = "PROFILE_EDIT";
 
-
-function ModalContent({closeModal,bc,modalVisible}) {
+function ModalContent({closeModal, bc, modalVisible,changeModalType}) {
   const type = useSelector(state => state.modalType.type);
   const helpType = useSelector(state => state.helpType.helpType);
   let width;
 
   // class 변경
-  if (type === SECURITY_LOGIN_STATUS || type === HISTORY_LOGIN_LOG || type === HISTORY_ACTIVITY_LOG) {
+  if (type === SECURITY_LOGIN_STATUS || type === HISTORY_LOGIN_LOG || type
+      === HISTORY_ACTIVITY_LOG) {
     width = "some-class";
   }
   return (
       <>
         {
             modalVisible && <Modal
-            width={width}
+                width={width}
                 visible={modalVisible}
-                                   closable={true}
-                                   maskClosable={false}
-                                   onClose={closeModal}>
-              <Content bc={bc} closeModal={closeModal} type={type} helpType={helpType}/>
+                closable={true}
+                maskClosable={false}
+                changeModalType={changeModalType}
+
+                onClose={closeModal}>
+              <Content bc={bc} closeModal={closeModal} type={type}
+                       helpType={helpType}/>
             </Modal>
         }
       </>
   )
 }
-function Content({type,helpType,bc,closeModal}) {
+
+function Content({type, helpType, bc, closeModal,changeModalType}) {
   if (type === JOIN) {
     return (
         <>
@@ -59,17 +65,18 @@ function Content({type,helpType,bc,closeModal}) {
     );
   } else if (type === SECURITY_PW_UPDATE) {
     return (
-      <>
-        <PwUpdateForm closeModal={closeModal}/>
-      </>
+        <>
+          <PwUpdateForm closeModal={closeModal}/>
+        </>
     )
-  } else if (type === HISTORY_LOGIN_LOG || type === HISTORY_ACTIVITY_LOG || type === SECURITY_LOGIN_STATUS) {
+  } else if (type === HISTORY_LOGIN_LOG || type === HISTORY_ACTIVITY_LOG || type
+      === SECURITY_LOGIN_STATUS) {
     return (
         <>
           <UserSettingModal type={type} closeModal={closeModal}/>
         </>
     )
-  }else if (type === HELP && helpType === ID) {
+  } else if (type === HELP && helpType === ID) {
     return (
         <>
           <Help RegexCheck={RegexCheck} ClickBtnSendCode={ClickBtnSendCode}
@@ -88,14 +95,17 @@ function Content({type,helpType,bc,closeModal}) {
                    helpType={helpType}/>
         </>
     );
-  } else if (type === LOGIN)  {
+  } else if (type === LOGIN) {
     return (
         <>
           <Login bc={bc} closeModal={closeModal}/>
         </>
     );
+  } else if (type === PROFILE_EDIT) {
+    return (<>
+      <ProfileEdit bc={bc} closeModal={closeModal} changeModalType={changeModalType}/>
+    </>)
   }
 }
-
 
 export default ModalContent;

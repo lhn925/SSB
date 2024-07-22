@@ -1,6 +1,7 @@
 export const USERS_INFO = "/users/info";
 export const USERS_INFO_PW = "/users/info/pw";
 export const USERS_INFO_PICTURE = "/users/info/picture"
+export const USERS_INFO_USERNAME = "/users/info/username"
 
 export const USERS_LOGOUT = "/users/logout";
 export const USERS_JOIN = "/users/join";

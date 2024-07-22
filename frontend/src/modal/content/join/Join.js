@@ -4,7 +4,7 @@ import {Collapse} from "react-bootstrap";
 import {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {
-  ChangeError,
+  ChangeError, duplicateCheck,
   GetInterval,
   PwSecureCheckFn,
   PwSecureLevel,
@@ -133,24 +133,7 @@ function Join(props) {
       }
     })
   }
-  const duplicateCheck = async (name, value) => {
-    const response = await DuplicateCheckApi(name, value);
-    const isSuccess = response.code !== 200;
-    if (isSuccess) {
-      if (response.data.errorDetails !== undefined) {
-        response.data.errorDetails.map((data) => {
-          ChangeError(setErrors, name, data.message, isSuccess);
-        });
-        return;
-      }
-      ChangeError(setErrors, name, t(`errorMsg.server`), isSuccess);
-    } else {
-      ChangeError(setErrors, name, '', isSuccess);
-    }
 
-    return isSuccess;
-
-  }
 
   const [secureLevel, setSecureLevel] = useState(
       {secLevelClass: '', secLevelStr: ''});
@@ -178,12 +161,11 @@ function Join(props) {
       const isRegex = props.RegexCheck(name, input_value, setErrors, t);
       // 정규표현식이 맞고 빈칸이 아닌 경우
       if (!isRegex && name !== "email") { // 중복 체크
-        await duplicateCheck(name, input_value);
+        await duplicateCheck(name, input_value,setErrors,t);
       }
       // 중복 체크 후 중복이면 리턴
     }
     if (name === "password") {
-      console.log(input_value);
       // 8글자이하 16글자 초과시에
       let number = PwSecureLevel(input_value);
       setSecureLevel(PwSecureCheckFn(number));
@@ -258,7 +240,7 @@ function Join(props) {
       toast.dismiss(loading);
     } else {
       toast.dismiss(loading);
-      toast.success("회원가입이 완료되었습니다.");
+      toast.success("t) 회원가입이 완료되었습니다.");
       dispatch(modalActions.changeType({type: "LOGIN"}));
     }
 

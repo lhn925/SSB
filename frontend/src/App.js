@@ -75,7 +75,7 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { closeDropdown } = useDropdown();
-  const {openModal, closeModal, changeModalType, modal} = useModal();
+  const useModal1 = useModal();
 
   const {
     playingClear,
@@ -137,12 +137,12 @@ function App() {
 
 
         <div className="App" onClick={closeDropdown}>
-          <Header modal={modal}
+          <Header
+
+                  {...useModal1}
                   dispatch={dispatch}
-                  openModal={openModal}
                   {...userReducer}
 
-                  changeModalType={changeModalType}
                   bc={bc}
                   currentAuth={currentAuth}
                   client={client.current.client}
@@ -168,7 +168,10 @@ function App() {
                 </Route>
                 <Route path="/" element={<div>메인화면</div>}>
                 </Route>
-                <Route path="/:userName" element={<ProfileContainer/>}>
+                <Route path="/:userName" element={<ProfileContainer
+                    useModal1={useModal1}
+
+                />}>
                 </Route>
                 <Route path="/upload" element={
                   <UploadActionsContext.Provider value={coverImgFileActions}>
@@ -185,18 +188,15 @@ function App() {
                 <Route path={URL_SETTINGS + "/:root?"}
                        element={
                          <Settings
-                             openModal={openModal}
+                             {...useModal1}
                              dispatch={dispatch}
-                             changeModalType={changeModalType}
-                             modal={modal}
                              navigate={navigate}
                              location={location}/>
                        }>
                 </Route>
               </Routes>
             </Suspense>
-            <ModalContent bc={bc} modalVisible={modal.visible}
-                          closeModal={closeModal}/>
+            <ModalContent bc={bc} modalVisible={useModal1.modal.visible} {...useModal1}/>
 
           </div>
 

@@ -11,10 +11,10 @@ const useModal = () => {
     dispatch(modalActions.openModal());
   };
   const changeModalType = (type) => {
-    dispatch(modalActions.changeType({ type }));
+    dispatch(modalActions.changeType({type}));
   };
 
-  return { openModal, closeModal, changeModalType,modal };
+  return {openModal, closeModal, changeModalType, modal};
 };
 
 export default useModal;

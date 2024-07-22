@@ -36,24 +36,16 @@ public class MyInfoExController {
         return getErrorResultResponseEntity(e.getMessage(), request, HttpStatus.FORBIDDEN);
     }
 
-    /**
-     * 중복 체크 (닉네임,이메일,아이디)
-     *
-     * @return
-     */
-    @ExceptionHandler({DuplicateCheckException.class})
-    public ResponseEntity duplicateCheckExHandle(DuplicateCheckException e, HttpServletRequest request) {
-        return getErrorResultResponseEntity("duplication", request, e.getMessage());
-    }
+//    /**
+//     * 중복 체크 (닉네임,이메일,아이디)
+//     *
+//     * @return
+//     */
+//    @ExceptionHandler({DuplicateCheckException.class})
+//    public ResponseEntity duplicateCheckExHandle(DuplicateCheckException e, HttpServletRequest request) {
+//        return getErrorResultResponseEntity("duplication", request, e.getMessage());
+//    }
 
-    /**
-     *
-     * @return
-     */
-    @ExceptionHandler({ChangeUserNameIsNotAfterException.class})
-    public ResponseEntity ChangeIsNotAfterExHandle(ChangeUserNameIsNotAfterException e, HttpServletRequest request) {
-        return getErrorResultResponseEntity("change.isNotAfter", request, e.getMessage());
-    }
 
     /**
      * 중복 체크 (닉네임,이메일,아이디)

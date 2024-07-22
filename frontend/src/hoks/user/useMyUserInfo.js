@@ -46,6 +46,10 @@ const useMyUserInfo = () => {
     dispatch(userActions.setPictureUrl({pictureUrl: pictureUrl}))
   }
 
+  const updateUserName = (userName) => {
+    dispatch(userActions.setUserName({userName: userName}))
+  }
+
   const addArrayValueByType = (id, type) => {
     dispatch(userActions.addArrayValueByType({id: id, type: type}));
   };
@@ -62,7 +66,8 @@ const useMyUserInfo = () => {
     addArrayValueByType,
     removeArrayValueByType,
     setUserData,
-    updatePictureUrl
+    updatePictureUrl,
+    updateUserName
   };
 };
 export default useMyUserInfo;

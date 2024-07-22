@@ -5,15 +5,18 @@ import FetchUserHeaderApi from "utill/api/profile/FetchUserHeaderApi";
 import useCachedUsers from "hoks/cachedUsers/useCachedUsers";
 import useMyUserInfo from "hoks/user/useMyUserInfo";
 
-const ProfileContainer = () => {
+const ProfileContainer = ({useModal1}) => {
   const {userName} = useParams();
   const [header, setHeader] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const cachedUser = useCachedUsers();
+
   const myUserInfo = useMyUserInfo();
+  const cachedUser = useCachedUsers();
+
   const fetchUserHeaderInfo = async () => {
     try {
+      setError(null);
       setLoading(true);
       let findUser = await cachedUser.fetchUserByUserName(userName);
       let userData = findUser ? findUser[0] : null;
@@ -45,7 +48,9 @@ const ProfileContainer = () => {
       <>
         {loading && <div>Loading...</div>}
         {error && <div>{error}</div>}
-        {header && <Profile header={header} setHeader={setHeader} cachedUser={cachedUser} myUserInfo={myUserInfo} />}
+        {header && <Profile useModal1={useModal1} header={header} setHeader={setHeader}
+                            cachedUser={cachedUser}
+                            myUserInfo={myUserInfo}  />}
       </>
   );
 };

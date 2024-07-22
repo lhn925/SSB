@@ -16,6 +16,7 @@ import {authApi} from "./api/interceptor/ApiAuthInterceptor";
 import {USERS_PROFILE_LIST} from "./api/ApiEndpoints";
 import Swal from "sweetalert2";
 import {isCancel} from "axios";
+import {DuplicateCheckApi} from "./api/duplicateCheck/DuplicateCheckApi";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -806,4 +807,21 @@ export const ssbConfirm = (title,text,isCancelBtn,confirmText,cancelText,confirm
       cancelEvent();
     }
   });
+}
+
+export const duplicateCheck = async (name, value,setErrors,t) => {
+  const response = await DuplicateCheckApi(name, value);
+  const isSuccess = response.code !== 200;
+  if (isSuccess) {
+    if (response.data.errorDetails !== undefined) {
+      response.data.errorDetails.map((data) => {
+        ChangeError(setErrors, name, data.message, isSuccess);
+      });
+      return;
+    }
+    ChangeError(setErrors, name, t(`errorMsg.server`), isSuccess);
+  } else {
+    ChangeError(setErrors, name, '', isSuccess);
+  }
+  return isSuccess;
 }

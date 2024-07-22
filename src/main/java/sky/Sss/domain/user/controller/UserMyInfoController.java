@@ -129,7 +129,7 @@ public class UserMyInfoController {
         }
         // 중복체크
         userMyInfoService.updateUserName(userNameUpdateDto, bindingResult);
-        return new ResponseEntity(new Result<>(userNameUpdateDto), HttpStatus.OK);
+        return new ResponseEntity(userNameUpdateDto, HttpStatus.OK);
     }
 
     /**

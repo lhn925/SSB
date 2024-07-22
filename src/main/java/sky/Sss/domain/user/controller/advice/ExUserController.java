@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import sky.Sss.domain.user.exception.ChangeUserNameIsNotAfterException;
 import sky.Sss.domain.user.exception.DuplicateCheckException;
 import sky.Sss.domain.user.exception.RefreshTokenNotFoundException;
 import sky.Sss.domain.user.exception.UserInfoNotFoundException;
@@ -56,7 +57,15 @@ public class ExUserController {
         }
         return Result.getErrorResult(new ErrorGlobalResultDto(errorCode, ms, request.getLocale()));
     }
+    /**
+     *
+     * @return
+     */
+    @ExceptionHandler({ChangeUserNameIsNotAfterException.class})
+    public ResponseEntity<?> ChangeIsNotAfterExHandle(ChangeUserNameIsNotAfterException e, HttpServletRequest request) {
 
+        return getErrorResultResponseEntity("change.isNotAfter", request, e.getMessage());
+    }
 
 
     @ExceptionHandler({AccessDeniedException.class})
@@ -92,6 +101,20 @@ public class ExUserController {
             return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()), status);
         }
     }
+
+    private ResponseEntity<ErrorResult> getErrorResultResponseEntity(String e, HttpServletRequest request,
+        HttpStatus badRequest) {
+        ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e, ms, request.getLocale());
+        return Result.getErrorResult(errorGlobalResultDto, badRequest);
+    }
+
+    private ResponseEntity<ErrorResult> getErrorResultResponseEntity(String code, HttpServletRequest request,
+        String e) {
+        ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(code, ms, request.getLocale(),
+            new String[]{e});
+        return Result.getErrorResult(errorGlobalResultDto);
+    }
+
 
 
 }

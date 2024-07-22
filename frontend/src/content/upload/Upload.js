@@ -293,13 +293,6 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
     dispatch(uploadInfoActions.changeIsPrivacy(
         {isPrivacy: value}))
   }
-
-
-
-
-
-
-
   // privacyChk
   const changePrivacyChkEvent = (value) => {
     setUploadSettings({...uploadSettings, isPrivacy: value})
