@@ -19,6 +19,7 @@ import {encodeFileToBase64, ssbConfirm} from "utill/function";
 import PictureUpdateApi from "utill/api/picture/PictureUpdateApi";
 import {toast} from "react-toastify";
 import profile2 from "css/image/profile2.png";
+import PictureDeleteApi from "../../utill/api/picture/PictureDeleteApi";
 
 export function Profile({header, setHeader, myUserInfo}) {
 
@@ -65,25 +66,19 @@ export function Profile({header, setHeader, myUserInfo}) {
   }
 
   const pictureDeleteClickEvent = () => {
-    const {files} = pictureFileRef.current;
-    if (files.length === 0) {
+    if (!header.pictureUrl) {
       return;
     }
-    ssbConfirm("Are you sure?", "사진을 정말 삭제 하시겠습니까?", true, "변경", "취소",
+    ssbConfirm("Are you sure?", "사진을 정말 삭제 하시겠습니까?", true, "삭제", "취소",
         async () => {
-          const formData = new FormData();
-          formData.append("file", files[0]);
-          const response = await PictureUpdateApi(formData);
+          const response = await PictureDeleteApi();
           if (response.code === 200) {
-            const pictureUrl = response.data.storeFileName;
-            myUserInfo.updatePictureUrl(pictureUrl);
-            setHeader({...header, pictureUrl: pictureUrl})
+            myUserInfo.updatePictureUrl(null);
+            setHeader({...header, pictureUrl: null})
           } else {
             toast.error(t(response.data?.errorDetails[0].message))
           }
-          pictureFileRef.current.value = null;
         }, () => {
-          pictureFileRef.current.value = null;
         })
   }
   return (
@@ -102,13 +97,15 @@ export function Profile({header, setHeader, myUserInfo}) {
                       Replace Image
                     </button>
                   </li>
-                  <li className="list-group-item">
-                    <button className="btn btn-upload" onClick={() => {
-                      pictureDeleteClickEvent();
-                    }}>
-                      Delete Image
-                    </button>
-                  </li>
+                  {
+                   header.pictureUrl &&  <li className="list-group-item">
+                      <button className="btn btn-upload" onClick={() => {
+                        pictureDeleteClickEvent();
+                      }}>
+                        Delete Image
+                      </button>
+                    </li>
+                  }
                 </ul>
               </div>
           }
