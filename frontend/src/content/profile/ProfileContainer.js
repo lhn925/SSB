@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Profile} from "./Profile";
 import FetchUserHeaderApi from "utill/api/profile/FetchUserHeaderApi";
 import useCachedUsers from "hoks/cachedUsers/useCachedUsers";
-import useMyUserInfo from "../../hoks/user/useMyUserInfo";
+import useMyUserInfo from "hoks/user/useMyUserInfo";
 
 const ProfileContainer = () => {
   const {userName} = useParams();
@@ -45,7 +45,7 @@ const ProfileContainer = () => {
       <>
         {loading && <div>Loading...</div>}
         {error && <div>{error}</div>}
-        {header && <Profile header={header} setHeader={setHeader} myUserInfo={myUserInfo} />}
+        {header && <Profile header={header} setHeader={setHeader} cachedUser={cachedUser} myUserInfo={myUserInfo} />}
       </>
   );
 };

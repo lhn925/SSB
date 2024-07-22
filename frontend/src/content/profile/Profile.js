@@ -12,7 +12,7 @@ import Nav from "components/nav/Nav";
 import {Btn} from "components/button/Btn";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {useTranslation} from "react-i18next";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useDropdown} from "context/dropDown/DropdownProvider";
 import {acceptArray} from "utill/enum/Accept";
 import {encodeFileToBase64, ssbConfirm} from "utill/function";
@@ -21,15 +21,12 @@ import {toast} from "react-toastify";
 import profile2 from "css/image/profile2.png";
 import PictureDeleteApi from "../../utill/api/picture/PictureDeleteApi";
 
-export function Profile({header, setHeader, myUserInfo}) {
+export function Profile({header, setHeader, myUserInfo,cachedUser}) {
 
   const {t} = useTranslation();
-
   const {isDropdownOpen, handleClick} = useDropdown();
   const pictureFileRef = useRef();
-  const [pictureImg, setPictureImg] = useState(null);
   const isMyProfile = myUserInfo.userReducer.id === header.id;
-
   const tabs = [
     {id: "all", title: "All", url: URL_SETTINGS},
     {id: "popular", title: "Popular tracks", url: URL_SETTINGS_SECURITY},
@@ -38,6 +35,12 @@ export function Profile({header, setHeader, myUserInfo}) {
     {id: "Playlists", title: "Playlists", url: URL_SETTINGS_HISTORY},
     {id: "Reposts", title: "Reposts", url: URL_SETTINGS_HISTORY},
   ];
+  useEffect(() => {
+    if (header.id === -1) {
+      return;
+    }
+    cachedUser.addUsers(header);
+  },[header])
   // 파일 btn event
   const clickImgUploadBtnEvent = () => {
     pictureFileRef.current.click();
@@ -64,7 +67,6 @@ export function Profile({header, setHeader, myUserInfo}) {
           pictureFileRef.current.value = null;
         })
   }
-
   const pictureDeleteClickEvent = () => {
     if (!header.pictureUrl) {
       return;
