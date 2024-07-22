@@ -11,7 +11,7 @@ import {
 } from "utill/function";
 import {PLUS} from "content/trackplayer/NumberSignTypes";
 import {LOCAL_PLY_KEY, LOCAL_PLY_LOG} from "utill/enum/localKeyEnum";
-
+import profile2 from "css/image/profile2.png";
 export function PlayList({
   changeOrder,
   getPlyTrackByTrackId,
@@ -222,8 +222,7 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                             <img style={{backgroundColor: '#fff'}}
                                  className="player_cover_img"
                                  src={data.info.coverUrl
-                                     && USERS_FILE_IMAGE
-                                     + data.info.coverUrl} alt="cover"/>
+                                    ? USERS_FILE_IMAGE + data.info.coverUrl : profile2} alt="cover"/>
                           </a>
                         </div>
                         <div className="queueItemView__playButton"

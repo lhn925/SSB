@@ -190,7 +190,7 @@ public class User extends BaseTimeEntity {
     }
 
     public String getPictureUrl() {
-        return this.pictureUrl == null ? FileStore.USER_DEFAULT_IMAGE_URL : this.pictureUrl;
+        return this.pictureUrl;
     }
 
     public static void changeIsLoginBlocked(User user, UserLoginBlockUpdateDto userLoginBlockUpdateDto) {

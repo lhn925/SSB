@@ -14,6 +14,8 @@ import {shuffle} from "lodash";
 import {PLUS} from "../content/trackplayer/NumberSignTypes";
 import {authApi} from "./api/interceptor/ApiAuthInterceptor";
 import {USERS_PROFILE_LIST} from "./api/ApiEndpoints";
+import Swal from "sweetalert2";
+import {isCancel} from "axios";
 
 export function PwSecureCheckFn(level) {
   const secureLevel = {
@@ -778,3 +780,30 @@ export function getMinutes(num) {
   return 1000 * 60 * num;
 }
 
+export const ssbConfirm = (title,text,isCancelBtn,confirmText,cancelText,confirmEvent,cancelEvent) => {
+  const swalWithButtons = Swal.mixin({
+    customClass: {
+      confirmButton: "btn btn-primary ms-3",
+      cancelButton: "btn btn-outline-info "
+    },
+    buttonsStyling: false
+  });
+  swalWithButtons.fire({
+    title: title,
+    text: text,
+    // icon: "warning",
+    showCancelButton: isCancelBtn,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      confirmEvent();
+    } else if (
+        /* Read more about handling dismissals below */
+        result.dismiss === Swal.DismissReason.cancel
+    ) {
+      cancelEvent();
+    }
+  });
+}

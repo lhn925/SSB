@@ -56,8 +56,7 @@ public class UserInfoDto implements Serializable {
             .userNameModifiedDate(customUserDetails.getUserNameModifiedDate())
             .enabled(Enabled.valueOf(userDetails.isEnabled()))
             .isLoginBlocked(Blocked.valueOf(customUserDetails.getLoginBlocked()))
-            .pictureUrl(
-                customUserDetails.getPictureUrl() == null ? FileStore.USER_DEFAULT_IMAGE_URL : customUserDetails.getPictureUrl())
+            .pictureUrl(customUserDetails.getPictureUrl())
             .grantedAuthority((List<GrantedAuthority>) customUserDetails.getAuthorities())
             .build();
     }

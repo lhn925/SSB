@@ -23,7 +23,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -147,11 +146,13 @@ public class UserMyInfoController {
     public ResponseEntity<?>  updateUserProfilePicture(@Validated @ModelAttribute UserPictureUpdateDto file,
         BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
+
+
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         UploadFileDto uploadFileDto = null;
         uploadFileDto = userMyInfoService.updatePicture(file.getFile());
-        return new ResponseEntity<>(new Result<>(uploadFileDto), HttpStatus.OK);
+        return new ResponseEntity<>(uploadFileDto, HttpStatus.OK);
     }
 
     /**

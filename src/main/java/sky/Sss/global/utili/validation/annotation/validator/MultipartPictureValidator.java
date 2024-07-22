@@ -2,11 +2,13 @@ package sky.Sss.global.utili.validation.annotation.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.global.file.utili.FileUtils;
 import sky.Sss.global.utili.validation.annotation.MultipartPictureValid;
 
 
+@Slf4j
 public class MultipartPictureValidator implements ConstraintValidator<MultipartPictureValid, MultipartFile> {
     @Override
     public void initialize(MultipartPictureValid constraintAnnotation) {

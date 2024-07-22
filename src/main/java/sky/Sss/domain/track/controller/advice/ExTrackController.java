@@ -48,7 +48,6 @@ public class ExTrackController {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (e.getClass().equals(IllegalArgumentException.class)) {
             status = HttpStatus.BAD_REQUEST;
-
         }
         try {
             ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale());

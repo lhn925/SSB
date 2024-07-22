@@ -91,7 +91,8 @@ authApi.interceptors.response.use(
           return error;
         }
       } else if (status === HttpStatusCode.InternalServerError) {
-        return Promise.reject({response:{status:500,data:{messages:`errorMsg.server`}}})
+        // return Promise.reject({response:{status:500,data:{messages:`errorMsg.server`}}});
+        return error.response;
       } else if (status === HttpStatusCode.NotFound) {
         if (config.url === USERS_INFO) {
           return error.response;

@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {LOGIN} from "modal/content/ModalContent";
 import {useSelector} from "react-redux";
-
+import profile2 from "css/image/profile2.png";
 import {
   Dropdown,
 } from "react-bootstrap";
@@ -131,7 +131,7 @@ function CircularImageDropdown({
       <>
         <Dropdown>
           <Dropdown.Toggle variant="" id="dropdown-basic">
-            <img src={USERS_FILE_IMAGE + pictureUrl}/>
+            <img src={pictureUrl ?  USERS_FILE_IMAGE + pictureUrl : profile2}/>
           </Dropdown.Toggle>
 
           <Dropdown.Menu>

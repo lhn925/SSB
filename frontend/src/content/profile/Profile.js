@@ -12,16 +12,23 @@ import Nav from "components/nav/Nav";
 import {Btn} from "components/button/Btn";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {useTranslation} from "react-i18next";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {useDropdown} from "context/dropDown/DropdownProvider";
+import {acceptArray} from "utill/enum/Accept";
+import {encodeFileToBase64, ssbConfirm} from "utill/function";
+import PictureUpdateApi from "utill/api/picture/PictureUpdateApi";
+import {toast} from "react-toastify";
+import profile2 from "css/image/profile2.png";
 
-export function Profile({header, myUserInfo}) {
+export function Profile({header, setHeader, myUserInfo}) {
 
   const {t} = useTranslation();
 
   const {isDropdownOpen, handleClick} = useDropdown();
-
+  const pictureFileRef = useRef();
+  const [pictureImg, setPictureImg] = useState(null);
   const isMyProfile = myUserInfo.userReducer.id === header.id;
+
   const tabs = [
     {id: "all", title: "All", url: URL_SETTINGS},
     {id: "popular", title: "Popular tracks", url: URL_SETTINGS_SECURITY},
@@ -30,23 +37,74 @@ export function Profile({header, myUserInfo}) {
     {id: "Playlists", title: "Playlists", url: URL_SETTINGS_HISTORY},
     {id: "Reposts", title: "Reposts", url: URL_SETTINGS_HISTORY},
   ];
+  // 파일 btn event
+  const clickImgUploadBtnEvent = () => {
+    pictureFileRef.current.click();
+  }
+  const changePictureUploadEvent = () => {
+    const {files} = pictureFileRef.current;
+    if (files.length === 0) {
+      return;
+    }
+    ssbConfirm("", "프로필 사진을 정말 변경하시겠습니까?", true, "변경", "취소",
+        async () => {
+          const formData = new FormData();
+          formData.append("file", files[0]);
+          const response = await PictureUpdateApi(formData);
+          if (response.code === 200) {
+            const pictureUrl = response.data.storeFileName;
+            myUserInfo.updatePictureUrl(pictureUrl);
+            setHeader({...header, pictureUrl: pictureUrl})
+          } else {
+            toast.error(t(response.data?.errorDetails[0].message))
+          }
+          pictureFileRef.current.value = null;
+        }, () => {
+          pictureFileRef.current.value = null;
+        })
+  }
+
+  const pictureDeleteClickEvent = () => {
+    const {files} = pictureFileRef.current;
+    if (files.length === 0) {
+      return;
+    }
+    ssbConfirm("Are you sure?", "사진을 정말 삭제 하시겠습니까?", true, "변경", "취소",
+        async () => {
+          const formData = new FormData();
+          formData.append("file", files[0]);
+          const response = await PictureUpdateApi(formData);
+          if (response.code === 200) {
+            const pictureUrl = response.data.storeFileName;
+            myUserInfo.updatePictureUrl(pictureUrl);
+            setHeader({...header, pictureUrl: pictureUrl})
+          } else {
+            toast.error(t(response.data?.errorDetails[0].message))
+          }
+          pictureFileRef.current.value = null;
+        }, () => {
+          pictureFileRef.current.value = null;
+        })
+  }
   return (
       <div
           className='track-show-page container justify-content-center l-container'>
+        {/*헤더*/}
         <div className="profile-container col-12">
           {
-              isDropdownOpen && <div className="dropdownMenu g-z-index-overlay">
+              isMyProfile && isDropdownOpen && <div
+                  className="dropdownMenu g-z-index-overlay">
                 <ul className="list-group">
                   <li className="list-group-item">
                     <button className="btn btn-upload" onClick={() => {
-                      console.log("안녀")
+                      clickImgUploadBtnEvent();
                     }}>
                       Replace Image
                     </button>
                   </li>
                   <li className="list-group-item">
                     <button className="btn btn-upload" onClick={() => {
-                      console.log("안녀")
+                      pictureDeleteClickEvent();
                     }}>
                       Delete Image
                     </button>
@@ -57,7 +115,7 @@ export function Profile({header, myUserInfo}) {
           <div className='user-show-container'>
             <div className='user-show-image-container'>
               <div style={{
-                backgroundImage: `url(${USERS_FILE_IMAGE + header.pictureUrl})`,
+                backgroundImage: `url(${header.pictureUrl ? USERS_FILE_IMAGE + header.pictureUrl : profile2})`,
                 width: `240px`,
                 height: `200px`,
                 backgroundSize: `cover`,
@@ -71,12 +129,9 @@ export function Profile({header, myUserInfo}) {
                         }}>
                   {t(`msg.common.image.btn`)}
                 </button>
-                <input type="file"
-                       name="coverImgFile"
-                    // ref={coverImgFileRef}
-                    // onChange={changeCoverImgUploadEvent}
-                       multiple={false}
-                    // accept={acceptArray.toString()}
+                <input type="file" name="pictureImg" ref={pictureFileRef}
+                       onChange={changePictureUploadEvent} multiple={false}
+                       accept={acceptArray.toString()}
                        className="visually-hidden"/>
               </div>}
               {/*{editUser}*/}
@@ -93,6 +148,7 @@ export function Profile({header, myUserInfo}) {
           </div>
 
 
+          {/*메인 상단 nav*/}
           <div className='track-show-container-bottom'>
           <span className='track-index-page-container'>
             <div className="userInfoBar nav-tabs">
@@ -111,8 +167,14 @@ export function Profile({header, myUserInfo}) {
                }
               </div>
             </div>
+
+
+            {/*메인*/}
             <div className='track-index-container'>
             </div>
+
+
+            {/*사이드바*/}
             <div className="sidebar-placeholder">
               <div className="user-stats">
                 <div className="us-track-num">

@@ -6,7 +6,7 @@ import {
 } from "utill/api/ApiEndpoints";
 
 export async function UserFollowingApi(followingId) {
-  return await authApi.post(USERS_ACTION_MY_FOLLOWING + followingId);
+  // return await authApi.post(USERS_ACTION_MY_FOLLOWING + followingId);
   try {
     const response = await authApi.post(USERS_ACTION_MY_FOLLOWING + followingId);
     return {

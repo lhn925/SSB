@@ -78,23 +78,23 @@ public class UserMyInfoService {
         User user = userQueryService.getEntityUser();
         UploadFileDto uploadFileDto = null;
         if (!file.isEmpty()) {
-            try {
+//            try {
                 uploadFileDto = fileStore.storeFileSave(file, FileStore.PICTURE_TYPE, 500);
                 uploadFileDto.setUserId(user.getUserId());
                 //기존에 있던 이미지 삭제 없으면 삭제 x
-
-                User.deletePicture(user, fileStore);
+//                User.deletePicture(user, fileStore);
                 // 서버에 저장되는 파일이름 저장
                 User.updatePicture(user, uploadFileDto.getStoreFileName());
                 UserInfoDto.createUserInfo(user);
 
                 userQueryService.setUserInfoDtoRedis(RedisUserDto.create(user));
-            } catch (IOException e) {
-                throw new RuntimeException("error");
-            }
+//            } catch (IOException e) {
+//                throw new IllegalArgumentException("error");
+//            }
         } else {
-            throw new RuntimeException("file.error.NotBlank");
+            throw new IllegalArgumentException("file.error.NotBlank");
         }
+
         return uploadFileDto;
     }
     @Transactional
@@ -107,17 +107,12 @@ public class UserMyInfoService {
 
         // 프로필 사진이 있는 경우
         if (StringUtils.hasText(pictureUrl)) {
-            try {
                 //유저 이미지 삭제
-                User.deletePicture(user, fileStore);
+//                User.deletePicture(user, fileStore);
                 User.updatePicture(user, null);
                 UserInfoDto.createUserInfo(user);
-
                 // Redis 초기화
                 userQueryService.setUserInfoDtoRedis(RedisUserDto.create(user));
-            } catch (IOException e) {
-                throw new RuntimeException("error");
-            }
         } else {
             throw new FileNotFoundException("file.error.delete");
         }

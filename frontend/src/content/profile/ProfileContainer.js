@@ -45,7 +45,7 @@ const ProfileContainer = () => {
       <>
         {loading && <div>Loading...</div>}
         {error && <div>{error}</div>}
-        {header && <Profile header={header} myUserInfo={myUserInfo} />}
+        {header && <Profile header={header} setHeader={setHeader} myUserInfo={myUserInfo} />}
       </>
   );
 };

@@ -436,7 +436,7 @@ function ManageBody({
                       name="password"
                       iconClass="form-pw"
                       placeholder={t(`msg.common.sky.pw`)}/>
-                  <div className="d-grid gap-2 col-6 mx-auto">
+                  <div className="d-grid gap-2 col-6 mx-auto ">
                     <BtnOutLine
                         event={clickLogoutEvent}
                         text={t(`msg.common.sky.logout`)}

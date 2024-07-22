@@ -25,6 +25,7 @@ import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {useTranslation} from "react-i18next";
 import {useSelector} from "react-redux";
 import useMyUserInfo from "../../hoks/user/useMyUserInfo";
+import profile2 from "css/image/profile2.png";
 
 /**
  *
@@ -698,11 +699,13 @@ export const TrackPlayer = ({
             </div>
 
             <div className='tp-td-uploader-pic'>
-              <a href={linkToTrack}> <img className="player_cover_img"
-                                          src={trackInfo.coverUrl
-                                              && USERS_FILE_IMAGE
-                                              + trackInfo.coverUrl}
-                                          alt={""}/></a>
+              {
+                  trackInfo.id !== -1 && <a href={linkToTrack}> <img
+                      className="player_cover_img"
+                      src={trackInfo.coverUrl
+                          ? USERS_FILE_IMAGE + trackInfo.coverUrl : profile2}
+                      alt={""}/></a>
+              }
             </div>
             <div className='tp-td-track-info text-start'>
               <a href={linkToUploader}><p

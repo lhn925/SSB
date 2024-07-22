@@ -42,6 +42,10 @@ const useMyUserInfo = () => {
     updateArrayByType(followerIds, FOLLOWER_IDS);
   };
 
+  const updatePictureUrl = (pictureUrl) => {
+    dispatch(userActions.setPictureUrl({pictureUrl: pictureUrl}))
+  }
+
   const addArrayValueByType = (id, type) => {
     dispatch(userActions.addArrayValueByType({id: id, type: type}));
   };
@@ -58,6 +62,7 @@ const useMyUserInfo = () => {
     addArrayValueByType,
     removeArrayValueByType,
     setUserData,
+    updatePictureUrl
   };
 };
 export default useMyUserInfo;

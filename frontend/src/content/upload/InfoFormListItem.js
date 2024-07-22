@@ -25,6 +25,7 @@ import {CustomTagMention} from "components/mention/CustomTagMention";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {Btn} from "components/button/Btn";
+import {acceptArray} from "../../utill/enum/Accept";
 
 export function InfoFormListItem({
   cleanStore,
@@ -51,7 +52,6 @@ export function InfoFormListItem({
   const msgDefaultPath = `msg.track.upload.`;
 
   const [activeTab, setActiveTab] = useState(currentRoot);
-  const acceptArray = [".jpg", ".png", ".jpeg", ".bmp"];
 
   const [isPlayList, setIsPlayList] = useState(uploadInfo.isPlayList);
 

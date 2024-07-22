@@ -1,5 +1,7 @@
 export const USERS_INFO = "/users/info";
 export const USERS_INFO_PW = "/users/info/pw";
+export const USERS_INFO_PICTURE = "/users/info/picture"
+
 export const USERS_LOGOUT = "/users/logout";
 export const USERS_JOIN = "/users/join";
 export const USERS_HELP_RESET = "/users/help/reset";
@@ -16,6 +18,9 @@ export const USERS_INFO_USER_LOG = "/users/info/user-log";
 
 export const USERS_PROFILE_LIST = "/users/profile/list";
 export const USERS_PROFILE = "/users/profile/";
+
+
+
 
 
 

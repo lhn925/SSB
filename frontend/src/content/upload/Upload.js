@@ -12,15 +12,13 @@ import {EmptyUploadInfoContent} from "content/upload/EmptyUploadInfoContent";
 import {convertPictureToFile} from "utill/function";
 import {UseUploadActions} from "utill/app/functions";
 import {useTranslation} from "react-i18next";
+import {acceptTrackArray} from "../../utill/enum/Accept";
 
 export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
   const root = "upload";
 
   const {t} = useTranslation();
 
-
-  const acceptArray = [".mp3", ".flac", ".ogg", ".mp4", ".mpeg", ".wav",
-    ".m4a"];
   const tabs = [
     {id: "upload", title: "Upload", url: URL_UPLOAD},
   ];
@@ -336,7 +334,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
               t={t}
               uploadTotalLength={uploadTotalLength}
               clickTrackUploadBtnEvent={clickTrackUploadBtnEvent}
-              acceptArray={acceptArray}
+              acceptArray={acceptTrackArray}
               trackFileRef={trackFileRef}
               uploadSettings={uploadSettings}
               changePlayListChkEvent={changePlayListChkEvent}
@@ -362,7 +360,7 @@ export const Upload = ({dispatch, uploadInfo, uploadInfoActions}) => {
                onChange={changeTrackUploadEvent}
                name="trackUpload"
                multiple={true}
-               accept={acceptArray.toString()}
+               accept={acceptTrackArray.toString()}
                ref={trackFileRef}
                id="trackUpload"
                className="visually-hidden"/>}

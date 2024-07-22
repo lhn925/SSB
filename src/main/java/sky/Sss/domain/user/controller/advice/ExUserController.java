@@ -80,6 +80,7 @@ public class ExUserController {
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<ErrorResult> ioExHandler(RuntimeException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.info("e.getMessage() = {}", e.getMessage());
         if (e.getClass().equals(IllegalArgumentException.class)) {
             status = HttpStatus.BAD_REQUEST;
         }
