@@ -12,6 +12,7 @@ const useMyUserInfo = () => {
   const isTrackLike = (trackId) => {
     return userReducer.trackLikedIds.includes(trackId);
   }
+
   const isFollowing = (uid) => userReducer.followingIds.includes(uid);
   const isFollower = (uid) => userReducer.followerIds.includes(uid);
 

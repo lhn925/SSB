@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 
-function Nav({ currentRoot, tabs }) {
+function Nav({ currentRoot, tabs,style }) {
   const [activeTab, setActiveTab] = useState(currentRoot);
 
   useEffect(() => {
@@ -15,7 +15,7 @@ function Nav({ currentRoot, tabs }) {
               <li className="nav-item" key={tab.id}>
                 <Link
                     value={tab.id}
-                    className={`nav-link link_font_color ${activeTab === tab.id ? "active" : ""}`}
+                    className={`nav-link link_font_color ${activeTab === tab.id ? "active" : ""} ` + style}
                     to={tab.url}
                 >
                   {tab.title}
@@ -26,5 +26,7 @@ function Nav({ currentRoot, tabs }) {
       </>
   );
 }
+
+
 
 export default Nav;

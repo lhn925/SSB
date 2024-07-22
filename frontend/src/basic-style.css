@@ -19,7 +19,9 @@
   grid-area: b;
 }
 .userInfoBar {
+  display: flex;
   position: relative;
+  grid-area: header;
   padding-top: 15px;
 }
 .l-fluid-fixed {

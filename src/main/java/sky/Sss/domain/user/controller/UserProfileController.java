@@ -67,9 +67,6 @@ public class UserProfileController {
         if (uidListSearchReqDto == null || uidListSearchReqDto.getIds().isEmpty()) {
             throw new IllegalArgumentException();
         }
-
-        log.info("uidListSearchReqDto.getIds().get(0) = {}", uidListSearchReqDto.getIds().get(0));
-        
         return ResponseEntity.ok(userProfileService.getUserInfoListByIds(
             new HashSet<>(uidListSearchReqDto.getIds())));
     }

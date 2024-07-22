@@ -13,15 +13,22 @@
 }
 
 .sidebar-placeholder{
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  /*flex: 1;*/
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  grid-area: b;
   border-left: 1px #e2e2e2 solid;
-  margin-top: 22px;
+  margin-top: 5px;
 }
 
-.track-index-page-container{
-  display: flex;
+.track-index-page-container {
+  display: grid;
+  grid-template-areas:
+		" header header header"
+		"  main   main    b"
+		"   .      .      b";
+  grid-template-columns: 3fr 1fr;
+  gap: 15px;
   width: 100%;
 }
 

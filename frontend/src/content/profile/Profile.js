@@ -3,58 +3,137 @@ import "css/common/tracks.css"
 import "css/profile/trackShow.css"
 import "css/profile/app.css"
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
+import {
+  URL_SETTINGS,
+  URL_SETTINGS_HISTORY,
+  URL_SETTINGS_SECURITY
+} from "content/UrlEndpoints";
+import Nav from "components/nav/Nav";
+import {Btn} from "components/button/Btn";
+import {BtnOutLine} from "components/button/BtnOutLine";
+import {useTranslation} from "react-i18next";
+import {useState} from "react";
+import {useDropdown} from "context/dropDown/DropdownProvider";
 
-export function Profile({userInfo}) {
+export function Profile({header, myUserInfo}) {
 
-  const tag1 = 'ti-tab';
-  const tag2 = 'ti-tab ttmid tagpicked';
-  const aboutstyle = "no-about";
-  const about = null;
+  const {t} = useTranslation();
+
+  const {isDropdownOpen, handleClick} = useDropdown();
+
+  const isMyProfile = myUserInfo.userReducer.id === header.id;
+  const tabs = [
+    {id: "all", title: "All", url: URL_SETTINGS},
+    {id: "popular", title: "Popular tracks", url: URL_SETTINGS_SECURITY},
+    {id: "tracks", title: "Tracks", url: URL_SETTINGS_HISTORY},
+    {id: "Albums", title: "Albums", url: URL_SETTINGS_HISTORY},
+    {id: "Playlists", title: "Playlists", url: URL_SETTINGS_HISTORY},
+    {id: "Reposts", title: "Reposts", url: URL_SETTINGS_HISTORY},
+  ];
   return (
-      <div className='track-show-page container justify-content-center l-container'>
+      <div
+          className='track-show-page container justify-content-center l-container'>
         <div className="profile-container col-12">
-          <div className='user-show-container '>
+          {
+              isDropdownOpen && <div className="dropdownMenu g-z-index-overlay">
+                <ul className="list-group">
+                  <li className="list-group-item">
+                    <button className="btn btn-upload" onClick={() => {
+                      console.log("안녀")
+                    }}>
+                      Replace Image
+                    </button>
+                  </li>
+                  <li className="list-group-item">
+                    <button className="btn btn-upload" onClick={() => {
+                      console.log("안녀")
+                    }}>
+                      Delete Image
+                    </button>
+                  </li>
+                </ul>
+              </div>
+          }
+          <div className='user-show-container'>
             <div className='user-show-image-container'>
-              <img src={USERS_FILE_IMAGE + userInfo.pictureUrl}
-                   alt="pictureUrl"/>
+              <div style={{
+                backgroundImage: `url(${USERS_FILE_IMAGE + header.pictureUrl})`,
+                width: `240px`,
+                height: `200px`,
+                backgroundSize: `cover`,
+                backgroundPosition: `center`
+              }}></div>
+              {isMyProfile && <div className={(isDropdownOpen && "d-block")
+                  + " upload-btn-wrapper"}>
+                <button className="btn btn-upload btn-upload-picture  "
+                        onClick={(e) => {
+                          handleClick(e);
+                        }}>
+                  {t(`msg.common.image.btn`)}
+                </button>
+                <input type="file"
+                       name="coverImgFile"
+                    // ref={coverImgFileRef}
+                    // onChange={changeCoverImgUploadEvent}
+                       multiple={false}
+                    // accept={acceptArray.toString()}
+                       className="visually-hidden"/>
+              </div>}
               {/*{editUser}*/}
             </div>
             <div className='user-show-detail'>
               <div className='user-sd-top'>
                 <div className='user-sd-info'>
-                  <div className='user-sd-title'>{userInfo.userName}</div>
-                  <div className='user-sd-other'>{userInfo.email}</div>
+                  <div className='user-sd-title'>{header.userName}</div>
+                  {/*<div className='user-sd-other'>{header.email}</div>*/}
                   {/*<div className='user-sd-other'>{user.location || "vibesphere, Earth"}</div>*/}
                 </div>
               </div>
             </div>
-
           </div>
+
+
           <div className='track-show-container-bottom'>
           <span className='track-index-page-container'>
-            <div className='track-index-container'>
-              <ul className='track-index-tabs'>
-                {/*<li className={tag1}><a onClick={()=> this.togglePostTracks()}>Tracks</a></li>*/}
-                {/*<li className={tag2}><a onClick={()=> this.togglePostLikes()}>Liked</a></li>*/}
-              </ul>
-              {/*{tIndex}*/}
+            <div className="userInfoBar nav-tabs">
+              <div className="content-tabs tabs">
+                {/*<PrivacyNav navigate={navigate} root={root}/>*/}
+                <Nav currentRoot={'test'} tabs={tabs}/>
+              </div>
+              <div className="userInfoBar-buttons">
+               {
+                 !isMyProfile ? <> <Btn text={"Station"}/>
+                   <BtnOutLine text={"Following"}/>
+                   <Btn text={"share"}/>
+                   <BtnOutLine text={"안녕"}/>
+                   <Btn text={"안녕"}/></> : <BtnOutLine text="Edit"/>
 
+               }
+              </div>
+            </div>
+            <div className='track-index-container'>
             </div>
             <div className="sidebar-placeholder">
               <div className="user-stats">
                 <div className="us-track-num">
-                  <p>Tracks</p>
+                  <p>Followers</p>
                   {/*<p>{parseInt(tracks.length)}</p>*/}
-                  <p>{2}</p>
+                  <p>{header.followerCount}</p>
                 </div>
                 <div className="vertical-line"></div>
-                <div className="us-track-num">
-                  <p>Liked Tracks</p>
-                  {/*<p>{parseInt(likedTracks.length)}</p>*/}
-                  <p>2</p>
+                  <div className="us-track-num">
+                  <p>following</p>
+                    {/*<p>{parseInt(tracks.length)}</p>*/}
+                    <p>{header.followingCount}</p>
                 </div>
+                <div className="vertical-line"></div>
+                  <div className="us-track-num">
+                  <p>Tracks</p>
+                    <p>{header.trackTotalCount}</p>
+                </div>
+
               </div>
-              <div className={aboutstyle}>{about}</div>
+              <div className="no-about">{}</div>
               <div className="ad-container">
                 <a href="https://github.com/Mpompili" target="_blank"><img
                     src="https://res.cloudinary.com/mpompili/image/upload/v1526013412/gotogithub.jpg"

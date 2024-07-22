@@ -21,6 +21,23 @@ const useCachedUsers = () => {
   const removeUser = (id) => {
     dispatch(cachedUsersActions.removeUser({id: id}));
   }
+  const fetchUserByUserName = (userName) => {
+    // 캐시에 사용자가 없는 경우 null 반환
+    if (cachedUsers.users.length === 0) {
+      return null;
+    }
+    const userMap = new Map(cachedUsers.users);
+    const userArray = userMap.values();
+    // 캐시에서 사용자 검색
+
+    for (const user of userArray) {
+      // 사용자가 발견된 경우 해당 사용자 반환, 그렇지 않으면 null 반환
+      if (user.userName === userName) {
+        return fetchUsers(user.id);
+      }
+    }
+    return null;
+  };
 
   const fetchUsers = async (...ids) => {
     if (ids == null || ids.length === 0) {
@@ -28,7 +45,6 @@ const useCachedUsers = () => {
     }
     const staleTime = cachedUsers.staleTime;
     const cacheTime = cachedUsers.cacheTime;
-
 
     const fetchUsers = [];
     const userMap = new Map(cachedUsers.users);
@@ -53,6 +69,7 @@ const useCachedUsers = () => {
         fetchUsers.push(user);
       }
     }
+
     if (findIds.length === 0) {
       return fetchUsers;
     }
@@ -76,7 +93,7 @@ const useCachedUsers = () => {
   }
 
   return {
-    addUsers, cachedUsers, fetchUsers, removeUser
+    addUsers, cachedUsers, fetchUsers, removeUser,fetchUserByUserName
   }
 };
 export default useCachedUsers;

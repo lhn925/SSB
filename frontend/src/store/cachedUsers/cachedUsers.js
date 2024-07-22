@@ -8,6 +8,7 @@ const createUsersInfo = (data) => (
       userName: data.userName,
       followerCount: data.followerCount,
       followingCount: data.followingCount,
+      trackTotalCount: data.trackTotalCount,
       pictureUrl: data.pictureUrl,
       lastFetched: data.lastFetched // fetch 시간대
     });

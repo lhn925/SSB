@@ -553,7 +553,6 @@ export function InfoFormListItem({
                      multiple={false}
                      accept={acceptArray.toString()}
                      className="visually-hidden"/>
-
             </div>
 
           </div>

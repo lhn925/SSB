@@ -15,6 +15,7 @@ export const USERS_INFO_LOGOUT_STATUS = "/users/info/logout/status";
 export const USERS_INFO_USER_LOG = "/users/info/user-log";
 
 export const USERS_PROFILE_LIST = "/users/profile/list";
+export const USERS_PROFILE = "/users/profile/";
 
 
 

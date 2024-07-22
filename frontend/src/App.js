@@ -40,6 +40,8 @@ import {SESSION_ID} from "utill/enum/localKeyEnum";
 import useMyUserInfo from "hoks/user/useMyUserInfo";
 import ProfileContainer from "content/profile/ProfileContainer";
 import {persistor} from "store/store";
+import {resetAll} from "./store/actions";
+import {DropdownProvider, useDropdown} from "context/dropDown/DropdownProvider";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -72,7 +74,7 @@ function App() {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { closeDropdown } = useDropdown();
   const {openModal, closeModal, changeModalType, modal} = useModal();
 
   const {
@@ -117,94 +119,93 @@ function App() {
   }, [client.current.client, uploadInfo.tracks])
 
   useEffect(() => {
-   async function userReset() {
+    async function userReset() {
       if (currentAuth.access == null && userReducer.userId != null) {
-        console.error("초기화 문제 발생")
-
+        dispatch(resetAll());
         await persistor.purge()
       }
     }
-    userReset().catch(()=>console.log("초기화 에러 발생 error"))
+
+    userReset().catch(() => console.log("초기화 에러 발생 error"))
     if (currentAuth.access == null) {
       return;
     }
-    CheckUserInfo(currentAuth, client, t, bc,userReducer.setUserData);
+    CheckUserInfo(currentAuth, client, t, bc, userReducer.setUserData);
   }, [currentAuth]) // 페이지 이동 시 유저정보 확인
 
   return (
-      <div className="App">
-        <Header modal={modal}
-                dispatch={dispatch}
-                openModal={openModal}
-                {...userReducer}
 
-                changeModalType={changeModalType}
-                bc={bc}
-                currentAuth={currentAuth}
-                client={client.current.client}
-                navigate={navigate}/>
-        <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-        />
-        <div className="container justify-content-center l-container">
 
-          <Suspense fallback="Loading...">
-            <Routes>
-              {/*<Route path="/" element={<Profile userInfo={userReducer}/>}>*/}
-              {/*</Route>*/}
-              <Route path="/feed">
-              </Route>
-              <Route path="/" element={  <div>메인화면</div>}>
-              </Route>
-              <Route path="/:userName" element={<ProfileContainer/>}>
-              </Route>
-              <Route path="/upload" element={
-                <UploadActionsContext.Provider value={coverImgFileActions}>
-                  <UploadValueContext.Provider value={coverImgFiles}>
-                    <Upload
-                        dispatch={dispatch}
-                        uploadInfo={uploadInfo}
-                        uploadInfoActions={uploadInfoActions}/>
+        <div className="App" onClick={closeDropdown}>
+          <Header modal={modal}
+                  dispatch={dispatch}
+                  openModal={openModal}
+                  {...userReducer}
 
-                  </UploadValueContext.Provider>
-                </UploadActionsContext.Provider>
-              }>
-              </Route>
-              <Route path={URL_SETTINGS + "/:root?"}
-                     element={
-                       <Settings
-                           openModal={openModal}
-                           dispatch={dispatch}
-                           changeModalType={changeModalType}
-                           modal={modal}
-                           navigate={navigate}
-                           location={location}/>
-                     }>
-              </Route>
-            </Routes>
-          </Suspense>
-          <ModalContent bc={bc} modalVisible={modal.visible}
-                        closeModal={closeModal}/>
+                  changeModalType={changeModalType}
+                  bc={bc}
+                  currentAuth={currentAuth}
+                  client={client.current.client}
+                  navigate={navigate}/>
+          <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+          />
+          <div className="container justify-content-center l-container">
 
+            <Suspense fallback="Loading...">
+              <Routes>
+
+                <Route path="/feed">
+                </Route>
+                <Route path="/" element={<div>메인화면</div>}>
+                </Route>
+                <Route path="/:userName" element={<ProfileContainer/>}>
+                </Route>
+                <Route path="/upload" element={
+                  <UploadActionsContext.Provider value={coverImgFileActions}>
+                    <UploadValueContext.Provider value={coverImgFiles}>
+                      <Upload
+                          dispatch={dispatch}
+                          uploadInfo={uploadInfo}
+                          uploadInfoActions={uploadInfoActions}/>
+
+                    </UploadValueContext.Provider>
+                  </UploadActionsContext.Provider>
+                }>
+                </Route>
+                <Route path={URL_SETTINGS + "/:root?"}
+                       element={
+                         <Settings
+                             openModal={openModal}
+                             dispatch={dispatch}
+                             changeModalType={changeModalType}
+                             modal={modal}
+                             navigate={navigate}
+                             location={location}/>
+                       }>
+                </Route>
+              </Routes>
+            </Suspense>
+            <ModalContent bc={bc} modalVisible={modal.visible}
+                          closeModal={closeModal}/>
+
+          </div>
+
+          {
+              currentAuth.access && <TrackPlayerContainer bc={bc}
+                                                          userReducer={userReducer}/>
+          }
         </div>
-
-        {
-            currentAuth.access && <TrackPlayerContainer bc={bc} userReducer={userReducer}/>
-        }
-
-
-      </div>
-  )
-      ;
+  );
 }
 
 export default App;
