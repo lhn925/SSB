@@ -57,7 +57,7 @@ public class UserMyInfoService {
         userJoinService.checkUserName(userNameUpdateDto.getUserName(), bindingResult);
 
         // 유저 네임을 가입하고나서 처음 변경 할경우 바로 변경 가능
-        if (userNameModifiedDate != null && now.isAfter(userNameModifiedDate)) {
+        if (userNameModifiedDate != null && !now.isAfter(userNameModifiedDate)) {
             // 1개월이 넘지못했다면
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd E HH:mm");
             throw new ChangeUserNameIsNotAfterException(userNameModifiedDate.format(dateTimeFormatter));
