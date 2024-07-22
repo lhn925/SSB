@@ -278,6 +278,7 @@ public class UserMyInfoController {
             return Result.getErrorResult(new ErrorResultDto(bindingResult, ms, request.getLocale()));
         }
         String sessionId = request.getSession().getId();
+
         // 로그인 되어 있는 디바이스 기기 로그아웃
         userLoginStatusService.logoutDevice(userLoginStatusUpdateDto.getPassword(),userLoginStatusUpdateDto.getSession(), Status.ON, Status.ON, sessionId);
         return ResponseEntity.ok(HttpStatus.OK);

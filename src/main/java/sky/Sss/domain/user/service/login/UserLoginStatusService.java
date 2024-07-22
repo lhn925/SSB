@@ -155,8 +155,9 @@ public class UserLoginStatusService {
     public void logoutDevice(String password, String logoutSessionId, Status loginStatus, Status isStatus,
         String sessionId) {
 //        해당 세션 정보 가져옴
-        User user = userQueryService.findOne();
-        boolean matches = passwordEncoder.matches(password, user.getPassword());
+        User user = userQueryService.getEntityUser();
+        boolean matches = passwordEncoder.matches(password.trim(), user.getPassword());
+
         if (!matches) {
             throw new BadCredentialsException("pw.authMatches.mismatch");
         }
