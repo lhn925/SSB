@@ -1,0 +1,55 @@
+.image, .image__full {
+  text-align: center;
+  position: relative;
+  background-repeat: no-repeat
+}
+
+.image__lightOutline .image__full {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1)
+}
+
+body:not(.sc-classic) .image__whiteOutline .image__full {
+  outline: 2px solid #fff;
+}
+
+.sc-classic .image__whiteOutline .image__full {
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  background-origin: border-box
+}
+
+.image.interactive {
+  cursor: pointer
+}
+
+.image__rounded {
+  border-radius: 50%
+}
+
+.image:focus {
+  outline: 0
+}
+
+.image:focus .image__full {
+  border: 1px dotted #999;
+  box-sizing: border-box;
+  background-origin: border-box
+}
+
+.image__rounded.m-loaded.sc-artwork {
+  background: none
+}
+
+.image__placeholder {
+  position: absolute
+}
+
+.image .sc-artwork.sc-artwork-placeholder-blank {
+  box-sizing: border-box;
+  background-origin: border-box
+}
+
+.image:not(.m-loaded) .sc-artwork.sc-artwork-placeholder-blank {
+  border: 1px dashed #ccc;
+  box-shadow: none
+}

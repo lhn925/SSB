@@ -1,0 +1,11 @@
+.soundBadgeList.compact .loading {
+  padding: 85px 0
+}
+
+.sc-classic .soundBadgeList.compact .soundBadgeList__item {
+  padding: 5px 0
+}
+
+body:not(.sc-classic) .soundBadgeList.compact .soundBadgeList__item {
+  max-height: 76px
+}

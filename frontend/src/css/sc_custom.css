@@ -2,12 +2,6 @@
 
 
 
-
-
-
-
-
-
 .sc-button {
   display: inline-block;
   position: relative;
@@ -162,4 +156,74 @@ a.sc-link-light {
 
 .sc-text-light {
   color: #999;
+}
+
+.sc-button-toolbar {
+  margin: 0 0 7px
+}
+
+.sc-button-toolbar:after,.sc-button-toolbar:before {
+  content: "";
+  display: table
+}
+
+.sc-button-toolbar:after {
+  clear: both
+}
+.sc-button-group {
+  vertical-align: middle;
+  display: inline-block;
+  clear: both
+}
+
+.sc-button-group>.sc-button,.sc-button-toolbar>.sc-button {
+  float: left;
+  margin-right: 5px
+}
+
+.sc-button-group>.sc-button:last-child,.sc-button-toolbar>.sc-button:last-child {
+  margin-right: 0
+}
+
+.sc-button-toolbar>.sc-button-group {
+  float: left;
+  clear: none;
+  padding-right: 5px;
+  padding-left: 5px
+}
+
+.sc-button-toolbar>.sc-button-group-medium {
+  padding-right: 10px;
+  padding-left: 10px
+}
+
+.sc-button-toolbar>.sc-button-group:first-child {
+  padding-left: 0;
+  border-left: none
+}
+
+.sc-button-toolbar>.sc-button-group:last-child {
+  padding-right: 0
+}
+
+.sc-button-group-pill>.sc-button:not(:last-child) {
+  margin-right: 0;
+  border-radius: 0;
+  border-right: 0
+}
+
+.sc-button-group-pill>.sc-button-visual:not(:last-child) {
+  margin-right: 1px
+}
+
+.sc-button-group-pill>.sc-button:first-child {
+  border-radius: 4px 0 0 4px
+}
+
+.sc-button-group-pill>.sc-button:last-child {
+  border-radius: 0 4px 4px 0
+}
+
+.sc-button-group-pill>.sc-button:first-child:last-child {
+  border-radius: 4px
 }

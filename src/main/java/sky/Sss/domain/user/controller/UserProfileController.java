@@ -85,7 +85,7 @@ public class UserProfileController {
     /**
      *
      * 사용자가 최근에 좋아요한 트랙 3개 및
-     * 좋아요 총합ㅌ
+     * 좋아요 총합
      *
      * @param uid
      * @return

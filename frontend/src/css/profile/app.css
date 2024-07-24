@@ -36,12 +36,56 @@
   margin-bottom: 40px;
 }
 
-.ad-container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+.sidebar-module {
+  /*display: flex;*/
+  /*flex-direction: column; !* 플렉스 아이템을 세로 방향으로 배치 *!*/
+  /*justify-content: center;*/
+  /*align-items: center;*/
+  /*overflow: hidden;*/
   box-sizing: border-box;
-  margin: 15px auto;
-  height: 250px;
-  width: 300px;}
+  /*margin: 15px auto;*/
+  width: 300px;
+  min-height: 250px; /* 최소 높이를 설정 */
+}
+
+.sidebar-header {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+  width: 300px;
+  color: #999;
+  text-decoration: none;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f2f2f2;
+  flex: 1;
+}
+
+.sidebarContent {
+
+}
+
+.sidebarHeader__title {
+  line-height: 24px;
+  display: flex;
+  flex-direction: row;
+  /*align-items: start;*/
+  font-size: 14px;
+  flex: 1;
+  margin: 15px 0 0;
+  color: #999;
+  text-align: start;
+}
+.sidebarHeader__more {
+  flex: 1;
+  margin: 15px 0 0;
+  line-height: 24px;
+  text-align: end;
+}
+
+.sidebarHeader__actualTitle {
+  line-height: 24px;
+  flex: 1;
+
+}
+

@@ -2,6 +2,9 @@ import "css/profile/profile.css"
 import "css/common/tracks.css"
 import "css/profile/trackShow.css"
 import "css/profile/app.css"
+import "css/profile/sound-badge.css"
+import "css/profile/sound-badge-list.css"
+import "css/profile/image.css"
 import {USERS_FILE_IMAGE} from "utill/api/ApiEndpoints";
 import {
   URL_SETTINGS,
@@ -12,18 +15,23 @@ import Nav from "components/nav/Nav";
 import {Btn} from "components/button/Btn";
 import {BtnOutLine} from "components/button/BtnOutLine";
 import {useTranslation} from "react-i18next";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useDropdown} from "context/dropDown/DropdownProvider";
 import {acceptArray} from "utill/enum/Accept";
-import {encodeFileToBase64, ssbConfirm} from "utill/function";
+import {durationTime, encodeFileToBase64, ssbConfirm} from "utill/function";
 import PictureUpdateApi from "utill/api/picture/PictureUpdateApi";
 import {toast} from "react-toastify";
 import profile2 from "css/image/profile2.png";
 import PictureDeleteApi from "utill/api/picture/PictureDeleteApi";
-import useModal from "hoks/modal/useModal";
 import {PROFILE_EDIT} from "../../modal/content/ModalContent";
 
-export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
+export function Profile({
+  header,
+  setHeader,
+  myUserInfo,
+  cachedUser,
+  useModal1
+}) {
 
   const {t} = useTranslation();
   const {isDropdownOpen, handleClick} = useDropdown();
@@ -44,16 +52,17 @@ export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
     }
 
     // 닉네임 변경시 즉시 반영
-    const isUserNameChange = header.userName !== myUserInfo.userReducer.userName;
+    const isUserNameChange = header.userName
+        !== myUserInfo.userReducer.userName;
     if (isMyProfile && isUserNameChange) {
-       const newHeader = {...header,userName:myUserInfo.userReducer.userName}
+      const newHeader = {...header, userName: myUserInfo.userReducer.userName}
       cachedUser.addUsers(newHeader);
       setHeader(newHeader);
       return;
     }
 
     cachedUser.addUsers(header);
-  }, [header,myUserInfo.userReducer.userName])
+  }, [header, myUserInfo.userReducer.userName])
   // 파일 btn event
   const clickImgUploadBtnEvent = () => {
     pictureFileRef.current.click();
@@ -90,7 +99,8 @@ export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
     if (!header.pictureUrl) {
       return;
     }
-    ssbConfirm("t) Are you sure?", "t)  사진을 정말 삭제 하시겠습니까?", true, "t) 삭제", "t) 취소",
+    ssbConfirm("t) Are you sure?", "t)  사진을 정말 삭제 하시겠습니까?", true, "t) 삭제",
+        "t) 취소",
         async () => {
           const response = await PictureDeleteApi();
           if (response.code === 200) {
@@ -116,7 +126,7 @@ export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
                     <button className="btn btn-upload" onClick={() => {
                       clickImgUploadBtnEvent();
                     }}>
-                      Replace Image
+                      t)Replace Image
                     </button>
                   </li>
                   {
@@ -124,7 +134,7 @@ export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
                         <button className="btn btn-upload" onClick={() => {
                           pictureDeleteClickEvent();
                         }}>
-                          Delete Image
+                          t)Delete Image
                         </button>
                       </li>
                   }
@@ -182,7 +192,8 @@ export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
                    <BtnOutLine text={"Following"}/>
                    <Btn text={"share"}/>
                    <BtnOutLine text={"안녕"}/>
-                   <Btn text={"안녕"}/></> : <BtnOutLine text="Edit" event={clickEditBtnEvent }/>
+                   <Btn text={"안녕"}/></> : <BtnOutLine text="Edit"
+                                                       event={clickEditBtnEvent}/>
 
                }
               </div>
@@ -215,21 +226,123 @@ export function Profile({header, setHeader, myUserInfo, cachedUser,useModal1}) {
                 </div>
 
               </div>
-              <div className="no-about">{}</div>
-              <div className="ad-container">
-                <a href="https://github.com/Mpompili" target="_blank"><img
-                    src="https://res.cloudinary.com/mpompili/image/upload/v1526013412/gotogithub.jpg"
-                    alt=""/></a>
-              </div>
-              <div className="ad-container">
+              {/*<div className="no-about">{}</div>*/}
+
+
+              <article className="sidebar-module" >
+                <a className="sidebar-header">
+                  <h3 className="sidebarHeader__title">
+                    <span className="sidebarHeader__actualTitle">2 likes</span>
+                  </h3>
+                  <span className="sidebarHeader__more">View all</span>
+                </a>
+
+                <div className="sidebarContent" style={{minHeight: `210.6px`}}>
+                  {/*상위*/}
+                  <div className="soundBadgeList compact lazyLoadingList">
+
+                    <ul className="sc-list-nostyle sc-clearfix"
+                        style={{textAlign:"left",padding:0}}>
+                      <li className="soundBadgeList__item">
+                        <div
+                            className="soundBadge compact sc-media playlist m-playable">
+                          <span className="soundBadge__artwork sc-mr-2x sc-media-image" style={{float:"left",marginRight:`10px`}} >
+                            <div
+                                className="image image__lightOutline sc-artwork sc-artwork-placeholder-7 m-loaded"
+                                style={{height: `50px`, width: `50px`}}>
+                              <a href="#">
+                            <img style={{backgroundColor: '#fff'}}
+                                 className="player_cover_img"
+                                 src={profile2} alt="cover"/>
+                          </a>
+                            </div>
+                              <span className="soundBadge__playButton">
+                                <a role="button" href=""
+                                   className="sc-button-play playButton sc-button sc-button-large"
+                                   tabIndex="0" title="Play"
+                                   draggable="true">Play</a>
+                              </span>
+                          </span>
+
+                                <div className="sc-media-content soundBadge__content">
+                              <div className="soundTitle sc-clearfix sc-hyphenate sc-type-h3 sc-text-h4">
+                                <div className="soundTitle__titleContainer">
+                                  <div className="soundTitle__usernameTitleContainer sc-mb-0.5x">
+                                    <div className="sc-type-light sc-text-secondary sc-text-h4 soundTitle__secondary sc-truncate">
+                                      <a href="/cindy-lim-82312455"
+                                         className="soundTitle__username sc-link-secondary sc-link-light">
+                                        <span className="soundTitle__usernameText">UaenaCindy</span>
+                                      </a>
+                                    </div>
+                                    <a className="sc-link-primary soundTitle__title sc-link-dark sc-text-h4"
+                                       href="/cindy-lim-82312455/sets/iu-1" title="IU 아이유 - Album">
+                                      <span className="sc-truncate">IU 아이유 - Album</span>
+                                    </a>
+                                  </div>
+                                  <div className="soundTitle__additionalContainer sc-ml-1.5x"></div>
+                                </div>
+                              </div>
+                              <span
+                                  className="releaseDateCompact sc-type-light sc-text-secondary sc-font-light">
+                                Album&nbsp;·&nbsp;<span className="sc-font-light">2021</span>
+                              </span>
+
+                              <div className="soundBadge__additional">
+                                <div className="soundBadge__actions">
+                                  <div className="soundActions sc-button-toolbar soundActions__small">
+                                    <div className="sc-button-group sc-button-group-small">
+                                      <button type="button"
+                                              className="sc-button-like sc-button-secondary sc-button sc-button-small sc-button-icon sc-button-responsive sc-button-selected"
+                                              aria-describedby="tooltip-10265" tabIndex="0" title="Unlike"
+                                              aria-label="Unlike">Liked</button>
+                                      <button type="button"
+                                              className="sc-button-more sc-button-more sc-button sc-button-small sc-button-icon sc-button-responsive"
+                                              tabIndex="0" aria-haspopup="true" role="button"
+                                              aria-owns="dropdown-button-10267" title="More"
+                                              aria-label="More">More</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+
+                        </div>
+
+
+
+
+
+                    </li>
+                    </ul>
+                  </div>
+                </div>
+
+
+              </article>
+
+
+
+
+
+                   <article className="sidebar-module">
+                <a className="sidebar-header">
+                  <h3 className="sidebarHeader__title">
+                    <span className="sidebarHeader__actualTitle">2 likes</span>
+                  </h3>
+                  <span className="sidebarHeader__more">View all</span>
+                </a>
+              </article>
+
+              <article className="sidebar-module">
                 <a href="https://www.linkedin.com/in/michael-pompili-916a0837/"
                    target="_blank"><img
                     src="https://res.cloudinary.com/mpompili/image/upload/v1526335358/linkedinad.jpg"
                     alt=""/></a>
-              </div>
+              </article>
               <div className="extraspace"></div>
-            </div>
-          </span>
+          </div>
+        </span>
           </div>
         </div>
       </div>

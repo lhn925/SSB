@@ -78,8 +78,6 @@ function ProfileEdit({bc, closeModal,changeModalType}) {
     const body = {
       userName: inputs.userName,
     }
-
-
     const response = await UserNameUpdateApi(body);
     variable.current.isDoubleClick = false;
     const result = response.code !== 200;

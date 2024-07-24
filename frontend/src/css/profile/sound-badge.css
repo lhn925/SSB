@@ -1,0 +1,359 @@
+.soundBadge {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 4px;
+  min-height: 64px
+}
+
+.sc-classic .soundBadge {
+  padding: 5px 10px;
+  min-height: 60px
+}
+
+.soundBadge__additional {
+  background: linear-gradient(270deg, #fff 79.69%, hsla(0, 0%, 100%, 0));
+  position: absolute;
+  padding-left: 24px;
+  right: 16px;
+  top: 24px;
+}
+
+body:not(.sc-classic) .soundBadge:not(.compact) .soundBadge__additional {
+  display: flex;
+  min-height: 32px
+}
+
+.sc-classic .soundBadge__additional {
+  background: #fff;
+  background: linear-gradient(90deg, hsla(0, 0%, 100%, .1), #fff 17px);
+  top: 25px;
+  right: 0;
+  padding: 0 10px 0 20px
+}
+
+.soundBadge__actions {
+  float: left;
+  display: none
+}
+
+body:not(.sc-classic) .soundBadge .soundActionsOwner {
+  padding-left: 0
+}
+
+body:not(.sc-classic) .soundBadge__extra {
+  display: flex;
+  align-items: center
+}
+
+.sc-classic .soundBadge__extra {
+  float: left;
+  margin: 2px 0 0 15px
+}
+
+.soundBadge__extraItem {
+  margin-left: 32px;
+  text-align: right
+}
+
+.sc-classic .soundBadge__extraItem {
+  float: left;
+  margin-left: 20px
+}
+
+.soundBadge__extraItem:first-child {
+  margin-left: 0
+}
+
+.soundBadge__duration, .soundBadge__uploadTime {
+  padding: 1px 0
+}
+
+.soundBadge__duration {
+  min-width: 45px
+}
+
+.soundBadge__hd {
+  min-width: 25px;
+  min-height: 1px
+}
+
+.sc-classic .soundBadge__hd {
+  min-width: 35px
+}
+
+.soundBadge__uploadTime {
+  min-width: 90px
+}
+
+.sc-classic .soundBadge__uploadTime {
+  min-width: 80px
+}
+
+.soundBadge__audibleAttributes {
+  min-width: 107px;
+  min-height: 1px
+}
+
+.soundBadge__audibleAttributes > div {
+  margin-left: auto
+}
+
+.sc-classic .soundBadge__audibleAttributes {
+  min-width: 168px
+}
+
+.sc-classic .soundBadge__content {
+  margin-top: 4px
+}
+
+.soundBadge__content.soundBadge__contentWithoutStats {
+  margin-top: 4px;
+}
+
+.sc-classic .soundBadge__content.soundBadge__contentWithoutStats {
+  margin-top: 7px
+}
+
+.soundBadge .soundTitle__title {
+  height: 1.3em;
+  float: left
+}
+
+.soundBadge .soundTitle__username {
+  margin: 0 0 2px
+}
+
+.sc-classic .soundBadge .soundTitle__username {
+  line-height: 1
+}
+
+.sc-classic .soundBadge .soundTitle__username small {
+  font-size: 12px
+}
+
+.soundBadge__audibleInfoStats {
+  padding-top: 2px
+}
+
+.soundBadge__artwork {
+  display: inline-block;
+  background: transparent 50%/contain no-repeat;
+  padding: 0;
+  position: relative
+}
+
+.sc-classic .soundBadge__artwork {
+  margin-right: 4px;
+  padding: 5px 6px;
+  width: 50px;
+  height: 50px
+}
+
+.soundBadge:not(.sc-classic .soundBadge) .sc-ministats-small {
+  margin: 0 8px 0 0;
+}
+
+.soundBadge__playButton {
+  visibility: hidden;
+  display: inline-block;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2
+}
+
+.sc-classic .soundBadge__playButton {
+  top: 5px;
+  bottom: 5px;
+  left: 6px;
+  right: 6px;
+  padding: 11px
+}
+
+body:not(.sc-classic) .soundBadge__additional .sc-button {
+  margin-right: 8px;
+}
+
+body:not(.sc-classic) .soundBadge__additional .sc-button:last-child {
+  margin-right: 0
+}
+
+.soundBadge.active .soundBadge__playButton, .soundBadge.hover .soundBadge__playButton, .soundBadge:hover .soundBadge__playButton {
+  visibility: visible
+}
+
+.sc-classic .soundBadge__tierIndicator {
+  top: 0;
+  right: 1px
+}
+
+.soundBadge__tierIndicator {
+  top: 0;
+  right: 0
+}
+
+.sc-classic .soundBadge.hiddenSound .soundBadge__artwork:after {
+  content: "";
+  background: hsla(0, 0%, 58.8%, .6);
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 6px;
+  right: 6px
+}
+
+.soundBadge__checkbox {
+  position: absolute;
+  left: 16px;
+  top: 28px
+}
+
+.sc-classic .soundBadge__checkbox {
+  left: 19px;
+  top: 50%;
+  margin-top: -8px
+}
+
+.soundBadge.compact {
+  padding: 8px 16px;
+}
+
+.sc-classic .soundBadge.compact {
+  padding: 0;
+  left: -6px;
+  margin-right: -6px
+}
+
+body:not(.sc-classic) .soundBadge.compact .soundBadge__playButton {
+  top: 8px;
+  right: 8px;
+  left: 8px;
+  bottom: 8px;
+}
+
+body:not(.sc-classic) .soundBadge.compact .soundBadge__additional {
+  top: 26px
+}
+
+.soundBadge.compact .soundBadge__additional {
+  top: 18px
+}
+
+.soundBadge.active:not(.compact), .soundBadge.hover:not(.compact), .soundBadge.selected:not(.compact), .soundBadge:hover:not(.compact) {
+  background-color: #f3f3f3;
+}
+
+.sc-classic .soundBadge.active:not(.compact), .sc-classic .soundBadge.hover:not(.compact), .sc-classic .soundBadge.selected:not(.compact), .sc-classic .soundBadge:hover:not(.compact) {
+  background-color: #f2f2f2;
+  margin: -1px -4px;
+  padding: 6px 14px
+}
+
+.soundBadge.active:not(.compact) .soundBadge__icon__wrapper, .soundBadge.hover:not(.compact) .soundBadge__icon__wrapper, .soundBadge.selected:not(.compact) .soundBadge__icon__wrapper, .soundBadge:hover:not(.compact) .soundBadge__icon__wrapper {
+  background-color: #f3f3f3;
+}
+
+.soundBadge.active:not(.compact) .soundBadge__additional, .soundBadge.hover:not(.compact) .soundBadge__additional, .soundBadge.selected:not(.compact) .soundBadge__additional, .soundBadge:hover:not(.compact) .soundBadge__additional {
+  background: #f3f3f3;
+}
+
+.sc-classic .soundBadge.active:not(.compact) .soundBadge__additional, .sc-classic .soundBadge.hover:not(.compact) .soundBadge__additional, .sc-classic .soundBadge.selected:not(.compact) .soundBadge__additional, .sc-classic .soundBadge:hover:not(.compact) .soundBadge__additional {
+  right: 4px;
+  top: 26px;
+  background: #f2f2f2;
+  background: linear-gradient(90deg, hsla(0, 0%, 94.9%, .1), #f2f2f2 17px)
+}
+
+.soundBadge.active .soundBadge__actions, .soundBadge.hover .soundBadge__actions, .soundBadge:hover .soundBadge__actions {
+  display: block
+}
+
+.sc-classic .soundBadge.active:not(.compact), .sc-classic .soundBadge.active:not(.compact).hover, .sc-classic .soundBadge.active:not(.compact):hover {
+  border-bottom: 1px solid #f50;
+  padding-bottom: 5px;
+  border-radius: 4px 4px 0 0
+}
+
+.sc-classic .soundBadge.active .soundTitle__title {
+  color: #f50
+}
+
+.soundBadge.hasCheckbox, .soundBadge.hasCheckbox.active, .soundBadge.hasCheckbox.hover, .soundBadge.hasCheckbox.selected, .soundBadge.hasCheckbox:hover {
+  padding-left: 56px
+}
+
+.sc-classic .soundBadge.hasCheckbox, .sc-classic .soundBadge.hasCheckbox.active, .sc-classic .soundBadge.hasCheckbox.hover, .sc-classic .soundBadge.hasCheckbox.selected, .sc-classic .soundBadge.hasCheckbox:hover {
+  margin-left: -4px;
+  padding-left: 42px
+}
+
+.sc-classic .soundBadge.hasCheckbox .soundBadge__additional {
+  padding-right: 15px
+}
+
+.soundBadge.playlist .soundBadge__artwork {
+}
+
+.soundBadge.clickable {
+  cursor: pointer
+}
+
+.soundBadge__disabledReason {
+  margin: 2px 0 0
+}
+
+@media (-webkit-min-device-pixel-ratio: 2),(min-resolution: 2dppx),(min-resolution: 192dpi) {
+  .soundBadge.playlist .soundBadge__artwork {
+  }
+}
+
+.soundBadge__icon__wrapper {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  color: #d61348;
+}
+
+.soundBadge__icon {
+  width: 24px;
+  height: 24px
+}
+
+.sc-classic .soundBadge__icon {
+  width: 22px;
+  height: 22px;
+  position: absolute;
+  left: -4px;
+  bottom: -2px;
+  background: #fff;
+  border-radius: 50%
+}
+
+.soundBadge__overQuota {
+  max-width: 60%;
+  margin: 0
+}
+
+.sc-classic .soundBadge__overQuota {
+  font-weight: 100
+}
+
+body:not(.sc-classic) .soundBadge.m-interactive:not(.m-playable) .sc-ministats, body:not(.sc-classic) .soundBadge.m-interactive:not(.m-playable) .soundTitle__title, body:not(.sc-classic) .soundBadge.m-interactive:not(.m-playable) .soundTitle__username {
+  color: hsla(0, 0%, 40%, .6);
+}
+
+.sc-classic .soundBadge.m-interactive:not(.m-playable) .soundTitle__title, .sc-classic .soundBadge.m-interactive:not(.m-playable) .soundTitle__username {
+  color: #ccc
+}
+
+.soundBadge.m-interactive .soundBadge__playButton {
+  cursor: pointer
+}
+.sc-media,.sc-media-body,.sc-media-content {
+  overflow: hidden
+}

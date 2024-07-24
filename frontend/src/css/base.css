@@ -191,3 +191,7 @@ h1 {
 .ul_basic {
   margin-bottom: 50px;
 }
+
+li {
+  list-style: none;
+}
