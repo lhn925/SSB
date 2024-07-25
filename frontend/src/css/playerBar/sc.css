@@ -138,7 +138,7 @@ table {
 }
 
 .sc-background-orange {
-  background-color: #f50;
+  background-color: #1aafec;
   background-image: linear-gradient(180deg,#f70 0,#f30)
 }
 
@@ -211,23 +211,23 @@ table {
 }
 
 .sc-border-orange {
-  border: 1px solid #f50
+  border: 1px solid #1aafec
 }
 
 .sc-border-orange-top {
-  border-top: 1px solid #f50
+  border-top: 1px solid #1aafec
 }
 
 .sc-border-orange-right {
-  border-right: 1px solid #f50
+  border-right: 1px solid #1aafec
 }
 
 .sc-border-orange-bottom {
-  border-bottom: 1px solid #f50
+  border-bottom: 1px solid #1aafec
 }
 
 .sc-border-orange-left {
-  border-left: 1px solid #f50
+  border-left: 1px solid #1aafec
 }
 
 .sc-border-box {
@@ -277,12 +277,12 @@ table {
 }
 
 .sc-button-active,.sc-button-selected {
-  color: #f50
+  color: #1aafec
 }
 
 .sc-button-active.sc-button-focus,.sc-button-active:focus,.sc-button-active:hover,.sc-button-selected.sc-button-focus,.sc-button-selected:focus,.sc-button-selected:hover {
-  color: #f50;
-  border: 1px solid #f50
+  color: #1aafec;
+  border: 1px solid #1aafec
 }
 
 .sc-button:visited {
@@ -290,8 +290,8 @@ table {
 }
 
 .sc-button-cta,.sc-button-cta:focus,.sc-button-cta:hover,.sc-button-cta:visited,.sc-button.sc-button-white:focus,.sc-button.sc-button-white:hover {
-  background-color: #f50;
-  border-color: #f50;
+  background-color: #1aafec;
+  border-color: #1aafec;
   color: #fff
 }
 
@@ -303,12 +303,12 @@ table {
 
 .sc-button.sc-button-white {
   background: #fff;
-  color: #f50;
-  border-color: #f50
+  color: #1aafec;
+  border-color: #1aafec
 }
 
 .sc-button-follow.sc-button-selected {
-  border-color: #f50
+  border-color: #1aafec
 }
 
 .sc-button-visual,.sc-button-visual:active,.sc-button-visual:focus,.sc-button-visual:hover,.sc-button-visual:visited {
@@ -412,9 +412,9 @@ table {
 }
 
 .sc-button-dropdown:not(.sc-button-disabled):not(:disabled) {
-  border: 1px solid #f50;
+  border: 1px solid #1aafec;
   cursor: pointer;
-  color: #f50;
+  color: #1aafec;
   text-align: left;
   text-overflow: ellipsis
 }
@@ -443,8 +443,8 @@ table {
 }
 
 .sc-button-dropdown.sc-button-active:not(.sc-button-dropdown-plain),.sc-button-dropdown:hover:not(.sc-button-dropdown-plain) {
-  background-color: #f50;
-  border-color: #f50;
+  background-color: #1aafec;
+  border-color: #1aafec;
   color: #fff
 }
 
@@ -454,8 +454,8 @@ table {
 
 .sc-button-dropdown:after {
   content: " ";
-  border-right: 1px solid #f50;
-  border-bottom: 1px solid #f50;
+  border-right: 1px solid #1aafec;
+  border-bottom: 1px solid #1aafec;
   height: 5px;
   width: 5px;
   transform: rotate(45deg);
@@ -1421,7 +1421,7 @@ table {
 }
 
 .sc-button-next,.sc-button-pause,.sc-button-play,.sc-button-prev,.sc-button.sc-button-blocked,.sc-button.sc-button-play.sc-button-disabled:disabled,.sc-button.sc-button-play:disabled,.sc-button.sc-button-play:disabled:hover {
-  background-color: #f50;
+  background-color: #1aafec;
   border-radius: 50%
 }
 
@@ -1845,7 +1845,7 @@ table {
 }
 
 .sc-orange {
-  color: #f50
+  color: #1aafec
 }
 
 .sc-blue {
@@ -2567,7 +2567,7 @@ input[type=date]:focus,input[type=email]:focus,input[type=password]:focus,input[
 }
 
 .sc-label.sc-label-private {
-  background: #f50
+  background: #1aafec
 }
 
 .sc-label.sc-label-monetizable-pending {
@@ -2584,7 +2584,7 @@ input[type=date]:focus,input[type=email]:focus,input[type=password]:focus,input[
 }
 
 .sc-label.sc-label-private-ghost {
-  color: #f50;
+  color: #1aafec;
   background-color: initial
 }
 
@@ -3111,7 +3111,7 @@ a.sc-ministats-light:hover {
   margin-left: 0
 }
 
-.sc-ministats-item > a{
+.sidebarContent a,.sc-ministats-item > a{
   text-decoration: none;
 }
 
@@ -3875,12 +3875,12 @@ a.sc-ministats-light:hover {
 }
 
 .sc-tag-selected,.sc-tag-selected:hover,.sc-tag-selected:visited {
-  background-color: #f50;
-  border-color: #f50
+  background-color: #1aafec;
+  border-color: #1aafec
 }
 
 .sc-tag-selected:before,.sc-tag-selected:hover:before {
-  border-color: transparent #f50 transparent transparent
+  border-color: transparent #1aafec transparent transparent
 }
 
 .sc-tag-small,.sc-tag-small:visited {
@@ -3953,7 +3953,7 @@ a.sc-ministats-light:hover {
 }
 
 .sc-text-orange {
-  color: #f50
+  color: #1aafec
 }
 
 .sc-toggle {
@@ -3980,7 +3980,7 @@ a.sc-ministats-light:hover {
   top: -2px;
   width: 50px;
   height: 29px;
-  background: #f50;
+  background: #1aafec;
   transition: opacity .2s;
   opacity: 0;
   border-radius: 14px
@@ -4467,8 +4467,8 @@ body:not(.sc-classic) .g-tabs-link.active {
 }
 
 .sc-classic .g-tabs-link.active {
-  border-color: #f50;
-  color: #f50;
+  border-color: #1aafec;
+  color: #1aafec;
   cursor: default
 }
 
@@ -4488,7 +4488,7 @@ body:not(.sc-classic) .g-tabs-link.active {
 }
 
 .g-tabs-link.active .g-tabs-subheading {
-  color: #f50
+  color: #1aafec
 }
 
 .g-tabs-icon {
@@ -5040,8 +5040,8 @@ body:not(.sc-classic) .g-tabs-link.active {
 }
 
 .sc-classic .g-button-premium-pro-unlimited {
-  background-color: #f50;
-  border-color: #f50
+  background-color: #1aafec;
+  border-color: #1aafec
 }
 
 .sc-classic .g-button-premium-pro-unlimited:focus,.sc-classic .g-button-premium-pro-unlimited:hover,.sc-classic .g-button-premium-pro-unlimited:visited,.sc-classic .g-button-premium-pro:focus,.sc-classic .g-button-premium-pro:hover,.sc-classic .g-button-premium-pro:visited {
@@ -5054,8 +5054,8 @@ body:not(.sc-classic) .g-tabs-link.active {
 }
 
 .sc-classic .g-button-premium-pro-unlimited:focus,.sc-classic .g-button-premium-pro-unlimited:hover {
-  background-color: #f50;
-  border-color: #f50
+  background-color: #1aafec;
+  border-color: #1aafec
 }
 
 .sc-classic .g-shadow-light {
@@ -5200,7 +5200,7 @@ body:not(.sc-classic) .g-tabs-link.active {
   display: block;
   width: 30px;
   height: 2px;
-  background-color: #f50;
+  background-color: #1aafec;
   margin-top: 15px
 }
 
@@ -5221,7 +5221,7 @@ body:not(.sc-classic) .g-tabs-link.active {
   display: block;
   width: 70px;
   height: 3px;
-  background-image: linear-gradient(90deg,#7d01a1,#f30 50%,#f50);
+  background-image: linear-gradient(90deg,#7d01a1,#f30 50%,#1aafec);
   margin-top: 15px
 }
 
@@ -5578,11 +5578,11 @@ body:not(.sc-classic) .g-upsell-container {
 }
 
 .g-dark .sc-button-selected:not(.sc-button-cta),.g-dark .sc-button-selected:not(.sc-button-primary) {
-  color: #f50
+  color: #1aafec
 }
 
 .g-dark .sc-button-selected:not(.sc-button-cta):focus,.g-dark .sc-button-selected:not(.sc-button-cta):hover,.g-dark .sc-button-selected:not(.sc-button-primary):focus,.g-dark .sc-button-selected:not(.sc-button-primary):hover {
-  border-color: #f50
+  border-color: #1aafec
 }
 
 .sc-classic .g-input-message {

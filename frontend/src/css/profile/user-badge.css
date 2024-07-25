@@ -1,0 +1,124 @@
+.userBadge {
+  position: relative;
+  min-height: 50px
+}
+
+.sc-classic .userBadge__title {
+  margin: 6px 0 0
+}
+
+.userBadge.m-horizontal {
+  display: flex;
+  align-items: center;
+  flex: 1
+}
+
+.userBadge.m-horizontal .userBadge__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column
+}
+
+.userBadge.m-horizontal .userBadge__meta {
+  display: flex
+}
+
+.userBadge.m-horizontal .userBadge__actions {
+  flex-shrink: 0
+}
+
+.sc-classic .userBadge.m-horizontal .userBadge__actions {
+  margin-top: auto;
+  margin-bottom: 2px
+}
+
+.userBadge.m-horizontal .userBadge__stats {
+  flex-grow: 1
+}
+
+.sc-classic .userBadge.m-horizontal .userBadge__avatar {
+  margin-right: 10px
+}
+
+.userBadge.m-horizontal .userBadge__title {
+  white-space: nowrap
+}
+
+.userBadge.m-horizontal .userBadge__usernameLink {
+  float: left;
+  max-width: 85%;
+  box-sizing: border-box
+}
+
+.sc-classic .userBadge.m-horizontal .userBadge__usernameLink {
+  margin-right: 3px;
+  max-width: 100%
+}
+
+.sc-classic .userBadge.m-horizontal.m-verified .userBadge__usernameLink {
+  margin-right: -13px;
+  padding-right: 16px
+}
+
+.userBadge.m-horizontal .userBadge__usernameLink.m-withFollowed {
+  max-width: 111px
+}
+
+.userBadge__verifiedBadge {
+  position: relative;
+  top: 2px
+}
+
+.sc-classic .userBadge__verifiedBadge {
+  top: 3px
+}
+
+body:not(.sc-classic) .userBadge .sc-ministats-small {
+  margin: 0 8px 0 0
+}
+
+.userBadge.m-vertical .userBadge__stats {
+  margin-bottom: 16px;
+}
+
+.sc-classic .userBadge.m-vertical .userBadge__stats, .sc-classic .userBadge.m-vertical .userBadge__title {
+  margin-bottom: 5px
+}
+
+body:not(.sc-classic) .userBadge.m-vertical .userBadge__title {
+  width: 120px
+}
+
+.userBadge.m-vertical .userBadge__username {
+  display: flex
+}
+
+body:not(.sc-classic) .userBadge.m-vertical .userBadge__username {
+  justify-content: center
+}
+
+.userBadge.m-vertical .userBadge__usernameLink {
+  margin-right: 4px;
+}
+
+.sc-classic .userBadge.m-vertical .userBadge__usernameLink {
+  margin-right: 3px
+}
+
+body:not(.sc-classic) .userBadge.m-vertical .sc-ministats-group {
+  justify-content: center
+}
+
+body:not(.sc-classic) .userBadge.m-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center
+}
+
+body:not(.sc-classic) .userBadge.m-vertical .userBadge__avatar {
+  margin: 0 0 8px;
+}
+
+body:not(.sc-classic) .userBadge.m-vertical .sc-button-follow, body:not(.sc-classic) .userBadge.m-vertical .userBadge__actions {
+  width: 100%
+}

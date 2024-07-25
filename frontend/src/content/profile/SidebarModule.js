@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import profile2 from "../../css/image/profile2.png";
 
 const SidebarModule = ({items, headerLink, headerTitle, type}) => {
+
+
+
   return (
       <article className="sidebar-module" style={{height: "auto"}}>
         <a className="sidebar-header" src={headerLink}>
@@ -18,6 +21,7 @@ const SidebarModule = ({items, headerLink, headerTitle, type}) => {
           <div className="soundBadgeList compact lazyLoadingList">
             <ul className="sc-list-nostyle sc-clearfix"
                 style={{textAlign: "left", padding: 0}}>
+              <SidebarByType type={type} items={items}/>
 
             </ul>
           </div>
@@ -26,7 +30,12 @@ const SidebarModule = ({items, headerLink, headerTitle, type}) => {
   );
 };
 
-const SidebarByType = (items, type) => {
+const SidebarByType = ({items,type}) => {
+
+  if (items == null) {
+    return;
+  }
+
   if (type === "like") {
     return (<>
           {

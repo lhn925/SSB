@@ -1,0 +1,48 @@
+.usersList {
+  overflow: hidden;
+  line-height: initial;
+
+}
+
+.usersList.user-badge .usersList__item {
+  padding: 8px 16px;
+}
+
+.sc-classic .usersList.user-badge .usersList__item {
+  padding: 10px 0
+}
+
+.usersList .loading {
+  padding: 86px 0
+}
+
+.usersList.floating {
+  margin-top: 15px
+}
+
+.usersList.floating.user-avatar-badge-hover {
+  margin-top: 0;
+  padding: 8px 16px;
+}
+
+.sc-classic .usersList.floating.user-avatar-badge-hover {
+  padding: 10px 0 8px
+}
+
+.usersList.floating .usersList__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start
+}
+
+.usersList.floating .usersList__item:not(:last-child) {
+  margin-right: -13px
+}
+
+.sc-classic .usersList.floating .usersList__item:not(:last-child) {
+  margin-right: -10px
+}
+
+.usersList.user-avatar-badge-hover.floating .loading, .usersList.user-avatar-badge.floating .loading {
+  padding: 0 15px
+}
