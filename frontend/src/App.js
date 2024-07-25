@@ -4,6 +4,7 @@ import 'App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import "css/bootstrap/bootstrap.min.css"
 import "css/base.css"
+import "css/playerBar/sc.css"
 import {Route, Routes, useLocation, useNavigate} from "react-router";
 import {ToastContainer} from "react-toastify";
 import React, {

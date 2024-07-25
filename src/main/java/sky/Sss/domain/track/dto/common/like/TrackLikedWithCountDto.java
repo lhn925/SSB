@@ -36,13 +36,13 @@ public class TrackLikedWithCountDto {
 
         private Long id;
 
-        private TrackDetailDto details;
+        private TrackDetailDto detail;
 
         private LocalDateTime createdDateTime;
 
         public TrackInfo(long id, TrackDetailDto trackInfo, LocalDateTime createdDateTime) {
             this.id = id;
-            this.details = trackInfo;
+            this.detail = trackInfo;
             this.createdDateTime = createdDateTime;
         }
     }

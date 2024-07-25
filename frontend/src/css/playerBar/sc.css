@@ -3,73 +3,6 @@ article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary
   display: block
 }
 
-audio,canvas,video {
-  display: inline-block
-}
-
-audio:not([controls]) {
-  display: none;
-  height: 0
-}
-
-[hidden] {
-  display: none
-}
-
-html {
-  font-family: sans-serif;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%
-}
-
-body {
-  margin: 0;
-  padding: 0
-}
-
-a:focus {
-  outline: thin dotted
-}
-
-a:active,a:hover {
-  outline: 0
-}
-
-h1 {
-  font-size: 2em
-}
-
-abbr[title] {
-  border-bottom: 1px dotted
-}
-
-b,strong {
-  font-weight: 700
-}
-
-dfn {
-  font-style: italic
-}
-
-mark {
-  background: #ff0;
-  color: #000
-}
-
-code,kbd,pre,samp {
-  font-family: monospace,serif;
-  font-size: 1em
-}
-
-pre {
-  white-space: pre;
-  white-space: pre-wrap;
-  word-wrap: break-word
-}
-
-q {
-  quotes: "\201C""\201D""\2018""\2019"
-}
 
 small {
   font-size: 80%
@@ -89,11 +22,6 @@ sup {
 sub {
   bottom: -.25em
 }
-
-img {
-  border: 0
-}
-
 svg:not(:root) {
   overflow: hidden
 }
@@ -111,12 +39,6 @@ fieldset {
 legend {
   border: 0;
   padding: 0
-}
-
-button,input,select,textarea {
-  font-family: inherit;
-  font-size: 100%;
-  margin: 0
 }
 
 button,input {
@@ -1975,10 +1897,6 @@ input[type=date]:focus,input[type=email]:focus,input[type=password]:focus,input[
   border-color: #999
 }
 
-input[type=checkbox],input[type=radio] {
-  vertical-align: bottom
-}
-
 .sc-hyphenate {
   -ms-word-break: break-all;
   -webkit-word-break: break-all;
@@ -2799,14 +2717,8 @@ input[type=checkbox],input[type=radio] {
   margin-right: 0
 }
 
-a,a:visited {
-  color: #38d;
-  text-decoration: none
-}
 
-a.sc-link-dark,a:hover {
-  color: #333
-}
+
 
 a.sc-link-medium {
   color: #666
@@ -2842,7 +2754,7 @@ a.sc-link-white:hover {
 
 ol,ul {
   padding: 0;
-  margin: 0 0 18px 25px
+  /*margin: 0 0 18px 25px*/
 }
 
 ol ol,ol ul,ul ol,ul ul {
@@ -2868,7 +2780,8 @@ ol {
 }
 
 .sc-media,.sc-media-body,.sc-media-content {
-  overflow: hidden
+  overflow: hidden;
+  line-height: 17px;
 }
 
 .sc-media-image,.sc-media-left {
@@ -3198,6 +3111,18 @@ a.sc-ministats-light:hover {
   margin-left: 0
 }
 
+.sc-ministats-item > a{
+  text-decoration: none;
+}
+
+.sc-text-h4 span {
+  font-weight: 400;
+}
+
+
+.sc-ministats-item span{
+  font-weight: 900;
+}
 .sc-ministats-group .sc-ministats-inverted {
   border-color: #fff
 }
@@ -4124,20 +4049,7 @@ a.sc-ministats-light:hover {
   word-break: normal
 }
 
-body {
-  font: 12px/1.4 Inter,sans-serif;
-  color: #333
-}
-
 .sc-type-h1,.sc-type-h2,.sc-type-h3,.sc-type-h4,.sc-type-h5,.sc-type-h6,h1,h2,h3,h4,h5,h6 {
-  font-family: Inter,sans-serif;
-  font-weight: 400;
-  margin: 18px 0 0;
-  line-height: 1.3
-}
-
-.sc-type-h1:first-child,.sc-type-h2:first-child,.sc-type-h3:first-child,.sc-type-h4:first-child,.sc-type-h5:first-child,.sc-type-h6:first-child,h1:first-child,h2:first-child,h3:first-child,h4:first-child,h5:first-child,h6:first-child {
-  margin-top: 0
 }
 
 .sc-type-h1,h1 {
@@ -4318,10 +4230,6 @@ body {
 
 body.sc-classic {
   background: #fff
-}
-
-.sc-artwork,img,svg {
-  display: block
 }
 
 @media (max-width: 1239px) {
@@ -6135,88 +6043,9 @@ body:not(.sc-classic) .g-options-row {
   z-index: -1
 }
 
-.l-container {
-  width: 1240px;
-  margin: 0 auto
-}
 
-body:not(.sc-classic) .header__inner.l-container {
-  box-sizing: border-box;
-  padding: 0 16px;
-  /*padding: 0 var(--spacing-2x)*/
-}
 
-.sc-classic .l-container {
-  padding: 0 30px;
-  width: 1180px
-}
 
-.l-container:after,.l-container:before {
-  content: "";
-  display: table
-}
-
-.l-container:after {
-  clear: both
-}
-
-.l-container.l-content,.sc-classic .l-container.l-content {
-  padding-top: 46px
-}
-
-.m-hideHeader .l-container.l-content {
-  padding-top: 0
-}
-
-.sc-classic .l-container.l-fullwidth {
-  width: 1240px;
-  padding: 0
-}
-
-.sc-classic .l-inner-fullwidth {
-  margin-left: -30px;
-  margin-right: -30px
-}
-
-@media (max-width: 1239px) {
-  .l-container {
-    width:1080px
-  }
-
-  .sc-classic .l-container {
-    width: 1020px
-  }
-
-  .sc-classic .l-container.l-fullwidth {
-    width: 1080px
-  }
-}
-
-@media (max-width: 1079px) {
-  .l-container {
-    width:960px
-  }
-
-  .sc-classic .l-container {
-    width: 920px;
-    padding: 0 20px
-  }
-
-  .sc-classic .l-container.l-fullwidth {
-    width: 960px
-  }
-
-  .sc-classic .l-inner-fullwidth {
-    margin-left: -20px;
-    margin-right: -20px
-  }
-}
-
-@media screen and (max-width: 959px) {
-  @-ms-viewport {
-    width:768px
-  }
-}
 
 .l-fixed {
   position: fixed

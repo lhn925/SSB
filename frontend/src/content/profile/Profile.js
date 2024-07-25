@@ -228,25 +228,26 @@ export function Profile({
               </div>
               {/*<div className="no-about">{}</div>*/}
 
-
-              <article className="sidebar-module" >
+              <article className="sidebar-module" style={{height: "auto"}}>
                 <a className="sidebar-header">
                   <h3 className="sidebarHeader__title">
+                    <span
+                        className="sc-icon sc-icon-like sc-icon-large sidebarHeader__icon"></span>
                     <span className="sidebarHeader__actualTitle">2 likes</span>
                   </h3>
-                  <span className="sidebarHeader__more">View all</span>
+                  <span className="sidebarHeader__more sc-type-h3 sc-text-h4">View all</span>
                 </a>
-
-                <div className="sidebarContent" style={{minHeight: `210.6px`}}>
+                <div className="sidebarContent">
                   {/*상위*/}
                   <div className="soundBadgeList compact lazyLoadingList">
-
                     <ul className="sc-list-nostyle sc-clearfix"
-                        style={{textAlign:"left",padding:0}}>
+                        style={{textAlign: "left", padding: 0}}>
                       <li className="soundBadgeList__item">
                         <div
                             className="soundBadge compact sc-media playlist m-playable">
-                          <span className="soundBadge__artwork sc-mr-2x sc-media-image" style={{float:"left",marginRight:`10px`}} >
+                          <span
+                              className="soundBadge__artwork sc-mr-2x sc-media-image"
+                              style={{float: "left", marginRight: `10px`}}>
                             <div
                                 className="image image__lightOutline sc-artwork sc-artwork-placeholder-7 m-loaded"
                                 style={{height: `50px`, width: `50px`}}>
@@ -264,41 +265,334 @@ export function Profile({
                               </span>
                           </span>
 
-                                <div className="sc-media-content soundBadge__content">
-                              <div className="soundTitle sc-clearfix sc-hyphenate sc-type-h3 sc-text-h4">
+                                <div
+                                    className="sc-media-content soundBadge__content">
+                              <div
+                                  className="soundTitle sc-clearfix sc-hyphenate sc-type-h3 sc-text-h4">
                                 <div className="soundTitle__titleContainer">
-                                  <div className="soundTitle__usernameTitleContainer sc-mb-0.5x">
-                                    <div className="sc-type-light sc-text-secondary sc-text-h4 soundTitle__secondary sc-truncate">
+                                  <div
+                                      className="soundTitle__usernameTitleContainer sc-mb-0.5x">
+                                    <div
+                                        className="sc-type-light sc-text-secondary sc-text-h4 soundTitle__secondary sc-truncate">
                                       <a href="/cindy-lim-82312455"
-                                         className="soundTitle__username sc-link-secondary sc-link-light">
-                                        <span className="soundTitle__usernameText">UaenaCindy</span>
+                                         className="soundTitle__username sc-link-secondary sc-link-light text-decoration-none">
+                                        <span
+                                            className="soundTitle__usernameText">UaenaCindy</span>
                                       </a>
                                     </div>
-                                    <a className="sc-link-primary soundTitle__title sc-link-dark sc-text-h4"
-                                       href="/cindy-lim-82312455/sets/iu-1" title="IU 아이유 - Album">
+                                    <a className="sc-link-primary soundTitle__title sc-link-dark sc-text-h4 text-decoration-none "
+                                       href="/cindy-lim-82312455/sets/iu-1"
+                                       title="IU 아이유 - Album">
                                       <span className="sc-truncate">IU 아이유 - Album</span>
                                     </a>
                                   </div>
-                                  <div className="soundTitle__additionalContainer sc-ml-1.5x"></div>
+                                  <div
+                                      className="soundTitle__additionalContainer sc-ml-1.5x"></div>
                                 </div>
                               </div>
+
+
+                          <ul className="soundStats sc-ministats-group"
+                              aria-label="Track stats">  <li title="8,440 plays"
+                                                             className="sc-ministats-item">
                               <span
-                                  className="releaseDateCompact sc-type-light sc-text-secondary sc-font-light">
-                                Album&nbsp;·&nbsp;<span className="sc-font-light">2021</span>
+                                  className="sc-ministats sc-ministats-small  sc-ministats-plays sc-text-secondary">
+                                <span
+                                    className="sc-visuallyhidden">8,440 plays</span>
+                                <span
+                                    aria-hidden="true">8,440</span>
                               </span>
+                            </li>
+
+                            <li title="102 likes" className="sc-ministats-item">
+                              <a href="/cindy-lim-82312455/the-thing-i-do-slowly/likes"
+                                 rel="nofollow"
+                                 className="sc-ministats sc-ministats-small  sc-ministats-likes sc-link-secondary">
+                                 <span className="sc-visuallyhidden">View all likes</span><span
+                                  aria-hidden="true">102</span>
+                              </a>
+                            </li>
+
+                            <li title="1 repost" className="sc-ministats-item">
+                              <a href="/cindy-lim-82312455/the-thing-i-do-slowly/reposts"
+                                 rel="nofollow"
+                                 className="sc-ministats sc-ministats-small  sc-ministats-reposts sc-link-secondary">
+                                <span className="sc-visuallyhidden">View all reposts</span><span
+                                  aria-hidden="true">1</span>
+                              </a>
+                            </li>
+                              <li title="1 comment"
+                                  className="sc-ministats-item">
+                                  <a href="/cindy-lim-82312455/the-thing-i-do-slowly/comments"
+                                     rel="nofollow"
+                                     className="sc-ministats sc-ministats-small  sc-ministats-comments sc-link-secondary">
+                                   <span className="sc-visuallyhidden">View all comments</span><span
+                                      aria-hidden="true">1</span>
+                                </a>
+                              </li>
+                          </ul>
 
                               <div className="soundBadge__additional">
                                 <div className="soundBadge__actions">
-                                  <div className="soundActions sc-button-toolbar soundActions__small">
-                                    <div className="sc-button-group sc-button-group-small">
+                                  <div
+                                      className="soundActions sc-button-toolbar soundActions__small">
+                                    <div
+                                        className="sc-button-group sc-button-group-small">
                                       <button type="button"
                                               className="sc-button-like sc-button-secondary sc-button sc-button-small sc-button-icon sc-button-responsive sc-button-selected"
-                                              aria-describedby="tooltip-10265" tabIndex="0" title="Unlike"
+                                              aria-describedby="tooltip-10265"
+                                              tabIndex="0" title="Unlike"
                                               aria-label="Unlike">Liked</button>
                                       <button type="button"
                                               className="sc-button-more sc-button-more sc-button sc-button-small sc-button-icon sc-button-responsive"
-                                              tabIndex="0" aria-haspopup="true" role="button"
-                                              aria-owns="dropdown-button-10267" title="More"
+                                              tabIndex="0" aria-haspopup="true"
+                                              role="button"
+                                              aria-owns="dropdown-button-10267"
+                                              title="More"
+                                              aria-label="More">More</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+
+                        </div>
+
+
+
+
+
+                    </li>
+                      <li className="soundBadgeList__item">
+                        <div
+                            className="soundBadge compact sc-media playlist m-playable">
+                          <span
+                              className="soundBadge__artwork sc-mr-2x sc-media-image"
+                              style={{float: "left", marginRight: `10px`}}>
+                            <div
+                                className="image image__lightOutline sc-artwork sc-artwork-placeholder-7 m-loaded"
+                                style={{height: `50px`, width: `50px`}}>
+                              <a href="#">
+                            <img style={{backgroundColor: '#fff'}}
+                                 className="player_cover_img"
+                                 src={profile2} alt="cover"/>
+                          </a>
+                            </div>
+                              <span className="soundBadge__playButton">
+                                <a role="button" href=""
+                                   className="sc-button-play playButton sc-button sc-button-large"
+                                   tabIndex="0" title="Play"
+                                   draggable="true">Play</a>
+                              </span>
+                          </span>
+
+                                <div
+                                    className="sc-media-content soundBadge__content">
+                              <div
+                                  className="soundTitle sc-clearfix sc-hyphenate sc-type-h3 sc-text-h4">
+                                <div className="soundTitle__titleContainer">
+                                  <div
+                                      className="soundTitle__usernameTitleContainer sc-mb-0.5x">
+                                    <div
+                                        className="sc-type-light sc-text-secondary sc-text-h4 soundTitle__secondary sc-truncate">
+                                      <a href="/cindy-lim-82312455"
+                                         className="soundTitle__username sc-link-secondary sc-link-light text-decoration-none">
+                                        <span
+                                            className="soundTitle__usernameText">UaenaCindy</span>
+                                      </a>
+                                    </div>
+                                    <a className="sc-link-primary soundTitle__title sc-link-dark sc-text-h4 text-decoration-none "
+                                       href="/cindy-lim-82312455/sets/iu-1"
+                                       title="IU 아이유 - Album">
+                                      <span className="sc-truncate">IU 아이유 - Album</span>
+                                    </a>
+                                  </div>
+                                  <div
+                                      className="soundTitle__additionalContainer sc-ml-1.5x"></div>
+                                </div>
+                              </div>
+
+
+                          <ul className="soundStats sc-ministats-group"
+                              aria-label="Track stats">  <li title="8,440 plays"
+                                                             className="sc-ministats-item">
+                              <span
+                                  className="sc-ministats sc-ministats-small  sc-ministats-plays sc-text-secondary">
+                                <span
+                                    className="sc-visuallyhidden">8,440 plays</span>
+                                <span
+                                    aria-hidden="true">8,440</span>
+                              </span>
+                            </li>
+
+                            <li title="102 likes" className="sc-ministats-item">
+                              <a href="/cindy-lim-82312455/the-thing-i-do-slowly/likes"
+                                 rel="nofollow"
+                                 className="sc-ministats sc-ministats-small  sc-ministats-likes sc-link-secondary">
+                                 <span className="sc-visuallyhidden">View all likes</span><span
+                                  aria-hidden="true">102</span>
+                              </a>
+                            </li>
+
+                            <li title="1 repost" className="sc-ministats-item">
+                              <a href="/cindy-lim-82312455/the-thing-i-do-slowly/reposts"
+                                 rel="nofollow"
+                                 className="sc-ministats sc-ministats-small  sc-ministats-reposts sc-link-secondary">
+                                <span className="sc-visuallyhidden">View all reposts</span><span
+                                  aria-hidden="true">1</span>
+                              </a>
+                            </li>
+                              <li title="1 comment"
+                                  className="sc-ministats-item">
+                                  <a href="/cindy-lim-82312455/the-thing-i-do-slowly/comments"
+                                     rel="nofollow"
+                                     className="sc-ministats sc-ministats-small  sc-ministats-comments sc-link-secondary">
+                                   <span className="sc-visuallyhidden">View all comments</span><span
+                                      aria-hidden="true">1</span>
+                                </a>
+                              </li>
+                          </ul>
+
+                              <div className="soundBadge__additional">
+                                <div className="soundBadge__actions">
+                                  <div
+                                      className="soundActions sc-button-toolbar soundActions__small">
+                                    <div
+                                        className="sc-button-group sc-button-group-small">
+                                      <button type="button"
+                                              className="sc-button-like sc-button-secondary sc-button sc-button-small sc-button-icon sc-button-responsive sc-button-selected"
+                                              aria-describedby="tooltip-10265"
+                                              tabIndex="0" title="Unlike"
+                                              aria-label="Unlike">Liked</button>
+                                      <button type="button"
+                                              className="sc-button-more sc-button-more sc-button sc-button-small sc-button-icon sc-button-responsive"
+                                              tabIndex="0" aria-haspopup="true"
+                                              role="button"
+                                              aria-owns="dropdown-button-10267"
+                                              title="More"
+                                              aria-label="More">More</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+
+                        </div>
+
+
+
+
+
+                    </li>
+                      <li className="soundBadgeList__item">
+                        <div
+                            className="soundBadge compact sc-media playlist m-playable">
+                          <span
+                              className="soundBadge__artwork sc-mr-2x sc-media-image"
+                              style={{float: "left", marginRight: `10px`}}>
+                            <div
+                                className="image image__lightOutline sc-artwork sc-artwork-placeholder-7 m-loaded"
+                                style={{height: `50px`, width: `50px`}}>
+                              <a href="#">
+                            <img style={{backgroundColor: '#fff'}}
+                                 className="player_cover_img"
+                                 src={profile2} alt="cover"/>
+                          </a>
+                            </div>
+                              <span className="soundBadge__playButton">
+                                <a role="button" href=""
+                                   className="sc-button-play playButton sc-button sc-button-large"
+                                   tabIndex="0" title="Play"
+                                   draggable="true">Play</a>
+                              </span>
+                          </span>
+
+                                <div
+                                    className="sc-media-content soundBadge__content">
+                              <div
+                                  className="soundTitle sc-clearfix sc-hyphenate sc-type-h3 sc-text-h4">
+                                <div className="soundTitle__titleContainer">
+                                  <div
+                                      className="soundTitle__usernameTitleContainer sc-mb-0.5x">
+                                    <div
+                                        className="sc-type-light sc-text-secondary sc-text-h4 soundTitle__secondary sc-truncate">
+                                      <a href="/cindy-lim-82312455"
+                                         className="soundTitle__username sc-link-secondary sc-link-light text-decoration-none">
+                                        <span
+                                            className="soundTitle__usernameText">UaenaCindy</span>
+                                      </a>
+                                    </div>
+                                    <a className="sc-link-primary soundTitle__title sc-link-dark sc-text-h4 text-decoration-none "
+                                       href="/cindy-lim-82312455/sets/iu-1"
+                                       title="IU 아이유 - Album">
+                                      <span className="sc-truncate">IU 아이유 - Album</span>
+                                    </a>
+                                  </div>
+                                  <div
+                                      className="soundTitle__additionalContainer sc-ml-1.5x"></div>
+                                </div>
+                              </div>
+
+
+                          <ul className="soundStats sc-ministats-group"
+                              aria-label="Track stats">  <li title="8,440 plays"
+                                                             className="sc-ministats-item">
+                              <span
+                                  className="sc-ministats sc-ministats-small  sc-ministats-plays sc-text-secondary">
+                                <span
+                                    className="sc-visuallyhidden">8,440 plays</span>
+                                <span
+                                    aria-hidden="true">8,440</span>
+                              </span>
+                            </li>
+
+                            <li title="102 likes" className="sc-ministats-item">
+                              <a href="/cindy-lim-82312455/the-thing-i-do-slowly/likes"
+                                 rel="nofollow"
+                                 className="sc-ministats sc-ministats-small  sc-ministats-likes sc-link-secondary">
+                                 <span className="sc-visuallyhidden">View all likes</span><span
+                                  aria-hidden="true">102</span>
+                              </a>
+                            </li>
+
+                            <li title="1 repost" className="sc-ministats-item">
+                              <a href="/cindy-lim-82312455/the-thing-i-do-slowly/reposts"
+                                 rel="nofollow"
+                                 className="sc-ministats sc-ministats-small  sc-ministats-reposts sc-link-secondary">
+                                <span className="sc-visuallyhidden">View all reposts</span><span
+                                  aria-hidden="true">1</span>
+                              </a>
+                            </li>
+                              <li title="1 comment"
+                                  className="sc-ministats-item">
+                                  <a href="/cindy-lim-82312455/the-thing-i-do-slowly/comments"
+                                     rel="nofollow"
+                                     className="sc-ministats sc-ministats-small  sc-ministats-comments sc-link-secondary">
+                                   <span className="sc-visuallyhidden">View all comments</span><span
+                                      aria-hidden="true">1</span>
+                                </a>
+                              </li>
+                          </ul>
+
+                              <div className="soundBadge__additional">
+                                <div className="soundBadge__actions">
+                                  <div
+                                      className="soundActions sc-button-toolbar soundActions__small">
+                                    <div
+                                        className="sc-button-group sc-button-group-small">
+                                      <button type="button"
+                                              className="sc-button-like sc-button-secondary sc-button sc-button-small sc-button-icon sc-button-responsive sc-button-selected"
+                                              aria-describedby="tooltip-10265"
+                                              tabIndex="0" title="Unlike"
+                                              aria-label="Unlike">Liked</button>
+                                      <button type="button"
+                                              className="sc-button-more sc-button-more sc-button sc-button-small sc-button-icon sc-button-responsive"
+                                              tabIndex="0" aria-haspopup="true"
+                                              role="button"
+                                              aria-owns="dropdown-button-10267"
+                                              title="More"
                                               aria-label="More">More</button>
                                     </div>
                                   </div>
@@ -321,24 +615,35 @@ export function Profile({
 
               </article>
 
-
-
-
-
                    <article className="sidebar-module">
                 <a className="sidebar-header">
                   <h3 className="sidebarHeader__title">
-                    <span className="sidebarHeader__actualTitle">2 likes</span>
+                    <span
+                        className="sc-icon sc-icon-following sc-icon-large sidebarHeader__icon"></span>
+                    <span className="sidebarHeader__actualTitle  sc-text-h3">5 following</span>
                   </h3>
-                  <span className="sidebarHeader__more">View all</span>
+                  <span className="sidebarHeader__more sc-type-h3 sc-text-h4">View all</span>
                 </a>
-              </article>
+               <div className="sidebarContent">
+                         <div
+                             className="soundBadgeList compact lazyLoadingList">
+                         </div>
+                       </div>
 
+
+
+
+
+
+
+
+
+              </article>
               <article className="sidebar-module">
-                <a href="https://www.linkedin.com/in/michael-pompili-916a0837/"
-                   target="_blank"><img
-                    src="https://res.cloudinary.com/mpompili/image/upload/v1526335358/linkedinad.jpg"
-                    alt=""/></a>
+
+
+
+
               </article>
               <div className="extraspace"></div>
           </div>

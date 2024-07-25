@@ -62,7 +62,7 @@
 }
 
 .sidebarContent {
-
+  padding: 0 0 0 4px;
 }
 
 .sidebarHeader__title {
@@ -72,7 +72,8 @@
   /*align-items: start;*/
   font-size: 14px;
   flex: 1;
-  margin: 15px 0 0;
+  margin: 15px 0 0 5px;
+
   color: #999;
   text-align: start;
 }
@@ -86,6 +87,5 @@
 .sidebarHeader__actualTitle {
   line-height: 24px;
   flex: 1;
-
 }
 
