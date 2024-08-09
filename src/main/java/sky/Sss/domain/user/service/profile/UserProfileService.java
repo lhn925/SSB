@@ -29,6 +29,7 @@ import sky.Sss.domain.user.model.Enabled;
 import sky.Sss.domain.user.model.Status;
 import sky.Sss.domain.user.service.UserQueryService;
 import sky.Sss.domain.user.service.follows.UserFollowsService;
+import sky.Sss.global.exception.NoContentException;
 import sky.Sss.global.redis.dto.RedisKeyDto;
 
 @Slf4j
@@ -209,7 +210,9 @@ public class UserProfileService {
                 }
             }
 
-            trackTargetWithCountDto.getTargetInfos().sort(Comparator.comparing(TrackInfo::getId).reversed());
+            trackTargetWithCountDto.getTargetInfos().sort(Comparator.comparing(TrackInfo::getLikeId).reversed());
+        } else {
+            throw new NoContentException();
         }
         return trackTargetWithCountDto;
     }

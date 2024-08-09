@@ -24,6 +24,7 @@ import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.ErrorResultDto;
 import sky.Sss.global.error.dto.FieldErrorCustom;
 import sky.Sss.global.error.dto.Result;
+import sky.Sss.global.exception.NoContentException;
 
 @Slf4j
 @RestControllerAdvice(basePackages = {"sky.Sss.domain.user"})
@@ -71,7 +72,7 @@ public class ExUserController {
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ErrorGlobalResultDto> accessExHandler(AccessDeniedException e, HttpServletRequest request) {
         return new ResponseEntity<>(new ErrorGlobalResultDto("access.error.forbidden", ms, request.getLocale()),
-            HttpStatus.FORBIDDEN);
+            HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({AuthenticationException.class})
@@ -89,9 +90,10 @@ public class ExUserController {
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<ErrorResult> ioExHandler(RuntimeException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        log.info("e.getMessage() = {}", e.getMessage());
         if (e.getClass().equals(IllegalArgumentException.class)) {
             status = HttpStatus.BAD_REQUEST;
+        } else if (e.getClass().equals(NoContentException.class)) {
+            status = HttpStatus.NO_CONTENT;
         }
         try {
             ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms,

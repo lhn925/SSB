@@ -15,6 +15,7 @@ import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.global.error.dto.ErrorGlobalResultDto;
 import sky.Sss.global.error.dto.ErrorResult;
 import sky.Sss.global.error.dto.Result;
+import sky.Sss.global.exception.NoContentException;
 
 @Slf4j
 @RestControllerAdvice(basePackages = {"sky.Sss.domain.track"})
@@ -39,7 +40,8 @@ public class ExTrackController {
     @ExceptionHandler({SsbPlayIncompleteException.class})
     public ResponseEntity<ErrorResult> playIncompleteExHandler(SsbPlayIncompleteException e,
         HttpServletRequest request) {
-        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()), HttpStatus.UNPROCESSABLE_ENTITY);
+        return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),
+            HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({RuntimeException.class})
@@ -48,12 +50,15 @@ public class ExTrackController {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (e.getClass().equals(IllegalArgumentException.class)) {
             status = HttpStatus.BAD_REQUEST;
+        } else if (e.getClass().equals(NoContentException.class)) {
+            status = HttpStatus.NO_CONTENT;
         }
         try {
-            ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms, request.getLocale());
-            return Result.getErrorResult(errorGlobalResultDto,status);
-        }catch (Exception ex) {
-            return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()),status);
+            ErrorGlobalResultDto errorGlobalResultDto = new ErrorGlobalResultDto(e.getMessage(), ms,
+                request.getLocale());
+            return Result.getErrorResult(errorGlobalResultDto, status);
+        } catch (Exception ex) {
+            return Result.getErrorResult(new ErrorGlobalResultDto("error", ms, request.getLocale()), status);
         }
 
     }
