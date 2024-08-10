@@ -76,10 +76,12 @@ authApi.interceptors.response.use(
         try {
           const response = await memoizedPostRefreshToken(refresh);
           const newAccessToken = response.data;
+
+          console.log(newAccessToken);
           // accessToken 저장
           store.dispatch(authActions.setAccess(newAccessToken));
           store.dispatch(authActions.setAccessHeader());
-          originRequest.headers.Authorization = newAccessToken;
+          originRequest.headers.Authorization = newAccessToken.accessToken;
           // 재요청
           return axios(originRequest);
         } catch (error) {
@@ -144,7 +146,7 @@ authTrackApi.interceptors.response.use(
           // accessToken 저장
           store.dispatch(authActions.setAccess(newAccessToken));
           store.dispatch(authActions.setAccessHeader());
-          originRequest.headers.Authorization = newAccessToken;
+          originRequest.headers.Authorization = newAccessToken.accessToken;
           // 재요청
           return axios(originRequest);
         } catch (error) {
