@@ -2,9 +2,9 @@ import {createSlice} from '@reduxjs/toolkit';
 import {PURGE} from "redux-persist/es/constants";
 import {RESET_ALL} from "store/actions/Types";
 
-export const TRACK_LIKED_IDS = "TRACK_LIKED_IDS";
-export const FOLLOWING_IDS = "FOLLOWING_IDS";
-export const FOLLOWER_IDS = "FOLLOWER_IDS";
+export const TRACK_LIKED_IDS = "trackLikedIds";
+export const FOLLOWING_IDS = "followingIds";
+export const FOLLOWER_IDS = "followerIds";
 const initialState = {
   id: 0,
   userId: null,
@@ -15,7 +15,7 @@ const initialState = {
   trackLikedIds: [],
   followingIds: [],
   followerIds: [],
-  trackUploadCount: 0
+  trackTotalCount: 0
 }
 const userReducers = createSlice({
   name: "user",
@@ -38,10 +38,14 @@ const userReducers = createSlice({
     },
     setPictureUrl(state, action) {
       state.pictureUrl = action.payload.pictureUrl;
+    },setTrackTotalCount(state, action) {
+      state.trackTotalCount = action.payload.trackTotalCount;
     },
     setUserName(state, action) {
       state.userName = action.payload.userName;
-    }, setArrayByType(state, action) {
+    },
+
+    setArrayByType(state, action) {
       switch (action.payload.type) {
         case TRACK_LIKED_IDS:
           state.trackLikedIds = action.payload.ids;
@@ -54,37 +58,9 @@ const userReducers = createSlice({
           break;
       }
     }, addArrayValueByType(state, action) {
-      const id = action.payload.id;
-      console.log(action.payload.type)
-      switch (action.payload.type) {
-        case TRACK_LIKED_IDS:
-          console.log("before :" + state.trackLikedIds.length)
-          state.trackLikedIds.push(id);
-          console.log("after :" + state.trackLikedIds.length)
-          break;
-        case FOLLOWING_IDS:
-          state.followingIds.push(id);
-          break;
-        case FOLLOWER_IDS:
-          state.followerIds.push(id);
-          break;
-      }
+      state[action.payload.type] = action.payload.values;
     }, removeArrayValueByType(state, action) {
-      const id = action.payload.id;
-      function removeId(array,id) {
-        return array.filter(val => val !== id);
-      }
-      switch (action.payload.type) {
-        case TRACK_LIKED_IDS:
-          state.trackLikedIds = removeId(state.trackLikedIds,id);
-          break;
-        case FOLLOWING_IDS:
-          state.followingIds = removeId(state.followingIds,id);
-          break;
-        case FOLLOWER_IDS:
-          state.followerIds = removeId(state.followerIds,id);
-          break;
-      }
+      state[action.payload.type] = action.payload.values;
     }
   }, extraReducers(builder) {
     builder.addCase(PURGE, () => initialState);

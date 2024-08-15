@@ -23,6 +23,7 @@ import sky.Sss.domain.user.dto.follows.FollowsUserListDto;
 import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 import sky.Sss.domain.user.dto.redis.RedisFollowsDto;
 import sky.Sss.domain.user.dto.rep.UserProfileDto;
+import sky.Sss.domain.user.dto.rep.UserProfileDto.UserProfileDtoBuilder;
 import sky.Sss.domain.user.entity.User;
 import sky.Sss.domain.user.model.ContentsType;
 import sky.Sss.domain.user.model.Enabled;
@@ -55,17 +56,15 @@ public class UserProfileService {
         // 유저를 팔로우 하고 있는 유저 idList
         List<RedisFollowsDto> followerUsersFromCacheOrDB = userFollowsService.getFollowersUsersFromCacheOrDB(user);
 
-        TrackUploadCountDto myUploadCount = trackQueryService.getMyUploadCount(user, Status.ON);
+//        TrackUploadCountDto myUploadCount = trackQueryService.getMyUploadCount(user, Status.ON);
 
         List<Long> followingIds = followingUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowingUid)
             .toList();
         List<Long> followerIds = followerUsersFromCacheOrDB.stream().map(RedisFollowsDto::getFollowerUid)
             .toList();
 
-        return new UserMyInfoDto(user.getId(), user.getUserId(), user.getEmail(), user.getUserName(),
-            user.getPictureUrl(),
-            user.getIsLoginBlocked(), user.getGrade(), userTrackLikedList, followingIds, followerIds,
-            Math.toIntExact(myUploadCount.getTotalCount()));
+        return new UserMyInfoDto(user.getUserId(), user.getEmail(),
+            user.getIsLoginBlocked(), user.getGrade(), userTrackLikedList, followingIds, followerIds);
     }
 
 
@@ -116,6 +115,9 @@ public class UserProfileService {
      * 유저의 아이디 리스트 다중 검색 후 해당 유저아이디의 해당하는 팔로윙,팔로우,업로드 트랙 수를 가져오는 API
      */
     public List<UserProfileDto> getUserInfoListByIds(Set<Long> uIds) {
+
+        // 요청한 유저
+        User currentUser = userQueryService.findOne();
         List<User> users = userQueryService.findUsersByIds(uIds, Enabled.ENABLED);
 
         List<String> tokens = users.stream().map(User::getToken).toList();
@@ -145,13 +147,16 @@ public class UserProfileService {
             List<RedisFollowsDto> followingList = followingMap.get(user.getToken());
 
             int followingCount = followingList != null ? followingList.size() : 0;
-            UserProfileDto userProfileDto = UserProfileDto.builder()
+            UserProfileDtoBuilder userProfileDtoBuilder = UserProfileDto.builder()
                 .userName(user.getUserName()).id(user.getId())
                 .pictureUrl(user.getPictureUrl())
                 .trackTotalCount(trackTotalCount)
                 .followerCount(followerCount)
-                .followingCount(followingCount).build();
-            userProfileDtoList.add(userProfileDto);
+                .followingCount(followingCount);
+            if (currentUser.getToken().equals(user.getToken())) {
+                userProfileDtoBuilder.userMyInfo(getUserMyInfoDto());
+            }
+            userProfileDtoList.add(userProfileDtoBuilder.build());
         }
         return userProfileDtoList;
 

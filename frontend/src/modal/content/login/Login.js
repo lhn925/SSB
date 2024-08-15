@@ -70,12 +70,13 @@ function Login(props) {
     let loading = toast.loading("로그인 중...");
 
     LoginApi(body).then(response => {
+      dispatch(authActions.setId(response.data));
       dispatch(authActions.setRefresh(response.data));
       dispatch(authActions.setAccess(response.data));
       dispatch(authActions.setRefreshHeader());
       dispatch(authActions.setAccessHeader());
       toast.dismiss(loading);
-      toast.success("로그인 성공 했습니다.");
+      toast.success("t)로그인 성공 했습니다.");
       props.bc.postMessage(
           {type: "login", sessionId: sessionStorage.getItem(SESSION_ID)})
       props.closeModal();

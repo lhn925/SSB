@@ -85,11 +85,12 @@ const useTrackPlayer = (bc, userReducer) => {
   }
 
   const localPlyAddTracks = (trackId) => {
-    TrackInfoApi(trackId).then(async (response) => {
+    TrackInfoApi(trackId).then( async (response) => {
       response.data.userId = userReducer.userId;
       response.data.createdDateTime = new Date().getTime();
       response.data.playIndex = playerSettings.item.order;
       const postUser = await fetchUsers(response.data.postUser.id);
+      console.log(postUser);
       if (postUser.length > 0) {
         response.data.postUser = postUser[0];
         localPlyAddTrackInfo(response.data);
@@ -127,7 +128,7 @@ const useTrackPlayer = (bc, userReducer) => {
           return;
         }
 
-        const userMap = await users.reduce((map, val) => {
+        const userMap = users.reduce((map, val) => {
           map.set(val.id, val);
           return map;
         }, new Map());

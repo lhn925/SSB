@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sky.Sss.domain.user.dto.myInfo.UserMyInfoDto;
 
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
@@ -17,18 +18,20 @@ public class UserProfileDto {
     private Integer trackTotalCount;
     private Integer followingCount;
     private String pictureUrl;
+    private UserMyInfoDto userMyInfo;
 
     @Builder
     public UserProfileDto(Long id, String userName,
         int followerCount,
         int followingCount,
         int trackTotalCount,
-        String pictureUrl) {
+        String pictureUrl,UserMyInfoDto userMyInfo) {
         this.id = id;
         this.userName = userName;
         this.followerCount = followerCount;
         this.trackTotalCount = trackTotalCount;
         this.followingCount = followingCount;
         this.pictureUrl = pictureUrl;
+        this.userMyInfo = userMyInfo;
     }
 }

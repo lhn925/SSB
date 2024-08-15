@@ -31,7 +31,7 @@ import {v4 as uuidV4} from "uuid";
 import {
   BeforeUnload, BroadCast,
   CheckUserInfo,
-  disConnectEvent
+  disConnectEvent, WsConnect
 } from "utill/app/functions";
 import useModal from "hoks/modal/useModal";
 import useTrackPlayer from "hoks/trackPlayer/useTrackPlayer";
@@ -45,6 +45,7 @@ import {resetAll} from "./store/actions";
 
 
 import {DropdownProvider, useDropdown} from "context/dropDown/DropdownProvider";
+import useCachedUsers from "./hoks/cachedUsers/useCachedUsers";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -70,8 +71,6 @@ function App() {
   const coverImgFileActions = useMemo(() => (
       createUploadActions(coverImgFiles, setCoverImgFiles)
   ), []);
-  const currentAuth = useAuth();
-  const userReducer = useMyUserInfo();
   const uploadInfo = useUpload();
   const bc = new BroadcastChannel(`my_chanel`);
   const dispatch = useDispatch();
@@ -79,7 +78,7 @@ function App() {
   const navigate = useNavigate();
   const { closeDropdown } = useDropdown();
   const useModal1 = useModal();
-
+  const cachedUsers = useCachedUsers();
   const {
     playingClear,
     changePlaying,
@@ -88,6 +87,9 @@ function App() {
 
   const {t} = useTranslation();
   const client = useRef({client: null});
+
+  const currentAuth = useAuth();
+  const userReducer = useMyUserInfo();
   BroadCast(bc, dispatch, location, changePlaying, playing, t);
 
   BeforeUnload(t, uploadInfo, client.current.client, playingClear,
@@ -121,20 +123,74 @@ function App() {
     }
   }, [client.current.client, uploadInfo.tracks])
 
+  // useEffect(() => {
+  //   async function userReset() {
+  //     if (currentAuth.access == null && userReducer.userId != null) {
+  //       dispatch(resetAll());
+  //       await persistor.purge()
+  //     }
+  //   }
+  //
+  //   userReset().catch(() => console.log("초기화 에러 발생 error"))
+  //   if (currentAuth.access == null) {
+  //     return;
+  //   }
+  //   CheckUserInfo(currentAuth, client, t, bc, userReducer.setUserData);
+  // }, [currentAuth])
+  // useEffect(() => {
+  //   const getMyUserInfo = async () => {
+  //
+  //     // 중복 호출 방지
+  //     if (cachedUsers.cachedUsers.users.length === 0) {
+  //       return;
+  //     }
+  //     const uid = currentAuth.id;
+  //     if (!uid) {
+  //       return;
+  //     }
+  //
+  //     const userArray = await cachedUsers.fetchUsers(uid);
+  //
+  //     const user = userArray[0];
+  //
+  //     console.log(user);
+  //     if (!user) {
+  //       return;
+  //     }
+  //     // 기존 userReducer를 대체 하기 위해
+  //     // id 추가
+  //
+  //     userReducer.setUserData(user);
+  //   }
+  //   getMyUserInfo();
+  //
+  // },[currentAuth])
+
+
   useEffect(() => {
-    async function userReset() {
-      if (currentAuth.access == null && userReducer.userId != null) {
+    async function getUserMyInfo() {
+      if (!client) {
+        return;
+      }
+      if (!currentAuth.id) {
         dispatch(resetAll());
-        await persistor.purge()
+        persistor.purge().catch(e => console.log(e));
+        return;
+      }
+      const fetchUsers = await cachedUsers.fetchUsers(currentAuth.id);
+      if (client.current.client) {
+        client.current.client.deactivate();
+      }
+      if (fetchUsers.length > 0) {
+        const user = fetchUsers[0];
+        userReducer.setUserData(user);
+        WsConnect(client, currentAuth.access, currentAuth.refresh,
+            user.userMyInfo.userId, t, bc);
       }
     }
+    getUserMyInfo();
+  }, [currentAuth.access])
 
-    userReset().catch(() => console.log("초기화 에러 발생 error"))
-    if (currentAuth.access == null) {
-      return;
-    }
-    CheckUserInfo(currentAuth, client, t, bc, userReducer.setUserData);
-  }, [currentAuth]) // 페이지 이동 시 유저정보 확인
 
   return (
 

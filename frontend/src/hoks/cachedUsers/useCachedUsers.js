@@ -2,6 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {cachedUsersActions} from "store/cachedUsers/cachedUsers";
 import FetchUsersProfileApi from "utill/api/users/FetchUsersProfileApi";
 import {toast} from "react-toastify";
+import useAuth from "../auth/useAuth";
 
 const useCachedUsers = () => {
   /**
@@ -10,10 +11,26 @@ const useCachedUsers = () => {
    */
   const cachedUsers = useSelector((state) => state?.cachedUsers);
   const dispatch = useDispatch();
+  const currentAuth = useAuth();
 
+  const fetchMyInfo = async () => {
+
+    if (!currentAuth.id) {
+      return ;
+    }
+
+    fetchUsers(currentAuth.id).then(data => {
+      return data[0]
+    });
+
+  }
   const addUsers = (user) => {
     if (user == null) {
       return;
+    }
+    // lastFetched 가 Null 일 경우에만
+    if (!user.lastFetched) {
+      user.lastFetched = Date.now();
     }
     dispatch(cachedUsersActions.addUsers({user: user}));
   }
@@ -21,7 +38,7 @@ const useCachedUsers = () => {
   const removeUser = (id) => {
     dispatch(cachedUsersActions.removeUser({id: id}));
   }
-  const fetchUserByUserName = (userName) => {
+  const fetchUserByUserName =async (userName) => {
     // 캐시에 사용자가 없는 경우 null 반환
     if (cachedUsers.users.length === 0) {
       return null;
@@ -33,7 +50,7 @@ const useCachedUsers = () => {
     for (const user of userArray) {
       // 사용자가 발견된 경우 해당 사용자 반환, 그렇지 않으면 null 반환
       if (user.userName === userName) {
-        return fetchUsers(user.id);
+        return await fetchUsers(user.id);
       }
     }
     return null;
@@ -73,26 +90,29 @@ const useCachedUsers = () => {
     if (findIds.length === 0) {
       return fetchUsers;
     }
-
     // 찾을려는 유저가 cache에 없거나 cacheTime이 만료된 경우
     if (findIds.length > 0) {
-      const response = await FetchUsersProfileApi(findIds);
-      if (response.code === 200 && response.data.length > 0) {
-        const nowDate = Date.now();
-        response.data.map(user => {
-          user.lastFetched = nowDate;
-          addUsers(user);
-          fetchUsers.push(user);
-        });
-      }
-      if (response.code === 400) {
-        toast.error(response.data?.errorDetails[0].message);
-      }
-      return fetchUsers;
+     await FetchUsersProfileApi(findIds).then(response => {
+        if (response.status === 200 && response.data.length > 0) {
+          const nowDate = Date.now();
+          response.data.map(user => {
+            // user.lastFetched = nowDate;
+            // user.isMyInfo = user.id === userReducer.id;
+            addUsers(user);
+            fetchUsers.push(user);
+          });
+        }
+      }).catch((error) => {
+        if (error.status === 400) {
+          toast.error(error.data?.errorDetails[0].message);
+        }
+      })
     }
+    return fetchUsers;
+
   }
 
-  return {
+  return {fetchMyInfo,
     addUsers, cachedUsers, fetchUsers, removeUser,fetchUserByUserName
   }
 };

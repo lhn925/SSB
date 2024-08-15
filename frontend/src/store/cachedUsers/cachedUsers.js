@@ -10,7 +10,15 @@ const createUsersInfo = (data) => (
       followingCount: data.followingCount,
       trackTotalCount: data.trackTotalCount,
       pictureUrl: data.pictureUrl,
-      lastFetched: data.lastFetched // fetch 시간대
+      userMyInfo: data.userMyInfo != null ? {
+        isLoginBlocked: data.userMyInfo.isLoginBlocked,
+        trackLikedIds: data.userMyInfo.trackLikedIds,
+        followingIds: data.userMyInfo.followingIds,
+        followerIds: data.userMyInfo.followerIds,
+        userId: data.userMyInfo.userId,
+        email: data.userMyInfo.email,
+      } : null,
+      lastFetched: data.lastFetched, // fetch 시간대
     });
 const initialState = {
   users: Array.from(new Map().entries()),

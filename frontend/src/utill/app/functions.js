@@ -7,12 +7,7 @@ import {TempRemoveApi} from "utill/api/upload/TempRemoveApi";
 import {uploadInfoActions} from "store/upload/uploadInfo";
 import {UploadActionsContext, UploadValueContext} from "App";
 import {SESSION_ID} from "utill/enum/localKeyEnum";
-import userReducers, {
-  FOLLOWER_IDS,
-  FOLLOWING_IDS,
-  TRACK_LIKED_IDS
-} from "store/userInfo/userReducers";
-import useMyUserInfo from "hoks/user/useMyUserInfo";
+
 
 export function CheckUserInfo(currentAuth, client, t,
     bc, setUserData) {
@@ -22,7 +17,7 @@ export function CheckUserInfo(currentAuth, client, t,
       client.current.client.deactivate();
     }
     setUserData(userData);
-    Connect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
+    WsConnect(client, currentAuth.access, currentAuth.refresh, userData.userId, t,
         bc);
   }).catch(() => {
     persistor.purge().then(() => {
@@ -33,7 +28,7 @@ export function CheckUserInfo(currentAuth, client, t,
   });
 }
 
-function Connect(client, accessToken, refreshToken, userId, t, bc) {
+export function WsConnect(client, accessToken, refreshToken, userId, t, bc) {
   const clientData = new StompJs.Client({
     brokerURL: `${process.env.REACT_APP_WS_URL}`,
     connectHeaders: {

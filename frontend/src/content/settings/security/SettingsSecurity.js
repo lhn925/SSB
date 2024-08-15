@@ -4,29 +4,30 @@ import {
   SECURITY_LOGIN_STATUS,
   SECURITY_PW_UPDATE
 } from "modal/content/ModalContent";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {toast} from "react-toastify";
 import {
   LoginBlockedApi
 } from "utill/api/settings/security/LoginBlockedApi";
 import {userActions} from "store/userInfo/userReducers";
 
-export function SettingsSecurity({t, userInfo, openModal, dispatch,changeModalType}) {
+export function SettingsSecurity({t, userReducer, openModal, dispatch,changeModalType}) {
 
-  const [isLoginBlocked, setIsLoginBlocked] = useState(Boolean(userInfo.isLoginBlocked));
-
+  const [isLoginBlocked, setIsLoginBlocked] = useState(userReducer.userReducer.isLoginBlocked);
   const variable = useRef({
     isDoubleClick: false // 더블 클릭 방지
   })
+  useEffect(() => {
+    setIsLoginBlocked(userReducer.userReducer.isLoginBlocked)
+  },[userReducer.userReducer.isLoginBlocked])
+
   const onLoginBlockedChange = async (e) => {
     const checked = e.target.checked;
-
     // 더블 클릭 방지
     if (variable.current.isDoubleClick) {
       return;
     }
     variable.current.isDoubleClick = true;
-
     let code = `msg.blockChange.loginUnblock`;
     if (checked) {
       code = `msg.blockChange.loginBlock`;
@@ -35,8 +36,7 @@ export function SettingsSecurity({t, userInfo, openModal, dispatch,changeModalTy
     variable.current.isDoubleClick = false;
     if (response.code === 200) {
       toast.success(t(code));
-      setIsLoginBlocked(checked);
-      dispatch(userActions.setIsLoginBlocked({isLoginBlocked:checked}))
+      await userReducer.updateIsLoginBlocked(checked);
     } else {
       toast.error(t(`errorMsg.server`))
     }

@@ -19,31 +19,23 @@ import sky.Sss.global.file.utili.FileStore;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserMyInfoDto implements Serializable {
 
-    private Long id;
     private String userId;
     private String email;
-    private String userName;
-    private String pictureUrl;
     private Boolean isLoginBlocked;
     private Boolean isAdmin;
     private List<Long> trackLikedIds;
     private List<Long> followingIds;
     private List<Long> followerIds;
-    private Integer trackUploadCount;
 
-    public UserMyInfoDto(Long id,String userId, String email, String userName, String pictureUrl, Boolean isLoginBlocked,
-        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds,List<Long> followerIds,Integer trackUploadCount) {
-        this.id = id;
+    public UserMyInfoDto(String userId, String email, Boolean isLoginBlocked,
+        UserGrade userGrade, List<Long> trackLikedIds, List<Long> followingIds,List<Long> followerIds) {
         this.userId = userId;
         this.email = email;
-        this.userName = userName;
-        this.pictureUrl = pictureUrl;
         this.isLoginBlocked = isLoginBlocked;
         this.isAdmin = userGrade.equals(UserGrade.ADMIN);
         this.trackLikedIds = trackLikedIds;
         this.followingIds = followingIds;
         this.followerIds = followerIds;
-        this.trackUploadCount = trackUploadCount;
     }
 
 

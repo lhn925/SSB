@@ -10,6 +10,7 @@ import sky.Sss.global.redis.dto.RedisKeyDto;
 @Setter(AccessLevel.PRIVATE)
 public class LoginSuccessTokenDto {
 
+    private Long id;
     private String accessToken;
     private String refreshToken;
 
@@ -21,8 +22,10 @@ public class LoginSuccessTokenDto {
         this.refreshToken = refreshToken;
     }
 
-    public static LoginSuccessTokenDto createJwtTokenDto (String accessToken,String refreshToken) {
+    public static LoginSuccessTokenDto createJwtTokenDto (Long id,String accessToken,String refreshToken) {
         LoginSuccessTokenDto jwtTokenDto = new LoginSuccessTokenDto();
+        jwtTokenDto.setId(id);
+
         jwtTokenDto.setAccessToken(accessToken);
         jwtTokenDto.setRefreshToken(refreshToken);
         return jwtTokenDto;

@@ -27,8 +27,6 @@ function Header({
 }) {
   const {t} = useTranslation();
   const variable = useRef({isDoubleClick: false});
-  const [userInfo, setUserInfo] = useState(userReducer);
-
   const clickBtnLogout = async () => {
     if (variable.current.isDoubleClick) {
       return;
@@ -47,9 +45,6 @@ function Header({
       }
     });
   }
-  useEffect(() => {
-    setUserInfo(userReducer);
-  }, [userReducer, currentAuth])
   const openModalHandler = () => {
     changeModalType(LOGIN)
     openModal();
@@ -93,12 +88,12 @@ function Header({
             </div>
             <div>
               {
-                userInfo.userId !== null ? <CircularImageDropdown
+                userReducer.userName ? <CircularImageDropdown
                     clickBtnLogout={clickBtnLogout}
                     navigate={navigate}
                     client={client}
-                    userName={userInfo.userName}
-                    pictureUrl={userInfo.pictureUrl}
+                    userName={userReducer.userName}
+                    pictureUrl={userReducer.pictureUrl}
                 /> : <>
                   <button onClick={openModalHandler}
                           className="btn-login-open btn-blue-outline btn-outline">
@@ -111,10 +106,8 @@ function Header({
           </div>
         </div>
       </header>
-
   )
 }
-
 function CircularImageDropdown({
   pictureUrl,
   userName,

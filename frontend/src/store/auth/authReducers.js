@@ -3,6 +3,7 @@ import {PURGE} from "redux-persist/es/constants";
 import {RESET_ALL} from "store/actions/Types";
 
 const initialState = {
+  id:null,
   access: null,
   refresh: null,
   accessHeader: {},
@@ -15,7 +16,9 @@ const authReducers = createSlice({
     reset(state) {
       Object.assign(state, initialState)
     },
-    setAccess(state, action) {
+    setId(state,action) {
+      state.id = action.payload.id;
+    }, setAccess(state, action) {
       state.access = action.payload.accessToken;
     }, setRefresh(state, action) {
       state.refresh = action.payload.refreshToken;
@@ -34,6 +37,7 @@ const authReducers = createSlice({
 
 export let authActions = {
   reset: authReducers.actions.reset,
+  setId: authReducers.actions.setId,
   setAccess: authReducers.actions.setAccess,
   setRefresh: authReducers.actions.setRefresh,
   setAccessHeader: authReducers.actions.setAccessHeader,

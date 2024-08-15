@@ -66,6 +66,7 @@ public class UserLoginService {
             throw new RefreshTokenNotFoundException("refresh.error");
         }
     }
+
     @Transactional
     public ResponseEntity<?> loginActions(UserLoginFormDto userLoginFormDto, HttpServletRequest request,
         String userAgent, String captchaKey, HttpSession session) throws NoSuchFileException {
@@ -100,7 +101,8 @@ public class UserLoginService {
 
             loginSuccess = LoginSuccess.SUCCESS;
 
-            LoginSuccessTokenDto successTokenDto = LoginSuccessTokenDto.createJwtTokenDto(jwtTokenDto.getAccessToken(),
+            LoginSuccessTokenDto successTokenDto = LoginSuccessTokenDto.createJwtTokenDto(uid,
+                jwtTokenDto.getAccessToken(),
                 jwtTokenDto.getRefreshToken());
             return new ResponseEntity<>(successTokenDto, HttpStatus.OK);
         } catch (LoginBlockException e) {
