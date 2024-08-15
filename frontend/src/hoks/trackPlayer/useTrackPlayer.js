@@ -22,8 +22,12 @@ import {localPlyTracksActions} from "store/trackplayer/localPlyTracks";
 import {resetCurrentTrack, resetLocalPlyTrack} from "store/actions/index";
 import {useTranslation} from "react-i18next";
 import useCachedUsers from "hoks/cachedUsers/useCachedUsers";
+import {
+  MessageSender,
+  useBroadcastChannel
+} from "../../context/broadCast/useBroadcastChannel";
 
-const useTrackPlayer = (bc, userReducer) => {
+const useTrackPlayer = (userReducer) => {
   const dispatch = useDispatch();
   const playing = useSelector(state => state?.playingReducer);
   const currentTrack = useSelector(state => state?.currentTrack);
@@ -32,7 +36,9 @@ const useTrackPlayer = (bc, userReducer) => {
   const localPlayLog = useSelector(state => state?.localPlayLog);
   const localPlyTracks = useSelector(state => state?.localPlyTracks);
   const {t} = useTranslation();
-  const {addUsers, cachedUsers, fetchUsers, removeUser} = useCachedUsers();
+  const bc = useBroadcastChannel();
+  const {fetchUsers} = useCachedUsers();
+
 
   const playingClear = () => {
     dispatch(playingActions.clear());
@@ -90,7 +96,6 @@ const useTrackPlayer = (bc, userReducer) => {
       response.data.createdDateTime = new Date().getTime();
       response.data.playIndex = playerSettings.item.order;
       const postUser = await fetchUsers(response.data.postUser.id);
-      console.log(postUser);
       if (postUser.length > 0) {
         response.data.postUser = postUser[0];
         localPlyAddTrackInfo(response.data);

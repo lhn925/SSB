@@ -46,6 +46,7 @@ import {resetAll} from "./store/actions";
 
 import {DropdownProvider, useDropdown} from "context/dropDown/DropdownProvider";
 import useCachedUsers from "./hoks/cachedUsers/useCachedUsers";
+import {useBroadcastChannel} from "./context/broadCast/useBroadcastChannel";
 
 // React Lazy 는 import 하려는 컴포넌트가 defaul export 되었다는 전제하에 실행 되기 때문에
 // named export 는 설정을 따로 해주어야 한다
@@ -72,7 +73,7 @@ function App() {
       createUploadActions(coverImgFiles, setCoverImgFiles)
   ), []);
   const uploadInfo = useUpload();
-  const bc = new BroadcastChannel(`my_chanel`);
+  const bc = useBroadcastChannel();
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
