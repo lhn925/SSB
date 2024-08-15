@@ -446,7 +446,7 @@ public class TrackService {
         // 비회원 플레이 X
         // 해당 트랙에 접근 권한이 없을 경우 플레이 x
         trackPlayMetricsService.addAllPlayLog(userAgent, trackPlayRepDto, ssbTrack, user);
-        updateIsOwner(trackPlayRepDto, user, isOwnerPost);
+        updateIsOwner(trackPlayRepDto, ssbTrack.getUser(), isOwnerPost);
 
         return trackPlayRepDto;
     }
