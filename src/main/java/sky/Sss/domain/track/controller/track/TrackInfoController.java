@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sky.Sss.domain.track.dto.track.rep.TotalLengthRepDto;
 import sky.Sss.domain.track.dto.track.common.TrackInfoSimpleDto;
+import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.track.dto.track.reply.TracksInfoReqDto;
 import sky.Sss.domain.track.exception.checked.SsbTrackAccessDeniedException;
 import sky.Sss.domain.track.service.track.TrackService;
@@ -38,12 +39,12 @@ public class TrackInfoController {
      * @throws SsbTrackAccessDeniedException
      */
     @GetMapping("/search/{id}")
-    public ResponseEntity<TrackInfoSimpleDto> searchTrackInfo(@PathVariable Long id) throws SsbTrackAccessDeniedException {
-        TrackInfoSimpleDto trackInfoSimpleDto = trackService.getTrackInfoSimpleDto(id);
-        if (trackInfoSimpleDto == null) {
+    public ResponseEntity<TrackDetailDto> searchTrackInfo(@PathVariable Long id) throws SsbTrackAccessDeniedException {
+        TrackDetailDto trackDetailDto = trackService.getTrackInfoSimpleDto(id);
+        if (trackDetailDto == null) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok(trackInfoSimpleDto);
+        return ResponseEntity.ok(trackDetailDto);
     }
 
 
@@ -54,8 +55,8 @@ public class TrackInfoController {
      * @throws SsbTrackAccessDeniedException
      */
     @GetMapping("/search/list")
-    public ResponseEntity<List<TrackInfoSimpleDto>> getTrackInfoList(@ModelAttribute TracksInfoReqDto tracksInfoReqDto) throws SsbTrackAccessDeniedException {
-        List<TrackInfoSimpleDto> simpleDtoList = trackService.getTrackInfoSimpleDtoList(tracksInfoReqDto);
+    public ResponseEntity<List<TrackDetailDto>> getTrackInfoList(@ModelAttribute TracksInfoReqDto tracksInfoReqDto) throws SsbTrackAccessDeniedException {
+        List<TrackDetailDto> simpleDtoList = trackService.getTrackInfoSimpleDtoList(tracksInfoReqDto);
 
         if (simpleDtoList.isEmpty()) {
             throw new SsbTrackAccessDeniedException("track.error.forbidden", HttpStatus.FORBIDDEN);

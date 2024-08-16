@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "css/playerBar/playList.css"
 import "css/playerBar/queue.css"
 import "css/playerBar/item-view.css"
@@ -12,6 +12,8 @@ import {
 import {PLUS} from "content/trackplayer/NumberSignTypes";
 import {LOCAL_PLY_KEY, LOCAL_PLY_LOG} from "utill/enum/localKeyEnum";
 import profile2 from "css/image/profile2.png";
+import useCachedTracks from "../../hoks/cachedTracks/useCachedTracks";
+
 export function PlayList({
   changeOrder,
   getPlyTrackByTrackId,
@@ -40,40 +42,87 @@ export function PlayList({
   t, useMyInfo
 }) {
 
+  const [infoTracks, setInfoTracks] = useState([]);
+
+  const {tracks} = useCachedTracks();
+  useEffect(() => {
+    const fetchTracks = async () => {
+      const updatedTracks = [];
+      for (const item of localPlyInfo) {
+        const newVar = await getPlyTrackByTrackId(item.id);
+        updatedTracks.push({...item,info:newVar})
+      }
+      setInfoTracks(updatedTracks);
+    };
+    fetchTracks();
+  }, [localPlyInfo]);
+  // const onClickPlayButtonHandler = (e) => {
+  //   const index = Number.parseInt(e.currentTarget.dataset.id);
+  //   const trackEq = index === trackInfo.index;
+  //   let currOrder = index - 1;
+  //   // 현재 셔플 재생이라면
+  //   // Index 위치 값 반환
+  //   // 선택한 곡이 현재 재생 곡일경우 그리고 재생하고 있을 경우
+  //   // 일시정지후 return
+  //   if (trackEq && isPlaying) {
+  //     changePlaying(false);
+  //     return;
+  //   }
+  //   if (settingsInfo.shuffle) {
+  //     for (let i = 0; i < playOrders.length; i++) {
+  //       const order = playOrders[i];
+  //       if (order === currOrder) {
+  //         currOrder = i;
+  //         break;
+  //       }
+  //     }
+  //   }
+  //
+  //   if (trackEq && !isPlaying) {
+  //     if (currPlayLog.trackId !== -1) {
+  //       changePlaying(true);
+  //       return;
+  //     }
+  //     resetPlayedSeconds();
+  //     createCurrentPlayLog(currOrder, PLUS);
+  //     changePlaying(true);
+  //     return;
+  //   }
+  //   resetPlayedSeconds();
+  //   updateOrderAndSign(currOrder, PLUS);
+  //   changePlaying(true);
+  // }
+
   const onClickPlayButtonHandler = (e) => {
     const index = Number.parseInt(e.currentTarget.dataset.id);
     const trackEq = index === trackInfo.index;
     let currOrder = index - 1;
-    // 현재 셔플 재생이라면
-    // Index 위치 값 반환
-    // 선택한 곡이 현재 재생 곡일경우 그리고 재생하고 있을 경우
-    // 일시정지후 return
-    if (trackEq && isPlaying) {
-      changePlaying(false);
-      return;
-    }
-    if (settingsInfo.shuffle) {
-      for (let i = 0; i < playOrders.length; i++) {
-        const order = playOrders[i];
-        if (order === currOrder) {
-          currOrder = i;
-          break;
+
+
+
+    // 선택한 곡이 현재 재생 곡일 경우
+    if (trackEq) {
+      if (isPlaying) {
+        changePlaying(false); // 재생 중이면 일시 정지
+      } else {
+        if (currPlayLog.trackId !== -1) {
+          changePlaying(true); // 재생 중이지 않고, PlayLog가 있으면 재생
+        } else {
+          resetPlayedSeconds();
+          createCurrentPlayLog(currOrder, PLUS); // 새 PlayLog 생성
+          changePlaying(true);
         }
       }
-    }
-
-    if (trackEq && !isPlaying) {
-      if (currPlayLog.trackId !== -1) {
-        changePlaying(true);
-        return;
-      }
-      resetPlayedSeconds();
-      createCurrentPlayLog(currOrder, PLUS);
-      changePlaying(true);
       return;
     }
+
+    // 셔플 재생 중이라면, 순서를 맞춤
+    if (settingsInfo.shuffle) {
+      currOrder = playOrders.findIndex(order => order === currOrder);
+    }
+
     resetPlayedSeconds();
-    updateOrderAndSign(currOrder, PLUS);
+    updateOrderAndSign(currOrder, PLUS); // 새로운 곡 재생
     changePlaying(true);
   }
 
@@ -159,7 +208,7 @@ export function PlayList({
                         {(provided) => getDragAndDrop(provided, localPlyInfo,
                             getPlyTrackByTrackId, trackInfo, isPlaying,
                             onClickPlayButtonHandler, toggleLike,
-                            onClickRmBtnHandler, t,useMyInfo)}
+                            onClickRmBtnHandler, t, useMyInfo,infoTracks)}
                       </Droppable>
                     </DragDropContext>
                     }
@@ -185,12 +234,13 @@ export function PlayList({
 }
 
 function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
-    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler, t,useMyInfo) {
+    isPlaying, onClickPlayButtonHandler, toggleLike, onClickRmBtnHandler, t,
+    useMyInfo,infoTracks) {
 
-  const infoTracks = localPlyInfo.map((item) => ({
-    ...item, info: getPlyTrackByTrackId(item.id)
-  }))
-
+  // const infoTracks = await Promise.all(localPlyInfo.map(async (item) => {
+  //   const newVar = await getPlyTrackByTrackId(item.id);
+  //   return { ...item, info: newVar };
+  // }));
   infoTracks.sort(function (a, b) {
     return sorted(a, b);
   });
@@ -198,9 +248,10 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
               ref={provided.innerRef}>
     {infoTracks.map((data, index) => (
 
-        data.isStatus !== 0 && <Draggable key={data.index}
-                                          draggableId={data.index + ""}
-                                          index={index}>
+        data.info && data.isStatus !== 0 && <Draggable key={data.index}
+                                                       draggableId={data.index
+                                                           + ""}
+                                                       index={index}>
           {(provided) => (
               <>
                 <div ref={provided.innerRef}{...provided.draggableProps}>
@@ -222,7 +273,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                             <img style={{backgroundColor: '#fff'}}
                                  className="player_cover_img"
                                  src={data.info.coverUrl
-                                    ? USERS_FILE_IMAGE + data.info.coverUrl : profile2} alt="cover"/>
+                                     ? USERS_FILE_IMAGE + data.info.coverUrl
+                                     : profile2} alt="cover"/>
                           </a>
                         </div>
                         <div className="queueItemView__playButton"
@@ -263,7 +315,8 @@ function getDragAndDrop(provided, localPlyInfo, getPlyTrackByTrackId, trackInfo,
                             !data.info.isOwner &&
                             <button type="button"
                                     className={"sc-button-like"
-                                        + (useMyInfo.isTrackLike(data.id) ? "-t" : "") +
+                                        + (useMyInfo.isTrackLike(data.id) ? "-t"
+                                            : "") +
                                         " queueItemView__like sc-button sc-button-small sc-button-icon sc-button-nostyle"}
                                     aria-describedby="tooltip-10505"
                                     tabIndex={0}

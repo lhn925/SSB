@@ -77,6 +77,8 @@ public class UserProfileService {
      * 유저 팔로잉 , 팔로우 , 업로드 트랙 수를 가져오는 API
      */
     public UserProfileDto getProfileHeader(User profileUser) {
+
+        UserProfileDtoBuilder builder = UserProfileDto.builder();
         // 본인 정보
         User user = userQueryService.findOne();
         // 본인 프로필 여부
@@ -87,6 +89,7 @@ public class UserProfileService {
 
         // 총 Tracks 수 본인이 아닐시에는 비공개 트랙 제외
         if (isMyProfile) {
+            builder.userMyInfo(getUserMyInfoDto());
             uploadCountDto = trackQueryService.getMyUploadCount(profileUser, Status.ON);
         } else {
             uploadCountDto = trackQueryService.getUserUploadCount(profileUser, Status.ON);
@@ -102,7 +105,7 @@ public class UserProfileService {
         // 팔로워 리스트
         List<RedisFollowsDto> userFollowsList = userFollowsService.getFollowersUsersFromCacheOrDB(profileUser);
         int totalFollowerCount = userFollowsList.size();
-        return UserProfileDto.builder().id(profileUser.getId())
+        return builder.id(profileUser.getId())
             .userName(profileUser.getUserName())
             .followerCount(totalFollowerCount)
             .followingCount(totalFollowingCount)
@@ -202,18 +205,21 @@ public class UserProfileService {
 
             List<LikedRedisDto> recentLikeTracks = likedRedisDtoList.subList(0, recentSize);
 
-            Map<Long, LikedRedisDto> likedToMap = recentLikeTracks.stream()
-                .collect(Collectors.toMap(LikedRedisDto::getTargetId, value -> value));
+//            Map<Long, LikedRedisDto> likedToMap = recentLikeTracks.stream()
+//                .collect(Collectors.toMap(LikedRedisDto::getTargetId, value -> value));
 
-            List<TrackDetailDto> trackDetailDtoList = trackInfoService.getTrackInfoList(likedToMap.keySet(), user);
+//            List<TrackDetailDto> trackDetailDtoList = trackInfoService.getTrackInfoList(likedToMap.keySet(), user);
 
-            for (TrackDetailDto trackDetailDto : trackDetailDtoList) {
-                LikedRedisDto likedRedisDto = likedToMap.get(trackDetailDto.getTrackInfo().getId());
-                if (likedRedisDto != null) {
-                    trackTargetWithCountDto.addTarget(likedRedisDto.getId(), trackDetailDto,
-                        likedRedisDto.getCreatedDateTime());
-                }
+//            for (TrackDetailDto trackDetailDto : trackDetailDtoList) {
+//                LikedRedisDto likedRedisDto = likedToMap.get(trackDetailDto.getTrackInfo().getId());
+//                if (likedRedisDto != null) {
+
+            for (LikedRedisDto recentLikeTrack : recentLikeTracks) {
+                trackTargetWithCountDto.addTarget(recentLikeTrack.getId(), recentLikeTrack.getTargetId(),
+                    recentLikeTrack.getCreatedDateTime());
             }
+//                }
+//            }
 
             trackTargetWithCountDto.getTargetInfos().sort(Comparator.comparing(TrackInfo::getLikeId).reversed());
         } else {

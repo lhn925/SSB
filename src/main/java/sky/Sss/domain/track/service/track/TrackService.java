@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sky.Sss.domain.feed.entity.SsbFeed;
 import sky.Sss.domain.feed.service.FeedService;
+import sky.Sss.domain.track.dto.track.rep.TrackDetailDto;
 import sky.Sss.domain.track.dto.track.req.BaseTrackDto;
 import sky.Sss.domain.track.dto.playlist.req.PlayListTrackInfoReqDto;
 import sky.Sss.domain.track.dto.playlist.redis.PlyTracksPositionRedisDto;
@@ -77,6 +78,7 @@ public class TrackService {
     private final FeedService feedService;
     private final RepostCommonService repostCommonService;
     private final UserFollowsService userFollowsService;
+    private final TrackInfoService trackInfoService;
 
     private final PlyTracksService plyTracksService;
     private final RedisCacheService redisCacheService;
@@ -166,6 +168,7 @@ public class TrackService {
     public Integer getTotalLength(User user) {
         return trackQueryService.getTotalLength(user);
     }
+
     public Integer getTotalLength() {
         User user = userQueryService.findOne();
         return getTotalLength(user);
@@ -451,7 +454,7 @@ public class TrackService {
         return trackPlayRepDto;
     }
 
-    public TrackInfoSimpleDto getTrackInfoSimpleDto(long id) {
+    public TrackDetailDto getTrackInfoSimpleDto(long id) {
         User user = null;
         boolean isMember = true;
         try {
@@ -460,38 +463,35 @@ public class TrackService {
             // 비회원인지 확인
             isMember = false;
         }
-        List<TrackInfoSimpleDto> simpleDtoList;
+        List<TrackDetailDto> detailDtoList;
         Set<Long> ids = new HashSet<>();
         ids.add(id);
-        if (isMember) {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, user, Status.ON);
-        } else {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(ids, Status.ON);
-        }
 
-        if (simpleDtoList.isEmpty()) {
+        detailDtoList = trackInfoService.getTrackInfoList(ids, user);
+
+        if (detailDtoList.isEmpty()) {
             return null;
         }
-        return simpleDtoList.get(0);
+        return detailDtoList.get(0);
     }
 
-    public List<TrackInfoSimpleDto> getTrackInfoSimpleDtoList(TracksInfoReqDto tracksInfoReqDto) {
+    public List<TrackDetailDto> getTrackInfoSimpleDtoList(TracksInfoReqDto tracksInfoReqDto) {
         Set<Long> idSet = new HashSet<>(tracksInfoReqDto.getIds());
         User user = null;
-        boolean isMember = true;
+//        boolean isMember = true;
         try {
             user = userQueryService.findOne();
         } catch (UserInfoNotFoundException e) {
             // 비회원인지 확인
-            isMember = false;
+//            isMember = false;
         }
-        List<TrackInfoSimpleDto> simpleDtoList = null;
-        if (isMember) {
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, user, Status.ON);
-        } else {
-            // 비회원일 경우 liked 포함 X
-            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, Status.ON);
-        }
+        List<TrackDetailDto> simpleDtoList = null;
+//        if (isMember) {
+            simpleDtoList = trackInfoService.getTrackInfoList(idSet, user);
+//        } else {
+//            // 비회원일 경우 liked 포함 X
+//            simpleDtoList = trackQueryService.getTrackInfoSimpleDtoList(idSet, Status.ON);
+//        }
         return simpleDtoList;
     }
 
@@ -515,6 +515,7 @@ public class TrackService {
         User user = userQueryService.findOne();
         removeTrack(id, token, user);
     }
+
     @Transactional
     public void removeTrack(Long id, String token, User user) {
         // 여기

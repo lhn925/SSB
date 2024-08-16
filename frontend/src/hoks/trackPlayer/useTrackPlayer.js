@@ -18,7 +18,9 @@ import {
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import TrackInfoSearchListApi
   from "utill/api/trackPlayer/TrackInfoSearchListApi";
-import {localPlyTracksActions} from "store/trackplayer/localPlyTracks";
+import {
+  cachedTracksActions
+} from "store/trackplayer/cachedTracks";
 import {resetCurrentTrack, resetLocalPlyTrack} from "store/actions/index";
 import {useTranslation} from "react-i18next";
 import useCachedUsers from "hoks/cachedUsers/useCachedUsers";
@@ -26,15 +28,19 @@ import {
   MessageSender,
   useBroadcastChannel
 } from "../../context/broadCast/useBroadcastChannel";
+import useMyUserInfo from "../user/useMyUserInfo";
+import {isAsyncThunkAction} from "@reduxjs/toolkit";
+import useCachedTracks from "../cachedTracks/useCachedTracks";
 
-const useTrackPlayer = (userReducer) => {
+const useTrackPlayer = () => {
   const dispatch = useDispatch();
+  const {userReducer} = useMyUserInfo();
   const playing = useSelector(state => state?.playingReducer);
   const currentTrack = useSelector(state => state?.currentTrack);
   const playerSettings = useSelector(state => state?.playerSettings);
   const localPly = useSelector(state => state?.localPly);
   const localPlayLog = useSelector(state => state?.localPlayLog);
-  const localPlyTracks = useSelector(state => state?.localPlyTracks);
+  const cachedTracks = useCachedTracks();
   const {t} = useTranslation();
   const bc = useBroadcastChannel();
   const {fetchUsers} = useCachedUsers();
@@ -61,15 +67,7 @@ const useTrackPlayer = (userReducer) => {
         }
     ));
   }
-  const updatePlyTrackInfo = (trackId, key, value) => {
-    dispatch(localPlyTracksActions.updatePlyTrackInfo(
-        {
-          id: trackId,
-          key: key,
-          value: value
-        }
-    ));
-  }
+
   const changePlyTrackInfo = (data) => {
     dispatch(localPlyActions.changePlyTrackInfo(
         {
@@ -90,28 +88,36 @@ const useTrackPlayer = (userReducer) => {
     ));
   }
 
-  const localPlyAddTracks = (trackId) => {
-    TrackInfoApi(trackId).then( async (response) => {
-      response.data.userId = userReducer.userId;
-      response.data.createdDateTime = new Date().getTime();
-      response.data.playIndex = playerSettings.item.order;
-      const postUser = await fetchUsers(response.data.postUser.id);
-      if (postUser.length > 0) {
-        response.data.postUser = postUser[0];
-        localPlyAddTrackInfo(response.data);
+  const localPlyAddTracks = async (trackId) => {
+
+    const response = await cachedTracks.fetchTracks(trackId);
+    try {
+      const track = {...response[0]};
+      track.userId = userReducer.userId;
+      track.createdDateTime = new Date().getTime();
+      track.playIndex = playerSettings.item.order;
+      // localPlyAddTrackInfo(track);
+      if (track) {
         dispatch(localPlyActions.addTracks(
-            {data: response.data, text: t(`msg.player.local.limit`)}));
+            {data: track, text: t(`msg.player.local.limit`)}));
       }
-    }).catch((error) => {
+      // const postUser = await fetchUsers(track.trackInfo.postUser.id);
+      //
+      // if (postUser.length > 0) {
+      //   track.trackInfo.postUser = postUser[0];
+      // }
+    } catch (error ){
+      console.error(error)
       toast.error(error.message);
-    })
+    }
   }
   const localPlyAddTrackInfo = (data) => {
-    dispatch(localPlyTracksActions.addTrackInfo({data: data}));
+
+    cachedTracks.addTrack(data);
   }
 
   // 로컬 플레이리스트 정보 최신화
-  const localPlyCreate = () => {
+  const localPlyCreate = async () => {
     const localPly = loadFromLocalStorage(LOCAL_PLY_KEY);
 
     // userId 가 null일 경우
@@ -123,29 +129,28 @@ const useTrackPlayer = (userReducer) => {
     if (statusList && statusList.length > 0) {
       const searchIds = statusList.map(item => item.id);
       const updatePly = [];
-      TrackInfoSearchListApi(searchIds).then(async (r) => {
-        const searchTracks = r.data;
+     await cachedTracks.fetchTracks(...searchIds).then(async (r) => {
+        const searchTracks = r;
         const uIds = searchTracks.map(track => track.postUser.id);
-
         const users = await fetchUsers(uIds);
         if (users.length === 0) {
           removeFromLocalStorage(LOCAL_PLY_KEY);
           return;
         }
-
         const userMap = users.reduce((map, val) => {
           map.set(val.id, val);
           return map;
         }, new Map());
 
         searchTracks.map(search => {
-          search.postUser = userMap.get(search.postUser.id);
-          localPlyAddTrackInfo(search);
+          const trackInfo = search;
+          trackInfo.postUser = userMap.get(trackInfo.postUser.id);
+          // localPlyAddTrackInfo(search);
           const findInfo = statusList.filter(
-              local => search.id === local.id);
+              local => trackInfo.id === local.id);
           findInfo.map(info => {
-            search.index = info.index;
-            search.createdDateTime = info.createdDateTime;
+            trackInfo.index = info.index;
+            trackInfo.createdDateTime = info.createdDateTime;
             updatePly.push(createPlyInfo(search));
           })
         })
@@ -176,12 +181,11 @@ const useTrackPlayer = (userReducer) => {
     }
     return statusOnLocalPly;
   }
-  const getPlyTrackByOrder = (order, numberSign) => {
+  const getPlyTrackByOrder = async (order, numberSign) => {
     const localPlyItem = calculateOrder(order, localPly.item,
         localPly.playOrders, getStatusOnLocalPly(), numberSign, updateSettings);
     if (localPlyItem) {
-      const findTrack = localPlyTracks.tracks.filter(
-          track => track.id === localPlyItem.id);
+      const findTrack = await cachedTracks.fetchTracks(localPlyItem.id);
       // findTrack.index = localPlyItem.index;
       // findTrack.addDateTime = localPlyItem.createdDateTime;
       if (findTrack.length > 0) {
@@ -194,14 +198,14 @@ const useTrackPlayer = (userReducer) => {
     }
     return undefined;
   }
-  const getPlyTrackByTrackId = (trackId) => {
-    const findTrack = localPlyTracks.tracks.filter(
-        track => track.id === trackId);
+  const getPlyTrackByTrackId = async (trackId) => {
+    const findTrack = await cachedTracks.fetchTracks(trackId);
     if (findTrack.length > 0) {
       return findTrack[0];
     }
     return undefined;
   }
+
   const changePlaying = (isPlaying) => {
     if (isPlaying) {
       bc.postMessage({type: "playing", key: playing.key});
@@ -219,7 +223,7 @@ const useTrackPlayer = (userReducer) => {
     // return updateList;
   }
   const changePlyVisible = (isVisible) => {
-    dispatch(localPlyTracksActions.changePlyVisible({isVisible: isVisible}));
+    cachedTracks.changePlyVisible(isVisible);
   }
 
   const changeOrder = (items) => {
@@ -230,25 +234,25 @@ const useTrackPlayer = (userReducer) => {
   }
 
   // 현재 트랙정보 가져오기 재생 url x
-  const createCurrentTrack = (order, numberSign) => {
+  const createCurrentTrack = async (order, numberSign) => {
     updateSettings("played", 0);
     updateSettings("playedSeconds", 0);
-    const data = getPlyTrackByOrder(order, numberSign);
+    const data = await getPlyTrackByOrder(order, numberSign);
     if (data === undefined) {
       return;
     }
     dispatch(currentActions.create({info: data}))
   }
-  const changeCurrTrackInfo = (order, numberSign) => {
-    const data = getPlyTrackByOrder(order, numberSign);
+  const changeCurrTrackInfo = async (order, numberSign) => {
+    const data = await getPlyTrackByOrder(order, numberSign);
     if (data === undefined) {
       return;
     }
     dispatch(currentActions.changeTrackInfo({info: data}))
   }
 // order 정보 가져오기
-  const createCurrentPlayLog = (order, numberSign) => {
-    const trackInfo = getPlyTrackByOrder(order, numberSign);
+  const createCurrentPlayLog = async (order, numberSign) => {
+    const trackInfo = await getPlyTrackByOrder(order, numberSign);
     if (trackInfo === undefined) {
       return;
     }
@@ -300,11 +304,23 @@ const useTrackPlayer = (userReducer) => {
     ));
   }
 
+
+
+  const addTrackAndPlay = (id) => {
+    localPlyAddTracks(id);
+
+  }
+
+  const updatePlyTrackInfo = (trackId, key, value) => {
+    cachedTracks.updatePlyTrackInfo(trackId,key,value)
+  }
+
+
   return {
     removePlyByIndex,
     changeOrder,
     getPlyTrackByTrackId,
-    localPlyTracks,
+    cachedTracks,
     changeCurrTrackInfo,
     updatePlyTrackInfo,
     changePlayLog,

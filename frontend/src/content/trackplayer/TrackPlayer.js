@@ -24,7 +24,7 @@ import {MINUS, PLUS} from "content/trackplayer/NumberSignTypes";
 import {LOCAL_PLY_KEY} from "utill/enum/localKeyEnum";
 import {useTranslation} from "react-i18next";
 import {useSelector} from "react-redux";
-import useMyUserInfo from "../../hoks/user/useMyUserInfo";
+import useMyUserInfo from "hoks/user/useMyUserInfo";
 import profile2 from "css/image/profile2.png";
 
 /**
@@ -35,7 +35,7 @@ import profile2 from "css/image/profile2.png";
 export const TrackPlayer = ({
   changeOrder,
   getPlyTrackByTrackId,
-  localPlyTracks,
+  cachedTracks,
   changeCurrTrackInfo,
   updatePlyTrackInfo,
   changePlayLog,
@@ -78,7 +78,7 @@ export const TrackPlayer = ({
   const {t} = useTranslation();
   const useMyInfo = useMyUserInfo();
 
-  const [isVisible, setVisible] = useState(localPlyTracks.isVisible);
+  const [isVisible, setVisible] = useState(cachedTracks.isVisible);
   const variable = useRef({
     isDoubleClick: false // 더블 클릭 방지
   })
@@ -226,7 +226,7 @@ export const TrackPlayer = ({
       return;
     }
     changeCurrTrackInfo(settingsInfo.order);
-  }, [localPlyTracks.tracks]);
+  }, [cachedTracks.tracks]);
 
   useEffect(() => {
     setIsPlaying(playing.item.playing);

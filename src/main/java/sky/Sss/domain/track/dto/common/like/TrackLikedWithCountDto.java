@@ -26,23 +26,23 @@ public class TrackLikedWithCountDto {
         this.totalCount = totalCount;
     }
 
-    public void addTarget(long id, TrackDetailDto trackDetailDto, LocalDateTime createdDateTime) {
-        this.targetInfos.add(new TrackInfo(id, trackDetailDto, createdDateTime));
+    public void addTarget(long id, long trackId, LocalDateTime createdDateTime) {
+        this.targetInfos.add(new TrackInfo(id, trackId, createdDateTime));
     }
 
     @Getter
     @Setter(PRIVATE)
     public static class TrackInfo {
 
-        private Long id;
+        private Long likeId;
 
-        private TrackDetailDto detail;
+        private Long trackId;
 
         private LocalDateTime createdDateTime;
 
-        public TrackInfo(long id, TrackDetailDto trackInfo, LocalDateTime createdDateTime) {
-            this.id = id;
-            this.detail = trackInfo;
+        public TrackInfo(long likeId, long trackId, LocalDateTime createdDateTime) {
+            this.likeId = likeId;
+            this.trackId = trackId;
             this.createdDateTime = createdDateTime;
         }
     }
